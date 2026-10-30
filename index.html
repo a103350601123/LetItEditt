@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LetItEdit — Professional Human Editing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;800&display=swap" rel="stylesheet">
+<!-- Load Supabase Library -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'Inter', system-ui, sans-serif; background:#0b1120; color:#e2e8f0; min-height:100vh; }
+  h1, h2, h3, h4, .logo-text, button { font-family: 'Poppins', sans-serif; }
+  
+  header { padding:15px 40px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1e293b; background:rgba(11, 17, 32, 0.95); position:sticky; top:0; z-index:999; backdrop-filter: blur(10px); }
+  .logo-container { display: flex; align-items: center; cursor: pointer; text-decoration: none; }
+  .logo-img { height: 55px; width: auto; object-fit: contain; border-radius: 8px; mix-blend-mode: screen; transition: transform 0.3s; }
+  .logo-container:hover .logo-img { transform: scale(1.05); }
+  nav { position: relative; z-index: 1000; }
+  nav a { color:#94a3b8; text-decoration:none; font-size:15px; font-weight:600; cursor: pointer; background: #1e293b; padding: 10px 20px; border-radius: 8px; border: 1px solid #334155; display: inline-block; transition: 0.2s; }
+  nav a:hover { color:#38bdf8; border-color: #38bdf8; } 
+  
+  .hero { text-align:center; padding:80px 20px 40px; }
+  .hero h1 { font-size:52px; font-weight:800; margin-bottom:16px; line-height:1.1; }
+  .hero h1 span { background:linear-gradient(90deg,#38bdf8,#2563eb); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero p { color:#94a3b8; font-size:18px; max-width:650px; margin:0 auto; line-height: 1.6; }
+
+  .service-container { max-width: 800px; margin: 40px auto 80px; padding: 0 20px; position: relative; z-index: 10; }
+  .card { background:#1e293b; border:1px solid #334155; border-radius:24px; padding:50px; position:relative; text-align: center; }
+  .card .badge { display:inline-block; padding:8px 16px; border-radius:999px; font-size:13px; font-weight:700; margin-bottom:24px; letter-spacing: 0.5px; background:rgba(56, 189, 248, 0.1); color:#38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); }
+  .card h2 { font-size:34px; margin-bottom:16px; }
+  .card p { color:#94a3b8; font-size:16px; line-height:1.7; margin-bottom:32px; max-width: 600px; margin-left: auto; margin-right: auto; }
+  
+  .pricing-preview { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 40px; text-align: left; }
+  .price-item { background: #0f172a; border: 1px solid #334155; padding: 12px 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
+  .price-item .time { color: #cbd5e1; font-size: 14px; }
+  .price-item .cost { color: #38bdf8; font-weight: 700; font-size: 16px; }
+  .price-item.rush { border-color: #ef4444; }
+  .price-item.rush .cost { color: #ef4444; }
+  
+  .card button { background:linear-gradient(135deg,#2563eb,#38bdf8); color:#fff; border:none; padding:16px 40px; border-radius:12px; font-size:18px; font-weight:600; cursor:pointer; width: 100%; max-width: 400px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3); position: relative; z-index: 100; transition: 0.2s; }
+  .card button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4); }
+
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:9999; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(8px); }
+  .modal-overlay.active { display:flex; }
+  .modal { background:#1e293b; border:1px solid #334155; border-radius:20px; max-width:700px; width:100%; padding:32px; max-height:90vh; overflow-y:auto; position:relative; }
+  .modal h3 { font-size:24px; margin-bottom:10px; }
+  .modal p.subtitle { color:#94a3b8; font-size:14px; margin-bottom:20px; line-height: 1.6; }
+  .modal .close { position:absolute; top:16px; right:20px; background:none; border:none; color:#64748b; font-size:28px; cursor:pointer; z-index: 1000; }
+  .modal .close:hover { color:#fff; }
+
+  .form-group { margin-bottom: 18px; text-align: left; }
+  .form-group label { display: block; font-size: 14px; font-weight: 600; color: #cbd5e1; margin-bottom: 8px; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; background: #0f172a; border: 1px solid #334155; border-radius: 10px; color: #e2e8f0; font-size: 15px; font-family: 'Inter', sans-serif; outline: none; transition: 0.2s; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #38bdf8; box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); }
+  .form-group textarea { resize: vertical; min-height: 100px; }
+  .form-group input[type="file"] { padding: 9px 12px; }
+  .form-group input[type="file"]::file-selector-button { background: #334155; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-right: 12px; font-weight: 600; transition: 0.2s; }
+  .form-group input[type="file"]::file-selector-button:hover { background: #475569; }
+  
+  .price-display { background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 12px; border-radius: 8px; text-align: center; margin-top: 10px; font-weight: 600; color: #38bdf8; font-size: 16px; }
+  .submit-btn { width: 100%; padding: 16px; background: linear-gradient(135deg,#2563eb,#38bdf8); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+  .submit-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+
+  #how, #contact { max-width: 800px; margin: 80px auto; padding: 40px 20px; text-align: center; border-top: 1px solid #1e293b; }
+  #how h2, #contact h2 { margin-bottom: 24px; color: #38bdf8; font-size: 32px; }
+  .steps-grid { display: grid; grid-template-columns: 1fr; gap: 16px; text-align: left; margin-top: 30px; }
+  .step { background: #1e293b; border: 1px solid #334155; padding: 20px; border-radius: 12px; display: flex; align-items: flex-start; gap: 16px; }
+  .step-num { background: #38bdf8; color: #0b1120; font-weight: 800; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .step-text h4 { font-size: 16px; margin-bottom: 4px; color: #e2e8f0; }
+  .step-text p { color: #94a3b8; font-size: 14px; }
+  #contact p { color: #94a3b8; margin-bottom: 24px; font-size: 16px;}
+  
+  .whatsapp-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; background: #25D366; color: white; text-decoration: none; font-weight: 600; font-size: 16px; padding: 14px 28px; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); position: relative; z-index: 100; transition: 0.3s; }
+  .whatsapp-btn:hover { transform: translateY(-2px); background: #20bd5a; box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4); }
+  .whatsapp-btn svg { width: 20px; height: 20px; fill: currentColor; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="#" class="logo-container">
+    <img src="assets/logo.png" alt="LetItEdit Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+    <div style="display:none; font-family:'Poppins'; font-weight:800; font-size:24px; color:#38bdf8; margin-left:10px;">LetItEdit</div>
+  </a>
+  <nav>
+    <a href="#how" onclick="scrollToSection(event, 'how')">How it works</a>
+  </nav>
+</header>
+
+<section class="hero" id="home">
+  <h1>Expert Human Editing. <span>Precision Delivered.</span></h1>
+  <p>Upload your project, and our dedicated team of professional freelancers will handle the rest. Experience top-tier editing with the convenience of paying only after your work is perfectly delivered.</p>
+</section>
+
+<div class="service-container">
+  <div class="card">
+    <div class="badge">👤 HUMAN EXPERT EDITING</div>
+    <h2>Upload Your Project</h2>
+    <p>We handle Photos, Videos, PDFs, and Screenshots. Choose your desired delivery speed below. <strong>You only pay once you receive your finished files!</strong></p>
+    
+    <div class="pricing-preview">
+      <div class="price-item rush"><span class="time">30 Mins</span><span class="cost">$10</span></div>
+      <div class="price-item"><span class="time">1 Hour</span><span class="cost">$7</span></div>
+      <div class="price-item"><span class="time">2 Hours</span><span class="cost">$6</span></div>
+      <div class="price-item"><span class="time">3 Hours</span><span class="cost">$5</span></div>
+      <div class="price-item"><span class="time">4–48 Hours</span><span class="cost">$5</span></div>
+    </div>
+
+    <button type="button" onclick="openHumanModal()">Start Your Order →</button>
+  </div>
+</div>
+
+<section id="how">
+    <h2>How It Works</h2>
+    <p>Our streamlined process ensures you get high-quality edits with zero risk.</p>
+    <div class="steps-grid">
+      <div class="step"><div class="step-num">1</div><div class="step-text"><h4>Submit Your Request</h4><p>Click "Start Your Order" and fill out the form. Upload your files and select your delivery speed.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text"><h4>Backend Delivery to Freelancers</h4><p>Your order is instantly sent to our backend team of expert freelancers.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><h4>Expert Editing</h4><p>Our human editors get to work, applying their professional touch to your project.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text"><h4>Delivery & Payment</h4><p>We send the finished files to your Email or WhatsApp. <strong>You only pay after you review and approve the work.</strong></p></div></div>
+    </div>
+</section>
+
+<div class="modal-overlay" id="humanModal">
+  <div class="modal">
+    <button class="close" type="button" onclick="closeModal('humanModal')">×</button>
+    <h3>👤 Human Editing Request</h3>
+    <p class="subtitle">Fill out the form below. We will edit your files and send them to your Email or WhatsApp. <strong>You will only be asked to pay after delivery.</strong></p>
+    
+    <form id="orderForm" onsubmit="handleFormSubmit(event)">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" name="name" id="name" required placeholder="John Doe">
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" name="email" id="email" required placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label>WhatsApp Number</label>
+        <input type="tel" name="whatsapp" id="whatsapp" required placeholder="+92 300 1234567">
+      </div>
+      <div class="form-group">
+        <label>Upload Your File(s)</label>
+        <input type="file" name="file" id="fileInput" required>
+      </div>
+      <div class="form-group">
+        <label>Edit Requirements</label>
+        <textarea name="requirements" id="requirements" required placeholder="Describe exactly what you need edited..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Select Delivery Time</label>
+        <select name="delivery_time" id="deliveryTime" onchange="updatePrice()" required>
+          <option value="30 Minutes ($10)">30 Minutes — Rush Delivery ($10)</option>
+          <option value="1 Hour ($7)">1 Hour ($7)</option>
+          <option value="2 Hours ($6)">2 Hours ($6)</option>
+          <option value="3 Hours ($5)">3 Hours ($5)</option>
+          <option value="4-48 Hours ($5)">4–48 Hours ($5)</option>
+        </select>
+        <div class="price-display" id="priceDisplay">Total to pay after delivery: $10</div>
+      </div>
+      <button type="submit" class="submit-btn" id="submitBtn">Submit Order →</button>
+    </form>
+  </div>
+</div>
+
+<section id="contact">
+    <h2>Need Help?</h2>
+    <p>Have questions about your order, need custom bulk pricing, or want to send files directly? Message us on WhatsApp!</p>
+    <a href="https://wa.me/923456006438" target="_blank" rel="noopener noreferrer" class="whatsapp-btn" onclick="openWhatsApp(event)">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Chat on WhatsApp
+    </a>
+</section>
+
+<script>
+  // Your Supabase Configuration
+  const supabaseUrl = 'https://bjragiylhglqfodbihvd.supabase.co'; 
+  const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqcmFnaXlsaGdscWZvZGJpaHZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMjQ1NzMsImV4cCI6MjEwODkwMDU3M30.upa96t4q9W1AXIr8wry3kL_8U7L__GmTZZ3kWNjurYU';
+  
+  // Initialize Client (renamed to supabaseClient so it doesn't clash)
+  const supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+  function openHumanModal(){ document.getElementById('humanModal').classList.add('active'); }
+  function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+  
+  function scrollToSection(event, id) {
+    event.preventDefault();
+    document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function openWhatsApp(event) {
+    event.preventDefault();
+    window.open('https://wa.me/923456006438', '_blank');
+  }
+  
+  document.querySelectorAll('.modal-overlay').forEach(o => {
+    o.addEventListener('click', e => { if(e.target === o) o.classList.remove('active'); });
+  });
+
+  function updatePrice() {
+    const select = document.getElementById('deliveryTime');
+    const priceText = select.options[select.selectedIndex].text;
+    const priceMatch = priceText.match(/\$(\d+)/);
+    if(priceMatch) {
+      document.getElementById('priceDisplay').innerText = `Total to pay after delivery: $${priceMatch[1]}`;
+    }
+  }
+
+  async function handleFormSubmit(event) {
+    event.preventDefault(); 
+    
+    const form = document.getElementById('orderForm');
+    const fileInput = document.getElementById('fileInput');
+    const submitBtn = document.getElementById('submitBtn');
+
+    if (!fileInput.files || fileInput.files.length === 0) {
+      alert('Please select a file to upload.');
+      return;
+    }
+
+    const file = fileInput.files[0];
+    const fileName = `${Date.now()}_${file.name}`;
+
+    submitBtn.innerText = 'Uploading file...';
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.7';
+
+    try {
+      // 1. Upload File to Supabase Storage
+      const { data: fileData, error: fileError } = await supabaseClient.storage
+        .from('uploads')
+        .upload(fileName, file);
+
+      if (fileError) throw fileError;
+
+      // 2. Get the public URL of the uploaded file (Not strictly needed if bucket is private, but good practice)
+      const { data: urlData } = supabaseClient.storage
+        .from('uploads')
+        .getPublicUrl(fileName);
+
+      const fileUrl = urlData.publicUrl;
+
+      // 3. Save Form Data to Supabase Database
+      const { error: dbError } = await supabaseClient
+        .from('orders')
+        .insert([
+          {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            whatsapp: document.getElementById('whatsapp').value,
+            requirements: document.getElementById('requirements').value,
+            delivery_time: document.getElementById('deliveryTime').value,
+            file_url: fileName
+          }
+        ]);
+
+      if (dbError) throw dbError;
+
+      // Success!
+      alert("✅ Order Received!\n\nYour file has been uploaded and details saved. We will contact you shortly on your Email or WhatsApp. You only pay once you are satisfied.");
+      closeModal('humanModal');
+      form.reset();
+      
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error submitting order: ' + error.message);
+    } finally {
+      submitBtn.innerText = 'Submit Order →';
+      submitBtn.disabled = false;
+      submitBtn.style.opacity = '1';
+    }
+  }
+</script>
+</body>
+</html>
