@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LetItEdit — Premium Human Editing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  :root {
+    --bg: #050914;
+    --surface: rgba(255, 255, 255, 0.03);
+    --surface-hover: rgba(255, 255, 255, 0.08);
+    --border: rgba(255, 255, 255, 0.1);
+    --primary: #38bdf8;
+    --primary-glow: rgba(56, 189, 248, 0.3);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  
+  body { 
+    font-family: 'Inter', sans-serif; 
+    background: var(--bg); 
+    color: var(--text-main); 
+    min-height: 100vh;
+    background-image: 
+      radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.08), transparent 25%),
+      radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%);
+    background-attachment: fixed;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, .brand { font-family: 'Outfit', sans-serif; }
+
+  /* --- FLOATING EDITING TOOLS BACKGROUND --- */
+  .floating-tools {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+  }
+  .tool-icon {
+    position: absolute; color: var(--primary); opacity: 0.06;
+    filter: blur(2px) drop-shadow(0 0 10px var(--primary-glow));
+    animation: float 20s infinite ease-in-out alternate;
+  }
+  .tool-icon:nth-child(2n) { color: #8b5cf6; filter: blur(3px) drop-shadow(0 0 10px rgba(139,92,246,0.4)); }
+  .tool-icon:nth-child(3n) { color: #10b981; filter: blur(1px) drop-shadow(0 0 10px rgba(16,185,129,0.4)); }
+
+  .t1 { top: 10%; left: 10%; width: 80px; animation-duration: 25s; }
+  .t2 { top: 20%; right: 15%; width: 120px; animation-duration: 18s; animation-delay: -5s; }
+  .t3 { bottom: 20%; left: 15%; width: 100px; animation-duration: 22s; animation-delay: -2s; }
+  .t4 { bottom: 30%; right: 10%; width: 90px; animation-duration: 28s; animation-delay: -10s; }
+  .t5 { top: 50%; left: 45%; width: 150px; animation-duration: 35s; animation-delay: -8s; }
+  .t6 { top: 70%; right: 40%; width: 70px; animation-duration: 20s; animation-delay: -15s; }
+  .t7 { top: 5%; left: 60%; width: 60px; animation-duration: 30s; animation-delay: -3s; }
+  .t8 { bottom: 5%; right: 30%; width: 110px; animation-duration: 24s; animation-delay: -12s; }
+
+  @keyframes float {
+    0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+    33% { transform: translate(30px, -50px) rotate(10deg) scale(1.05); }
+    66% { transform: translate(-20px, 20px) rotate(-5deg) scale(0.95); }
+    100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  }
+
+  /* Crystal Glass Effect */
+  .glass-panel {
+    background: var(--surface);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    border-radius: 24px;
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Header */
+  header {
+    padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; z-index: 999;
+    background: rgba(5, 9, 20, 0.8); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo-container { display: flex; align-items: center; text-decoration: none; cursor: pointer; }
+  .logo-img { height: 50px; width: auto; border-radius: 8px; mix-blend-mode: screen; transition: 0.3s; }
+  .logo-container:hover .logo-img { transform: scale(1.05); }
+  .fallback-logo { display: none; font-weight: 800; font-size: 24px; color: var(--primary); margin-left: 10px; }
+  
+  .help-btn {
+    background: rgba(37, 211, 102, 0.1); color: #25D366; border: 1px solid rgba(37, 211, 102, 0.3);
+    padding: 10px 24px; border-radius: 50px; text-decoration: none; font-weight: 600;
+    display: flex; align-items: center; gap: 8px; transition: 0.3s;
+  }
+  .help-btn:hover { background: rgba(37, 211, 102, 0.2); box-shadow: 0 0 20px rgba(37, 211, 102, 0.2); }
+
+  /* Views */
+  .view { display: none; opacity: 0; transition: opacity 0.4s ease; position: relative; z-index: 10; }
+  .view.active { display: block; opacity: 1; animation: fadeIn 0.5s forwards; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Home View */
+  .hero { text-align: center; padding: 80px 20px 40px; }
+  .hero h1 { font-size: 56px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; margin-bottom: 20px; }
+  .hero h1 span { 
+    background: linear-gradient(135deg, #38bdf8, #8b5cf6); 
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-shadow: 0 0 40px rgba(56, 189, 248, 0.3);
+  }
+  .hero p { color: var(--text-muted); font-size: 18px; max-width: 600px; margin: 0 auto; }
+
+  .file-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px; max-width: 1000px; margin: 40px auto; padding: 0 20px;
+  }
+  .file-card {
+    padding: 40px 20px; text-align: center; cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative; overflow: hidden;
+  }
+  .file-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at center, rgba(56,189,248,0.1) 0%, transparent 70%);
+    opacity: 0; transition: 0.4s; z-index: -1;
+  }
+  .file-card:hover { transform: translateY(-8px); border-color: rgba(56, 189, 248, 0.5); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 20px var(--primary-glow); }
+  .file-card:hover::before { opacity: 1; }
+  
+  .file-icon { font-size: 48px; margin-bottom: 16px; display: inline-block; filter: drop-shadow(0 0 10px var(--primary-glow)); }
+  .file-card h3 { font-size: 20px; color: var(--text-main); font-weight: 600; }
+
+  /* Reviews Section */
+  .reviews-section {
+    max-width: 1100px; margin: 80px auto 40px; padding: 0 20px; text-align: center;
+  }
+  .reviews-section h2 { font-size: 36px; color: var(--text-main); margin-bottom: 40px; }
+  .reviews-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+  .review-card { padding: 30px; text-align: left; transition: 0.3s; }
+  .review-card:hover { transform: translateY(-5px); border-color: rgba(255, 255, 255, 0.2); }
+  
+  .stars { color: #fbbf24; font-size: 18px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+  .rating-num { font-size: 14px; color: var(--text-muted); font-weight: 600; background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 6px; }
+  
+  .review-text { font-size: 15px; line-height: 1.6; color: var(--text-muted); margin-bottom: 20px; font-style: italic; }
+  .reviewer { display: flex; align-items: center; gap: 12px; }
+  .reviewer-avatar { 
+    width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #38bdf8, #8b5cf6); 
+    display: flex; justify-content: center; align-items: center; font-weight: bold; color: #fff; font-size: 18px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+  .reviewer-info h4 { font-size: 15px; color: var(--text-main); margin-bottom: 2px; }
+  .reviewer-info span { font-size: 12px; color: var(--text-muted); }
+
+  /* Features Section */
+  .features-section { max-width: 1000px; margin: 80px auto; padding: 0 20px; text-align: center; }
+  .features-section h2 { font-size: 36px; margin-bottom: 40px; }
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; }
+  .feature-item { padding: 30px 20px; text-align: center; }
+  .feature-icon { font-size: 36px; margin-bottom: 16px; color: var(--primary); filter: drop-shadow(0 0 10px var(--primary-glow)); }
+  .feature-item h4 { font-size: 18px; margin-bottom: 10px; color: var(--text-main); }
+  .feature-item p { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+
+  /* Service View */
+  .service-container { max-width: 800px; margin: 40px auto; padding: 20px; }
+  .back-btn { 
+    background: none; border: none; color: var(--text-muted); font-size: 16px; 
+    cursor: pointer; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; transition: 0.3s;
+  }
+  .back-btn:hover { color: var(--primary); transform: translateX(-5px); }
+  
+  .instruction-box { padding: 40px; text-align: center; margin-bottom: 30px; }
+  .instruction-box h2 { font-size: 32px; color: var(--primary); margin-bottom: 16px; }
+  .instruction-box p { font-size: 16px; line-height: 1.8; color: var(--text-main); }
+
+  /* Pricing Board */
+  .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px; margin: 30px 0; }
+  .price-btn {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    padding: 20px 10px; text-align: center; cursor: pointer; transition: 0.3s;
+    color: var(--text-main); font-family: 'Outfit', sans-serif;
+  }
+  .price-btn:hover { background: var(--surface-hover); border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 0 15px var(--primary-glow); }
+  .price-btn .time { display: block; font-size: 14px; color: var(--text-muted); margin-bottom: 8px; }
+  .price-btn .cost { font-size: 28px; font-weight: 800; color: var(--text-main); }
+  .price-btn.rush .cost { color: #ef4444; }
+
+  .main-action-btn {
+    width: 100%; padding: 18px; background: linear-gradient(135deg, #38bdf8, #2563eb);
+    color: white; border: none; border-radius: 16px; font-size: 18px; font-weight: 700; 
+    cursor: pointer; transition: 0.3s; box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4);
+  }
+  .main-action-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(37, 99, 235, 0.6); }
+
+  /* Modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(5, 9, 20, 0.8);
+    backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal { width: 100%; max-width: 600px; padding: 40px; position: relative; max-height: 90vh; overflow-y: auto; }
+  .close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-muted); font-size: 28px; cursor: pointer; transition: 0.2s; }
+  .close-btn:hover { color: white; transform: rotate(90deg); }
+
+  .form-group { margin-bottom: 20px; text-align: left; }
+  .form-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+  .form-group input, .form-group textarea {
+    width: 100%; padding: 14px 16px; background: rgba(0,0,0,0.2);
+    border: 1px solid var(--border); border-radius: 12px; color: white; font-family: 'Inter', sans-serif; outline: none; transition: 0.3s;
+  }
+  .form-group input:focus, .form-group textarea:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
+  .form-group input[type="file"]::file-selector-button {
+    background: var(--surface-hover); color: white; border: none; padding: 8px 16px; border-radius: 8px; margin-right: 12px; cursor: pointer; transition: 0.3s;
+  }
+  
+  .price-highlight { text-align: center; font-size: 18px; font-weight: 600; color: var(--primary); margin: 20px 0; }
+  
+  /* ONE BUTTON FOR PAYMENT */
+  .submit-btn { 
+    width: 100%; padding: 18px; background: #0070ba; color: white; border: none; border-radius: 12px; 
+    font-weight: 700; font-size: 18px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 112, 186, 0.4);
+    display: flex; justify-content: center; align-items: center; gap: 10px;
+  }
+  .submit-btn:hover { background: #005c99; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 112, 186, 0.6); }
+
+  /* Footer */
+  footer {
+    text-align: center; padding: 40px 20px; border-top: 1px solid var(--border);
+    margin-top: 80px; color: var(--text-muted); font-size: 14px; position: relative; z-index: 10;
+  }
+  footer a { color: var(--primary); text-decoration: none; transition: 0.2s; }
+  footer a:hover { color: #fff; text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<!-- FLOATING BACKGROUND TOOLS -->
+<div class="floating-tools">
+  <svg class="tool-icon t1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.06 11.9l8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"></path><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"></path></svg>
+  <svg class="tool-icon t2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"></path><path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"></path></svg>
+  <svg class="tool-icon t3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4V2m0 20v-2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 15h2M20 15h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path><path d="M9 15l6-6"></path></svg>
+  <svg class="tool-icon t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 12 12 17 22 12"></polyline><polyline points="2 17 12 22 22 17"></polyline></svg>
+  <svg class="tool-icon t5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3M9 20h6M12 4v16"></path></svg>
+  <svg class="tool-icon t6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+  <svg class="tool-icon t7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
+  <svg class="tool-icon t8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
+</div>
+
+<header>
+  <a href="#" class="logo-container" onclick="switchView('home')">
+    <img src="assets/logo.png" alt="LetItEdit Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+    <div class="fallback-logo">LetItEdit</div>
+  </a>
+  <a href="https://wa.me/923456006438" target="_blank" class="help-btn">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    Need Help?
+  </a>
+</header>
+
+<!-- VIEW 1: HOME -->
+<div id="view-home" class="view active">
+  <section class="hero">
+    <h1>Which file type would you like our <span>experts</span> to refine today?</h1>
+    <p>Select your document format below to view custom instructions, pricing, and to submit your file to our freelance team.</p>
+  </section>
+
+  <div class="file-grid">
+    <div class="file-card glass-panel" onclick="openService('PDF')">
+      <div class="file-icon">📄</div>
+      <h3>PDF Document</h3>
+    </div>
+    <div class="file-card glass-panel" onclick="openService('Screenshot')">
+      <div class="file-icon">📱</div>
+      <h3>Screenshot</h3>
+    </div>
+    <div class="file-card glass-panel" onclick="openService('Doc')">
+      <div class="file-icon">📝</div>
+      <h3>Word (Doc) File</h3>
+    </div>
+    <div class="file-card glass-panel" onclick="openService('Excel')">
+      <div class="file-icon">📊</div>
+      <h3>Excel Sheet</h3>
+    </div>
+  </div>
+
+  <!-- REVIEWS SECTION -->
+  <section class="reviews-section">
+    <h2>What Our Clients Say</h2>
+    <div class="reviews-grid">
+      
+      <!-- Review 1 (5.0) -->
+      <div class="review-card glass-panel">
+        <div class="stars">★★★★★ <span class="rating-num">5.0</span></div>
+        <p class="review-text">"Absolutely flawless work. I needed my PDF formatted for a major presentation within 1 hour, and the team delivered it perfectly in 45 minutes. Highly recommended!"</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">S</div>
+          <div class="reviewer-info">
+            <h4>Sarah Jenkins</h4>
+            <span>Marketing Director</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Review 2 (4.7) -->
+      <div class="review-card glass-panel">
+        <div class="stars">★★★★☆ <span class="rating-num">4.7</span></div>
+        <p class="review-text">"Great service and very fast turnaround. Only minor issue was a small alignment problem on my Excel sheet, but they fixed it immediately upon request. Will use again."</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">M</div>
+          <div class="reviewer-info">
+            <h4>Michael Ross</h4>
+            <span>Financial Analyst</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Review 3 (5.0) -->
+      <div class="review-card glass-panel">
+        <div class="stars">★★★★★ <span class="rating-num">5.0</span></div>
+        <p class="review-text">"I use LetItEdit almost weekly for editing my screenshots before posting them in my tutorials. The quality is always top-tier and the PayPal checkout is incredibly fast."</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">A</div>
+          <div class="reviewer-info">
+            <h4>Ahmed Khan</h4>
+            <span>Content Creator</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Review 4 (5.0) -->
+      <div class="review-card glass-panel">
+        <div class="stars">★★★★★ <span class="rating-num">5.0</span></div>
+        <p class="review-text">"I was struggling to format my Word document for a thesis submission. The editor handled my references and spacing perfectly. A lifesaver!"</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">E</div>
+          <div class="reviewer-info">
+            <h4>Emily Clark</h4>
+            <span>University Student</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Review 5 (4.3) -->
+      <div class="review-card glass-panel">
+        <div class="stars">★★★★☆ <span class="rating-num">4.3</span></div>
+        <p class="review-text">"The editing was solid and exactly what I asked for. It took slightly longer than the 2 hours I paid for, but the customer support via WhatsApp was excellent and kept me updated."</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">D</div>
+          <div class="reviewer-info">
+            <h4>David Lim</h4>
+            <span>Business Owner</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Review 6 (5.0) -->
+      <div class="review-card glass-panel">
+        <div class="stars">★★★★★ <span class="rating-num">5.0</span></div>
+        <p class="review-text">"Best freelance editing site I've used. The interface is beautiful, the process is seamless, and the quality of work is unmatched. 10/10."</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">R</div>
+          <div class="reviewer-info">
+            <h4>Rachel Green</h4>
+            <span>Graphic Designer</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- NEW FEATURES SECTION -->
+  <section class="features-section">
+    <h2>Why Choose LetItEdit?</h2>
+    <div class="features-grid">
+      
+      <div class="feature-item glass-panel">
+        <div class="feature-icon">🛡️</div>
+        <h4>100% Secure</h4>
+        <p>Your files and personal data are encrypted and handled with absolute confidentiality.</p>
+      </div>
+
+      <div class="feature-item glass-panel">
+        <div class="feature-icon">⚡</div>
+        <h4>Lightning Fast</h4>
+        <p>Need it in 30 minutes? Our backend team is ready to deliver rush orders instantly.</p>
+      </div>
+
+      <div class="feature-item glass-panel">
+        <div class="feature-icon">💎</div>
+        <h4>Expert Editors</h4>
+        <p>Every file is handled by a dedicated professional with years of industry experience.</p>
+      </div>
+
+      <div class="feature-item glass-panel">
+        <div class="feature-icon">💬</div>
+        <h4>24/7 Support</h4>
+        <p>Have a question? Reach out via WhatsApp anytime for immediate assistance.</p>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<!-- VIEW 2: SERVICE INSTRUCTIONS -->
+<div id="view-service" class="view">
+  <div class="service-container">
+    <button class="back-btn" onclick="switchView('home')">← Back to File Selection</button>
+    
+    <div class="instruction-box glass-panel">
+      <h2 id="service-title">PDF Editing</h2>
+      <p id="service-instructions">Your PDF document and editing instructions will be securely delivered to an available freelancer. Once your file is perfectly polished, you will be notified directly via your Email or WhatsApp.</p>
+    </div>
+
+    <h3 style="text-align: center; margin-bottom: 20px; font-size: 24px;">Select Delivery Speed</h3>
+    <div class="pricing-grid">
+      <button class="price-btn rush" onclick="openOrderModal('30 Minutes', 5)">
+        <span class="time">30 Mins (Rush)</span><span class="cost">$5</span>
+      </button>
+      <button class="price-btn" onclick="openOrderModal('1 Hour', 4)">
+        <span class="time">1 Hour</span><span class="cost">$4</span>
+      </button>
+      <button class="price-btn" onclick="openOrderModal('2 Hours', 3)">
+        <span class="time">2 Hours</span><span class="cost">$3</span>
+      </button>
+      <button class="price-btn" onclick="openOrderModal('3-5 Hours', 2)">
+        <span class="time">3-5 Hours</span><span class="cost">$2</span>
+      </button>
+      <button class="price-btn" onclick="openOrderModal('6-12 Hours', 1)">
+        <span class="time">6-12 Hours</span><span class="cost">$1</span>
+      </button>
+    </div>
+
+    <button class="main-action-btn" onclick="openOrderModal('Standard (6-12 Hours)', 1)">Start Order & Pay →</button>
+  </div>
+</div>
+
+<!-- MODAL: ORDER FORM -->
+<div class="modal-overlay" id="orderModal">
+  <div class="modal glass-panel">
+    <button class="close-btn" onclick="closeModal()">×</button>
+    <h3 style="font-size: 26px; margin-bottom: 8px;">Finalize Your Order</h3>
+    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 24px;">Fill in your details below. You will be redirected to PayPal to complete your secure payment.</p>
+    
+    <form id="orderForm" onsubmit="handleFormSubmit(event)">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="name" required placeholder="John Doe">
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="email" required placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label>WhatsApp Number</label>
+        <input type="tel" id="whatsapp" required placeholder="+92 300 1234567" pattern="^\+[1-9]\d{1,14}$" title="Please include your country code, e.g., +923001234567" maxlength="16">
+        <small style="color: var(--text-muted); font-size: 11px; margin-top: 4px; display: block;">Include country code (e.g., +92...)</small>
+      </div>
+      <div class="form-group">
+        <label>Upload File</label>
+        <input type="file" id="fileInput" required>
+      </div>
+      <div class="form-group">
+        <label>Edit Requirements</label>
+        <textarea id="requirements" required rows="3" placeholder="Describe exactly what needs to be edited..."></textarea>
+      </div>
+      
+      <div class="price-highlight" id="priceDisplay">Total Amount: $5</div>
+      <input type="hidden" id="deliveryTime" value="">
+
+      <!-- TEST MODE CHECKBOX -->
+      <div class="form-group" style="display: flex; align-items: center; gap: 10px; background: rgba(255, 193, 7, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(255, 193, 7, 0.3);">
+        <input type="checkbox" id="testMode" style="width: 20px; height: 20px; cursor: pointer; accent-color: #fbbf24;">
+        <label for="testMode" style="margin-bottom: 0; cursor: pointer; color: #fbbf24; font-weight: 600; text-transform: none; letter-spacing: 0;">TEST MODE (Skip PayPal Redirect)</label>
+      </div>
+
+      <!-- ONLY ONE PAYMENT BUTTON -->
+      <button type="submit" class="submit-btn" id="submitBtn">
+        Pay $5 via PayPal & Submit
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>&copy; 2024 LetItEdit. All rights reserved.</p>
+  <p style="margin-top: 10px;">Need assistance? <a href="https://wa.me/923456006438" target="_blank">Contact us on WhatsApp</a> or email <a href="mailto:a1003350601123@gmail.com">a1003350601123@gmail.com</a></p>
+</footer>
+
+<script>
+  // Supabase Config
+  const supabaseUrl = 'https://bjragiylhglqfodbihvd.supabase.co'; 
+  const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqcmFnaXlsaGdscWZvZGJpaHZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMjQ1NzMsImV4cCI6MjEwODkwMDU3M30.upa96t4q9W1AXIr8wry3kL_8U7L__GmTZZ3kWNjurYU';
+  const supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+  let currentPrice = 5;
+  let currentService = '';
+
+  const serviceData = {
+    'PDF': {
+      title: 'PDF Document Editing',
+      text: 'Your PDF document and required instructions will be securely delivered to an available freelancer. Once the document is fully edited and formatted, you will be notified via your Email or WhatsApp.'
+    },
+    'Screenshot': {
+      title: 'Screenshot Enhancement',
+      text: 'Your screenshot and visual instructions will be routed to an available graphic expert. Once your image is perfectly cropped, annotated, or edited, you will be notified via your Email or WhatsApp.'
+    },
+    'Doc': {
+      title: 'Word (Doc) File Formatting',
+      text: 'Your Word document and formatting requirements will be assigned to an available editor. Once your document is polished, proofread, and ready, you will be notified via your Email or WhatsApp.'
+    },
+    'Excel': {
+      title: 'Excel Data Editing',
+      text: 'Your spreadsheet and data requirements will be sent to an available specialist. Once your formulas, charts, and data are perfectly updated, you will be notified via your Email or WhatsApp.'
+    }
+  };
+
+  function switchView(viewName) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    if(viewName === 'home') {
+      document.getElementById('view-home').classList.add('active');
+    } else {
+      document.getElementById('view-service').classList.add('active');
+    }
+    window.scrollTo(0, 0);
+  }
+
+  function openService(type) {
+    currentService = type;
+    document.getElementById('service-title').innerText = serviceData[type].title;
+    document.getElementById('service-instructions').innerText = serviceData[type].text;
+    
+    const fileInput = document.getElementById('fileInput');
+    fileInput.value = ''; 
+    
+    if (type === 'PDF') {
+      fileInput.setAttribute('accept', '.pdf');
+    } else if (type === 'Screenshot') {
+      fileInput.setAttribute('accept', 'image/*');
+    } else if (type === 'Doc') {
+      fileInput.setAttribute('accept', '.doc, .docx, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    } else if (type === 'Excel') {
+      fileInput.setAttribute('accept', '.xls, .xlsx, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    }
+    
+    switchView('service');
+  }
+
+  function openOrderModal(time, price) {
+    currentPrice = price;
+    document.getElementById('deliveryTime').value = time + ' ($' + price + ')';
+    document.getElementById('priceDisplay').innerText = 'Total Amount: $' + price;
+    
+    // Update button text
+    document.getElementById('submitBtn').innerText = `Pay $${price} via PayPal & Submit`;
+    
+    document.getElementById('orderModal').classList.add('active');
+  }
+
+  function closeModal() {
+    document.getElementById('orderModal').classList.remove('active');
+  }
+
+  document.getElementById('orderModal').addEventListener('click', function(e) {
+    if(e.target === this) closeModal();
+  });
+
+  async function handleFormSubmit(event) {
+    event.preventDefault(); 
+    
+    const form = document.getElementById('orderForm');
+    const fileInput = document.getElementById('fileInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const isTestMode = document.getElementById('testMode').checked;
+
+    if (!fileInput.files || fileInput.files.length === 0) {
+      alert('Please select a file to upload.');
+      return;
+    }
+
+    const file = fileInput.files[0];
+    const fileNameLower = file.name.toLowerCase();
+    let isValid = false;
+    
+    if (currentService === 'PDF' && fileNameLower.endsWith('.pdf')) isValid = true;
+    else if (currentService === 'Screenshot' && (fileNameLower.endsWith('.png') || fileNameLower.endsWith('.jpg') || fileNameLower.endsWith('.jpeg'))) isValid = true;
+    else if (currentService === 'Doc' && (fileNameLower.endsWith('.doc') || fileNameLower.endsWith('.docx'))) isValid = true;
+    else if (currentService === 'Excel' && (fileNameLower.endsWith('.xls') || fileNameLower.endsWith('.xlsx'))) isValid = true;
+
+    if (!isValid) {
+      alert(`Invalid file type. You selected ${currentService}. Please upload the correct file format.`);
+      return;
+    }
+
+    const fileName = `${Date.now()}_${file.name}`;
+
+    submitBtn.innerText = isTestMode ? 'Saving Test Order...' : 'Saving Order & Redirecting...';
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.7';
+
+    try {
+      const { data: fileData, error: fileError } = await supabaseClient.storage
+        .from('uploads')
+        .upload(fileName, file);
+
+      if (fileError) throw fileError;
+
+      const { error: dbError } = await supabaseClient
+        .from('orders')
+        .insert([
+          {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            whatsapp: document.getElementById('whatsapp').value,
+            requirements: `[FILE TYPE: ${currentService}] ` + document.getElementById('requirements').value,
+            delivery_time: document.getElementById('deliveryTime').value,
+            file_url: fileName
+          }
+        ]);
+
+      if (dbError) throw dbError;
+
+      if (isTestMode) {
+        // TEST MODE SUCCESS (No PayPal)
+        alert("✅ TEST ORDER SAVED!\n\nNo PayPal redirect was triggered. Please check your email and Supabase dashboard to confirm the data and email notification arrived.");
+      } else {
+        // REAL ORDER SUCCESS (Open PayPal)
+        const paypalLink = 'https://www.paypal.me/mujahidhussain78y/' + currentPrice;
+        window.open(paypalLink, '_blank');
+        alert("✅ Order Saved!\n\nYou have been redirected to PayPal in a new tab to complete your payment. Please complete the payment to finalize your order.");
+      }
+      
+      closeModal();
+      form.reset();
+      switchView('home'); 
+      
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error submitting order: ' + error.message);
+    } finally {
+      submitBtn.innerText = `Pay $${currentPrice} via PayPal & Submit`;
+      submitBtn.disabled = false;
+      submitBtn.style.opacity = '1';
+    }
+  }
+</script>
+</body>
+</html>
