@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
 <!-- 🔥 ADVANCED SEO CODE 🔥 -->
-<title>Professional PDF Formatting, Excel Editing & Video Services | LetItEdit</title>
-<meta name="description" content="Need fast document editing? We fix PDF formatting for resumes, clean up Excel spreadsheets, format Word docs, and edit videos. Pay securely via PayPal. 100% secure.">
-<meta name="keywords" content="PDF editing service, format PDF for resume, fix Excel formulas, clean up spreadsheet, video editing service, format Word document APA, edit screenshot, freelance editing, human editing">
+<title>Professional PDF, Excel, Screenshot & Video Editing Services | LetItEdit</title>
+<meta name="description" content="Need fast document or image editing? We format PDFs for resumes, fix Excel formulas, polish Word docs, do screenshot editing (blur text/annotate), and professional video editing. Pay via PayPal.">
+<meta name="keywords" content="PDF editing service, format PDF for resume, fix Excel formulas, clean up spreadsheet, video editing service, format Word document APA, screenshot editing service, blur sensitive information in screenshot, annotate image, freelance editing, human editing">
 <link rel="canonical" href="https://letitedit.com/" />
 
 <!-- SCHEMA MARKUP FOR GOOGLE RICH RESULTS -->
@@ -17,7 +17,7 @@
   "@type": "ProfessionalService",
   "name": "LetItEdit",
   "url": "https://letitedit.com",
-  "description": "Professional human editing services for PDFs, Excel spreadsheets, Word documents, Screenshots, and Video editing. Fast, secure, and reliable.",
+  "description": "Professional human editing services for PDFs, Excel spreadsheets, Word documents, Screenshot editing (blur, annotate), and Video editing. Fast, secure, and reliable.",
   "telephone": "+923456006438",
   "email": "a1003350601123@gmail.com",
   "priceRange": "$$",
@@ -29,7 +29,7 @@
       { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "PDF Formatting and Editing" } },
       { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Excel Data Cleaning and Formulas" } },
       { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Word Document Formatting" } },
-      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Screenshot Editing and Blurring" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Screenshot Editing and Sensitive Info Blurring" } },
       { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Video Editing and Post Production" } }
     ]
   }
@@ -80,7 +80,8 @@
   .slide-right { transform: translateX(40px); }
   .slide-left { transform: translateX(-40px); }
 
-  .animate-on-scroll.is-visible {
+  /* SAFETY NET: If JS fails, this makes sure buttons are visible */
+  .is-visible, .view.active .animate-on-scroll {
     opacity: 1;
     transform: translate(0, 0);
   }
@@ -327,7 +328,7 @@
 </div>
 
 <header>
-  <a href="#" class="logo-container" onclick="switchView('home')">
+  <a href="#" class="logo-container" onclick="event.preventDefault(); if(window.location.protocol !== 'file:') history.pushState({view: 'home'}, '', '/'); switchView('home', false);">
     <img src="assets/logo.png" alt="LetItEdit Professional Editing Services" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
     <div class="fallback-logo">LetItEdit</div>
   </a>
@@ -340,14 +341,23 @@
 <!-- VIEW 1: HOME -->
 <div id="view-home" class="view active">
   <section class="hero">
-    <h1 class="animate-on-scroll slide-right">Professional Document & Video <span>Editing Services</span></h1>
-    <p class="animate-on-scroll slide-left">Upload PDFs, Excel sheets, Word documents, or screenshots for expert human editing. Fast turnaround, 100% secure, and pay securely via PayPal.</p>
+    <h1 class="animate-on-scroll slide-right">Professional PDF, Excel, Screenshot & Video <span>Editing Services</span></h1>
+    <p class="animate-on-scroll slide-left">Upload PDFs, Excel sheets, Word documents, screenshots, or videos for expert human editing. Fast turnaround, 100% secure, and pay securely via PayPal.</p>
   </section>
 
   <div class="file-grid">
-    <!-- Video Editing Button (Full Width) -->
+    <!-- Video Editing Button (Full Width) with Beautiful SVG Icon -->
     <div class="file-card glass-panel full-width animate-on-scroll" onclick="switchView('video')">
-      <div class="file-icon">🎬</div>
+      <svg class="file-icon" style="width: 60px; height: 60px; color: #38bdf8; filter: drop-shadow(0 0 15px rgba(56,189,248,0.8)); margin-bottom: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+        <line x1="7" y1="2" x2="7" y2="22"></line>
+        <line x1="17" y1="2" x2="17" y2="22"></line>
+        <line x1="2" y1="12" x2="22" y2="12"></line>
+        <line x1="2" y1="7" x2="7" y2="7"></line>
+        <line x1="2" y1="17" x2="7" y2="17"></line>
+        <line x1="17" y1="17" x2="22" y2="17"></line>
+        <line x1="17" y1="7" x2="22" y2="7"></line>
+      </svg>
       <h3>Video Editing</h3>
     </div>
 
@@ -379,7 +389,7 @@
         <div class="marquee-content" style="display:flex;">
           <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Flawless PDF formatting for my resume. Delivered in 45 mins!"</p><div class="reviewer"><div class="reviewer-avatar">S</div><div class="reviewer-info"><h4>Sarah J.</h4><span>USA</span></div></div></div>
           <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Excellent Excel work. Fixed all my formulas perfectly."</p><div class="reviewer"><div class="reviewer-avatar">M</div><div class="reviewer-info"><h4>Michael R.</h4><span>UK</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★☆ <span class="rating-num">4.7</span></div><p class="review-text">"Very fast screenshot editing. Good communication."</p><div class="reviewer"><div class="reviewer-avatar">A</div><div class="reviewer-info"><h4>Ahmed K.</h4><span>UAE</span></div></div></div>
+          <div class="review-card glass-panel"><div class="stars">★★★★☆ <span class="rating-num">4.7</span></div><p class="review-text">"Very fast screenshot editing. Blurred sensitive data well."</p><div class="reviewer"><div class="reviewer-avatar">A</div><div class="reviewer-info"><h4>Ahmed K.</h4><span>UAE</span></div></div></div>
           <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Best freelance site for Word document formatting."</p><div class="reviewer"><div class="reviewer-avatar">E</div><div class="reviewer-info"><h4>Emily C.</h4><span>Canada</span></div></div></div>
           <div class="review-card glass-panel"><div class="stars">★★★★☆ <span class="rating-num">4.3</span></div><p class="review-text">"Solid work, took slightly longer than 2 hours but worth it."</p><div class="reviewer"><div class="reviewer-avatar">D</div><div class="reviewer-info"><h4>David L.</h4><span>Singapore</span></div></div></div>
           <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Beautiful interface, seamless process. 10/10."</p><div class="reviewer"><div class="reviewer-avatar">R</div><div class="reviewer-info"><h4>Rachel G.</h4><span>Australia</span></div></div></div>
@@ -392,7 +402,7 @@
         <div class="marquee-content" style="display:flex;">
           <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Flawless PDF formatting for my resume. Delivered in 45 mins!"</p><div class="reviewer"><div class="reviewer-avatar">S</div><div class="reviewer-info"><h4>Sarah J.</h4><span>USA</span></div></div></div>
           <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Excellent Excel work. Fixed all my formulas perfectly."</p><div class="reviewer"><div class="reviewer-avatar">M</div><div class="reviewer-info"><h4>Michael R.</h4><span>UK</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★☆ <span class="rating-num">4.7</span></div><p class="review-text">"Very fast screenshot editing. Good communication."</p><div class="reviewer"><div class="reviewer-avatar">A</div><div class="reviewer-info"><h4>Ahmed K.</h4><span>UAE</span></div></div></div>
+          <div class="review-card glass-panel"><div class="stars">★★★★☆ <span class="rating-num">4.7</span></div><p class="review-text">"Very fast screenshot editing. Blurred sensitive data well."</p><div class="reviewer"><div class="reviewer-avatar">A</div><div class="reviewer-info"><h4>Ahmed K.</h4><span>UAE</span></div></div></div>
           <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Best freelance site for Word document formatting."</p><div class="reviewer"><div class="reviewer-avatar">E</div><div class="reviewer-info"><h4>Emily C.</h4><span>Canada</span></div></div></div>
           <div class="review-card glass-panel"><div class="stars">★★★★☆ <span class="rating-num">4.3</span></div><p class="review-text">"Solid work, took slightly longer than 2 hours but worth it."</p><div class="reviewer"><div class="reviewer-avatar">D</div><div class="reviewer-info"><h4>David L.</h4><span>Singapore</span></div></div></div>
           <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Beautiful interface, seamless process. 10/10."</p><div class="reviewer"><div class="reviewer-avatar">R</div><div class="reviewer-info"><h4>Rachel G.</h4><span>Australia</span></div></div></div>
@@ -443,7 +453,7 @@
 <!-- VIEW 2: STANDARD SERVICE -->
 <div id="view-service" class="view">
   <div class="service-container">
-    <button class="back-btn" onclick="switchView('home')">← Back to File Selection</button>
+    <button class="back-btn" onclick="history.back()">← Back to File Selection</button>
     
     <div class="instruction-box glass-panel">
       <h2 id="service-title">PDF Editing</h2>
@@ -476,11 +486,12 @@
 <!-- VIEW 3: VIDEO EDITING INSTRUCTIONS -->
 <div id="view-video" class="view">
   <div class="service-container">
-    <button class="back-btn" onclick="switchView('home')">← Back to File Selection</button>
+    <button class="back-btn" onclick="history.back()">← Back to File Selection</button>
     
     <div class="instruction-box glass-panel" style="text-align: left;">
       <h2 style="text-align: center; color: #38bdf8; margin-bottom: 20px;">Professional Video Editing</h2>
-      <p><strong>Why can't I order video editing here?</strong></p>
+      
+      <p><strong>How do I start my video editing project?</strong></p>
       <p>Video projects are much larger and require custom attention, specific software, and direct communication with an editor to ensure your vision is met perfectly. For this reason, we handle video editing directly through WhatsApp or Email.</p>
       
       <p style="margin-top: 15px;"><strong>What about other services?</strong></p>
@@ -538,6 +549,21 @@
   </div>
 </div>
 
+<!-- NEW MODAL: THANK YOU MESSAGE -->
+<div class="modal-overlay" id="thankYouModal">
+  <div class="modal glass-panel" style="text-align: center; padding: 50px 30px;">
+    <div style="font-size: 70px; margin-bottom: 20px; filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.6));">🎉</div>
+    <h3 style="font-size: 32px; margin-bottom: 16px; color: #38bdf8;">Thank You for Your Order!</h3>
+    <p style="color: var(--text-main); font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+      Your order has been successfully placed and sent to our expert team. <br><br>
+      Your finished files will be delivered directly to your <strong>WhatsApp or Email</strong> shortly.
+    </p>
+    <button class="main-action-btn" onclick="closeThankYou()" style="animation: none; max-width: 250px; margin: 0 auto; background: #10b981; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);">
+      Back to Home
+    </button>
+  </div>
+</div>
+
 <!-- FOOTER -->
 <footer>
   <p>&copy; 2024 LetItEdit. All rights reserved.</p>
@@ -546,14 +572,24 @@
 
 <script>
   // Supabase Config
-  const supabaseUrl = 'https://bjragiylhglqfodbihvd.supabase.co'; 
-  const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqcmFnaXlsaGdscWZvZGJpaHZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMjQ1NzMsImV4cCI6MjEwODkwMDU3M30.upa96t4q9W1AXIr8wry3kL_8U7L__GmTZZ3kWNjurYU';
-  const supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
+  let supabaseClient = null;
+  try {
+    const supabaseUrl = 'https://bjragiylhglqfodbihvd.supabase.co'; 
+    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqcmFnaXlsaGdscWZvZGJpaHZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMjQ1NzMsImV4cCI6MjEwODkwMDU3M30.upa96t4q9W1AXIr8wry3kL_8U7L__GmTZZ3kWNjurYU';
+    supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
+  } catch(e) {
+    console.log("Supabase init failed", e);
+  }
 
   let currentPrice = 5;
   let currentService = '';
 
   document.addEventListener("DOMContentLoaded", function() {
+    // Force all elements in the home view to be visible immediately
+    document.querySelectorAll('#view-home .animate-on-scroll').forEach(el => {
+      el.classList.add('is-visible');
+    });
+
     const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -586,17 +622,42 @@
     }
   };
 
-  function switchView(viewName) {
+  function switchView(viewName, pushToHistory = true) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    let activeView;
     if(viewName === 'home') {
-      document.getElementById('view-home').classList.add('active');
+      activeView = document.getElementById('view-home');
     } else if (viewName === 'video') {
-      document.getElementById('view-video').classList.add('active');
+      activeView = document.getElementById('view-video');
     } else {
-      document.getElementById('view-service').classList.add('active');
+      activeView = document.getElementById('view-service');
     }
+    activeView.classList.add('active');
+    
+    activeView.querySelectorAll('.animate-on-scroll').forEach(el => {
+      el.classList.add('is-visible');
+    });
+
     window.scrollTo(0, 0);
+
+    if (pushToHistory && window.location.protocol !== 'file:') {
+      history.pushState({ view: viewName }, '', '#' + viewName);
+    }
   }
+
+  window.addEventListener('popstate', (event) => {
+    if (document.getElementById('orderModal').classList.contains('active')) {
+      document.getElementById('orderModal').classList.remove('active');
+    }
+    if (document.getElementById('thankYouModal').classList.contains('active')) {
+      document.getElementById('thankYouModal').classList.remove('active');
+    }
+    if (event.state && event.state.view) {
+      switchView(event.state.view, false);
+    } else {
+      switchView('home', false);
+    }
+  });
 
   function openService(type) {
     currentService = type;
@@ -627,10 +688,25 @@
     document.getElementById('submitBtn').innerText = `Pay $${price} via PayPal & Submit`;
     
     document.getElementById('orderModal').classList.add('active');
+    
+    if (window.location.protocol !== 'file:') {
+      history.pushState({ modal: true }, '', '');
+    }
   }
 
   function closeModal() {
     document.getElementById('orderModal').classList.remove('active');
+  }
+
+  function showThankYou() {
+    document.getElementById('orderModal').classList.remove('active');
+    document.getElementById('thankYouModal').classList.add('active');
+    document.getElementById('orderForm').reset();
+    switchView('home');
+  }
+
+  function closeThankYou() {
+    document.getElementById('thankYouModal').classList.remove('active');
   }
 
   document.getElementById('orderModal').addEventListener('click', function(e) {
@@ -640,6 +716,11 @@
   async function handleFormSubmit(event) {
     event.preventDefault(); 
     
+    if (!supabaseClient) {
+      alert('Database connection error. Please refresh the page.');
+      return;
+    }
+
     const form = document.getElementById('orderForm');
     const fileInput = document.getElementById('fileInput');
     const submitBtn = document.getElementById('submitBtn');
@@ -694,11 +775,8 @@
       const paypalLink = 'https://www.paypal.me/mujahidhussain78y/' + currentPrice;
       window.open(paypalLink, '_blank');
 
-      alert("✅ Order Saved!\n\nYou have been redirected to PayPal in a new tab to complete your payment. Please complete the payment to finalize your order.");
-      
-      closeModal();
-      form.reset();
-      switchView('home'); 
+      // Show the beautiful Thank You Popup
+      showThankYou();
       
     } catch (error) {
       console.error('Error:', error);
