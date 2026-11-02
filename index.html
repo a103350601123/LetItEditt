@@ -4,37 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<!-- 🔥 ADVANCED SEO CODE 🔥 -->
 <title>Professional PDF, Excel, Screenshot & Video Editing Services | LetItEdit</title>
-<meta name="description" content="Need fast document or image editing? We format PDFs for resumes, fix Excel formulas, polish Word docs, do screenshot editing (blur text/annotate), and professional video editing. Pay via PayPal.">
-<meta name="keywords" content="PDF editing service, format PDF for resume, fix Excel formulas, clean up spreadsheet, video editing service, format Word document APA, screenshot editing service, blur sensitive information in screenshot, annotate image, freelance editing, human editing">
-<link rel="canonical" href="https://letitedit.com/" />
-
-<!-- SCHEMA MARKUP FOR GOOGLE RICH RESULTS -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  "name": "LetItEdit",
-  "url": "https://letitedit.com",
-  "description": "Professional human editing services for PDFs, Excel spreadsheets, Word documents, Screenshot editing (blur, annotate), and Video editing. Fast, secure, and reliable.",
-  "telephone": "+923456006438",
-  "email": "a1003350601123@gmail.com",
-  "priceRange": "$$",
-  "areaServed": "Worldwide",
-  "hasOfferCatalog": {
-    "@type": "OfferCatalog",
-    "name": "Editing Services",
-    "itemListElement": [
-      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "PDF Formatting and Editing" } },
-      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Excel Data Cleaning and Formulas" } },
-      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Word Document Formatting" } },
-      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Screenshot Editing and Sensitive Info Blurring" } },
-      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Video Editing and Post Production" } }
-    ]
-  }
-}
-</script>
+<meta name="description" content="Fast, secure human editing services for PDFs, Excel, Word, Screenshots, and Video. Pay securely via PayPal.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,750 +14,348 @@
 
 <style>
   :root {
-    --bg: #050914;
-    --surface: rgba(255, 255, 255, 0.04);
-    --surface-hover: rgba(255, 255, 255, 0.09);
-    --border: rgba(255, 255, 255, 0.15);
-    --primary: #38bdf8;
-    --primary-glow: rgba(56, 189, 248, 0.5);
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
+    --bg: #050914; --surface: rgba(255, 255, 255, 0.04); --border: rgba(255, 255, 255, 0.15);
+    --primary: #38bdf8; --primary-glow: rgba(56, 189, 248, 0.5); --text-main: #f8fafc; --text-muted: #94a3b8;
   }
-
   * { margin:0; padding:0; box-sizing:border-box; }
-  
   body { 
-    font-family: 'Inter', sans-serif; 
-    background: var(--bg); 
-    color: var(--text-main); 
-    min-height: 100vh;
-    background-image: 
-      radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.15), transparent 30%),
-      radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.15), transparent 30%),
-      radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05), transparent 40%);
-    background-attachment: fixed;
-    overflow-x: hidden;
+    font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); min-height: 100vh;
+    background-image: radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.15), transparent 30%), radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.15), transparent 30%);
+    background-attachment: fixed; overflow-x: hidden;
   }
+  h1, h2, h3 { font-family: 'Outfit', sans-serif; }
 
-  h1, h2, h3, h4, .brand { font-family: 'Outfit', sans-serif; }
-
-  /* --- SCROLL ANIMATIONS --- */
-  .animate-on-scroll {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
-    will-change: opacity, transform;
-  }
-  .slide-right { transform: translateX(40px); }
-  .slide-left { transform: translateX(-40px); }
-
-  /* SAFETY NET: If JS fails, this makes sure buttons are visible */
-  .is-visible, .view.active .animate-on-scroll {
-    opacity: 1;
-    transform: translate(0, 0);
-  }
-
-  /* --- FLOATING EDITING TOOLS BACKGROUND --- */
-  .floating-tools {
-    position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
-  }
-  .tool-icon {
-    position: absolute; color: var(--primary); opacity: 0.12;
-    filter: blur(1px) drop-shadow(0 0 20px var(--primary-glow));
-    animation: float 25s infinite ease-in-out alternate;
-    will-change: transform;
-  }
-  .tool-icon:nth-child(2n) { color: #8b5cf6; filter: blur(1px) drop-shadow(0 0 20px rgba(139,92,246,0.6)); }
-  .tool-icon:nth-child(3n) { color: #10b981; filter: blur(1px) drop-shadow(0 0 20px rgba(16,185,129,0.6)); }
-
-  .t1 { top: 10%; left: 10%; width: 80px; animation-duration: 25s; }
-  .t2 { top: 20%; right: 15%; width: 120px; animation-duration: 18s; animation-delay: -5s; }
-  .t3 { bottom: 20%; left: 15%; width: 100px; animation-duration: 22s; animation-delay: -2s; }
-  .t4 { bottom: 30%; right: 10%; width: 90px; animation-duration: 28s; animation-delay: -10s; }
-  .t5 { top: 50%; left: 45%; width: 150px; animation-duration: 35s; animation-delay: -8s; }
-  .t6 { top: 70%; right: 40%; width: 70px; animation-duration: 20s; animation-delay: -15s; }
-  .t7 { top: 5%; left: 60%; width: 60px; animation-duration: 30s; animation-delay: -3s; }
-  .t8 { bottom: 5%; right: 30%; width: 110px; animation-duration: 24s; animation-delay: -12s; }
-
-  @keyframes float {
-    0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
-    33% { transform: translate3d(30px, -50px, 0) rotate(10deg) scale(1.05); }
-    66% { transform: translate3d(-20px, 20px, 0) rotate(-5deg) scale(0.95); }
-    100% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
-  }
-
-  /* --- HIGH-END CRYSTAL GLASS EFFECT --- */
   .glass-panel {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-    border-top: 1px solid rgba(255, 255, 255, 0.4);
-    border-left: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 
-      0 8px 32px 0 rgba(0, 0, 0, 0.6), 
-      inset 0 0 20px rgba(255, 255, 255, 0.05);
-    border-radius: 24px;
-    position: relative;
-    z-index: 10;
-    overflow: hidden;
+    backdrop-filter: blur(20px); border: 1px solid var(--border); border-top: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6); border-radius: 24px; position: relative; z-index: 10;
   }
 
-  /* Header */
-  header {
-    padding: 15px 40px; display: flex; justify-content: space-between; align-items: center;
-    position: sticky; top: 0; z-index: 999;
-    background: rgba(5, 9, 20, 0.85); backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-  }
-  .logo-container { display: flex; align-items: center; text-decoration: none; cursor: pointer; }
-  .logo-img { height: 75px; width: auto; border-radius: 8px; mix-blend-mode: screen; transition: 0.3s; }
-  .logo-container:hover .logo-img { transform: scale(1.05); }
-  .fallback-logo { display: none; font-weight: 800; font-size: 28px; color: var(--primary); margin-left: 10px; }
-  
-  .help-btn {
-    background: rgba(37, 211, 102, 0.1); color: #25D366; border: 1px solid rgba(37, 211, 102, 0.3);
-    padding: 10px 24px; border-radius: 50px; text-decoration: none; font-weight: 600;
-    display: flex; align-items: center; gap: 8px; transition: 0.3s;
-  }
-  .help-btn:hover { background: rgba(37, 211, 102, 0.2); box-shadow: 0 0 20px rgba(37, 211, 102, 0.3); }
+  header { padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 999; background: rgba(5, 9, 20, 0.85); border-bottom: 1px solid var(--border); }
+  .logo-img { height: 75px; }
+  .help-btn { background: rgba(37, 211, 102, 0.1); color: #25D366; border: 1px solid rgba(37, 211, 102, 0.3); padding: 10px 24px; border-radius: 50px; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px; }
 
-  /* Views */
-  .view { display: none; opacity: 0; position: relative; z-index: 10; }
+  .view { display: none; opacity: 0; }
   .view.active { display: block; opacity: 1; animation: fadeIn 0.5s forwards; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* Home View */
   .hero { text-align: center; padding: 80px 20px 40px; }
-  .hero h1 { font-size: 56px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; margin-bottom: 20px; }
-  .hero h1 span { 
-    background: linear-gradient(135deg, #38bdf8, #8b5cf6, #ec4899); 
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-    text-shadow: 0 0 40px rgba(56, 189, 248, 0.4);
-  }
-  .hero p { color: var(--text-muted); font-size: 18px; max-width: 650px; margin: 0 auto; line-height: 1.6; }
-
-  /* --- GRID LAYOUT --- */
-  .file-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 24px; max-width: 1100px; margin: 40px auto; padding: 0 20px;
-  }
-
-  .file-card {
-    padding: 40px 20px; text-align: center; cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center;
-  }
-  .file-card::before {
-    content: ''; position: absolute; inset: 0;
-    background: radial-gradient(circle at center, rgba(56,189,248,0.2) 0%, transparent 70%);
-    opacity: 0; transition: 0.4s; z-index: -1;
-  }
-  .file-card:hover { transform: translateY(-10px); border-color: rgba(56, 189, 248, 0.8); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px var(--primary-glow); }
-  .file-card:hover::before { opacity: 1; }
+  .hero h1 { font-size: 56px; font-weight: 800; margin-bottom: 20px; }
+  .hero h1 span { background: linear-gradient(135deg, #38bdf8, #8b5cf6); -webkit-background-clip: text; color: transparent; }
   
-  .file-card.full-width {
-    grid-column: 1 / -1;
-    padding: 50px 20px;
-  }
+  .file-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+  .file-card { padding: 40px 20px; text-align: center; cursor: pointer; transition: 0.4s; display: flex; flex-direction: column; align-items: center; }
+  .file-card:hover { transform: translateY(-10px); border-color: var(--primary); box-shadow: 0 0 30px var(--primary-glow); }
+  .file-card.full-width { grid-column: 1 / -1; padding: 50px 20px; }
+  .file-icon { font-size: 52px; margin-bottom: 16px; }
 
-  .file-icon { font-size: 52px; margin-bottom: 16px; display: inline-block; filter: drop-shadow(0 0 15px var(--primary-glow)); transition: 0.3s; }
-  .file-card:hover .file-icon { transform: scale(1.1); }
-  .file-card h3 { font-size: 22px; color: var(--text-main); font-weight: 600; }
-
-  /* --- MARQUEE REVIEWS --- */
-  .reviews-section { margin: 80px 0; text-align: center; overflow: hidden; }
-  .reviews-section h2 { font-size: 36px; color: var(--text-main); margin-bottom: 40px; }
-  
-  .marquee-container { display: flex; width: 100vw; overflow: hidden; position: relative; }
-  .marquee-container::before, .marquee-container::after { content: ''; position: absolute; top: 0; bottom: 0; width: 150px; z-index: 20; pointer-events: none; }
-  .marquee-container::before { left: 0; background: linear-gradient(to right, var(--bg) 0%, transparent 100%); }
-  .marquee-container::after { right: 0; background: linear-gradient(to left, var(--bg) 0%, transparent 100%); }
-
-  .marquee-track { display: flex; width: max-content; animation: scrollLeft 60s linear infinite; }
-  .marquee-track:hover { animation-play-state: paused; }
-  @keyframes scrollLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-
-  .review-card { 
-    padding: 24px; text-align: left; width: 350px; margin: 0 12px; flex-shrink: 0;
-    display: flex; flex-direction: column; justify-content: space-between;
-  }
-  .stars { color: #fbbf24; font-size: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-  .rating-num { font-size: 12px; color: var(--text-muted); font-weight: 600; background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 6px; }
-  .review-text { font-size: 14px; line-height: 1.6; color: var(--text-muted); margin-bottom: 20px; font-style: italic; flex-grow: 1;}
-  .reviewer { display: flex; align-items: center; gap: 12px; }
-  .reviewer-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #38bdf8, #8b5cf6); display: flex; justify-content: center; align-items: center; font-weight: bold; color: #fff; font-size: 16px; }
-  .reviewer-info h4 { font-size: 14px; color: var(--text-main); margin-bottom: 2px; }
-  .reviewer-info span { font-size: 12px; color: var(--text-muted); }
-
-  /* Features Section */
-  .features-section { max-width: 1000px; margin: 80px auto; padding: 0 20px; text-align: center; }
-  .features-section h2 { font-size: 36px; margin-bottom: 40px; }
-  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; }
-  .feature-item { padding: 30px 20px; text-align: center; }
-  .feature-icon { font-size: 36px; margin-bottom: 16px; color: var(--primary); filter: drop-shadow(0 0 10px var(--primary-glow)); }
-  .feature-item h4 { font-size: 18px; margin-bottom: 10px; color: var(--text-main); }
-  .feature-item p { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
-
-  /* Service View */
   .service-container { max-width: 800px; margin: 40px auto; padding: 20px; }
-  .back-btn { background: none; border: none; color: var(--text-muted); font-size: 16px; cursor: pointer; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
-  .back-btn:hover { color: var(--primary); transform: translateX(-5px); }
   .instruction-box { padding: 40px; text-align: center; margin-bottom: 30px; }
-  .instruction-box h2 { font-size: 32px; color: var(--primary); margin-bottom: 16px; }
-  .instruction-box p { font-size: 16px; line-height: 1.8; color: var(--text-main); margin-bottom: 15px; }
-
-  /* Pricing Board */
+  
   .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px; margin: 30px 0; }
-  .price-btn {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
-    padding: 20px 10px; text-align: center; cursor: pointer; transition: 0.3s;
-    color: var(--text-main); font-family: 'Outfit', sans-serif;
-  }
-  .price-btn:hover { background: var(--surface-hover); border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 0 15px var(--primary-glow); }
-  .price-btn .time { display: block; font-size: 14px; color: var(--text-muted); margin-bottom: 8px; }
-  .price-btn .cost { font-size: 28px; font-weight: 800; color: var(--text-main); }
-  .price-btn.rush .cost { color: #ef4444; }
+  .price-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; cursor: pointer; color: white; transition: 0.3s; }
+  .price-btn:hover { border-color: var(--primary); transform: translateY(-3px); }
 
-  /* Main Action Button with Neon Pulse */
-  .main-action-btn {
-    width: 100%; padding: 18px; background: linear-gradient(135deg, #38bdf8, #2563eb);
-    color: white; border: none; border-radius: 16px; font-size: 18px; font-weight: 700; 
-    cursor: pointer; transition: 0.3s; box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4);
-    animation: pulse-glow 2s infinite;
-  }
-  .main-action-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 15px 40px rgba(37, 99, 235, 0.7); }
-  @keyframes pulse-glow {
-    0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4); }
-    70% { box-shadow: 0 0 0 15px rgba(56, 189, 248, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
-  }
-
-  /* Modal */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(5, 9, 20, 0.85); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; padding: 20px; }
   .modal-overlay.active { display: flex; }
   .modal { width: 100%; max-width: 600px; padding: 40px; position: relative; max-height: 90vh; overflow-y: auto; }
-  .close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-muted); font-size: 28px; cursor: pointer; transition: 0.2s; }
-  .close-btn:hover { color: white; transform: rotate(90deg); }
-
+  
   .form-group { margin-bottom: 20px; text-align: left; }
-  .form-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-  .form-group input, .form-group textarea { width: 100%; padding: 14px 16px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 12px; color: white; font-family: 'Inter', sans-serif; outline: none; transition: 0.3s; }
-  .form-group input:focus, .form-group textarea:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); background: rgba(0,0,0,0.5); }
-  .form-group input[type="file"]::file-selector-button { background: var(--surface-hover); color: white; border: none; padding: 8px 16px; border-radius: 8px; margin-right: 12px; cursor: pointer; transition: 0.3s; }
+  .form-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; }
+  .form-group input, .form-group textarea { width: 100%; padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 12px; color: white; outline: none; }
   
-  .price-highlight { text-align: center; font-size: 18px; font-weight: 600; color: var(--primary); margin: 20px 0; }
-  
-  .submit-btn { 
-    width: 100%; padding: 18px; background: #0070ba; color: white; border: none; border-radius: 12px; 
-    font-weight: 700; font-size: 18px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 112, 186, 0.4);
-    display: flex; justify-content: center; align-items: center; gap: 10px;
-  }
-  .submit-btn:hover { background: #005c99; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 112, 186, 0.6); }
+  .btn-primary { width: 100%; padding: 18px; background: linear-gradient(135deg, #38bdf8, #2563eb); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 18px; cursor: pointer; }
+  .btn-paypal { width: 100%; padding: 18px; background: #0070ba; color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 18px; cursor: pointer; text-decoration: none; display: block; text-align: center; margin-bottom: 15px; }
+  .btn-whatsapp { width: 100%; padding: 18px; background: #25D366; color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 18px; cursor: pointer; text-decoration: none; display: block; text-align: center; }
 
-  /* Footer */
-  footer { text-align: center; padding: 40px 20px; border-top: 1px solid var(--border); margin-top: 80px; color: var(--text-muted); font-size: 14px; position: relative; z-index: 10; }
-  footer a { color: var(--primary); text-decoration: none; transition: 0.2s; }
-  footer a:hover { color: #fff; text-decoration: underline; }
+  /* Floating Resume Banner */
+  #resumeBanner { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(56, 189, 248, 0.95); color: white; padding: 15px 30px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 9999; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; }
+  #resumeBanner:hover { background: #38bdf8; transform: translateX(-50%) translateY(-5px); }
 
-  /* --- MOBILE RESPONSIVE FIXES --- */
-  @media (max-width: 900px) {
-    .file-grid { grid-template-columns: repeat(2, 1fr); }
-  }
+  @media (max-width: 900px) { .file-grid { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 768px) {
-    header { padding: 15px 20px; }
-    .logo-img { height: 50px; }
+    .file-grid { grid-template-columns: 1fr; }
     .hero h1 { font-size: 38px; }
-    .hero p { font-size: 16px; }
-    .card, .modal { padding: 25px 20px; }
-    .file-grid { grid-template-columns: 1fr; gap: 16px; margin: 20px auto; }
-    .file-card, .file-card.full-width { padding: 30px 15px; }
-    .pricing-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-    .features-grid { grid-template-columns: 1fr; }
-    .reviews-section h2, .features-section h2 { font-size: 28px; }
-    .marquee-container::before, .marquee-container::after { width: 50px; }
-    .service-container { padding: 15px; }
-    .instruction-box { padding: 25px 15px; }
-    .instruction-box h2 { font-size: 26px; }
-    .help-btn span { display: none; } 
-    .help-btn { padding: 10px; border-radius: 50%; }
+    .pricing-grid { grid-template-columns: 1fr 1fr; }
   }
 </style>
 </head>
 <body>
 
-<!-- FLOATING BACKGROUND TOOLS -->
-<div class="floating-tools">
-  <svg class="tool-icon t1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.06 11.9l8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"></path><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"></path></svg>
-  <svg class="tool-icon t2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"></path><path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"></path></svg>
-  <svg class="tool-icon t3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4V2m0 20v-2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 15h2M20 15h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path><path d="M9 15l6-6"></path></svg>
-  <svg class="tool-icon t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 12 12 17 22 12"></polyline><polyline points="2 17 12 22 22 17"></polyline></svg>
-  <svg class="tool-icon t5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3M9 20h6M12 4v16"></path></svg>
-  <svg class="tool-icon t6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
-  <svg class="tool-icon t7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
-  <svg class="tool-icon t8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
-</div>
-
 <header>
-  <a href="#" class="logo-container" onclick="event.preventDefault(); if(window.location.protocol !== 'file:') history.pushState({view: 'home'}, '', '/'); switchView('home', false);">
-    <img src="assets/logo.png" alt="LetItEdit Professional Editing Services" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-    <div class="fallback-logo">LetItEdit</div>
-  </a>
-  <a href="https://wa.me/923456006438" target="_blank" class="help-btn">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-    <span>Need Help?</span>
-  </a>
+  <a href="#" onclick="switchView('home'); return false;"><img src="assets/logo.png" alt="LetItEdit" class="logo-img" onerror="this.style.display='none';"></a>
+  <a href="https://wa.me/923456006438" target="_blank" class="help-btn">Need Help?</a>
 </header>
 
 <!-- VIEW 1: HOME -->
 <div id="view-home" class="view active">
   <section class="hero">
-    <h1 class="animate-on-scroll slide-right">Professional PDF, Excel, Screenshot & Video <span>Editing Services</span></h1>
-    <p class="animate-on-scroll slide-left">Upload PDFs, Excel sheets, Word documents, screenshots, or videos for expert human editing. Fast turnaround, 100% secure, and pay securely via PayPal.</p>
+    <h1>Professional <span>Editing Services</span></h1>
   </section>
-
   <div class="file-grid">
-    <!-- Video Editing Button (Full Width) with Beautiful SVG Icon -->
-    <div class="file-card glass-panel full-width animate-on-scroll" onclick="switchView('video')">
-      <svg class="file-icon" style="width: 60px; height: 60px; color: #38bdf8; filter: drop-shadow(0 0 15px rgba(56,189,248,0.8)); margin-bottom: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
-        <line x1="7" y1="2" x2="7" y2="22"></line>
-        <line x1="17" y1="2" x2="17" y2="22"></line>
-        <line x1="2" y1="12" x2="22" y2="12"></line>
-        <line x1="2" y1="7" x2="7" y2="7"></line>
-        <line x1="2" y1="17" x2="7" y2="17"></line>
-        <line x1="17" y1="17" x2="22" y2="17"></line>
-        <line x1="17" y1="7" x2="22" y2="7"></line>
-      </svg>
-      <h3>Video Editing</h3>
+    <div class="file-card glass-panel full-width" onclick="switchView('video')">
+      <div class="file-icon">🎬</div><h3>Video Editing</h3>
     </div>
-
-    <!-- Other 4 Buttons (Below) -->
-    <div class="file-card glass-panel animate-on-scroll" onclick="openService('PDF')">
-      <div class="file-icon">📄</div>
-      <h3>PDF Document</h3>
-    </div>
-    <div class="file-card glass-panel animate-on-scroll" onclick="openService('Screenshot')">
-      <div class="file-icon">📱</div>
-      <h3>Screenshot</h3>
-    </div>
-    <div class="file-card glass-panel animate-on-scroll" onclick="openService('Doc')">
-      <div class="file-icon">📝</div>
-      <h3>Word (Doc) File</h3>
-    </div>
-    <div class="file-card glass-panel animate-on-scroll" onclick="openService('Excel')">
-      <div class="file-icon">📊</div>
-      <h3>Excel Sheet</h3>
-    </div>
+    <div class="file-card glass-panel" onclick="openService('PDF')"><div class="file-icon">📄</div><h3>PDF Document</h3></div>
+    <div class="file-card glass-panel" onclick="openService('Screenshot')"><div class="file-icon">📱</div><h3>Screenshot</h3></div>
+    <div class="file-card glass-panel" onclick="openService('Doc')"><div class="file-icon">📝</div><h3>Word (Doc)</h3></div>
+    <div class="file-card glass-panel" onclick="openService('Excel')"><div class="file-icon">📊</div><h3>Excel Sheet</h3></div>
   </div>
-
-  <!-- SINGLE LINE MARQUEE REVIEWS -->
-  <section class="reviews-section">
-    <h2 class="animate-on-scroll">Trusted by Clients Worldwide</h2>
-    
-    <div class="marquee-container">
-      <div class="marquee-track">
-        <div class="marquee-content" style="display:flex;">
-          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Flawless PDF formatting for my resume. Delivered in 45 mins!"</p><div class="reviewer"><div class="reviewer-avatar">S</div><div class="reviewer-info"><h4>Sarah J.</h4><span>USA</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Excellent Excel work. Fixed all my formulas perfectly."</p><div class="reviewer"><div class="reviewer-avatar">M</div><div class="reviewer-info"><h4>Michael R.</h4><span>UK</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★☆ <span class="rating-num">4.7</span></div><p class="review-text">"Very fast screenshot editing. Blurred sensitive data well."</p><div class="reviewer"><div class="reviewer-avatar">A</div><div class="reviewer-info"><h4>Ahmed K.</h4><span>UAE</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Best freelance site for Word document formatting."</p><div class="reviewer"><div class="reviewer-avatar">E</div><div class="reviewer-info"><h4>Emily C.</h4><span>Canada</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★☆ <span class="rating-num">4.3</span></div><p class="review-text">"Solid work, took slightly longer than 2 hours but worth it."</p><div class="reviewer"><div class="reviewer-avatar">D</div><div class="reviewer-info"><h4>David L.</h4><span>Singapore</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Beautiful interface, seamless process. 10/10."</p><div class="reviewer"><div class="reviewer-avatar">R</div><div class="reviewer-info"><h4>Rachel G.</h4><span>Australia</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Highly professional editing. Highly recommended."</p><div class="reviewer"><div class="reviewer-avatar">P</div><div class="reviewer-info"><h4>Priya S.</h4><span>India</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Great service. The 30-minute rush delivery is real!"</p><div class="reviewer"><div class="reviewer-avatar">K</div><div class="reviewer-info"><h4>Kenji T.</h4><span>Japan</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Perfectly edited my thesis document. Lifesaver."</p><div class="reviewer"><div class="reviewer-avatar">L</div><div class="reviewer-info"><h4>Lukas M.</h4><span>Germany</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★☆ <span class="rating-num">4.8</span></div><p class="review-text">"Great attention to detail on my Excel charts."</p><div class="reviewer"><div class="reviewer-avatar">C</div><div class="reviewer-info"><h4>Carlos E.</h4><span>Brazil</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Extremely satisfied with the PDF edits. Great job."</p><div class="reviewer"><div class="reviewer-avatar">J</div><div class="reviewer-info"><h4>James W.</h4><span>New Zealand</span></div></div></div>
-        </div>
-        <div class="marquee-content" style="display:flex;">
-          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Flawless PDF formatting for my resume. Delivered in 45 mins!"</p><div class="reviewer"><div class="reviewer-avatar">S</div><div class="reviewer-info"><h4>Sarah J.</h4><span>USA</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Excellent Excel work. Fixed all my formulas perfectly."</p><div class="reviewer"><div class="reviewer-avatar">M</div><div class="reviewer-info"><h4>Michael R.</h4><span>UK</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★☆ <span class="rating-num">4.7</span></div><p class="review-text">"Very fast screenshot editing. Blurred sensitive data well."</p><div class="reviewer"><div class="reviewer-avatar">A</div><div class="reviewer-info"><h4>Ahmed K.</h4><span>UAE</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Best freelance site for Word document formatting."</p><div class="reviewer"><div class="reviewer-avatar">E</div><div class="reviewer-info"><h4>Emily C.</h4><span>Canada</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★☆ <span class="rating-num">4.3</span></div><p class="review-text">"Solid work, took slightly longer than 2 hours but worth it."</p><div class="reviewer"><div class="reviewer-avatar">D</div><div class="reviewer-info"><h4>David L.</h4><span>Singapore</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Beautiful interface, seamless process. 10/10."</p><div class="reviewer"><div class="reviewer-avatar">R</div><div class="reviewer-info"><h4>Rachel G.</h4><span>Australia</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Highly professional editing. Highly recommended."</p><div class="reviewer"><div class="reviewer-avatar">P</div><div class="reviewer-info"><h4>Priya S.</h4><span>India</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Great service. The 30-minute rush delivery is real!"</p><div class="reviewer"><div class="reviewer-avatar">K</div><div class="reviewer-info"><h4>Kenji T.</h4><span>Japan</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Perfectly edited my thesis document. Lifesaver."</p><div class="reviewer"><div class="reviewer-avatar">L</div><div class="reviewer-info"><h4>Lukas M.</h4><span>Germany</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★☆ <span class="rating-num">4.8</span></div><p class="review-text">"Great attention to detail on my Excel charts."</p><div class="reviewer"><div class="reviewer-avatar">C</div><div class="reviewer-info"><h4>Carlos E.</h4><span>Brazil</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Extremely satisfied with the PDF edits. Great job."</p><div class="reviewer"><div class="reviewer-avatar">J</div><div class="reviewer-info"><h4>James W.</h4><span>New Zealand</span></div></div></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEW FEATURES SECTION -->
-  <section class="features-section">
-    <h2 class="animate-on-scroll">Why Choose LetItEdit?</h2>
-    <div class="features-grid">
-      
-      <div class="feature-item glass-panel animate-on-scroll">
-        <div class="feature-icon">🛡️</div>
-        <h4>100% Secure</h4>
-        <p>Your files and personal data are encrypted and handled with absolute confidentiality.</p>
-      </div>
-
-      <div class="feature-item glass-panel animate-on-scroll">
-        <div class="feature-icon">⚡</div>
-        <h4>Lightning Fast</h4>
-        <p>Need it in 30 minutes? Our backend team is ready to deliver rush orders instantly.</p>
-      </div>
-
-      <div class="feature-item glass-panel animate-on-scroll">
-        <div class="feature-icon">💎</div>
-        <h4>Expert Editors</h4>
-        <p>Every file is handled by a dedicated professional with years of industry experience.</p>
-      </div>
-
-      <div class="feature-item glass-panel animate-on-scroll">
-        <div class="feature-icon">💬</div>
-        <h4>24/7 Support</h4>
-        <p>Have a question? Reach out via WhatsApp anytime for immediate assistance.</p>
-      </div>
-
-    </div>
-  </section>
-
 </div>
 
-<!-- VIEW 2: STANDARD SERVICE -->
+<!-- VIEW 2: SERVICE -->
 <div id="view-service" class="view">
   <div class="service-container">
-    <button class="back-btn" onclick="history.back()">← Back to File Selection</button>
-    
+    <button class="btn-primary" style="background: transparent; text-align: left; padding: 0; margin-bottom: 20px;" onclick="switchView('home')">← Back</button>
     <div class="instruction-box glass-panel">
-      <h2 id="service-title">PDF Editing</h2>
-      <p id="service-instructions">Your file and editing instructions will be securely delivered to an available freelancer. Once your file is perfectly polished, you will be notified directly via your Email or WhatsApp.</p>
+      <h2 id="service-title" style="color: var(--primary); margin-bottom: 15px;">PDF Editing</h2>
+      <p>Submit your requirements, proceed to payment, and once verified, you will be able to upload your file securely.</p>
     </div>
 
-    <h3 style="text-align: center; margin-bottom: 20px; font-size: 24px;">Select Delivery Speed</h3>
+    <h3 style="text-align: center; margin-bottom: 20px;">Select Delivery Speed</h3>
     <div class="pricing-grid">
-      <button class="price-btn rush" onclick="openOrderModal('30 Minutes', 5)">
-        <span class="time">30 Mins (Rush)</span><span class="cost">$5</span>
-      </button>
-      <button class="price-btn" onclick="openOrderModal('1 Hour', 4)">
-        <span class="time">1 Hour</span><span class="cost">$4</span>
-      </button>
-      <button class="price-btn" onclick="openOrderModal('2 Hours', 3)">
-        <span class="time">2 Hours</span><span class="cost">$3</span>
-      </button>
-      <button class="price-btn" onclick="openOrderModal('3-5 Hours', 2)">
-        <span class="time">3-5 Hours</span><span class="cost">$2</span>
-      </button>
-      <button class="price-btn" onclick="openOrderModal('6-12 Hours', 1)">
-        <span class="time">6-12 Hours</span><span class="cost">$1</span>
-      </button>
+      <button class="price-btn" onclick="openOrderModal('30 Minutes', 5)"><span style="font-size:14px; color:var(--text-muted); display:block; margin-bottom:8px;">30 Mins</span><span style="font-size:24px; font-weight:800;">$5</span></button>
+      <button class="price-btn" onclick="openOrderModal('1 Hour', 4)"><span style="font-size:14px; color:var(--text-muted); display:block; margin-bottom:8px;">1 Hour</span><span style="font-size:24px; font-weight:800;">$4</span></button>
+      <button class="price-btn" onclick="openOrderModal('2 Hours', 3)"><span style="font-size:14px; color:var(--text-muted); display:block; margin-bottom:8px;">2 Hours</span><span style="font-size:24px; font-weight:800;">$3</span></button>
+      <button class="price-btn" onclick="openOrderModal('3-5 Hours', 2)"><span style="font-size:14px; color:var(--text-muted); display:block; margin-bottom:8px;">3-5 Hours</span><span style="font-size:24px; font-weight:800;">$2</span></button>
+      <button class="price-btn" onclick="openOrderModal('6-12 Hours', 1)"><span style="font-size:14px; color:var(--text-muted); display:block; margin-bottom:8px;">6-12 Hours</span><span style="font-size:24px; font-weight:800;">$1</span></button>
     </div>
-
-    <button class="main-action-btn" onclick="openOrderModal('Standard (6-12 Hours)', 1)">Start Order & Pay →</button>
   </div>
 </div>
 
-<!-- VIEW 3: VIDEO EDITING INSTRUCTIONS -->
+<!-- VIEW 3: VIDEO -->
 <div id="view-video" class="view">
   <div class="service-container">
-    <button class="back-btn" onclick="history.back()">← Back to File Selection</button>
-    
+    <button class="btn-primary" style="background: transparent; text-align: left; padding: 0; margin-bottom: 20px;" onclick="switchView('home')">← Back</button>
     <div class="instruction-box glass-panel" style="text-align: left;">
-      <h2 style="text-align: center; color: #38bdf8; margin-bottom: 20px;">Professional Video Editing</h2>
-      
-      <p><strong>How do I start my video editing project?</strong></p>
-      <p>Video projects are much larger and require custom attention, specific software, and direct communication with an editor to ensure your vision is met perfectly. For this reason, we handle video editing directly through WhatsApp or Email.</p>
-      
-      <p style="margin-top: 15px;"><strong>What about other services?</strong></p>
-      <p>If you need <strong>PDF formatting, Screenshot editing, Word documents, or Excel fixes</strong>, those are available instantly on this website! Just click "Back to File Selection" and choose your file type to upload it directly and pay via PayPal.</p>
-      
+      <h2 style="text-align: center; color: #38bdf8;">Professional Video Editing</h2>
+      <p>Video projects are custom. We handle video editing directly through WhatsApp to ensure your vision is met.</p>
       <div style="margin-top: 30px; text-align: center;">
-        <p style="margin-bottom: 20px; font-weight: 600; color: #f8fafc;">To start your Video Editing project, please contact us directly:</p>
-        <a href="https://wa.me/923456006438" target="_blank" class="submit-btn" style="background: #25D366; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); text-decoration: none; display: inline-flex; width: auto; padding: 16px 32px; animation: none;">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 10px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          Chat on WhatsApp
-        </a>
-        <p style="margin-top: 20px; font-size: 14px; color: #94a3b8;">Or email us at: <a href="mailto:a1003350601123@gmail.com" style="color: #38bdf8;">a1003350601123@gmail.com</a></p>
+        <a href="https://wa.me/923456006438" target="_blank" class="btn-whatsapp" style="width: auto; padding: 16px 32px; border-radius: 50px; display: inline-block;">Chat on WhatsApp</a>
       </div>
     </div>
   </div>
 </div>
 
-<!-- MODAL: ORDER FORM -->
+<!-- MODAL 1: ORDER FORM (No File) -->
 <div class="modal-overlay" id="orderModal">
   <div class="modal glass-panel">
-    <button class="close-btn" onclick="closeModal()">×</button>
-    <h3 style="font-size: 26px; margin-bottom: 8px;">Finalize Your Order</h3>
-    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 24px;">Fill in your details below. You will be redirected to PayPal to complete your secure payment.</p>
+    <button style="position:absolute; top:20px; right:20px; background:none; border:none; color:white; font-size:28px; cursor:pointer;" onclick="closeModal('orderModal')">×</button>
+    <h3 style="font-size: 26px; margin-bottom: 8px;">Order Details</h3>
+    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 24px;">Fill in your details. You will upload your file after payment.</p>
     
     <form id="orderForm" onsubmit="handleFormSubmit(event)">
-      <div class="form-group">
-        <label>Full Name</label>
-        <input type="text" id="name" required placeholder="John Doe">
-      </div>
-      <div class="form-group">
-        <label>Email Address</label>
-        <input type="email" id="email" required placeholder="you@example.com">
-      </div>
-      <div class="form-group">
-        <label>WhatsApp Number</label>
-        <input type="tel" id="whatsapp" required placeholder="+92 300 1234567" pattern="^\+[1-9]\d{1,14}$" title="Please include your country code, e.g., +923001234567" maxlength="16">
-        <small style="color: var(--text-muted); font-size: 11px; margin-top: 4px; display: block;">Include country code (e.g., +92...)</small>
-      </div>
-      <div class="form-group">
-        <label>Upload File</label>
-        <input type="file" id="fileInput" required>
-      </div>
-      <div class="form-group">
-        <label>Edit Requirements</label>
-        <textarea id="requirements" required rows="3" placeholder="Describe exactly what needs to be edited..."></textarea>
-      </div>
+      <div class="form-group"><label>Full Name</label><input type="text" id="name" required placeholder="John Doe"></div>
+      <div class="form-group"><label>Email Address</label><input type="email" id="email" required placeholder="you@example.com"></div>
+      <div class="form-group"><label>WhatsApp Number</label><input type="tel" id="whatsapp" required placeholder="+92 300 1234567"></div>
+      <div class="form-group"><label>Edit Requirements</label><textarea id="requirements" required rows="3" placeholder="Describe your project..."></textarea></div>
       
-      <div class="price-highlight" id="priceDisplay">Total Amount: $5</div>
+      <div style="text-align: center; font-size: 18px; font-weight: 600; color: var(--primary); margin: 20px 0;" id="priceDisplay">Total: $5</div>
       <input type="hidden" id="deliveryTime" value="">
 
-      <button type="submit" class="submit-btn" id="submitBtn" style="animation: none;">
-        Pay $5 via PayPal & Submit
-      </button>
+      <button type="submit" class="btn-primary" id="submitBtn">Proceed to Payment →</button>
     </form>
   </div>
 </div>
 
-<!-- NEW MODAL: THANK YOU MESSAGE -->
-<div class="modal-overlay" id="thankYouModal">
-  <div class="modal glass-panel" style="text-align: center; padding: 50px 30px;">
-    <div style="font-size: 70px; margin-bottom: 20px; filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.6));">🎉</div>
-    <h3 style="font-size: 32px; margin-bottom: 16px; color: #38bdf8;">Thank You for Your Order!</h3>
-    <p style="color: var(--text-main); font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
-      Your order has been successfully placed and sent to our expert team. <br><br>
-      Your finished files will be delivered directly to your <strong>WhatsApp or Email</strong> shortly.
-    </p>
-    <button class="main-action-btn" onclick="closeThankYou()" style="animation: none; max-width: 250px; margin: 0 auto; background: #10b981; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);">
-      Back to Home
-    </button>
+<!-- MODAL 2: PAYMENT & WAITING -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal glass-panel" style="text-align: center;">
+    <div style="font-size: 50px; margin-bottom: 10px;">🔒</div>
+    <h3 style="font-size: 24px; color: #38bdf8; margin-bottom: 15px;">Complete Payment</h3>
+    <p style="margin-bottom: 20px; font-size: 14px;">Your order is saved. Please pay below. <br><strong>Do not close this tab.</strong></p>
+    
+    <a href="https://www.paypal.me/mujahidhussain78y" target="_blank" class="btn-paypal">Pay with PayPal</a>
+    <a href="https://wa.me/923456006438" target="_blank" class="btn-whatsapp" style="margin-bottom: 20px;">Send Receipt on WhatsApp</a>
+    
+    <div style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+        <div style="width: 15px; height: 15px; border: 2px solid #38bdf8; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <span style="font-size: 14px; font-weight: 600;" id="paymentStatusText">Waiting for payment verification...</span>
+      </div>
+    </div>
+    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
   </div>
 </div>
 
-<!-- FOOTER -->
-<footer>
-  <p>&copy; 2024 LetItEdit. All rights reserved.</p>
-  <p style="margin-top: 10px;">Need assistance? <a href="https://wa.me/923456006438" target="_blank">Contact us on WhatsApp</a> or email <a href="mailto:a1003350601123@gmail.com">a1003350601123@gmail.com</a></p>
-</footer>
+<!-- MODAL 3: SECURE UPLOAD (Unlocked by Admin) -->
+<div class="modal-overlay" id="uploadModal">
+  <div class="modal glass-panel" style="text-align: center;">
+    <div style="font-size: 50px; margin-bottom: 10px;">✅</div>
+    <h3 style="font-size: 24px; color: #10b981; margin-bottom: 15px;">Payment Verified!</h3>
+    <p style="margin-bottom: 20px; font-size: 14px;">Thank you. Please upload your file now.</p>
+    
+    <form id="uploadForm" onsubmit="handleFileUpload(event)">
+      <input type="hidden" id="uploadOrderId" value="">
+      <div class="form-group" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; border: 1px dashed var(--primary);">
+        <input type="file" id="fileInput" required style="border:none; background:transparent; padding:0;">
+      </div>
+      <button type="submit" class="btn-primary" id="uploadBtn" style="background: linear-gradient(135deg, #10b981, #059669);">Upload & Finish</button>
+    </form>
+  </div>
+</div>
 
 <script>
-  // Supabase Config
-  let supabaseClient = null;
-  try {
-    const supabaseUrl = 'https://bjragiylhglqfodbihvd.supabase.co'; 
-    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqcmFnaXlsaGdscWZvZGJpaHZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMjQ1NzMsImV4cCI6MjEwODkwMDU3M30.upa96t4q9W1AXIr8wry3kL_8U7L__GmTZZ3kWNjurYU';
-    supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
-  } catch(e) {
-    console.log("Supabase init failed", e);
-  }
+  // 1. Supabase Setup
+  const supabaseUrl = 'https://bjragiylhglqfodbihvd.supabase.co'; 
+  const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqcmFnaXlsaGdscWZvZGJpaHZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMjQ1NzMsImV4cCI6MjEwODkwMDU3M30.upa96t4q9W1AXIr8wry3kL_8U7L__GmTZZ3kWNjurYU';
+  const supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
 
   let currentPrice = 5;
   let currentService = '';
+  let pollingInterval = null;
 
-  document.addEventListener("DOMContentLoaded", function() {
-    // Force all elements in the home view to be visible immediately
-    document.querySelectorAll('#view-home .animate-on-scroll').forEach(el => {
-      el.classList.add('is-visible');
-    });
-
-    const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-        } else {
-          entry.target.classList.remove('is-visible');
-        }
-      });
-    }, observerOptions);
-    document.querySelectorAll('.animate-on-scroll').forEach(el => { observer.observe(el); });
+  // 2. Check for Pending Order on Load (Welcome Back Banner)
+  window.addEventListener('DOMContentLoaded', () => {
+    const pendingId = localStorage.getItem('pendingOrderId');
+    if (pendingId) {
+      showResumeBanner(pendingId);
+    }
   });
 
-  const serviceData = {
-    'PDF': {
-      title: 'PDF Formatting & Editing',
-      text: 'We fix PDF formatting for resumes, merge and split PDF files, and edit text and images. Your document will be securely delivered to an available freelancer.'
-    },
-    'Screenshot': {
-      title: 'Screenshot Enhancement',
-      text: 'We edit screenshots for tutorials, annotate images, and blur sensitive information. Once your image is perfectly edited, you will be notified via Email or WhatsApp.'
-    },
-    'Doc': {
-      title: 'Word (Doc) File Formatting',
-      text: 'We format Word documents APA style, fix document formatting issues, and proofread text. Once your document is polished and ready, you will be notified via Email or WhatsApp.'
-    },
-    'Excel': {
-      title: 'Excel Data Editing',
-      text: 'We fix Excel formulas, clean up spreadsheets, format charts for presentations, and handle data entry. Once your spreadsheet is perfectly updated, you will be notified.'
-    }
-  };
+  function showResumeBanner(orderId) {
+    const banner = document.createElement('div');
+    banner.id = 'resumeBanner';
+    banner.innerHTML = `🔔 You have a pending order. Click here to check status.`;
+    banner.onclick = () => {
+      banner.remove();
+      document.getElementById('paymentModal').classList.add('active');
+      startPolling(orderId);
+    };
+    document.body.appendChild(banner);
+  }
 
-  function switchView(viewName, pushToHistory = true) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    let activeView;
-    if(viewName === 'home') {
-      activeView = document.getElementById('view-home');
-    } else if (viewName === 'video') {
-      activeView = document.getElementById('view-video');
-    } else {
-      activeView = document.getElementById('view-service');
-    }
-    activeView.classList.add('active');
-    
-    activeView.querySelectorAll('.animate-on-scroll').forEach(el => {
-      el.classList.add('is-visible');
-    });
+  // 3. Handle Form Submit (Save to DB)
+  async function handleFormSubmit(event) {
+    event.preventDefault(); 
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.innerText = 'Saving...';
+    submitBtn.disabled = true;
 
-    window.scrollTo(0, 0);
+    try {
+      const { data, error } = await supabaseClient
+        .from('orders')
+        .insert([{
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            whatsapp: document.getElementById('whatsapp').value,
+            requirements: `[UNPAID - ${currentService}] ` + document.getElementById('requirements').value,
+            delivery_time: document.getElementById('deliveryTime').value,
+            status: 'pending' // Crucial for the gate!
+        }]).select();
 
-    if (pushToHistory && window.location.protocol !== 'file:') {
-      history.pushState({ view: viewName }, '', '#' + viewName);
+      if (error) throw error;
+
+      // Save Order ID to Browser
+      const orderId = data[0].id;
+      localStorage.setItem('pendingOrderId', orderId);
+      document.getElementById('uploadOrderId').value = orderId;
+
+      // Switch Modals
+      document.getElementById('orderModal').classList.remove('active');
+      document.getElementById('paymentModal').classList.add('active');
+      
+      startPolling(orderId);
+
+    } catch (error) {
+      alert('Error: ' + error.message);
+    } finally {
+      submitBtn.innerText = 'Proceed to Payment →';
+      submitBtn.disabled = false;
     }
   }
 
-  window.addEventListener('popstate', (event) => {
-    if (document.getElementById('orderModal').classList.contains('active')) {
-      document.getElementById('orderModal').classList.remove('active');
+  // 4. The Polling Engine (Checks if Admin Approved)
+  function startPolling(orderId) {
+    if (pollingInterval) clearInterval(pollingInterval);
+
+    pollingInterval = setInterval(async () => {
+      const { data, error } = await supabaseClient
+        .from('orders')
+        .select('status')
+        .eq('id', orderId)
+        .single();
+
+      if (data && data.status === 'paid') {
+        clearInterval(pollingInterval);
+        localStorage.removeItem('pendingOrderId'); // Clear memory
+        
+        // UNLOCK!
+        document.getElementById('paymentModal').classList.remove('active');
+        document.getElementById('uploadModal').classList.add('active');
+      }
+    }, 3000); // Checks every 3 seconds
+  }
+
+  // 5. Handle Final File Upload
+  async function handleFileUpload(event) {
+    event.preventDefault();
+    const fileInput = document.getElementById('fileInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const orderId = document.getElementById('uploadOrderId').value;
+
+    if (!fileInput.files.length) return;
+
+    uploadBtn.innerText = 'Uploading...';
+    uploadBtn.disabled = true;
+
+    const file = fileInput.files[0];
+    const fileName = `${Date.now()}_${file.name}`;
+
+    try {
+      // Upload to Storage
+      const { error: storageError } = await supabaseClient.storage
+        .from('uploads')
+        .upload(fileName, file);
+      if (storageError) throw storageError;
+
+      // Update Order Row with file link
+      const { error: dbError } = await supabaseClient
+        .from('orders')
+        .update({ file_url: fileName, status: 'completed' })
+        .eq('id', orderId);
+      if (dbError) throw dbError;
+
+      alert("✅ Order Complete! We will edit your file and send it to your WhatsApp/Email shortly.");
+      window.location.reload(); // Reset page
+
+    } catch (error) {
+      alert('Upload failed: ' + error.message);
+      uploadBtn.innerText = 'Upload & Finish';
+      uploadBtn.disabled = false;
     }
-    if (document.getElementById('thankYouModal').classList.contains('active')) {
-      document.getElementById('thankYouModal').classList.remove('active');
-    }
-    if (event.state && event.state.view) {
-      switchView(event.state.view, false);
-    } else {
-      switchView('home', false);
-    }
-  });
+  }
+
+  // --- UI Helpers ---
+  const serviceData = {
+    'PDF': { title: 'PDF Formatting', text: 'Submit details. After payment, upload your PDF securely.' },
+    'Screenshot': { title: 'Screenshot Editing', text: 'Submit details. After payment, upload your image securely.' },
+    'Doc': { title: 'Word Formatting', text: 'Submit details. After payment, upload your Doc securely.' },
+    'Excel': { title: 'Excel Editing', text: 'Submit details. After payment, upload your Excel securely.' }
+  };
+
+  function switchView(viewName) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    if(viewName === 'home') document.getElementById('view-home').classList.add('active');
+    else if (viewName === 'video') document.getElementById('view-video').classList.add('active');
+    else document.getElementById('view-service').classList.add('active');
+    window.scrollTo(0, 0);
+  }
 
   function openService(type) {
     currentService = type;
     document.getElementById('service-title').innerText = serviceData[type].title;
-    document.getElementById('service-instructions').innerText = serviceData[type].text;
-    
-    const fileInput = document.getElementById('fileInput');
-    fileInput.value = ''; 
-    
-    if (type === 'PDF') {
-      fileInput.setAttribute('accept', '.pdf');
-    } else if (type === 'Screenshot') {
-      fileInput.setAttribute('accept', 'image/*');
-    } else if (type === 'Doc') {
-      fileInput.setAttribute('accept', '.doc, .docx, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-    } else if (type === 'Excel') {
-      fileInput.setAttribute('accept', '.xls, .xlsx, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    }
-    
     switchView('service');
   }
 
   function openOrderModal(time, price) {
     currentPrice = price;
     document.getElementById('deliveryTime').value = time + ' ($' + price + ')';
-    document.getElementById('priceDisplay').innerText = 'Total Amount: $' + price;
-    
-    document.getElementById('submitBtn').innerText = `Pay $${price} via PayPal & Submit`;
-    
+    document.getElementById('priceDisplay').innerText = 'Total: $' + price;
     document.getElementById('orderModal').classList.add('active');
-    
-    if (window.location.protocol !== 'file:') {
-      history.pushState({ modal: true }, '', '');
-    }
   }
 
-  function closeModal() {
-    document.getElementById('orderModal').classList.remove('active');
-  }
-
-  function showThankYou() {
-    document.getElementById('orderModal').classList.remove('active');
-    document.getElementById('thankYouModal').classList.add('active');
-    document.getElementById('orderForm').reset();
-    switchView('home');
-  }
-
-  function closeThankYou() {
-    document.getElementById('thankYouModal').classList.remove('active');
-  }
-
-  document.getElementById('orderModal').addEventListener('click', function(e) {
-    if(e.target === this) closeModal();
-  });
-
-  async function handleFormSubmit(event) {
-    event.preventDefault(); 
-    
-    if (!supabaseClient) {
-      alert('Database connection error. Please refresh the page.');
-      return;
-    }
-
-    const form = document.getElementById('orderForm');
-    const fileInput = document.getElementById('fileInput');
-    const submitBtn = document.getElementById('submitBtn');
-
-    if (!fileInput.files || fileInput.files.length === 0) {
-      alert('Please select a file to upload.');
-      return;
-    }
-
-    const file = fileInput.files[0];
-    const fileNameLower = file.name.toLowerCase();
-    let isValid = false;
-    
-    if (currentService === 'PDF' && fileNameLower.endsWith('.pdf')) isValid = true;
-    else if (currentService === 'Screenshot' && (fileNameLower.endsWith('.png') || fileNameLower.endsWith('.jpg') || fileNameLower.endsWith('.jpeg'))) isValid = true;
-    else if (currentService === 'Doc' && (fileNameLower.endsWith('.doc') || fileNameLower.endsWith('.docx'))) isValid = true;
-    else if (currentService === 'Excel' && (fileNameLower.endsWith('.xls') || fileNameLower.endsWith('.xlsx'))) isValid = true;
-
-    if (!isValid) {
-      alert(`Invalid file type. You selected ${currentService}. Please upload the correct file format.`);
-      return;
-    }
-
-    const fileName = `${Date.now()}_${file.name}`;
-
-    submitBtn.innerText = 'Saving Order & Redirecting...';
-    submitBtn.disabled = true;
-    submitBtn.style.opacity = '0.7';
-
-    try {
-      const { data: fileData, error: fileError } = await supabaseClient.storage
-        .from('uploads')
-        .upload(fileName, file);
-
-      if (fileError) throw fileError;
-
-      const { error: dbError } = await supabaseClient
-        .from('orders')
-        .insert([
-          {
-            name: document.getElementById('name').value,
-            email: document.getElementById('email').value,
-            whatsapp: document.getElementById('whatsapp').value,
-            requirements: `[FILE TYPE: ${currentService}] ` + document.getElementById('requirements').value,
-            delivery_time: document.getElementById('deliveryTime').value,
-            file_url: fileName
-          }
-        ]);
-
-      if (dbError) throw dbError;
-
-      const paypalLink = 'https://www.paypal.me/mujahidhussain78y/' + currentPrice;
-      window.open(paypalLink, '_blank');
-
-      // Show the beautiful Thank You Popup
-      showThankYou();
-      
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Error submitting order: ' + error.message);
-    } finally {
-      submitBtn.innerText = `Pay $${currentPrice} via PayPal & Submit`;
-      submitBtn.disabled = false;
-      submitBtn.style.opacity = '1';
-    }
-  }
+  function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 </script>
 </body>
 </html>
