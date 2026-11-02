@@ -3,10 +3,15 @@ export async function onRequest(context) {
   const payload = await request.json();
   const order = payload.record;
 
+  // 1. Create the Approve Link for YOU
+  const approveLink = `https://letitedit.com/approve-order?id=${order.id}&secret=letitedit_secret_123`;
+
+  // 2. Format the email
   const emailBody = `
-    Hello Umaima,
+    Hello Mujahid,
     
-    You have received a new order on LetItEdit!
+    You have received a new order on LetItEdit! 
+    (Status: PENDING PAYMENT)
     
     Customer Details:
     -----------------
@@ -18,12 +23,13 @@ export async function onRequest(context) {
     Requirements:
     ${order.requirements}
     
-    File to Edit:
-    Please go to your Supabase Storage and download the file named: ${order.file_url}
+    STEP 1: Go to your PayPal/SadaPay and confirm you received the money.
+    STEP 2: Once confirmed, click the link below to unlock the customer's upload screen:
     
-    Let's get to work!
+    👉 ${approveLink}
   `;
 
+  // 3. Send the email via Resend
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -33,7 +39,7 @@ export async function onRequest(context) {
     body: JSON.stringify({
       from: "LetItEdit <onboarding@resend.dev>",
       to: ["a1003350601123@gmail.com"],
-      subject: `🚨 New Order: ${order.name} (${order.delivery_time})`,
+      subject: `🚨 PENDING Order: ${order.name} (${order.delivery_time})`,
       text: emailBody,
     })
   });
