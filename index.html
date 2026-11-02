@@ -3,7 +3,72 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>LetItEdit — Premium Human Editing</title>
+
+<!-- ========================================== -->
+<!-- 🔥 HEAVY SEO OPTIMIZATION (INVISIBLE TO USERS) 🔥 -->
+<!-- ========================================== -->
+<title>Professional PDF, Excel, Screenshot & Video Editing Services | LetItEdit</title>
+<meta name="description" content="Need fast document or image editing? We format PDFs for resumes, fix Excel formulas, polish Word docs, do screenshot editing, and professional video editing. 100% secure, human touch, pay via PayPal.">
+<meta name="keywords" content="PDF editing service, format PDF for resume, fix PDF formatting online, merge and split PDF files, professional PDF editor for hire, fix Excel formulas online, clean up Excel spreadsheet, format Excel chart for presentation, Excel data entry and editing, format Word document APA style, fix Word document formatting, professional Word document editor, edit screenshot for tutorial, annotate screenshot online, remove background from screenshot, short form video editing service, edit YouTube video for me, professional video editor for hire, freelance editing services, human document editing, fast turnaround editing">
+<meta name="author" content="LetItEdit">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://letitedit.com/" />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://letitedit.com/">
+<meta property="og:title" content="Professional PDF, Excel, Screenshot & Video Editing Services">
+<meta property="og:description" content="Upload your documents for expert human editing. 100% secure and fast delivery.">
+
+<!-- 🚀 ADVANCED SCHEMA MARKUP FOR GOOGLE RICH SNIPPETS 🚀 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "ProfessionalService",
+      "name": "LetItEdit",
+      "url": "https://letitedit.com",
+      "description": "Professional human editing services for PDFs, Excel spreadsheets, Word documents, Screenshot editing, and Video editing.",
+      "telephone": "+923456006438",
+      "email": "a1003350601123@gmail.com",
+      "priceRange": "$$",
+      "areaServed": "Worldwide",
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Editing Services",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "PDF Formatting and Resume Editing" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Excel Data Cleaning and Formula Fixing" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Word Document Formatting" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Screenshot Editing and Blurring" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Video Editing and Post Production" } }
+        ]
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [{
+        "@type": "Question",
+        "name": "How do I format my PDF for a resume?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "You can upload your PDF on LetItEdit, select your delivery time, and our human experts will professionally format your resume to make it ATS-friendly."
+        }
+      }, {
+        "@type": "Question",
+        "name": "Can you fix Excel formulas and clean up spreadsheets?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, our backend experts can fix broken Excel formulas, format charts for presentations, and clean up messy spreadsheet data."
+        }
+      }]
+    }
+  ]
+}
+</script>
+<!-- ========================================== -->
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -38,136 +103,60 @@
 
   h1, h2, h3, h4, .brand { font-family: 'Outfit', sans-serif; }
 
-  /* --- SCROLL ANIMATIONS --- */
-  .animate-on-scroll {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-    will-change: opacity, transform;
-  }
-  .slide-right { transform: translateX(40px); }
-  .slide-left { transform: translateX(-40px); }
+  .animate-on-scroll { opacity: 0; transform: translateY(40px); transition: 0.6s; will-change: opacity, transform; }
+  .slide-right { transform: translateX(40px); } .slide-left { transform: translateX(-40px); }
+  .animate-on-scroll.is-visible { opacity: 1; transform: translate(0, 0); }
 
-  .animate-on-scroll.is-visible {
-    opacity: 1;
-    transform: translate(0, 0);
-  }
+  /* FLOATING BACKGROUND */
+  .floating-tools { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .tool-icon { position: absolute; color: var(--primary); opacity: 0.15; filter: blur(1px) drop-shadow(0 0 15px var(--primary-glow)); animation: float 25s infinite ease-in-out alternate; }
+  .tool-icon:nth-child(2n) { color: #8b5cf6; }
+  .t1 { top: 10%; left: 10%; width: 80px; } .t2 { top: 20%; right: 15%; width: 120px; }
+  .t3 { bottom: 20%; left: 15%; width: 100px; } .t4 { bottom: 30%; right: 10%; width: 90px; }
+  .t5 { top: 50%; left: 45%; width: 150px; } .t6 { top: 70%; right: 40%; width: 70px; }
+  @keyframes float { 0% { transform: translate3d(0,0,0) scale(1); } 100% { transform: translate3d(30px,-50px,0) scale(1.05); } }
 
-  /* --- FLOATING EDITING TOOLS BACKGROUND --- */
-  .floating-tools {
-    position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
-  }
-  .tool-icon {
-    position: absolute; color: var(--primary); opacity: 0.15;
-    filter: blur(1px) drop-shadow(0 0 15px var(--primary-glow));
-    animation: float 25s infinite ease-in-out alternate;
-    will-change: transform;
-  }
-  .tool-icon:nth-child(2n) { color: #8b5cf6; filter: blur(1px) drop-shadow(0 0 15px rgba(139,92,246,0.5)); }
-  .tool-icon:nth-child(3n) { color: #10b981; filter: blur(1px) drop-shadow(0 0 15px rgba(16,185,129,0.5)); }
-
-  .t1 { top: 10%; left: 10%; width: 80px; animation-duration: 25s; }
-  .t2 { top: 20%; right: 15%; width: 120px; animation-duration: 18s; animation-delay: -5s; }
-  .t3 { bottom: 20%; left: 15%; width: 100px; animation-duration: 22s; animation-delay: -2s; }
-  .t4 { bottom: 30%; right: 10%; width: 90px; animation-duration: 28s; animation-delay: -10s; }
-  .t5 { top: 50%; left: 45%; width: 150px; animation-duration: 35s; animation-delay: -8s; }
-  .t6 { top: 70%; right: 40%; width: 70px; animation-duration: 20s; animation-delay: -15s; }
-  .t7 { top: 5%; left: 60%; width: 60px; animation-duration: 30s; animation-delay: -3s; }
-  .t8 { bottom: 5%; right: 30%; width: 110px; animation-duration: 24s; animation-delay: -12s; }
-
-  @keyframes float {
-    0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
-    33% { transform: translate3d(30px, -50px, 0) rotate(10deg) scale(1.05); }
-    66% { transform: translate3d(-20px, 20px, 0) rotate(-5deg) scale(0.95); }
-    100% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
-  }
-
-  /* --- MORE CRYSTAL GLASS EFFECT --- */
   .glass-panel {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--border);
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
-    border-left: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.03);
-    border-radius: 24px;
-    position: relative;
-    z-index: 10;
-    overflow: hidden;
+    backdrop-filter: blur(16px); border: 1px solid var(--border); border-top: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); border-radius: 24px; position: relative; z-index: 10; overflow: hidden;
   }
 
-  /* Header */
-  header {
-    padding: 15px 40px; display: flex; justify-content: space-between; align-items: center;
-    position: sticky; top: 0; z-index: 999;
-    background: rgba(5, 9, 20, 0.85); backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-  }
+  header { padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 999; background: rgba(5, 9, 20, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
   .logo-container { display: flex; align-items: center; text-decoration: none; cursor: pointer; }
-  .logo-img { height: 70px; width: auto; border-radius: 8px; mix-blend-mode: screen; transition: 0.3s; }
-  .logo-container:hover .logo-img { transform: scale(1.05); }
+  .logo-img { height: 70px; width: auto; mix-blend-mode: screen; transition: 0.3s; }
   .fallback-logo { display: none; font-weight: 800; font-size: 28px; color: var(--primary); margin-left: 10px; }
-  
-  .help-btn {
-    background: rgba(37, 211, 102, 0.1); color: #25D366; border: 1px solid rgba(37, 211, 102, 0.3);
-    padding: 10px 24px; border-radius: 50px; text-decoration: none; font-weight: 600;
-    display: flex; align-items: center; gap: 8px; transition: 0.3s;
-  }
+  .help-btn { background: rgba(37, 211, 102, 0.1); color: #25D366; border: 1px solid rgba(37, 211, 102, 0.3); padding: 10px 24px; border-radius: 50px; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
   .help-btn:hover { background: rgba(37, 211, 102, 0.2); box-shadow: 0 0 20px rgba(37, 211, 102, 0.2); }
 
-  /* Views */
   .view { display: none; opacity: 0; position: relative; z-index: 10; }
   .view.active { display: block; opacity: 1; animation: fadeIn 0.5s forwards; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* Home View */
+  /* VISIBLE SEO OPTIMIZED HEADINGS */
   .hero { text-align: center; padding: 80px 20px 40px; }
   .hero h1 { font-size: 56px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; margin-bottom: 20px; }
-  .hero h1 span { 
-    background: linear-gradient(135deg, #38bdf8, #8b5cf6); 
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-    text-shadow: 0 0 40px rgba(56, 189, 248, 0.3);
-  }
-  .hero p { color: var(--text-muted); font-size: 18px; max-width: 600px; margin: 0 auto; }
+  .hero h1 span { background: linear-gradient(135deg, #38bdf8, #8b5cf6); -webkit-background-clip: text; color: transparent; text-shadow: 0 0 40px rgba(56, 189, 248, 0.3); }
+  .hero p { color: var(--text-muted); font-size: 18px; max-width: 650px; margin: 0 auto; line-height: 1.6; }
 
-  /* --- GRID LAYOUT FOR BUTTONS --- */
-  .file-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 24px; max-width: 1100px; margin: 40px auto; padding: 0 20px;
-  }
-
-  .file-card {
-    padding: 40px 20px; text-align: center; cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center;
-  }
-  .file-card::before {
-    content: ''; position: absolute; inset: 0;
-    background: radial-gradient(circle at center, rgba(56,189,248,0.15) 0%, transparent 70%);
-    opacity: 0; transition: 0.4s; z-index: -1;
-  }
+  .file-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+  .file-card { padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+  .file-card::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(56,189,248,0.15) 0%, transparent 70%); opacity: 0; transition: 0.4s; z-index: -1; }
   .file-card:hover { transform: translateY(-8px); border-color: rgba(56, 189, 248, 0.6); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 25px var(--primary-glow); }
   .file-card:hover::before { opacity: 1; }
-  
   .file-card.full-width { grid-column: 1 / -1; padding: 50px 20px; }
-
-  .file-icon { font-size: 48px; margin-bottom: 16px; display: inline-block; filter: drop-shadow(0 0 10px var(--primary-glow)); }
+  .file-icon { font-size: 48px; margin-bottom: 16px; filter: drop-shadow(0 0 10px var(--primary-glow)); }
   .file-card h3 { font-size: 20px; color: var(--text-main); font-weight: 600; }
 
-  /* --- SINGLE LINE MARQUEE REVIEWS --- */
   .reviews-section { margin: 80px 0; text-align: center; overflow: hidden; }
   .reviews-section h2 { font-size: 36px; color: var(--text-main); margin-bottom: 40px; }
-  
   .marquee-container { display: flex; width: 100vw; overflow: hidden; position: relative; }
   .marquee-container::before, .marquee-container::after { content: ''; position: absolute; top: 0; bottom: 0; width: 150px; z-index: 20; pointer-events: none; }
   .marquee-container::before { left: 0; background: linear-gradient(to right, var(--bg) 0%, transparent 100%); }
   .marquee-container::after { right: 0; background: linear-gradient(to left, var(--bg) 0%, transparent 100%); }
-
   .marquee-track { display: flex; width: max-content; animation: scrollLeft 50s linear infinite; }
   .marquee-track:hover { animation-play-state: paused; }
   @keyframes scrollLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-
   .review-card { padding: 24px; text-align: left; width: 350px; margin: 0 12px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-between; }
   .stars { color: #fbbf24; font-size: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
   .rating-num { font-size: 12px; color: var(--text-muted); font-weight: 600; background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 6px; }
@@ -177,7 +166,6 @@
   .reviewer-info h4 { font-size: 14px; color: var(--text-main); margin-bottom: 2px; }
   .reviewer-info span { font-size: 12px; color: var(--text-muted); }
 
-  /* Features Section */
   .features-section { max-width: 1000px; margin: 80px auto; padding: 0 20px; text-align: center; }
   .features-section h2 { font-size: 36px; margin-bottom: 40px; }
   .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; }
@@ -186,16 +174,13 @@
   .feature-item h4 { font-size: 18px; margin-bottom: 10px; color: var(--text-main); }
   .feature-item p { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
 
-  /* Service View */
   .service-container { max-width: 800px; margin: 40px auto; padding: 20px; }
   .back-btn { background: none; border: none; color: var(--text-muted); font-size: 16px; cursor: pointer; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
   .back-btn:hover { color: var(--primary); transform: translateX(-5px); }
-  
   .instruction-box { padding: 40px; text-align: center; margin-bottom: 30px; }
   .instruction-box h2 { font-size: 32px; color: var(--primary); margin-bottom: 16px; }
   .instruction-box p { font-size: 16px; line-height: 1.8; color: var(--text-main); margin-bottom: 15px; }
 
-  /* Pricing Board */
   .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px; margin: 30px 0; }
   .price-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px 10px; text-align: center; cursor: pointer; transition: 0.3s; color: var(--text-main); font-family: 'Outfit', sans-serif; }
   .price-btn:hover { background: var(--surface-hover); border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 0 15px var(--primary-glow); }
@@ -207,7 +192,6 @@
   .main-action-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(37, 99, 235, 0.6); }
   .main-action-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
 
-  /* Modal */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(5, 9, 20, 0.85); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; padding: 20px; }
   .modal-overlay.active { display: flex; }
   .modal { width: 100%; max-width: 600px; padding: 40px; position: relative; max-height: 90vh; overflow-y: auto; }
@@ -220,25 +204,20 @@
   .form-group input:focus, .form-group textarea:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
   .form-group input[type="file"]::file-selector-button { background: var(--surface-hover); color: white; border: none; padding: 8px 16px; border-radius: 8px; margin-right: 12px; cursor: pointer; transition: 0.3s; }
   
-  /* Validation Styles */
   .form-group.has-error input, .form-group.has-error textarea { border-color: var(--error); box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); }
   .error-msg { display: none; color: var(--error); font-size: 12px; margin-top: 6px; font-weight: 500; animation: fadeIn 0.3s; }
   .form-group.has-error .error-msg { display: block; }
 
   .price-highlight { text-align: center; font-size: 18px; font-weight: 600; color: var(--primary); margin: 20px 0; }
-  
   .submit-btn { width: 100%; padding: 18px; background: #0070ba; color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 18px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 112, 186, 0.4); display: flex; justify-content: center; align-items: center; gap: 10px; }
   .submit-btn:hover { background: #005c99; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 112, 186, 0.6); }
-  
   .btn-whatsapp { width: 100%; padding: 18px; background: #25D366; color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 18px; cursor: pointer; text-decoration: none; display: block; text-align: center; margin-bottom: 20px; transition: 0.3s; }
   .btn-whatsapp:hover { background: #20bd5a; }
 
-  /* Footer */
   footer { text-align: center; padding: 40px 20px; border-top: 1px solid var(--border); margin-top: 80px; color: var(--text-muted); font-size: 14px; position: relative; z-index: 10; }
   footer a { color: var(--primary); text-decoration: none; transition: 0.2s; }
   footer a:hover { color: #fff; text-decoration: underline; }
 
-  /* Resume Banner */
   #resumeBanner { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(56, 189, 248, 0.95); color: white; padding: 15px 30px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 9999; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; pointer-events: auto; }
   #resumeBanner:hover { background: #38bdf8; transform: translateX(-50%) translateY(-5px); }
 
@@ -265,7 +244,6 @@
 </head>
 <body>
 
-<!-- FLOATING BACKGROUND TOOLS -->
 <div class="floating-tools">
   <svg class="tool-icon t1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.06 11.9l8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"></path><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"></path></svg>
   <svg class="tool-icon t2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"></path><path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"></path></svg>
@@ -273,13 +251,11 @@
   <svg class="tool-icon t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 12 12 17 22 12"></polyline><polyline points="2 17 12 22 22 17"></polyline></svg>
   <svg class="tool-icon t5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3M9 20h6M12 4v16"></path></svg>
   <svg class="tool-icon t6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
-  <svg class="tool-icon t7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
-  <svg class="tool-icon t8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
 </div>
 
 <header>
   <a href="#" class="logo-container" onclick="switchView('home'); return false;">
-    <img src="assets/logo.png" alt="LetItEdit Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+    <img src="assets/logo.png" alt="LetItEdit Professional PDF and Video Editing Services" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
     <div class="fallback-logo">LetItEdit</div>
   </a>
   <a href="https://wa.me/923456006438" target="_blank" class="help-btn">
@@ -291,8 +267,10 @@
 <!-- VIEW 1: HOME -->
 <div id="view-home" class="view active">
   <section class="hero">
-    <h1 class="animate-on-scroll slide-right">Which file type would you like our <span>experts</span> to refine today?</h1>
-    <p class="animate-on-scroll slide-left">Select your document format below to view custom instructions, pricing, and to submit your file to our freelance team.</p>
+    <!-- VISIBLE SEO H1 -->
+    <h1 class="animate-on-scroll slide-right">Professional PDF, Excel & Video <span>Editing Services</span></h1>
+    <!-- VISIBLE SEO DESCRIPTION -->
+    <p class="animate-on-scroll slide-left">Need fast document editing? We format PDFs for resumes, fix Excel formulas, polish Word docs, and do professional screenshot and video editing. 100% secure and human touch.</p>
   </section>
 
   <div class="file-grid">
@@ -324,17 +302,17 @@
     <div class="marquee-container">
       <div class="marquee-track">
         <div class="marquee-content" style="display:flex;">
-          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Flawless PDF formatting. Delivered in 45 mins!"</p><div class="reviewer"><div class="reviewer-avatar">S</div><div class="reviewer-info"><h4>Sarah J.</h4><span>USA</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Excellent Excel work. Fixed all my formulas."</p><div class="reviewer"><div class="reviewer-avatar">M</div><div class="reviewer-info"><h4>Michael R.</h4><span>UK</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★☆ <span class="rating-num">4.7</span></div><p class="review-text">"Very fast screenshot editing. Good communication."</p><div class="reviewer"><div class="reviewer-avatar">A</div><div class="reviewer-info"><h4>Ahmed K.</h4><span>UAE</span></div></div></div>
+          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Flawless PDF formatting for my resume. Delivered in 45 mins!"</p><div class="reviewer"><div class="reviewer-avatar">S</div><div class="reviewer-info"><h4>Sarah J.</h4><span>USA</span></div></div></div>
+          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Excellent Excel work. Fixed all my formulas perfectly."</p><div class="reviewer"><div class="reviewer-avatar">M</div><div class="reviewer-info"><h4>Michael R.</h4><span>UK</span></div></div></div>
+          <div class="review-card glass-panel"><div class="stars">★★★★☆ <span class="rating-num">4.7</span></div><p class="review-text">"Very fast screenshot editing. Blurred sensitive data well."</p><div class="reviewer"><div class="reviewer-avatar">A</div><div class="reviewer-info"><h4>Ahmed K.</h4><span>UAE</span></div></div></div>
           <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Best freelance site for Word document formatting."</p><div class="reviewer"><div class="reviewer-avatar">E</div><div class="reviewer-info"><h4>Emily C.</h4><span>Canada</span></div></div></div>
           <div class="review-card glass-panel"><div class="stars">★★★★☆ <span class="rating-num">4.3</span></div><p class="review-text">"Solid work, took slightly longer than 2 hours but worth it."</p><div class="reviewer"><div class="reviewer-avatar">D</div><div class="reviewer-info"><h4>David L.</h4><span>Singapore</span></div></div></div>
           <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Beautiful interface, seamless process. 10/10."</p><div class="reviewer"><div class="reviewer-avatar">R</div><div class="reviewer-info"><h4>Rachel G.</h4><span>Australia</span></div></div></div>
         </div>
         <div class="marquee-content" style="display:flex;">
-          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Flawless PDF formatting. Delivered in 45 mins!"</p><div class="reviewer"><div class="reviewer-avatar">S</div><div class="reviewer-info"><h4>Sarah J.</h4><span>USA</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Excellent Excel work. Fixed all my formulas."</p><div class="reviewer"><div class="reviewer-avatar">M</div><div class="reviewer-info"><h4>Michael R.</h4><span>UK</span></div></div></div>
-          <div class="review-card glass-panel"><div class="stars">★★★★☆ <span class="rating-num">4.7</span></div><p class="review-text">"Very fast screenshot editing. Good communication."</p><div class="reviewer"><div class="reviewer-avatar">A</div><div class="reviewer-info"><h4>Ahmed K.</h4><span>UAE</span></div></div></div>
+          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Flawless PDF formatting for my resume. Delivered in 45 mins!"</p><div class="reviewer"><div class="reviewer-avatar">S</div><div class="reviewer-info"><h4>Sarah J.</h4><span>USA</span></div></div></div>
+          <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Excellent Excel work. Fixed all my formulas perfectly."</p><div class="reviewer"><div class="reviewer-avatar">M</div><div class="reviewer-info"><h4>Michael R.</h4><span>UK</span></div></div></div>
+          <div class="review-card glass-panel"><div class="stars">★★★★☆ <span class="rating-num">4.7</span></div><p class="review-text">"Very fast screenshot editing. Blurred sensitive data well."</p><div class="reviewer"><div class="reviewer-avatar">A</div><div class="reviewer-info"><h4>Ahmed K.</h4><span>UAE</span></div></div></div>
           <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Best freelance site for Word document formatting."</p><div class="reviewer"><div class="reviewer-avatar">E</div><div class="reviewer-info"><h4>Emily C.</h4><span>Canada</span></div></div></div>
           <div class="review-card glass-panel"><div class="stars">★★★★☆ <span class="rating-num">4.3</span></div><p class="review-text">"Solid work, took slightly longer than 2 hours but worth it."</p><div class="reviewer"><div class="reviewer-avatar">D</div><div class="reviewer-info"><h4>David L.</h4><span>Singapore</span></div></div></div>
           <div class="review-card glass-panel"><div class="stars">★★★★★ <span class="rating-num">5.0</span></div><p class="review-text">"Beautiful interface, seamless process. 10/10."</p><div class="reviewer"><div class="reviewer-avatar">R</div><div class="reviewer-info"><h4>Rachel G.</h4><span>Australia</span></div></div></div>
@@ -389,7 +367,7 @@
   </div>
 </div>
 
-<!-- MODAL 1: ORDER FORM (No File) -->
+<!-- MODAL 1: ORDER FORM -->
 <div class="modal-overlay" id="orderModal">
   <div class="modal glass-panel">
     <button class="close-btn" onclick="closeModal('orderModal')">×</button>
@@ -463,10 +441,11 @@
   </div>
 </div>
 
-<!-- FOOTER -->
+<!-- FOOTER (Visible SEO Text) -->
 <footer>
   <p>&copy; 2024 LetItEdit. All rights reserved.</p>
   <p style="margin-top: 10px;">Need assistance? <a href="https://wa.me/923456006438" target="_blank">Contact us on WhatsApp</a> or email <a href="mailto:a1003350601123@gmail.com">a1003350601123@gmail.com</a></p>
+  <p style="margin-top: 20px; font-size: 12px; color: #64748b;">Professional editing services for PDF formatting, Excel data entry, Word document formatting, screenshot annotation, and video editing.</p>
 </footer>
 
 <script>
@@ -482,18 +461,11 @@
   let currentService = '';
   let pollingInterval = null;
 
-  // ==========================================
-  // 1. UI LOGIC (Defined first so buttons always work)
-  // ==========================================
+  // UI LOGIC
   function switchView(viewName) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
-    
-    let activeView;
-    if(viewName === 'home') activeView = document.getElementById('view-home');
-    else if (viewName === 'video') activeView = document.getElementById('view-video');
-    else activeView = document.getElementById('view-service');
-    
+    let activeView = viewName === 'home' ? document.getElementById('view-home') : (viewName === 'video' ? document.getElementById('view-video') : document.getElementById('view-service'));
     if(activeView) {
       activeView.classList.add('active');
       activeView.querySelectorAll('.animate-on-scroll').forEach(el => el.classList.add('is-visible'));
@@ -501,12 +473,18 @@
     window.scrollTo(0, 0);
   }
 
+  const serviceData = {
+    'PDF': { title: 'PDF Formatting & Resume Editing', text: 'We fix PDF formatting for resumes, merge and split files, and convert documents perfectly.' },
+    'Screenshot': { title: 'Screenshot Editing & Annotation', text: 'We edit screenshots for tutorials, annotate images, and blur sensitive information securely.' },
+    'Doc': { title: 'Word (Doc) File Formatting', text: 'We format Word documents APA style, fix document formatting issues, and proofread text perfectly.' },
+    'Excel': { title: 'Excel Data Cleaning & Formulas', text: 'We fix Excel formulas, clean up spreadsheets, format charts for presentations, and handle data entry.' }
+  };
+
   function openService(type) {
     currentService = type;
     document.getElementById('service-title').innerText = serviceData[type].title;
     document.getElementById('service-instructions').innerText = serviceData[type].text;
     
-    // Set file input restrictions based on service
     const fileInput = document.getElementById('fileInput');
     if (fileInput) {
       if (type === 'PDF') fileInput.setAttribute('accept', '.pdf');
@@ -514,7 +492,6 @@
       else if (type === 'Doc') fileInput.setAttribute('accept', '.doc, .docx');
       else if (type === 'Excel') fileInput.setAttribute('accept', '.xls, .xlsx');
     }
-    
     switchView('service');
   }
 
@@ -528,40 +505,22 @@
 
   function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-  const serviceData = {
-    'PDF': { title: 'PDF Document Editing', text: 'Your PDF document and required instructions will be securely delivered to an available freelancer.' },
-    'Screenshot': { title: 'Screenshot Enhancement', text: 'Your screenshot and visual instructions will be routed to an available graphic expert.' },
-    'Doc': { title: 'Word (Doc) File Formatting', text: 'Your Word document and formatting requirements will be assigned to an available editor.' },
-    'Excel': { title: 'Excel Data Editing', text: 'Your spreadsheet and data requirements will be sent to an available specialist.' }
-  };
-
-  // ==========================================
-  // 2. VALIDATION & SUBMIT LOGIC
-  // ==========================================
-  
-  // Clear errors on input
   document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll('#view-home .animate-on-scroll').forEach(el => el.classList.add('is-visible'));
-    const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) entry.target.classList.add('is-visible');
         else entry.target.classList.remove('is-visible');
       });
-    }, observerOptions);
-    document.querySelectorAll('.animate-on-scroll').forEach(el => { observer.observe(el); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
 
     const pendingId = localStorage.getItem('pendingOrderId');
     if (pendingId) showResumeBanner(pendingId);
 
     ['name', 'email', 'whatsapp', 'requirements'].forEach(id => {
       const el = document.getElementById(id);
-      if(el) {
-        el.addEventListener('input', () => {
-          const group = document.getElementById('group-' + (id === 'requirements' ? 'req' : id));
-          if(group) group.classList.remove('has-error');
-        });
-      }
+      if(el) el.addEventListener('input', () => document.getElementById('group-' + (id === 'requirements' ? 'req' : id)).classList.remove('has-error'));
     });
   });
 
@@ -585,13 +544,10 @@
     const req = document.getElementById('requirements').value.trim();
     
     if (name.length < 3) { document.getElementById('group-name').classList.add('has-error'); isValid = false; }
-    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) { document.getElementById('group-email').classList.add('has-error'); isValid = false; }
-    
     if (whatsapp.length < 7) { document.getElementById('group-whatsapp').classList.add('has-error'); isValid = false; }
     if (req.length < 10) { document.getElementById('group-req').classList.add('has-error'); isValid = false; }
-    
     return isValid;
   }
 
