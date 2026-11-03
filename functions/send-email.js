@@ -6,25 +6,27 @@ export async function onRequest(context) {
   // 1. Create the Approve Link for YOU
   const approveLink = `https://letitedit.com/approve-order?id=${order.id}&secret=letitedit_secret_123`;
 
-  // 2. Format the email
+  // 2. Format the email with the Order Number clearly visible
   const emailBody = `
     Hello Mujahid,
     
     You have received a new order on LetItEdit! 
-    (Status: PENDING PAYMENT)
+    
+    🚨 ORDER NUMBER: #${order.id} 🚨
+    Status: PENDING PAYMENT
     
     Customer Details:
     -----------------
     Name: ${order.name}
-    Email: ${order.email}
-    WhatsApp: ${order.whatsapp}
-    Delivery Time: ${order.delivery_time}
+    Email: ${order.email || 'Not provided'}
+    WhatsApp: ${order.whatsapp || 'Not provided'}
+    Delivery Speed: ${order.delivery_time}
     
     Requirements:
     ${order.requirements}
     
-    STEP 1: Go to your PayPal/SadaPay and confirm you received the money.
-    STEP 2: Once confirmed, click the link below to unlock the customer's upload screen:
+    STEP 1: Check your PayPal/SadaPay account for a payment matching Order #${order.id} and the correct amount.
+    STEP 2: Once confirmed, click the link below to unlock their file upload:
     
     👉 ${approveLink}
   `;
@@ -39,7 +41,7 @@ export async function onRequest(context) {
     body: JSON.stringify({
       from: "LetItEdit <onboarding@resend.dev>",
       to: ["a1003350601123@gmail.com"],
-      subject: `🚨 PENDING Order: ${order.name} (${order.delivery_time})`,
+      subject: `🚨 Order #${order.id} (PENDING) - ${order.name}`,
       text: emailBody,
     })
   });
