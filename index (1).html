@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF, Word, Excel and Video Editing Service | LetItEdit</title>
+<meta name="description" content="Fast online document editing by a real person: PDF and resume formatting, Word APA/MLA formatting, Excel formula fixes, screenshot and video editing. From $1.">
+<meta name="keywords" content="PDF editing service, resume formatting, CV formatting, Word document formatting, APA formatting, MLA formatting, Excel formula help, Excel data cleaning, screenshot editing, blur screenshot, video editing service, freelance editor, online document editing">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#d63a73">
+<link rel="canonical" href="https://letitedit.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LetItEdit">
+<meta property="og:title" content="LetItEdit: PDF, Word, Excel and Video Editing Service">
+<meta property="og:description" content="Resume and PDF formatting, Word APA/MLA formatting, Excel fixes, screenshot and video editing by a real person. Free revisions.">
+<meta property="og:url" content="https://letitedit.com/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="LetItEdit: PDF, Word, Excel and Video Editing Service">
+<meta name="twitter:description" content="Fast online document editing by a real person. Free revisions. From $1.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"ProfessionalService","name":"LetItEdit","url":"https://letitedit.com/",
+"description":"Freelance online editing service for PDF and resume formatting, Word document formatting, Excel formula fixes, screenshot editing and short video editing.",
+"priceRange":"$1-$5","areaServed":"Worldwide",
+"contactPoint":{"@type":"ContactPoint","contactType":"customer support","telephone":"+92-345-6006438","availableLanguage":"English"},
+"hasOfferCatalog":{"@type":"OfferCatalog","name":"Editing services","itemListElement":[
+{"@type":"Offer","priceSpecification":{"@type":"PriceSpecification","priceCurrency":"USD","minPrice":1,"maxPrice":5},"itemOffered":{"@type":"Service","name":"PDF editing and resume formatting","description":"Resume and CV formatting, merging and splitting PDFs, fixing layouts and spacing."}},
+{"@type":"Offer","priceSpecification":{"@type":"PriceSpecification","priceCurrency":"USD","minPrice":1,"maxPrice":5},"itemOffered":{"@type":"Service","name":"Word document formatting","description":"APA and MLA formatting, headings, tables, page numbers and reference lists."}},
+{"@type":"Offer","priceSpecification":{"@type":"PriceSpecification","priceCurrency":"USD","minPrice":1,"maxPrice":5},"itemOffered":{"@type":"Service","name":"Excel formula fixes and data cleaning","description":"Fixing formulas, cleaning messy data and formatting tables and charts."}},
+{"@type":"Offer","priceSpecification":{"@type":"PriceSpecification","priceCurrency":"USD","minPrice":1,"maxPrice":5},"itemOffered":{"@type":"Service","name":"Screenshot editing","description":"Annotating tutorials, blurring private details, cropping and cleaning up images."}},
+{"@type":"Offer","itemOffered":{"@type":"Service","name":"Video editing","description":"Short-form video cuts, captions and pacing, quoted per project."}}
+]}}
+</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✏️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--paper:#fff;--wash:#f2f5fa;--ink:#0e1726;--muted:#566074;--line:#dde3ee;--blue:#1f4fff;--blue-d:#173bc2;--red:#c62828;--green:#12805c}
+*{box-sizing:border-box;margin:0}
+body{font:17px/1.65 "Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--paper)}
+h1,h2,h3{font-family:Literata,Georgia,serif;line-height:1.2}
+a{color:var(--blue)}
+p{max-width:64ch}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.wrap{max-width:1000px;margin:0 auto;padding:0 22px}
+
+header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;height:66px}
+.logo{font:700 23px Literata,Georgia,serif;background:none;border:0;color:var(--ink)}
+.logo i{font-style:normal;color:var(--blue)}
+nav{display:flex;align-items:center;gap:22px;font-size:15px}
+nav button{background:none;border:0;color:var(--muted)}
+nav button:hover{color:var(--ink)}
+
+.btn{display:inline-block;padding:13px 24px;border-radius:6px;font-weight:600;text-decoration:none;background:var(--blue);color:#fff;border:2px solid var(--blue);text-align:center}
+.btn:hover{background:var(--blue-d);border-color:var(--blue-d)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--ink)}
+.btn.ghost:hover{background:var(--ink);color:#fff}
+.btn.sm{padding:8px 16px;font-size:15px}
+.btn.full{display:block;width:100%}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+
+.view{display:none}.view.on{display:block}
+section{padding:70px 0}
+.wash{background:var(--wash)}
+h2{font-size:clamp(25px,4vw,34px);margin-bottom:10px}
+.lead{color:var(--muted);margin-bottom:30px}
+.back{background:none;border:0;color:var(--muted);margin:26px 0 0;padding:0}
+.back:hover{color:var(--ink)}
+
+.hero{padding:76px 0 64px}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+.hero h1{font-size:clamp(33px,5.4vw,52px);letter-spacing:-.015em}
+.hero .sub{font-size:19px;color:var(--muted);margin:20px 0 28px}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+.paper{background:#fff;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:4px;padding:24px 24px 10px;box-shadow:0 12px 32px rgba(14,23,38,.1);font-family:Literata,Georgia,serif;font-size:17px}
+.paper h3{font-size:19px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.paper p{margin-bottom:14px}
+del{color:var(--red)}
+ins{color:var(--blue);text-decoration:none;font-weight:700;background:rgba(31,79,255,.09);padding:0 3px;border-radius:2px}
+
+.rows{border-top:2px solid var(--ink)}
+.row{display:grid;grid-template-columns:230px 1fr auto;gap:6px 28px;align-items:center;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:22px 8px;color:inherit}
+.row:hover{background:var(--paper)}
+.row h3{font-size:21px}
+.row span{color:var(--muted)}
+.row b{color:var(--blue);font-weight:600}
+
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;list-style:none;padding:0;counter-reset:s}
+.steps li{counter-increment:s;border-top:2px solid var(--ink);padding-top:14px}
+.steps li:before{content:counter(s);font:700 28px Literata,Georgia,serif;color:var(--blue);display:block}
+.steps h3{font-size:19px;margin-bottom:4px}
+.steps p{color:var(--muted);font-size:15.5px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:34px 54px}
+.two h3{font-size:20px;margin-bottom:6px}
+.two p{color:var(--muted)}
+
+.page{max-width:760px;padding:34px 22px 80px;margin:0 auto}
+.page h1{font-size:clamp(30px,5vw,40px);margin:18px 0 6px}
+.page .upd{color:var(--muted);margin-bottom:20px}
+.page h2{font-size:21px;margin:28px 0 6px;padding-top:18px;border-top:1px solid var(--line)}
+.page p,.page li{color:var(--muted);margin-bottom:10px}
+.page ul{padding-left:20px}
+.page strong{color:var(--ink)}
+
+.svc{max-width:720px;margin:0 auto;padding:10px 22px 80px}
+.svc h1{font-size:clamp(28px,4.5vw,38px);margin:18px 0 10px}
+.svc>p{color:var(--muted)}
+.note{border-left:4px solid var(--blue);background:var(--wash);padding:12px 16px;margin:22px 0;font-size:15.5px}
+.speeds{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin:18px 0 26px}
+.speed{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:16px 8px;text-align:center;color:var(--ink)}
+.speed:hover{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+.speed small{display:block;color:var(--muted);font-size:14px}
+.speed strong{font:700 26px Literata,Georgia,serif}
+
+.overlay{display:none;position:fixed;inset:0;z-index:50;background:rgba(14,23,38,.62);align-items:center;justify-content:center;padding:16px}
+.overlay.on{display:flex}
+.modal{background:var(--paper);width:100%;max-width:520px;max-height:92vh;overflow:auto;border-radius:8px;padding:30px;position:relative}
+.modal h3{font-size:24px;margin-bottom:4px}
+.stepno{color:var(--blue);font-weight:600;font-size:15px;margin-bottom:6px}
+.x{position:absolute;top:12px;right:14px;background:none;border:0;font-size:28px;color:var(--muted)}
+.fld{margin-bottom:16px}
+.fld label{display:block;font-size:15px;font-weight:600;margin-bottom:5px}
+.fld input,.fld textarea{width:100%;padding:12px 14px;border:1px solid #b9c2d3;border-radius:6px;font:inherit;background:#fff;color:var(--ink)}
+.fld.bad input,.fld.bad textarea{border-color:var(--red)}
+.fld small{display:none;color:var(--red);font-size:14px}
+.fld.bad small{display:block}
+.err{color:var(--red);font-size:15px;margin:0 0 12px}
+.total{font:700 20px Literata,Georgia,serif;margin:14px 0}
+.fine{font-size:14.5px;color:var(--muted);margin:12px 0}
+.ref{font:700 22px ui-monospace,Menlo,monospace;background:var(--wash);padding:8px 14px;border-radius:6px;display:inline-block;margin:4px 0 10px;user-select:all}
+.wait{display:flex;gap:10px;align-items:center;background:var(--wash);border-radius:6px;padding:12px 14px;margin-top:14px;font-size:15.5px}
+.spin{width:16px;height:16px;border:2px solid var(--blue);border-top-color:transparent;border-radius:50%;animation:sp 1s linear infinite;flex:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.spin{animation:none}}
+.drop{border:2px dashed #b9c2d3;border-radius:6px;padding:18px;margin:16px 0;background:var(--wash)}
+.tick{color:var(--green);font-weight:600}
+
+.band{background:var(--ink);color:#fff}
+.band p{color:#c4cce0;margin-bottom:24px}
+.band .btn.ghost{color:#fff;border-color:#fff}
+.band .btn.ghost:hover{background:#fff;color:var(--ink)}
+footer{padding:28px 0 40px;font-size:15px;color:var(--muted);border-top:1px solid var(--line)}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 24px}
+footer button{background:none;border:0;color:var(--muted);margin-right:16px;padding:0}
+footer button:hover{color:var(--ink)}
+#resume{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:40;box-shadow:0 8px 24px rgba(14,23,38,.3)}
+
+@media(max-width:800px){
+  nav button{display:none}
+  section{padding:52px 0}
+  .hero .wrap,.two,.steps{grid-template-columns:1fr}
+  .row{grid-template-columns:1fr}
+}
+
+/* ---- Crystal and love theme ---- */
+:root{--blue:#4f46e5;--blue-d:#3730a3;--rose:#d63a73;--glass:rgba(255,255,255,.58);--edge:rgba(255,255,255,.85)}
+::selection{background:rgba(214,58,115,.25)}
+body{background:linear-gradient(135deg,#ffe3ee 0%,#ece8ff 48%,#dcf0ff 100%) fixed}
+body:before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(circle at 12% 15%,rgba(255,140,185,.38),transparent 38%),radial-gradient(circle at 90% 28%,rgba(125,140,255,.32),transparent 40%),radial-gradient(circle at 48% 98%,rgba(120,210,255,.34),transparent 42%)}
+main,footer{position:relative;z-index:1}
+header{background:rgba(255,255,255,.55);backdrop-filter:blur(18px) saturate(1.5);border-bottom:1px solid var(--edge)}
+footer{background:rgba(255,255,255,.45);backdrop-filter:blur(12px);border-top:1px solid var(--edge)}
+.wash{background:rgba(255,255,255,.4);backdrop-filter:blur(12px)}
+.rows{border-top:2px solid var(--rose)}
+.row{border-radius:16px;transition:background .25s,transform .25s}
+.row:hover{background:var(--glass);transform:translateX(6px)}
+.steps li{border-top:2px solid var(--rose)}
+.steps li:before{color:var(--rose)}
+
+/* Glass panels */
+.paper,.modal,.speed,.page,.svc{background:var(--glass);backdrop-filter:blur(18px) saturate(1.4);border:1px solid var(--edge);box-shadow:0 20px 50px rgba(90,70,180,.13)}
+.paper{border-left:4px solid var(--rose);border-radius:20px}
+.page,.svc{border-radius:26px;margin:26px auto 70px;padding:20px 34px 44px}
+.speed{border-radius:18px;transition:transform .2s,box-shadow .2s}
+.speed:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(214,58,115,.2)}
+.note{background:rgba(255,255,255,.6);border-left-color:var(--rose);border-radius:0 12px 12px 0}
+.overlay{background:rgba(60,40,120,.34);backdrop-filter:blur(8px)}
+.modal{background:rgba(255,255,255,.84);border-radius:26px}
+.fld input,.fld textarea{border-radius:12px;background:rgba(255,255,255,.85)}
+.drop{border-radius:14px;border-color:rgba(214,58,115,.45);background:rgba(255,255,255,.6)}
+.wait{background:rgba(255,255,255,.65);border-radius:14px}
+.ref{background:rgba(255,255,255,.75);border-radius:12px}
+
+/* Loving buttons */
+.btn{background:linear-gradient(135deg,#d63a73,#5b4bff);border:2px solid transparent;border-radius:999px;box-shadow:0 8px 20px rgba(214,58,115,.26);transition:transform .2s,box-shadow .2s}
+.btn:hover{background:linear-gradient(135deg,#c02d65,#4a3be8);border-color:transparent;transform:translateY(-2px);box-shadow:0 12px 26px rgba(214,58,115,.34)}
+.btn.ghost{background:rgba(255,255,255,.55);border-color:rgba(79,70,229,.55);color:var(--ink);box-shadow:none}
+.btn.ghost:hover{background:#fff;color:var(--ink);border-color:var(--blue)}
+.band{background:linear-gradient(135deg,#d63a73,#5b4bff)}
+.band p{color:rgba(255,255,255,.92)}
+.band .btn.ghost{background:transparent}
+.band .btn.ghost:hover{border-color:#fff}
+
+/* Animated words and pages */
+.rot{display:inline-block;color:var(--rose);font-style:italic;transition:opacity .3s,transform .3s}
+.rot.out{opacity:0;transform:translateY(-.3em)}
+.w{display:inline-block;opacity:0;transform:translateY(.5em)}
+.go .w{animation:wordUp .6s cubic-bezier(.2,.7,.2,1) both}
+@keyframes wordUp{to{opacity:1;transform:none}}
+.view.on{animation:pageIn .6s cubic-bezier(.2,.7,.2,1) both}
+@keyframes pageIn{from{opacity:0;transform:translateY(22px) scale(.99);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+.view.on .rows>*,.view.on .steps>li{animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
+.rows>:nth-child(2),.steps>:nth-child(2){animation-delay:.08s}
+.rows>:nth-child(3),.steps>:nth-child(3){animation-delay:.16s}
+.rows>:nth-child(4),.steps>:nth-child(4){animation-delay:.24s}
+.rows>:nth-child(5){animation-delay:.32s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.heart{display:inline-block;color:var(--rose);animation:beat 1.8s ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1)}14%{transform:scale(1.28)}28%{transform:scale(1)}42%{transform:scale(1.2)}}
+
+/* Flying tools */
+.tools{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.tools svg{position:absolute;width:78px;color:#5b4bff;opacity:.15;filter:blur(.6px);animation:drift 26s ease-in-out infinite alternate;--dx:44px;--dy:-64px;--r0:-12deg;--r1:14deg}
+.tools svg:nth-child(even){color:#d63a73;--dx:-56px;--dy:50px;--r0:16deg;--r1:-12deg;animation-duration:32s}
+.tools svg:nth-child(3n){animation-delay:-11s;width:104px}
+.tools svg:nth-child(1){left:6%;top:12%}.tools svg:nth-child(2){left:78%;top:10%}.tools svg:nth-child(3){left:44%;top:42%}
+.tools svg:nth-child(4){left:88%;top:52%}.tools svg:nth-child(5){left:14%;top:62%}.tools svg:nth-child(6){left:60%;top:78%}
+.tools svg:nth-child(7){left:30%;top:20%}.tools svg:nth-child(8){left:4%;top:86%}.tools svg:nth-child(9){left:92%;top:84%}
+@keyframes drift{from{transform:translate3d(0,0,0) rotate(var(--r0))}to{transform:translate3d(var(--dx),var(--dy),0) rotate(var(--r1))}}
+@media(max-width:800px){.tools svg{width:54px!important}.page,.svc{margin:14px auto 50px;width:calc(100% - 24px);padding:14px 20px 34px}}
+@media(prefers-reduced-motion:reduce){*,*:before{animation:none!important;transition:none!important}.w{opacity:1;transform:none}}
+
+/* ---- More crystal, glow and hover ---- */
+.paper,.modal,.speed,.page,.svc,.seo>div{background-image:linear-gradient(135deg,rgba(255,255,255,.72),rgba(255,255,255,.2) 55%,rgba(255,255,255,.5));backdrop-filter:blur(24px) saturate(1.7);border:1px solid rgba(255,255,255,.9);box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 rgba(150,130,255,.18),0 24px 60px rgba(90,70,180,.16)}
+.seo{gap:22px}
+.seo>div{padding:22px;border-radius:20px}
+.row,.speed,.seo>div{--mx:50%;--my:50%;transition:background .25s,transform .25s,box-shadow .25s}
+.row:hover,.speed:hover,.seo>div:hover{background-image:radial-gradient(260px circle at var(--mx) var(--my),rgba(255,255,255,.98),rgba(255,255,255,.35) 70%);box-shadow:0 0 0 1px rgba(214,58,115,.4),0 0 26px rgba(214,58,115,.35),0 0 60px rgba(91,75,255,.25)}
+nav button,footer button,.back{padding:7px 14px;border-radius:999px;transition:background .2s,box-shadow .2s,color .2s}
+nav button:hover,footer button:hover,.back:hover{color:var(--ink);background:rgba(255,255,255,.82);box-shadow:0 0 0 1px rgba(214,58,115,.35),0 0 20px rgba(214,58,115,.4)}
+.logo{transition:text-shadow .2s}
+.logo:hover{text-shadow:0 0 18px rgba(214,58,115,.55)}
+.btn:hover{box-shadow:0 0 0 3px rgba(255,255,255,.75),0 0 26px rgba(214,58,115,.7),0 0 56px rgba(91,75,255,.5)}
+.btn.ghost:hover{box-shadow:0 0 22px rgba(79,70,229,.45)}
+.fld input:focus,.fld textarea:focus,.fld select:focus{outline:none;border-color:var(--rose);box-shadow:0 0 0 3px rgba(214,58,115,.18),0 0 22px rgba(214,58,115,.3)}
+.fld select{width:100%;padding:12px 14px;border:1px solid #b9c2d3;border-radius:12px;font:inherit;background:rgba(255,255,255,.85);color:var(--ink)}
+.calc{font-family:"Public Sans",system-ui,sans-serif}
+.calc h3{font-family:Literata,Georgia,serif}
+.gems{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.gems i{position:absolute;background:linear-gradient(135deg,rgba(255,255,255,.75),rgba(170,150,255,.22) 50%,rgba(255,160,200,.32));clip-path:polygon(50% 0,100% 36%,80% 100%,20% 100%,0 36%);opacity:.55;animation:gem 28s ease-in-out infinite alternate}
+.gems i:nth-child(1){width:190px;height:170px;left:-40px;top:30%}
+.gems i:nth-child(2){width:150px;height:135px;right:6%;top:6%;animation-duration:34s;animation-delay:-9s}
+.gems i:nth-child(3){width:230px;height:205px;right:-50px;bottom:6%;animation-duration:40s;animation-delay:-18s}
+.gems b{position:absolute;color:#fff;font-size:20px;opacity:.5;text-shadow:0 0 12px rgba(214,58,115,.9),0 0 22px rgba(91,75,255,.8);animation:twinkle 3.4s ease-in-out infinite}
+.gems b:nth-child(4){left:20%;top:16%}.gems b:nth-child(5){left:70%;top:30%;animation-delay:-1s}.gems b:nth-child(6){left:38%;top:60%;animation-delay:-2s}
+.gems b:nth-child(7){left:90%;top:68%;animation-delay:-.5s}.gems b:nth-child(8){left:8%;top:78%;animation-delay:-1.6s}.gems b:nth-child(9){left:55%;top:8%;animation-delay:-2.6s}
+@keyframes gem{from{transform:translateY(0) rotate(-8deg)}to{transform:translateY(-60px) rotate(10deg)}}
+@keyframes twinkle{0%,100%{opacity:.15;transform:scale(.6)}50%{opacity:.95;transform:scale(1.15)}}
+.hero .wrap{align-items:start}
+.rot{white-space:nowrap;text-align:left}
+.fld{transition:opacity .25s}
+.fld.skip{opacity:.5}
+.fld.skip label:after{content:" (not needed)";font-weight:400;color:var(--muted)}
+.or{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:14px;margin:-4px 0 12px}
+.or:before,.or:after{content:"";flex:1;height:1px;background:var(--line)}
+</style>
+</head>
+<body>
+
+<div class="tools" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1-4L17.5 3.5a2.1 2.1 0 013 3L7 20z"/><path d="M15 6l3 3"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h8l5 5v15H6z"/><path d="M14 2v5h5M9 13h6M9 17h6"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16M15 4v16"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-8 8"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="11" rx="2"/><path d="M3 9l3-5h4L7 9M10 9l3-5h4l-3 5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><path d="M8 7.5L20 18M8 16.5L20 6"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="20" height="8" rx="1.5"/><path d="M6 8v3M10 8v4M14 8v3M18 8v4"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.5l-8 8a5 5 0 01-7-7l9-9a3.3 3.3 0 014.7 4.7l-9 9a1.7 1.7 0 01-2.4-2.4l8-8"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-9-9a5 5 0 019-2.5A5 5 0 0121 11c-2 4.6-9 9-9 9z"/></svg></div>
+
+<div class="gems" aria-hidden="true"><i></i><i></i><i></i><b>✦</b><b>✦</b><b>✦</b><b>✦</b><b>✦</b><b>✦</b></div>
+
+<header>
+  <div class="wrap bar">
+    <button class="logo" onclick="show('home')" aria-label="LetItEdit home">Let<i>It</i>Edit</button>
+    <nav aria-label="Main">
+      <button onclick="show('home')">Home</button>
+      <button onclick="show('about')">About</button>
+      <button onclick="show('faq')">FAQ</button>
+      <a class="btn sm" href="https://wa.me/923456006438" target="_blank" rel="noopener">Message on WhatsApp</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- HOME -->
+<div id="view-home" class="view on">
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <h1>Online editing service: your <span class="rot" id="rot">resume</span>, refined by a real person.</h1>
+        <p class="sub">PDF, Word, Excel, screenshot and video editing for students, job seekers and small businesses. LetItEdit looks after every file with care. Choose a service, pay, and upload. Revisions are always free.</p>
+        <div class="cta">
+          <a class="btn" href="#services">Choose a service</a>
+          <button class="btn ghost" onclick="show('faq')">Read the FAQ</button>
+        </div>
+      </div>
+      <div class="paper calc" aria-label="Price calculator">
+        <h3>Get your price</h3>
+        <p class="fine" style="margin-top:0">Pick what you need and see the cost. No sign-up.</p>
+        <div class="fld"><label for="cSvc">Service</label>
+          <select id="cSvc"><option value="PDF">PDF formatting</option><option value="Doc">Word document</option><option value="Excel">Excel sheet</option><option value="Screenshot">Screenshot editing</option></select></div>
+        <div class="fld"><label for="cSpd">Delivery speed</label>
+          <select id="cSpd" onchange="calcUpdate()"><option value="0">30 minutes (rush)</option><option value="1" selected>1 hour</option><option value="2">2 hours</option><option value="3">3 to 5 hours</option><option value="4">6 to 12 hours</option></select></div>
+        <p class="total" id="cOut">$4 for delivery in 1 hour</p>
+        <button class="btn full" onclick="calcOrder()">Order now</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="services" class="wash">
+    <div class="wrap">
+      <h2>Choose a service</h2>
+      <p class="lead">Pick one to see delivery times and prices.</p>
+      <div class="rows">
+        <button class="row" onclick="openService('PDF')"><h3>PDF formatting</h3><span>Resumes, merged or split files, broken layouts and spacing.</span><b>From $1</b></button>
+        <button class="row" onclick="openService('Doc')"><h3>Word documents</h3><span>APA and MLA styling, headings, tables and reference lists.</span><b>From $1</b></button>
+        <button class="row" onclick="openService('Excel')"><h3>Excel sheets</h3><span>Fix formulas, clean messy data, format charts and tables.</span><b>From $1</b></button>
+        <button class="row" onclick="openService('Screenshot')"><h3>Screenshots</h3><span>Annotate tutorials, blur private details, crop and clean up.</span><b>From $1</b></button>
+        <button class="row" onclick="show('video')"><h3>Video editing</h3><span>Short-form cuts, captions and pacing, quoted on WhatsApp.</span><b>Get a quote</b></button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>How ordering works</h2>
+      <p class="lead">You pay first so LetItEdit can reserve time for your job. Your file is only uploaded after LetItEdit confirms payment.</p>
+      <ol class="steps">
+        <li><h3>Order</h3><p>Pick a service and speed, then enter your details and what you need.</p></li>
+        <li><h3>Pay</h3><p>Pay through PayPal and quote your order number in the payment note.</p></li>
+        <li><h3>Payment check</h3><p>LetItEdit checks the payment in its email and confirms your order. This page updates by itself.</p></li>
+        <li><h3>Upload and receive</h3><p>Upload your file. LetItEdit edits it and sends it back by email or WhatsApp.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="wash">
+    <div class="wrap two">
+      <div>
+        <h2>Why people use LetItEdit</h2>
+        <p class="lead" style="margin-bottom:0">Small jobs, done carefully, with clear rules.</p>
+      </div>
+      <div>
+        <h3>Edited by a person</h3><p>Every file is checked by hand, not run through automated software.</p>
+        <h3 style="margin-top:18px">Free revisions</h3><p>Ask for changes within 48 hours of delivery and LetItEdit updates the file at no cost.</p>
+        <h3 style="margin-top:18px">Private by default</h3><p>Files are used only for your order and deleted 30 days after it is complete.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Online editing services for students, job seekers and small businesses</h2>
+      <p class="lead">LetItEdit is a freelance editing service. Send your file, pick a delivery time, and get it back clean and ready to use.</p>
+      <div class="two seo">
+        <div><h3>PDF editing and resume formatting</h3><p>Need a resume or CV that looks professional? LetItEdit formats PDF files, fixes spacing and fonts, merges and splits PDFs, and gets documents ready to print or upload.</p></div>
+        <div><h3>Word document formatting</h3><p>LetItEdit formats Word documents in APA and MLA style: headings, page numbers, tables, citations and reference lists for essays, theses and reports.</p></div>
+        <div><h3>Excel formula fixes and data cleaning</h3><p>LetItEdit fixes broken Excel formulas, cleans messy spreadsheets and formats tables and charts so your data is easy to read and share.</p></div>
+        <div><h3>Screenshot editing and blurring</h3><p>LetItEdit annotates screenshots for tutorials and guides, blurs private information, crops images and adds clear labels.</p></div>
+        <div><h3>Short video editing</h3><p>LetItEdit edits short videos with clean cuts, captions and pacing for social media and business use.</p></div>
+        <div><h3>Fast and affordable delivery</h3><p>Choose rush delivery in 30 minutes, or a lower price with a slower turnaround. Prices start at $1 and revisions are free.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Something special in mind?</h2>
+      <p>Large files, several documents or a video project? Message LetItEdit first for a price quote.</p>
+      <a class="btn ghost" href="https://wa.me/923456006438" target="_blank" rel="noopener">Message on WhatsApp</a>
+    </div>
+  </section>
+</div>
+
+<!-- ABOUT -->
+<div id="view-about" class="view"><div class="page">
+  <button class="back" onclick="show('home')">Back to home</button>
+  <h1>About LetItEdit</h1>
+  <!-- EDIT: replace the bracketed parts with your real details. A real name builds the most trust. -->
+  <p class="upd">Freelance document and video editing</p>
+  <p>LetItEdit is run by <strong>[Your name]</strong>, a freelance editor based in <strong>[your city, country]</strong>. LetItEdit formats PDFs, Word documents, Excel sheets and screenshots, and edits short videos, for students, job seekers and small businesses.</p>
+  <h2>How LetItEdit works</h2>
+  <p>Each job is edited by hand and checked before delivery. If something is not right, LetItEdit fixes it for free.</p>
+  <h2>Why you pay first</h2>
+  <p>Payment reserves time in the schedule so rush jobs can be delivered quickly. LetItEdit verifies each payment by email. Once it is confirmed, you can upload your file.</p>
+  <h2>Contact</h2>
+  <p>WhatsApp: <a href="https://wa.me/923456006438" target="_blank" rel="noopener">+92 345 6006438</a></p>
+</div></div>
+
+<!-- FAQ -->
+<div id="view-faq" class="view"><div class="page">
+  <button class="back" onclick="show('home')">Back to home</button>
+  <h1>Frequently asked questions</h1>
+  <p class="upd">Short answers to what people ask most.</p>
+  <h2>How does ordering work?</h2>
+  <p>Choose a service and speed, enter your details, and pay through PayPal. LetItEdit confirms your payment by email, and this page then asks you to upload your file. The edited file is sent to your email or WhatsApp.</p>
+  <h2>How long does payment confirmation take?</h2>
+  <!-- EDIT: change this to what is true for you -->
+  <p>Payments are confirmed by hand, usually within 15 minutes during working hours. If it takes longer, message LetItEdit on WhatsApp with your order number.</p>
+  <h2>Is my file private?</h2>
+  <p>Yes. Your file is stored in private cloud storage and used only for your order. LetItEdit does not share or sell it, and deletes it 30 days after the order is complete.</p>
+  <h2>What if changes are needed?</h2>
+  <p>Revisions are free. Reply to the delivery email or WhatsApp message within 48 hours and LetItEdit will fix it.</p>
+  <h2>Which file types are accepted?</h2>
+  <ul>
+    <li><strong>PDF formatting:</strong> .pdf files such as resumes, contracts and reports</li>
+    <li><strong>Word documents:</strong> .doc and .docx files such as theses and manuscripts</li>
+    <li><strong>Excel sheets:</strong> .xls and .xlsx files such as data sheets and models</li>
+    <li><strong>Screenshots:</strong> .png, .jpg and .jpeg images</li>
+  </ul>
+  <h2>Is there another way to pay?</h2>
+  <p>PayPal is the main method. If you need another option, message LetItEdit on WhatsApp before you order.</p>
+</div></div>
+
+<!-- PRIVACY -->
+<div id="view-privacy" class="view"><div class="page">
+  <button class="back" onclick="show('home')">Back to home</button>
+  <h1>Privacy policy</h1>
+  <p class="upd">Last updated: October 2026</p>
+  <!-- EDIT: make sure every statement here is true for how you work. -->
+  <h2>What LetItEdit collects</h2>
+  <p>Your name, your email address or WhatsApp number (you only need to give one), the instructions you write, and the files you upload. Payments are handled by PayPal. LetItEdit never sees or stores your card details.</p>
+  <h2>How LetItEdit uses it</h2>
+  <p>Only to complete your order: confirming payment, editing your file, delivering it and giving support.</p>
+  <h2>Storage and deletion</h2>
+  <p>Orders and files are stored with Supabase, a cloud database provider. LetItEdit deletes uploaded files 30 days after your order is complete.</p>
+  <h2>Sharing</h2>
+  <p>LetItEdit does not sell or share your information. It is only handled by services needed to run the site and take payment, such as Supabase and PayPal.</p>
+  <h2>Your choices</h2>
+  <p>You can ask LetItEdit to delete your order and files at any time on WhatsApp.</p>
+</div></div>
+
+<!-- TERMS -->
+<div id="view-terms" class="view"><div class="page">
+  <button class="back" onclick="show('home')">Back to home</button>
+  <h1>Terms of service</h1>
+  <p class="upd">Last updated: October 2026</p>
+  <h2>Services</h2>
+  <p>LetItEdit provides document and media editing. The scope of each job is what you describe when you order. LetItEdit may decline a job if it cannot do it well.</p>
+  <h2>Payment</h2>
+  <p>Payment is required before you upload your file. LetItEdit confirms payment by email. If payment is not completed, the order is cancelled.</p>
+  <h2>Your files</h2>
+  <p>You keep all rights to your files. By uploading, you let LetItEdit open and edit them only to complete your order.</p>
+  <h2>Revisions and refunds</h2>
+  <p>Revisions for the same job are free if requested within 48 hours of delivery. If LetItEdit cannot deliver your job, or misses the agreed time, you get a full refund.</p>
+  <h2>Prohibited content</h2>
+  <p>Do not upload anything illegal, defamatory, infringing or harmful. LetItEdit may stop work and cancel the order if you do.</p>
+  <h2>Liability</h2>
+  <p>LetItEdit’s liability is limited to the amount you paid for the order in question.</p>
+</div></div>
+
+<!-- SERVICE -->
+<div id="view-service" class="view"><div class="svc">
+  <button class="back" onclick="show('home')">Back to services</button>
+  <h1 id="svcTitle">PDF formatting</h1>
+  <p id="svcText"></p>
+  <p class="note">Introductory prices are shown below. You pay first, and you upload your file after LetItEdit confirms payment.</p>
+  <h2 style="font-size:22px">Choose delivery speed</h2>
+  <div class="speeds">
+    <button class="speed" onclick="openOrder('30 minutes',5)"><small>30 min (rush)</small><strong>$5</strong></button>
+    <button class="speed" onclick="openOrder('1 hour',4)"><small>1 hour</small><strong>$4</strong></button>
+    <button class="speed" onclick="openOrder('2 hours',3)"><small>2 hours</small><strong>$3</strong></button>
+    <button class="speed" onclick="openOrder('3-5 hours',2)"><small>3 to 5 hours</small><strong>$2</strong></button>
+    <button class="speed" onclick="openOrder('6-12 hours',1)"><small>6 to 12 hours</small><strong>$1</strong></button>
+  </div>
+  <button class="btn full" onclick="openOrder('Standard (6-12 hours)',1)">Start order</button>
+</div></div>
+
+<!-- VIDEO -->
+<div id="view-video" class="view"><div class="svc">
+  <button class="back" onclick="show('home')">Back to services</button>
+  <h1>Video editing</h1>
+  <p>Video projects are larger and need a conversation first, so LetItEdit handles them directly on WhatsApp. Share what you have, the length you want and your deadline, and a price will be sent.</p>
+  <p style="margin-top:24px"><a class="btn" href="https://wa.me/923456006438" target="_blank" rel="noopener">Message about a video</a></p>
+</div></div>
+
+</main>
+
+<!-- MODAL 1: ORDER DETAILS -->
+<div class="overlay" id="orderModal" role="dialog" aria-modal="true" aria-labelledby="oT">
+  <div class="modal">
+    <button class="x" onclick="closeModal('orderModal')" aria-label="Close">×</button>
+    <p class="stepno">Step 1 of 3: Your details</p>
+    <h3 id="oT">Order details</h3>
+    <p class="fine">You will upload your file after your payment is confirmed.</p>
+    <form id="orderForm" onsubmit="submitOrder(event)" novalidate>
+      <div class="fld" id="g-name"><label for="name">Full name</label><input id="name" autocomplete="name"><small>Enter your full name.</small></div>
+      <p class="note" style="margin:0 0 16px">Add <strong>one</strong> way to reach you: your email <strong>or</strong> your WhatsApp number. You don’t need both. Your finished file will be sent there.</p>
+      <div class="fld" id="g-email"><label for="email">Email address</label><input id="email" type="email" placeholder="you@example.com" autocomplete="email"><small>Enter a valid email address.</small></div>
+      <div class="or">or</div>
+      <div class="fld" id="g-wa"><label for="whatsapp">WhatsApp number</label><input id="whatsapp" type="tel" placeholder="+92 300 1234567" autocomplete="off"><small>Enter your WhatsApp number with country code.</small></div>
+      <div class="fld" id="g-req"><label for="req">What do you need done?</label><textarea id="req" rows="3" placeholder="Example: Format my resume to one page and fix the spacing."></textarea><small>Describe the job in at least 10 characters.</small></div>
+      <p class="total" id="total">Total: $5</p>
+      <input type="hidden" id="delivery">
+      <p class="err" id="orderErr" hidden></p>
+      <button class="btn full" id="orderBtn" type="submit">Continue to payment</button>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL 2: PAYMENT -->
+<div class="overlay" id="payModal" role="dialog" aria-modal="true" aria-labelledby="pT">
+  <div class="modal">
+    <button class="x" onclick="closePay()" aria-label="Close">×</button>
+    <p class="stepno">Step 2 of 3: Payment</p>
+    <h3 id="pT">Pay with PayPal</h3>
+    <p class="fine">Your order is saved. Your order number is:</p>
+    <div class="ref" id="ref"></div>
+    <p class="fine">Pay <strong id="payAmt">$5</strong> through PayPal and type this order number in the payment note. Choose “Goods and services” if PayPal asks, so your payment is protected.</p>
+    <a class="btn full" id="ppLink" href="#" target="_blank" rel="noopener">Pay with PayPal</a>
+    <div class="wait"><span class="spin"></span><span>Waiting for LetItEdit to confirm your payment. Keep this tab open.</span></div>
+    <p class="fine">Closing this window is fine. Come back to this page and tap “Resume order”. Need another payment method or help? <a href="https://wa.me/923456006438" target="_blank" rel="noopener">Message LetItEdit on WhatsApp</a>.</p>
+  </div>
+</div>
+
+<!-- MODAL 3: UPLOAD -->
+<div class="overlay" id="upModal" role="dialog" aria-modal="true" aria-labelledby="uT">
+  <div class="modal">
+    <p class="stepno">Step 3 of 3: Upload</p>
+    <h3 id="uT"><span class="tick">Payment confirmed.</span> Upload your file</h3>
+    <form id="upForm" onsubmit="uploadFile(event)">
+      <input type="hidden" id="upId">
+      <div class="drop"><input type="file" id="file" required></div>
+      <p class="fine">Maximum file size is 20 MB.</p>
+      <p class="err" id="upErr" hidden></p>
+      <button class="btn full" id="upBtn" type="submit">Upload file</button>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL 4: DONE -->
+<div class="overlay" id="doneModal" role="dialog" aria-modal="true" aria-labelledby="dT">
+  <div class="modal">
+    <h3 id="dT"><span class="tick">Order received.</span></h3>
+    <p class="fine" style="font-size:16px;color:var(--ink)">Thank you. LetItEdit has your file and will deliver the edited version to your email or WhatsApp within your chosen delivery time.</p>
+    <p class="note">Need changes? Reply to the delivery message within 48 hours and LetItEdit will revise it for free.</p>
+    <button class="btn full" onclick="finish()">Return to home</button>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 LetItEdit. Made with <span class="heart">♥</span> and care.</span>
+    <span><button onclick="show('privacy')">Privacy policy</button><button onclick="show('terms')">Terms of service</button><button onclick="show('faq')">FAQ</button><button onclick="show('about')">About</button></span>
+  </div>
+</footer>
+
+<script>
+/* ---- Settings (same Supabase project as before) ---- */
+const SUPABASE_URL='https://bjragiylhglqfodbihvd.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqcmFnaXlsaGdscWZvZGJpaHZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMjQ1NzMsImV4cCI6MjEwODkwMDU3M30.upa96t4q9W1AXIr8wry3kL_8U7L__GmTZZ3kWNjurYU';
+const PAYPAL='https://www.paypal.me/mujahidhussain78y';
+
+let db=null;
+try{db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}catch(e){console.error('Supabase init failed',e)}
+const $=id=>document.getElementById(id);
+let service='',price=5,poll=null,uploaded=false;
+
+const SERVICES={
+  PDF:{t:'PDF formatting',d:'LetItEdit fixes PDF layouts, formats resumes and structures documents so they look professional.',a:'.pdf'},
+  Screenshot:{t:'Screenshot editing',d:'LetItEdit edits screenshots for tutorials, annotates screens and blurs private information.',a:'image/*'},
+  Doc:{t:'Word document formatting',d:'LetItEdit applies APA or MLA styling, fixes formatting and proofreads your text.',a:'.doc,.docx'},
+  Excel:{t:'Excel data structuring',d:'LetItEdit fixes formulas, cleans up messy spreadsheets and formats charts for clear reading.',a:'.xls,.xlsx'}
+};
+
+let cur='home';
+function show(v,fromPop){
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.overlay').forEach(x=>x.classList.remove('on'));
+  $('view-'+v).classList.add('on');
+  animateView($('view-'+v));
+  scrollTo(0,0);
+  cur=v;
+  if(!fromPop&&!(history.state&&history.state.v===v))history.pushState({v:v},'');
+}
+function openService(k){
+  service=k;
+  delete $('svcTitle').dataset.w;
+  $('svcTitle').textContent=SERVICES[k].t;
+  $('svcText').textContent=SERVICES[k].d;
+  $('file').setAttribute('accept',SERVICES[k].a);
+  show('service');
+}
+function openOrder(time,p){
+  price=p;
+  $('delivery').value=time+' ($'+p+')';
+  $('total').textContent='Total: $'+p+' for '+time+' delivery';
+  $('orderErr').hidden=true;
+  $('orderModal').classList.add('on');
+}
+function closeModal(id){$(id).classList.remove('on')}
+
+function validate(){
+  const v={name:$('name').value.trim(),email:$('email').value.trim(),wa:$('whatsapp').value.trim(),req:$('req').value.trim()};
+  const none=!v.email&&!v.wa;
+  const bad={'g-name':v.name.length<3,'g-email':!!v.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email),'g-wa':!!v.wa&&v.wa.length<7,'g-req':v.req.length<10};
+  const e=$('orderErr');
+  e.hidden=!none;
+  if(none)e.textContent='Please add your email or your WhatsApp number. You only need one.';
+  let ok=!none;
+  for(const k in bad){$(k).classList.toggle('bad',bad[k]);if(bad[k])ok=false}
+  return ok;
+}
+document.addEventListener('input',e=>{const g=e.target.closest('.fld');if(g)g.classList.remove('bad')});
+
+async function submitOrder(e){
+  e.preventDefault();
+  if(!validate())return;
+  const err=$('orderErr'),btn=$('orderBtn');
+  err.hidden=true;
+  if(!db){err.textContent='Could not connect. Please refresh the page and try again.';err.hidden=false;return}
+  btn.disabled=true;btn.textContent='Saving your order...';
+  try{
+    const {data,error}=await db.from('orders').insert([{
+      name:$('name').value.trim(),
+      email:$('email').value.trim(),
+      whatsapp:$('whatsapp').value.trim(),
+      requirements:'[UNPAID - '+service+'] '+$('req').value.trim(),
+      delivery_time:$('delivery').value,
+      status:'pending'
+    }]).select();
+    if(error)throw error;
+    const id=data[0].id;
+    localStorage.setItem('pendingOrder',JSON.stringify({id:id,price:price}));
+    $('upId').value=id;
+    closeModal('orderModal');
+    openPay(id,price);
+  }catch(ex){
+    err.textContent='Your order could not be saved ('+ex.message+'). Please try again or message LetItEdit on WhatsApp.';
+    err.hidden=false;
+  }finally{
+    btn.disabled=false;btn.textContent='Continue to payment';
+  }
+}
+
+function openPay(id,p){
+  const s=String(id);
+  $('ref').textContent=s.length>12?s.slice(0,8).toUpperCase():s;
+  $('payAmt').textContent='$'+p;
+  $('ppLink').href=PAYPAL+'/'+p+'USD';
+  $('upId').value=id;
+  $('payModal').classList.add('on');
+  startPoll(id);
+}
+function closePay(){
+  closeModal('payModal');
+  if(poll)clearInterval(poll);
+  const o=JSON.parse(localStorage.getItem('pendingOrder')||'null');
+  if(o)showResume(o);
+}
+function startPoll(id){
+  if(poll)clearInterval(poll);
+  poll=setInterval(async()=>{
+    if(!db)return;
+    const {data}=await db.from('orders').select('status').eq('id',id).single();
+    if(data&&data.status==='paid'){
+      clearInterval(poll);
+      localStorage.removeItem('pendingOrder');
+      closeModal('payModal');
+      const r=$('resume');if(r)r.remove();
+      uploaded=false;
+      $('upModal').classList.add('on');
+    }
+  },3000);
+}
+function showResume(o){
+  if($('resume'))return;
+  const b=document.createElement('button');
+  b.id='resume';b.className='btn';b.textContent='Resume order: waiting for payment';
+  b.onclick=()=>{b.remove();openPay(o.id,o.price)};
+  document.body.appendChild(b);
+}
+
+async function uploadFile(e){
+  e.preventDefault();
+  const err=$('upErr'),btn=$('upBtn'),f=$('file').files[0];
+  err.hidden=true;
+  if(!f||!db)return;
+  if(f.size>20*1024*1024){err.textContent='That file is over 20 MB. Please send a smaller file or message LetItEdit on WhatsApp.';err.hidden=false;return}
+  btn.disabled=true;btn.textContent='Uploading...';
+  const id=$('upId').value;
+  const path=id+'/'+Date.now()+'_'+f.name.replace(/[^\w.\-]/g,'_');
+  try{
+    const {error:se}=await db.storage.from('uploads').upload(path,f);
+    if(se)throw se;
+    const {error:de}=await db.from('orders').update({file_url:path,status:'completed'}).eq('id',id);
+    if(de)throw de;
+    uploaded=true;
+    closeModal('upModal');
+    $('doneModal').classList.add('on');
+  }catch(ex){
+    err.textContent='Upload failed ('+ex.message+'). Please try again.';
+    err.hidden=false;
+    btn.disabled=false;btn.textContent='Upload file';
+  }
+}
+function finish(){uploaded=true;location.reload()}
+
+window.addEventListener('beforeunload',e=>{
+  if($('upModal').classList.contains('on')&&!uploaded){e.preventDefault();e.returnValue='Please finish uploading your file.'}
+});
+document.addEventListener('DOMContentLoaded',()=>{
+  const o=JSON.parse(localStorage.getItem('pendingOrder')||'null');
+  if(o)showResume(o);
+});
+
+/* ---- Animated words ---- */
+const ROT_WORDS=['resume','spreadsheet','thesis','screenshot','video','contract'];
+/* Reserve the width of the longest word so the page never shifts while the word changes */
+function sizeRot(){
+  const r=$('rot');
+  if(!r)return;
+  const t=r.cloneNode();
+  t.removeAttribute('id');
+  t.style.cssText='position:absolute;visibility:hidden;min-width:0;transition:none';
+  r.parentNode.appendChild(t);
+  let w=0;
+  ROT_WORDS.forEach(x=>{t.textContent=x;w=Math.max(w,t.getBoundingClientRect().width)});
+  t.remove();
+  r.style.minWidth=Math.ceil(w)+'px';
+}
+function words(el){
+  if(el.dataset.w)return;
+  el.dataset.w=1;
+  const t=el.textContent.trim().split(' ');
+  el.textContent='';
+  t.forEach((w,i)=>{
+    const s=document.createElement('span');
+    s.className='w';s.style.animationDelay=(i*70)+'ms';s.textContent=w;
+    el.appendChild(s);
+    if(i<t.length-1)el.appendChild(document.createTextNode(' '));
+  });
+}
+function animateView(v){
+  v.querySelectorAll('h1,h2').forEach(el=>{
+    if(el.closest('.hero'))return;
+    words(el);el.classList.remove('go');void el.offsetWidth;el.classList.add('go');
+  });
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  animateView($('view-home'));
+  const r=$('rot'),W=ROT_WORDS;
+  sizeRot();
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(sizeRot);
+  addEventListener('resize',sizeRot);
+  let i=0;
+  if(r&&!matchMedia('(prefers-reduced-motion: reduce)').matches)setInterval(()=>{
+    r.classList.add('out');
+    setTimeout(()=>{i=(i+1)%W.length;r.textContent=W[i];r.classList.remove('out')},320);
+  },2400);
+});
+
+/* ---- One contact only: email or WhatsApp ---- */
+function pickContact(e){
+  const isMail=e.target.id==='email';
+  const other=$(isMail?'whatsapp':'email');
+  const has=e.target.value.trim()!=='';
+  if(has)other.value='';
+  const go=$(isMail?'g-wa':'g-email');
+  go.classList.toggle('skip',has);
+  if(has)go.classList.remove('bad');
+  $(isMail?'g-email':'g-wa').classList.remove('skip');
+  $('orderErr').hidden=true;
+}
+$('email').addEventListener('input',pickContact);
+$('whatsapp').addEventListener('input',pickContact);
+
+/* ---- Price calculator ---- */
+const PRICES=[['30 minutes',5],['1 hour',4],['2 hours',3],['3-5 hours',2],['6-12 hours',1]];
+function calcUpdate(){const c=PRICES[$('cSpd').value];$('cOut').textContent='$'+c[1]+' for delivery in '+c[0]}
+function calcOrder(){
+  service=$('cSvc').value;
+  $('file').setAttribute('accept',SERVICES[service].a);
+  const c=PRICES[$('cSpd').value];
+  openOrder(c[0],c[1]);
+}
+calcUpdate();
+
+/* ---- Cursor glow ---- */
+document.addEventListener('pointermove',e=>{
+  const el=e.target.closest&&e.target.closest('.row,.speed,.seo>div');
+  if(el){const r=el.getBoundingClientRect();el.style.setProperty('--mx',(e.clientX-r.left)+'px');el.style.setProperty('--my',(e.clientY-r.top)+'px')}
+});
+
+/* ---- Back button: go to the previous page of the site ---- */
+history.replaceState({v:'home'},'');
+addEventListener('popstate',e=>{
+  const m=document.querySelector('.overlay.on');
+  if(m){
+    if((m.id==='upModal'&&!uploaded)||m.id==='doneModal'){history.pushState({v:cur},'');return}
+    if(m.id==='payModal')closePay();else closeModal(m.id);
+    history.pushState({v:cur},'');
+    return;
+  }
+  show((e.state&&e.state.v)||'home',true);
+});
+</script>
+</body>
+</html>
