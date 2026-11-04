@@ -1,41 +1,65 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PDF, CV, Word, Excel and Video Editing Service | LetItEdit</title>
-<meta name="description" content="Fast online document editing by a real person: PDF and resume formatting, CV creation, Word APA/MLA formatting, Excel formula fixes, screenshot editing and annotating, and video editing. From $1.">
-<link rel="canonical" href="https://letitedit.com/">
+<title>PDF, Word, Excel and Video Editing Service | LetItEdit</title>
+<meta name="description" content="Fast online document editing by a real person. From $1.">
 <link rel="stylesheet" href="/styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head><body>
-<header><div class="wrap bar"><a class="logo" href="/">Let<i>It</i>Edit</a><nav aria-label="Main"><a href="/">Home</a><a class="btn sm" href="https://wa.me/447393652862" target="_blank" rel="noopener">Message on WhatsApp</a></nav></div></header>
-<main class="wrap">
-
-<section class="card">
-<h1>Document and video editing by a real person.</h1>
-<p>PDF, CV, Word, Excel, screenshot and video editing for students, job seekers and small businesses. Pick a service, pay, and upload. Revisions are always free.</p>
-<div class="cta"><a class="btn" href="#services">Choose a service</a><a class="btn ghost" href="/faq.html">Read the FAQ</a></div>
-</section>
-
-<section class="card" id="services">
-<h2>Choose a service</h2>
-<p>Each service page shows delivery times and prices. Pay first, upload after confirmation.</p>
-<div class="more">
-<a href="/pdf-editing-service.html">PDF Editing<br><small>From $5</small></a>
-<a href="/cv-creation-editing.html">CV Creation &amp; Editing<br><small>From $5</small></a>
-<a href="/word-document-formatting.html">Word Document Formatting<br><small>From $1</small></a>
-<a href="/excel-data-cleaning-formulas.html">Excel Formula Fixes<br><small>From $1</small></a>
-<a href="/screenshot-editing-annotation.html">Screenshot Editing<br><small>From $4</small></a>
-<a href="/video-editing-service.html">Video Editing<br><small>Get a quote</small></a>
+<div class="tools" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1-4L17.5 3.5a2.1 2.1 0 013 3L7 20z"/><path d="M15 6l3 3"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h8l5 5v15H6z"/><path d="M14 2v5h5M9 13h6M9 17h6"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16M15 4v16"/></svg></div>
+<div class="gems" aria-hidden="true"><i></i><i></i><i></i><b>✦</b><b>✦</b><b>✦</b><b>✦</b><b>✦</b><b>✦</b></div>
+<header><div class="wrap bar"><a class="logo" href="/">Let<i>It</i>Edit</a><nav aria-label="Main"><a href="/">Home</a><a href="/about.html">About</a><a href="/faq.html">FAQ</a><a class="btn sm" href="https://wa.me/923456006438" target="_blank" rel="noopener">Message on WhatsApp</a></nav></div></header>
+<main>
+<div class="view on">
+<section class="hero">
+<div class="wrap">
+<div>
+<h1>Your <span class="rot" id="rot">resume</span>,<br>expertly edited by a real person.</h1>
+<p class="sub">PDF, Word, Excel, screenshot and video editing for students, job seekers and small businesses. LetItEdit looks after every file with care. Choose a service, pay, and upload. Revisions are always free.</p>
+<div class="cta">
+<a class="btn" href="#services">Choose a service</a>
+<a class="btn ghost" href="/faq.html">Read the FAQ</a>
+</div>
+</div>
+<div class="paper calc" aria-label="Price calculator">
+<h3>Get your price</h3>
+<p class="fine" style="margin-top:0">Pick what you need and see the cost. No sign-up.</p>
+<div class="fld"><label for="cSvc">Service</label>
+<select id="cSvc"><option value="PDF">PDF formatting</option><option value="Doc">Word document</option><option value="Excel">Excel sheet</option><option value="Screenshot">Screenshot editing</option></select></div>
+<div class="fld"><label for="cSpd">Delivery speed</label>
+<select id="cSpd" onchange="calcUpdate()"><option value="0">30 minutes (rush)</option><option value="1" selected>1 hour</option><option value="2">2 hours</option><option value="3">3 to 5 hours</option><option value="4">6 to 12 hours</option></select></div>
+<p class="total" id="cOut">$4 for delivery in 1 hour</p>
+<button class="btn full" onclick="calcOrder()">Order now</button>
+</div>
 </div>
 </section>
-
-<section class="card" id="how">
-<h2>How ordering works</h2>
-<p>Each job is edited by hand and checked before delivery.</p>
-<h3>1. Order</h3><p>Pick a service and speed, then enter your details and what you need done.</p>
-<h3>2. Pay</h3><p>Pay through PayPal and put your order number in the payment note.</p>
-<h3>3. Payment check</h3><p>LetItEdit confirms the payment by email. Your order page updates automatically.</p>
-<h3>4. Upload and receive</h3><p>Upload your file. LetItEdit edits it and sends it back by email or WhatsApp.</p>
+<section id="services" class="wash">
+<div class="wrap">
+<h2>Choose a service</h2>
+<p class="lead">Pick one to see delivery times and prices.</p>
+<div class="rows">
+<a class="row" href="/pdf-editing-service.html" style="text-decoration:none"><h3>PDF formatting</h3><span>Resumes, merged or split files, broken layouts and spacing.</span><b>From $1</b></a>
+<a class="row" href="/cv-creation-editing.html" style="text-decoration:none"><h3>CV Creation</h3><span>Professional CV building, ATS optimization.</span><b>From $5</b></a>
+<a class="row" href="/word-document-formatting.html" style="text-decoration:none"><h3>Word documents</h3><span>APA and MLA styling, headings, tables and reference lists.</span><b>From $1</b></a>
+<a class="row" href="/excel-data-cleaning-formulas.html" style="text-decoration:none"><h3>Excel sheets</h3><span>Fix formulas, clean messy data, format charts and tables.</span><b>From $1</b></a>
+<a class="row" href="/screenshot-editing-annotation.html" style="text-decoration:none"><h3>Screenshots</h3><span>Annotate tutorials, blur private details, crop and clean up.</span><b>From $1</b></a>
+<a class="row" href="/video-editing-service.html" style="text-decoration:none"><h3>Video editing</h3><span>Short-form cuts, captions and pacing, quoted on WhatsApp.</span><b>Get a quote</b></a>
+</div>
+</div>
 </section>
-
+<section>
+<div class="wrap">
+<h2>How ordering works</h2>
+<p class="lead">You pay first so LetItEdit can reserve time for your job. Your file is only uploaded after LetItEdit confirms payment.</p>
+<ol class="steps">
+<li><h3>Order</h3><p>Pick a service and speed, then enter your details and what you need.</p></li>
+<li><h3>Pay</h3><p>Pay through PayPal and quote your order number in the payment note.</p></li>
+<li><h3>Payment check</h3><p>LetItEdit checks the payment in its email and confirms your order.</p></li>
+<li><h3>Upload and receive</h3><p>Upload your file. LetItEdit edits it and sends it back by email or WhatsApp.</p></li>
+</ol>
+</div>
+</section>
+</div>
 </main>
-<footer><div class="wrap"><span>© 2026 LetItEdit. Made with care.</span><span><a href="/">Home</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a></span></div></footer>
+<footer><div class="wrap"><span>© 2026 LetItEdit. Made with <span class="heart">♥</span> and care.</span><span><a href="/privacy.html">Privacy policy</a><a href="/terms.html">Terms of service</a><a href="/faq.html">FAQ</a><a href="/about.html">About</a></span></div></footer>
+<script src="/app.js"></script>
 </body></html>
