@@ -12,25 +12,15 @@
 <div class="view on">
 <section class="hero">
 <div class="wrap">
+<!-- LEFT SIDE: TEXT AND CRYSTAL BUTTONS -->
 <div>
 <h1>Your <span class="rot" id="rot">resume</span>,<br>expertly edited by a real person.</h1>
 <p class="sub">PDF, Word, Excel, screenshot and video editing for students, job seekers and small businesses. LetItEdit looks after every file with care. Choose a service, pay, and upload. Revisions are always free.</p>
 <div class="cta">
-<a class="btn" href="#services">Choose a service</a>
 <a class="btn ghost" href="/faq.html">Read the FAQ</a>
 </div>
-</div>
-<div class="paper calc" aria-label="Price calculator">
-<h3>Get your price</h3>
-<p class="fine" style="margin-top:0">Pick what you need and see the cost. No sign-up.</p>
-<div class="fld"><label for="cSvc">Service</label>
-<select id="cSvc"><option value="PDF">PDF formatting</option><option value="Doc">Word document</option><option value="Excel">Excel sheet</option><option value="Screenshot">Screenshot editing</option></select></div>
-<div class="fld"><label for="cSpd">Delivery speed</label>
-<select id="cSpd" onchange="calcUpdate()"><option value="0">30 minutes (rush)</option><option value="1" selected>1 hour</option><option value="2">2 hours</option><option value="3">3 to 5 hours</option><option value="4">6 to 12 hours</option></select></div>
-<p class="total" id="cOut">$4 for delivery in 1 hour</p>
-<button class="btn full" onclick="calcOrder()">Order now</button>
 
-<!-- NEW CRYSTAL BUTTONS TO JUMP TO SERVICE PAGES -->
+<!-- NEW CRYSTAL BUTTONS MOVED TO LEFT -->
 <div class="service-grid">
   <a href="/pdf-editing-service.html">PDF</a>
   <a href="/cv-creation-editing.html">CV</a>
@@ -41,6 +31,19 @@
 </div>
 
 </div>
+
+<!-- RIGHT SIDE: CALCULATOR -->
+<div class="paper calc" aria-label="Price calculator">
+<h3>Get your price</h3>
+<p class="fine" style="margin-top:0">Pick what you need and see the cost. No sign-up.</p>
+<div class="fld"><label for="cSvc">Service</label>
+<select id="cSvc"><option value="PDF">PDF formatting</option><option value="Doc">Word document</option><option value="Excel">Excel sheet</option><option value="Screenshot">Screenshot editing</option></select></div>
+<div class="fld"><label for="cSpd">Delivery speed</label>
+<select id="cSpd" onchange="calcUpdate()"><option value="0">30 minutes (rush)</option><option value="1" selected>1 hour</option><option value="2">2 hours</option><option value="3">3 to 5 hours</option><option value="4">6 to 12 hours</option></select></div>
+<p class="total" id="cOut">$4 for delivery in 1 hour</p>
+<button class="btn full" onclick="calcOrder()">Order now</button>
+</div>
+
 </div>
 </section>
 <section id="services" class="wash">
