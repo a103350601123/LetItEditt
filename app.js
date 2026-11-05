@@ -30,7 +30,6 @@ if(error)throw error;
 oid=data[0].id;
 const s=String(oid);
 
-// 👇 FIXED: Only send email if 'oid' is valid 👇
 if (oid) {
   fetch('/send-email', {
     method: 'POST',
