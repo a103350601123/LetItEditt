@@ -29,7 +29,6 @@
   <a href="/excel-data-cleaning-formulas.html">Excel</a>
   <a href="/screenshot-editing-annotation.html">Screenshot</a>
   <a href="/video-editing-service.html">Video</a>
-  <!-- Beautiful Thesis Button -->
   <a href="#" onclick="thesisContact(); return false;" class="btn-thesis">Research Paper / Thesis</a>
 </div>
 
@@ -83,9 +82,19 @@
 </section>
 </div>
 </main>
-<footer><div class="wrap"><span>© 2026 LetItEdit. Made with <span class="heart">♥</span> and care.</span><span><a href="/privacy.html">Privacy policy</a><a href="/terms.html">Terms of service</a><a href="/faq.html">FAQ</a><a href="/about.html">About</a></span></div></footer>
+<footer>
+  <div class="wrap">
+    <span>© 2026 LetItEdit. Made with <span class="heart">♥</span> and care.</span>
+    <span>
+      <a href="mailto:info@letitedit.com">info@letitedit.com</a>
+      <a href="/privacy.html">Privacy policy</a>
+      <a href="/terms.html">Terms of service</a>
+      <a href="/faq.html">FAQ</a>
+      <a href="/about.html">About</a>
+    </span>
+  </div>
+</footer>
 
-<!-- THESIS QUOTE MODAL -->
 <div class="overlay" id="thesisModal" role="dialog" aria-modal="true">
   <div class="modal" style="text-align: center; border-top: 5px solid var(--rose);">
     <button class="x" onclick="document.getElementById('thesisModal').classList.remove('on')" aria-label="Close">×</button>
@@ -102,28 +111,18 @@
 
 <script src="/app.js"></script>
 <script>
-// ==========================================
-// THESIS LOGIC (UK WHATSAPP ONLY)
-// ==========================================
-
-// 1. Show the beautiful modal instead of opening WhatsApp directly
 function thesisContact() {
   document.getElementById('thesisModal').classList.add('on');
 }
-
-// 2. Handle Thesis in Calculator
 document.querySelector('.paper.calc button.btn').onclick = function(e) {
   const selectedService = document.getElementById('cSvc').value;
-  
   if (selectedService === 'Thesis') {
     e.preventDefault();
-    thesisContact(); // Open the modal
+    thesisContact();
   } else {
-    calcOrder(); // Normal order flow
+    calcOrder();
   }
 };
-
-// 3. Update Calculator Text when Thesis is selected
 document.getElementById('cSvc').addEventListener('change', function() {
   if (this.value === 'Thesis') {
     document.getElementById('cOut').textContent = 'Requires custom quote (Click Order Now)';
