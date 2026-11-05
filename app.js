@@ -8,7 +8,6 @@ try{db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}catch(e){}
 const cl=i=>$(i).classList.remove('on'),op=i=>$(i).classList.add('on');
 const M=(i,h)=>'<div class="overlay" id="'+i+'" role="dialog" aria-modal="true"><div class="modal">'+h+'</div></div>';
 
-// Added "Cancel this order" link to the Payment Modal (pM)
 document.body.insertAdjacentHTML('beforeend',
 M('oM','<button class="x" data-cl="oM" aria-label="Close">×</button><p class="stepno">Step 1 of 3: Your details</p><h3>Order details</h3><form id="of" novalidate><div class="fld"><label for="nm">Full name</label><input id="nm" autocomplete="name"></div><p class="fine">Add one way to reach you: email or WhatsApp.</p><div class="fld"><label for="em">Email address</label><input id="em" type="email"></div><div class="fld"><label for="wa">or WhatsApp number</label><input id="wa" type="tel" placeholder="+44 7393 652862"></div><div class="fld"><label for="rq">What do you need done?</label><textarea id="rq" rows="3"></textarea></div><p class="total" id="tt"></p><p class="err" id="er" hidden></p><button class="btn full" type="submit">Continue to payment</button></form>')+
 M('dM','<button class="x" data-cl="dM" aria-label="Close">×</button><h3 style="color:#d63a73">User Agreement &amp; Disclaimer</h3><div class="agree"><strong>1. User responsibility:</strong> you own the rights to the content or have permission to edit it.<br><br><strong>2. No liability:</strong> LetItEdit is not responsible for how edited files are used or distributed.<br><br><strong>3. Freelance service:</strong> provided as-is, with no endorsement of the final use of the materials.</div><button class="btn full" id="ag">I Agree</button><p class="fine" style="margin-top:10px"><a href="#" data-back="1">Cancel</a></p>')+
@@ -29,8 +28,8 @@ try{if(!db)throw Error('no connection');
 const {data,error}=await db.from('orders').insert([{name:$('nm').value.trim(),email:$('em').value.trim(),whatsapp:$('wa').value.trim(),requirements:'[UNPAID - '+(typeof SVC!=='undefined'?SVC.k:'General')+'] '+$('rq').value.trim(),delivery_time:cur+' ($'+price+')',status:'pending',terms_accepted:true}]).select();
 if(error)throw error;oid=data[0].id;const s=String(oid);
 
-// 👇 NEW: Trigger the Cloudflare function to send the email! 👇
-fetch('/functions/send-email', {
+// 👇 FIXED URL: Changed from '/functions/send-email' to '/send-email' 👇
+fetch('/send-email', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -46,27 +45,10 @@ fetch('/functions/send-email', {
 
 $('rf').textContent=s.length>12?s.slice(0,8).toUpperCase():s;$('am').textContent='$'+price;$('pl').href=PAYPAL+'/'+price+'USD';
 cl('dM');op('pM');clearInterval(poll);
-localStorage.setItem('pendingOrder', JSON.stringify({id: oid, price: price})); // Save to memory
+localStorage.setItem('pendingOrder', JSON.stringify({id: oid, price: price}));
 poll=setInterval(async()=>{const {data:d}=await db.from('orders').select('status').eq('id',oid).single();if(d&&d.status==='paid'){clearInterval(poll);localStorage.removeItem('pendingOrder');cl('pM');op('uM')}},3000);
 }catch(x){alert('Order could not be saved ('+x.message+'). Please try again or message LetItEdit on WhatsApp.');cl('dM');op('oM')}
 b.disabled=false;b.textContent='I Agree'};
-
-// Show floating Resume button if they close the payment window
-function closePay(){
-  closeModal('pM');
-  if(poll) clearInterval(poll);
-  const o = JSON.parse(localStorage.getItem('pendingOrder')||'null');
-  if(o) showResume(o);
-}
-
-function showResume(o){
-  if($('resumeBtn'))$('resumeBtn').remove();
-  const b=document.createElement('button');
-  b.id='resumeBtn'; b.className='btn glow-btn'; b.innerHTML='⏳ Resume Pending Order';
-  b.style='position:fixed; left:50%; bottom:20px; transform:translateX(-50%); z-index:99; padding:15px 30px; border-radius:99px;';
-  b.onclick=()=>{b.remove(); openPay(o.id,o.price);};
-  document.body.appendChild(b);
-}
 
 function cancelOrder(e){
   e.preventDefault();
@@ -99,6 +81,15 @@ function startPoll(id){
       op('uM');
     }
   },3000);
+}
+
+function showResume(o){
+  if($('resumeBtn'))$('resumeBtn').remove();
+  const b=document.createElement('button');
+  b.id='resumeBtn'; b.className='btn glow-btn'; b.innerHTML='⏳ Resume Pending Order';
+  b.style='position:fixed; left:50%; bottom:20px; transform:translateX(-50%); z-index:99; padding:15px 30px; border-radius:99px;';
+  b.onclick=()=>{b.remove(); openPay(o.id,o.price);};
+  document.body.appendChild(b);
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
