@@ -9,9 +9,9 @@ const cl=i=>$(i).classList.remove('on'),op=i=>$(i).classList.add('on');
 const M=(i,h)=>'<div class="overlay" id="'+i+'" role="dialog" aria-modal="true"><div class="modal">'+h+'</div></div>';
 
 document.body.insertAdjacentHTML('beforeend',
-M('oM','<button class="x" data-cl="oM" aria-label="Close">×</button><p class="stepno">Step 1 of 3: Your details</p><h3>Order details</h3><form id="of" novalidate><div class="fld"><label for="nm">Full name</label><input id="nm" autocomplete="name"></div><p class="fine">Add one way to reach you: email or WhatsApp.</p><div class="fld"><label for="em">Email address</label><input id="em" type="email"></div><div class="fld"><label for="wa">or WhatsApp number</label><input id="wa" type="tel" placeholder="+92 345 6006438"></div><div class="fld"><label for="rq">What do you need done?</label><textarea id="rq" rows="3"></textarea></div><p class="total" id="tt"></p><p class="err" id="er" hidden></p><button class="btn full" type="submit">Continue to payment</button></form>')+
+M('oM','<button class="x" data-cl="oM" aria-label="Close">×</button><p class="stepno">Step 1 of 3: Your details</p><h3>Order details</h3><form id="of" novalidate><div class="fld"><label for="nm">Full name</label><input id="nm" autocomplete="name"></div><p class="fine">Add one way to reach you: email or WhatsApp.</p><div class="fld"><label for="em">Email address</label><input id="em" type="email"></div><div class="fld"><label for="wa">or WhatsApp number</label><input id="wa" type="tel" placeholder="+44 7393 652862"></div><div class="fld"><label for="rq">What do you need done?</label><textarea id="rq" rows="3"></textarea></div><p class="total" id="tt"></p><p class="err" id="er" hidden></p><button class="btn full" type="submit">Continue to payment</button></form>')+
 M('dM','<button class="x" data-cl="dM" aria-label="Close">×</button><h3 style="color:#d63a73">User Agreement &amp; Disclaimer</h3><div class="agree"><strong>1. User responsibility:</strong> you own the rights to the content or have permission to edit it.<br><br><strong>2. No liability:</strong> LetItEdit is not responsible for how edited files are used or distributed.<br><br><strong>3. Freelance service:</strong> provided as-is, with no endorsement of the final use of the materials.</div><button class="btn full" id="ag">I Agree</button><p class="fine" style="margin-top:10px"><a href="#" data-back="1">Cancel</a></p>')+
-M('pM','<button class="x" data-cl="pM" aria-label="Close">×</button><p class="stepno">Step 2 of 3: Payment</p><h3>Pay with PayPal</h3><p class="fine">Your order number is:</p><div class="ref" id="rf"></div><p class="fine">Pay <strong id="am"></strong> via PayPal and put this number in the payment note. Choose Goods and services if asked.</p><a class="btn full" id="pl" href="#" target="_blank" rel="noopener">Pay with PayPal</a><div class="wait"><span class="spin"></span><span>Waiting for LetItEdit to confirm your payment. Keep this tab open.</span></div><p class="fine">Need help? <a href="https://wa.me/923456006438" target="_blank" rel="noopener">Message on WhatsApp</a>.</p>')+
+M('pM','<button class="x" data-cl="pM" aria-label="Close">×</button><p class="stepno">Step 2 of 3: Payment</p><h3>Pay with PayPal</h3><p class="fine">Your order number is:</p><div class="ref" id="rf"></div><p class="fine">Pay <strong id="am"></strong> via PayPal and put this number in the payment note. Choose Goods and services if asked.</p><a class="btn full" id="pl" href="#" target="_blank" rel="noopener">Pay with PayPal</a><div class="wait"><span class="spin"></span><span>Waiting for LetItEdit to confirm your payment. Keep this tab open.</span></div><p class="fine">Need help? <a href="https://wa.me/447393652862" target="_blank" rel="noopener">Message on WhatsApp</a> or email <a href="mailto:info@letitedit.com">info@letitedit.com</a>.</p>')+
 M('uM','<p class="stepno">Step 3 of 3: Upload</p><h3><span class="tick">Payment confirmed.</span> Upload your file</h3><form id="uf"><div class="drop"><input type="file" id="fl" required></div><p class="fine">Maximum file size is 20 MB.</p><p class="err" id="ue" hidden></p><button class="btn full" id="ub" type="submit">Upload file</button></form>')+
 M('fM','<h3><span class="tick">Order received.</span></h3><p>Thank you. LetItEdit has your file and will deliver it by email or WhatsApp within your chosen time. Revisions are free within 48 hours.</p><br><button class="btn full" onclick="location.href=\'/\'">Return to home</button>'));
 
@@ -40,13 +40,11 @@ try{const a=await db.storage.from('uploads').upload(p,f);if(a.error)throw a.erro
 const c=await db.from('orders').update({file_url:p,status:'completed'}).eq('id',oid);if(c.error)throw c.error;cl('uM');op('fM')}
 catch(x){er.textContent='Upload failed ('+x.message+'). Please try again.';er.hidden=false;b.disabled=false;b.textContent='Upload file'}};
 
-// Setup speed buttons for service pages
 if(typeof SVC!=='undefined'){
   $('fl').setAttribute('accept',SVC.a);
   SVC.pr.forEach(([t,p])=>{const b=document.createElement('button');b.className='speed';b.innerHTML='<small>'+t+'</small><strong>$'+p+'</strong>';b.onclick=()=>openOrder(t,p);$('speeds').appendChild(b)})
 }
 
-// Calculator on Home page
 if($('cSvc')){
   const PRICES=[['30 minutes',5],['1 hour',4],['2 hours',3],['3-5 hours',2],['6-12 hours',1]];
   window.calcUpdate=function(){const c=PRICES[$('cSpd').value];$('cOut').textContent='$'+c[1]+' for delivery in '+c[0]};
@@ -54,13 +52,10 @@ if($('cSvc')){
   calcUpdate();
 }
 
-// Animated words
 const ROT_WORDS=['resume','spreadsheet','thesis','screenshot','video','contract'];
 if($('rot')&&!matchMedia('(prefers-reduced-motion: reduce)').matches){let i=0;setInterval(()=>{if(document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;$('rot').classList.add('out');setTimeout(()=>{i=(i+1)%ROT_WORDS.length;$('rot').textContent=ROT_WORDS[i];$('rot').classList.remove('out')},320);},2400);}
 
-// One contact only
 function pickContact(e){const isMail=e.target.id==='em';const other=$(isMail?'wa':'em');const has=e.target.value.trim()!=='';if(has)other.value='';const go=$(isMail?'g-wa':'g-email');go.classList.toggle('skip',has);if(has)go.classList.remove('bad');$(isMail?'g-email':'g-wa').classList.remove('skip');$('er').hidden=true;}
 if($('em')&&$('wa')){$('em').addEventListener('input',pickContact);$('wa').addEventListener('input',pickContact);}
 
-// Cursor glow
 if(matchMedia('(pointer: fine)').matches){document.addEventListener('pointermove',e=>{const el=e.target.closest&&e.target.closest('.row,.speed,.seo>div');if(el){const r=el.getBoundingClientRect();el.style.setProperty('--mx',(e.clientX-r.left)+'px');el.style.setProperty('--my',(e.clientY-r.top)+'px')}});}
