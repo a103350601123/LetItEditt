@@ -225,3 +225,38 @@ nav a:not(.btn):hover,footer a:hover,.back:hover{color:var(--ink);background:rgb
   from { box-shadow: 0 0 10px rgba(214,58,115,0.4), 0 0 20px rgba(91,75,255,0.2); }
   to { box-shadow: 0 0 25px rgba(214,58,115,0.8), 0 0 40px rgba(91,75,255,0.6); }
 }
+/* Beautiful Research/Thesis Button */
+.btn-thesis {
+  grid-column: span 3;
+  background: linear-gradient(135deg, rgba(255,255,255,0.9), #ffe3ee, #ffd1dc) !important;
+  border: 2px solid var(--rose) !important;
+  color: var(--rose) !important;
+  font-weight: 800 !important;
+  font-size: 16px !important;
+  padding: 16px 10px !important;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(214,58,115,0.25), inset 0 2px 0 rgba(255,255,255,0.8) !important;
+  text-shadow: 0 1px 0 #fff;
+  transition: all 0.3s ease;
+}
+.btn-thesis::before {
+  content: '✨ ';
+  font-size: 18px;
+}
+.btn-thesis:hover {
+  background: linear-gradient(135deg, #ffe3ee, #ffb6c1) !important;
+  box-shadow: 0 15px 35px rgba(214,58,115,0.5), inset 0 2px 0 rgba(255,255,255,1) !important;
+  transform: translateY(-3px) scale(1.02);
+  color: #c02d65 !important;
+}
+
+/* Glowing Pulse Effect for Calculator & Modals */
+.glow-btn, #of button[type="submit"] {
+  animation: glowPulse 2s infinite alternate;
+  border: 2px solid rgba(255,255,255,0.4) !important;
+}
+@keyframes glowPulse {
+  from { box-shadow: 0 0 10px rgba(214,58,115,0.4), 0 0 20px rgba(91,75,255,0.2); }
+  to { box-shadow: 0 0 25px rgba(214,58,115,0.8), 0 0 40px rgba(91,75,255,0.6); }
+}
