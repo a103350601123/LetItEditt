@@ -29,7 +29,7 @@ STEP 2: Once confirmed, email the customer to let them know they can upload thei
       },
       body: JSON.stringify({
         from: "LetItEdit <orders@letitedit.com>",
-        to: ["ismi8442@gmail.com"], 
+        to: ["a1003350601123@gmail.com"], 
         subject: `🚨 Order #${order.id} (PENDING) - ${order.name}`,
         text: emailBody,
       })
