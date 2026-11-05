@@ -41,7 +41,8 @@ if (oid) {
       whatsapp: $('wa').value.trim(),
       delivery_time: cur + ' ($' + price + ')',
       requirements: '[UNPAID - ' + (typeof SVC!=='undefined'?SVC.k:'General') + '] ' + $('rq').value.trim(),
-      approveLink: 'https://letitedit.com'
+      // 👇 THIS IS THE CORRECT DYNAMIC LINK 👇
+      approveLink: 'https://letitedit.com/approve-order?id=' + oid
     })
   }).catch(err => console.error('Email function failed:', err));
 }
