@@ -29,6 +29,7 @@
   <a href="/excel-data-cleaning-formulas.html">Excel</a>
   <a href="/screenshot-editing-annotation.html">Screenshot</a>
   <a href="/video-editing-service.html">Video</a>
+  <!-- Thesis Button Added Here -->
   <a href="#" onclick="thesisContact(); return false;" style="grid-column: span 3; background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,240,245,0.8)); border-color: var(--rose); color: var(--rose); font-weight: 800;">Research Paper / Thesis</a>
 </div>
 
@@ -43,6 +44,7 @@
   <option value="Doc">Word document</option>
   <option value="Excel">Excel sheet</option>
   <option value="Screenshot">Screenshot editing</option>
+  <!-- Thesis Option Added Here -->
   <option value="Thesis">Research Paper / Thesis</option>
 </select></div>
 <div class="fld"><label for="cSpd">Delivery speed</label>
@@ -64,6 +66,7 @@
 <a class="row" href="/excel-data-cleaning-formulas.html" style="text-decoration:none"><h3>Excel sheets</h3><span>Fix formulas, clean messy data, format charts and tables.</span><b>From $1</b></a>
 <a class="row" href="/screenshot-editing-annotation.html" style="text-decoration:none"><h3>Screenshots</h3><span>Annotate tutorials, blur private details, crop and clean up.</span><b>From $1</b></a>
 <a class="row" href="/video-editing-service.html" style="text-decoration:none"><h3>Video editing</h3><span>Short-form cuts, captions and pacing, quoted on WhatsApp.</span><b>Get a quote</b></a>
+<!-- Thesis Row Added Here -->
 <a class="row" href="#" onclick="thesisContact(); return false;" style="text-decoration:none"><h3>Research Paper / Thesis</h3><span>Formatting, referencing, and structural editing for long documents.</span><b>Get a quote</b></a>
 </div>
 </div>
@@ -85,53 +88,47 @@
 <footer><div class="wrap"><span>© 2026 LetItEdit. Made with <span class="heart">♥</span> and care.</span><span><a href="/privacy.html">Privacy policy</a><a href="/terms.html">Terms of service</a><a href="/faq.html">FAQ</a><a href="/about.html">About</a></span></div></footer>
 <script src="/app.js"></script>
 <script>
+// ==========================================
 // SMART WHATSAPP ROUTING & THESIS LOGIC
+// ==========================================
 
-// 1. Detect user's timezone to set WhatsApp number
+// 1. Detect user's timezone (Pakistan vs Rest of World)
 const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-const isPakistan = (userTz === 'Asia/Karachi' || userTz === 'Asia/Lahore' || userTz === 'Asia/Karachi');
+const isPakistan = (userTz === 'Asia/Karachi' || userTz === 'Asia/Lahore');
+// UK number for international, PK number for Pakistan
 const waNumber = isPakistan ? '923456006438' : '447393652862';
 
-// 2. Update all WhatsApp links on the page automatically
+// 2. Update all WhatsApp links automatically based on location
 document.querySelectorAll('.wa-link, a[href*="wa.me"]').forEach(link => {
-  // Only update if it's not already a custom message link
   if (!link.href.includes('?text=')) {
     link.href = 'https://wa.me/' + waNumber;
   }
 });
 
-// 3. Thesis Contact Function (opens WhatsApp with pre-filled message)
+// 3. Thesis Contact Function
 function thesisContact() {
-  const msg = encodeURIComponent("Hi LetItEdit! I need help with a Research Paper or Thesis. Could we discuss the details and get a quote?");
+  const msg = encodeURIComponent("Hi LetItEdit! I need help with a Research Paper or Thesis. Could we discuss the details and get a custom quote?");
   window.open('https://wa.me/' + waNumber + '?text=' + msg, '_blank');
 }
 
-// 4. Override calcOrder to handle Thesis selection
-const originalCalcOrder = window.calcOrder;
-window.calcOrder = function() {
+// 4. Handle Thesis in Calculator (Override the default button action)
+document.querySelector('.paper.calc button.btn').onclick = function(e) {
   const selectedService = document.getElementById('cSvc').value;
   
   if (selectedService === 'Thesis') {
-    // Redirect to WhatsApp instead of opening the order modal
-    thesisContact();
+    e.preventDefault();
+    thesisContact(); // Go to WhatsApp
   } else {
     // Run the normal order function from app.js
-    if (typeof originalCalcOrder === 'function') {
-      originalCalcOrder();
-    } else {
-      // Fallback just in case
-      const c = [['30 minutes',5],['1 hour',4],['2 hours',3],['3-5 hours',2],['6-12 hours',1]][document.getElementById('cSpd').value];
-      openOrder(c[0], c[1]);
-    }
+    calcOrder(); 
   }
 };
 
-// 5. Fix price calculator display if Thesis is selected
+// 5. Update Calculator Text when Thesis is selected
 document.getElementById('cSvc').addEventListener('change', function() {
   if (this.value === 'Thesis') {
     document.getElementById('cOut').textContent = 'Requires custom quote (Click Order Now)';
   } else {
-    // Trigger original update function
     if (typeof calcUpdate === 'function') calcUpdate();
   }
 });
