@@ -1,53 +1,73 @@
-export async function onRequest(context) {
+export async function onRequestGet(context) {
   const { request, env } = context;
   const url = new URL(request.url);
-  const orderId = url.searchParams.get("id");
-  const secret = url.searchParams.get("secret");
+  const id = url.searchParams.get("id");
 
-  if (secret !== "letitedit_secret_123") {
-    return new Response("Unauthorized. Invalid secret key.", { status: 401 });
+  if (!id) {
+    return new Response("Missing order ID in the link.", { status: 400 });
   }
 
-  const supabaseUrl = 'https://bjragiylhglqfodbihvd.supabase.co'; 
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqcmFnaXlsaGdscWZvZGJpaHZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMjQ1NzMsImV4cCI6MjEwODkwMDU3M30.upa96t4q9W1AXIr8wry3kL_8U7L__GmTZZ3kWNjurYU';
+  // Your Supabase URL
+  const SUPABASE_URL = 'https://bjragiylhglqfodbihvd.supabase.co';
+  
+  // We need the Secret Service Role Key to update the database
+  const SERVICE_KEY = env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!SERVICE_KEY) {
+    return new Response("Server Error: SUPABASE_SERVICE_ROLE_KEY is missing from Cloudflare settings.", { status: 500 });
+  }
 
   try {
-    const res = await fetch(`${supabaseUrl}/rest/v1/orders?id=eq.${orderId}`, {
-      method: 'PATCH',
+    // Update the order status to 'paid'
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${id}`, {
+      method: "PATCH",
       headers: {
-        'apikey': supabaseKey,
-        'Authorization': `Bearer ${supabaseKey}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation' // Forces Supabase to return the updated row
+        "apikey": SERVICE_KEY,
+        "Authorization": `Bearer ${SERVICE_KEY}`,
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify({ status: 'paid' })
+      body: JSON.stringify({ status: "paid" })
     });
 
-    const data = await res.json();
+    if (!res.ok) throw new Error(await res.text());
 
-    // If data is an empty array, it means Supabase found 0 rows with that ID (or RLS blocked it)
-    if (res.ok && data.length > 0) {
-      return new Response(`
-        <html>
-          <body style="background:#050914; color:#fff; text-align:center; padding-top:100px; font-family:sans-serif;">
-            <h1 style="color:#10b981; font-size: 40px;">✅ Payment Approved!</h1>
-            <p style="font-size: 18px;">Database successfully updated to 'paid'.</p>
-            <p style="color:#94a3b8;">Order ID: ${orderId}</p>
-          </body>
-        </html>
-      `, { headers: { 'Content-Type': 'text/html' } });
-    } else {
-      return new Response(`
-        <html>
-          <body style="background:#050914; color:#fff; text-align:center; padding-top:100px; font-family:sans-serif;">
-            <h1 style="color:#ef4444; font-size: 40px;">❌ Update Failed</h1>
-            <p style="font-size: 18px;">Supabase rejected the update. 0 rows were changed.</p>
-            <p style="color:#ef4444;">This means either the Order ID is wrong, or your RLS Policies are blocking the UPDATE.</p>
-          </body>
-        </html>
-      `, { status: 400, headers: { 'Content-Type': 'text/html' } });
-    }
+    // Show a beautiful success page to the Admin
+    return new Response(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Order Approved</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+          body{font-family:system-ui,sans-serif;text-align:center;padding:50px;background:linear-gradient(135deg,#ffe3ee 0%,#ece8ff 48%,#dcf0ff 100%);color:#0e1726}
+          .card{background:rgba(255,255,255,0.8);backdrop-filter:blur(10px);padding:40px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.1);max-width:500px;margin:0 auto;border:1px solid white;}
+          h1{color:#12805c;margin-bottom:10px;}
+          .btn{display:inline-block;margin-top:20px;padding:12px 24px;background:#4f46e5;color:white;text-decoration:none;border-radius:99px;font-weight:bold;}
+        </style>
+      </head>
+      <body>
+        <div class="card">
+            <h1>✅ Order Approved</h1>
+            <p>Order <strong>#${id}</strong> has been marked as <strong>paid</strong>.</p>
+            <p>The user's page will now automatically unlock and allow them to upload their file.</p>
+            <a href="/" class="btn">Return to Website</a>
+        </div>
+      </body>
+      </html>
+    `, {
+      headers: { "Content-Type": "text/html" }
+    });
+
   } catch (error) {
-    return new Response("Server Error: " + error.message, { status: 500 });
+    return new Response(`
+      <!DOCTYPE html>
+      <html>
+      <head><title>Error</title></head>
+      <body style="font-family:sans-serif;padding:40px;text-align:center;">
+        <h1 style="color:red;">❌ Error Approving Order</h1>
+        <p>${error.message}</p>
+      </body>
+      </html>
+    `, { status: 500, headers: { "Content-Type": "text/html" } });
   }
 }
