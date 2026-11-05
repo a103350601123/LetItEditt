@@ -18,13 +18,6 @@ header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.4);backdrop
 nav{display:flex;align-items:center;gap:22px;font-size:15px}
 nav a:not(.btn){background:none;border:0;color:var(--muted);text-decoration:none}
 nav a:not(.btn):hover{color:var(--ink)}
-.btn{display:inline-block;padding:13px 24px;border-radius:6px;font-weight:600;text-decoration:none;background:var(--blue);color:#fff;border:2px solid var(--blue);text-align:center;transition:.3s}
-.btn:hover{background:var(--blue-d);border-color:var(--blue-d)}
-.btn.ghost{background:rgba(255,255,255,.4);backdrop-filter:blur(10px);color:var(--ink);border-color:rgba(255,255,255,.8); box-shadow:0 4px 15px rgba(0,0,0,.05);}
-.btn.ghost:hover{background:#fff;color:var(--ink); box-shadow:0 8px 25px rgba(0,0,0,.1);}
-.btn.sm{padding:8px 16px;font-size:15px}
-.btn.full{display:block;width:100%}
-.btn:disabled{opacity:.6;cursor:not-allowed}
 section{padding:70px 0}
 .wash{background:rgba(255,255,255,.2)}
 h2{font-size:clamp(25px,4vw,34px);margin-bottom:10px}
@@ -65,8 +58,8 @@ h2{font-size:clamp(25px,4vw,34px);margin-bottom:10px}
 .svc>p{color:var(--muted)}
 .note{border-left:4px solid var(--blue);background:rgba(255,255,255,.4);backdrop-filter:blur(10px);padding:12px 16px;margin:22px 0;font-size:15.5px; border-radius: 0 12px 12px 0;}
 .speeds{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin:18px 0 26px}
-.speed{background:rgba(255,255,255,.5);border:1px solid var(--line);border-radius:6px;padding:16px 8px;text-align:center;color:var(--ink);cursor:pointer; backdrop-filter: blur(10px);}
-.speed:hover{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue), 0 8px 20px rgba(31,79,255,.15); background: rgba(255,255,255,.8);}
+.speed{background:linear-gradient(135deg, #fff, #f0f4ff);border:1px solid rgba(255,255,255,.9);border-radius:6px;padding:16px 8px;text-align:center;color:var(--ink);cursor:pointer; box-shadow: inset 0 2px 4px #fff, inset 0 -2px 5px rgba(0,0,0,0.05), 0 4px 10px rgba(0,0,0,0.05); transition: all 0.2s;}
+.speed:hover{border-color:var(--blue);transform: translateY(-2px); box-shadow: inset 0 3px 6px #fff, inset 0 -2px 5px rgba(0,0,0,0.05), 0 8px 15px rgba(31,79,255,0.15); background: #fff;}
 .speed small{display:block;color:var(--muted);font-size:14px}
 .speed strong{font:700 26px Literata,Georgia,serif}
 .overlay{display:none;position:fixed;inset:0;z-index:50;background:rgba(14,23,38,.62);align-items:center;justify-content:center;padding:16px}
@@ -115,19 +108,14 @@ footer{background:rgba(255,255,255,.3);backdrop-filter:blur(20px) saturate(1.5)}
 .steps li:before{color:var(--rose)}
 
 /* ENHANCED GLASS PANELS */
-.paper,.modal,.speed,.page,.svc,.service-grid a {
+.paper,.modal,.page,.svc {
     background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.2));
     backdrop-filter: blur(25px) saturate(1.8);
     border: 1px solid rgba(255,255,255,0.9);
-    box-shadow: 
-        inset 0 1px 0 rgba(255,255,255,1),
-        inset 0 -1px 0 rgba(150,130,255,0.2),
-        0 24px 60px rgba(90,70,180,0.15);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(150,130,255,0.2), 0 24px 60px rgba(90,70,180,0.15);
 }
 .paper{border-left:4px solid var(--rose);border-radius:20px}
 .page,.svc{border-radius:26px;margin:26px auto 70px;padding:20px 34px 44px}
-.speed{border-radius:18px;transition:transform .2s,box-shadow .2s;text-decoration:none}
-.speed:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(214,58,115,.2)}
 .note{background:rgba(255,255,255,.5);border-left-color:var(--rose);border-radius:0 12px 12px 0}
 .overlay{background:rgba(60,40,120,.34);backdrop-filter:blur(12px)}
 .modal{background:rgba(255,255,255,.85);border-radius:26px; box-shadow: 0 30px 60px rgba(0,0,0,.2), inset 0 1px 0 #fff;}
@@ -137,11 +125,82 @@ footer{background:rgba(255,255,255,.3);backdrop-filter:blur(20px) saturate(1.5)}
 .wait{background:rgba(255,255,255,.6);border-radius:14px}
 .ref{background:rgba(255,255,255,.7);border-radius:12px}
 
-/* GLOWING BUTTONS */
-.btn{background:linear-gradient(135deg,#d63a73,#5b4bff);border:2px solid transparent;border-radius:999px;box-shadow:0 8px 20px rgba(214,58,115,.3), inset 0 2px 0 rgba(255,255,255,.3);transition:transform .2s,box-shadow .2s}
-.btn:hover{background:linear-gradient(135deg,#c02d65,#4a3be8);border-color:transparent;transform:translateY(-2px);box-shadow:0 12px 26px rgba(214,58,115,.4), inset 0 2px 0 rgba(255,255,255,.4)}
-.btn.ghost{background:rgba(255,255,255,.4);border-color:rgba(255,255,255,.9);color:var(--ink);box-shadow:0 4px 15px rgba(0,0,0,.05)}
-.btn.ghost:hover{background:#fff;color:var(--ink);border-color:var(--blue); box-shadow: 0 8px 25px rgba(31,79,255,.2)}
+/* 3D EMBOSSED CRYSTAL BUTTONS */
+.btn{
+  display:inline-block; padding:13px 24px; border-radius:99px; font-weight:600; text-decoration:none;
+  background:linear-gradient(135deg, #ff6b9e, #d63a73, #5b4bff);
+  color:#fff; border: 1px solid rgba(255,255,255,0.6); text-align:center;
+  box-shadow: 
+    inset 0 2px 3px rgba(255,255,255,0.8), 
+    inset 0 -3px 5px rgba(0,0,0,0.3), 
+    0 8px 20px rgba(214,58,115,0.4);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: all 0.15s ease;
+}
+.btn:hover{
+  background:linear-gradient(135deg, #ff85b1, #e0457e, #6858ff);
+  transform:translateY(-2px);
+  box-shadow: 
+    inset 0 3px 5px rgba(255,255,255,0.9), 
+    inset 0 -2px 4px rgba(0,0,0,0.2), 
+    0 12px 25px rgba(214,58,115,0.6);
+}
+.btn:active{
+  transform:translateY(2px);
+  box-shadow: 
+    inset 0 4px 8px rgba(0,0,0,0.4), 
+    inset 0 -1px 2px rgba(255,255,255,0.5), 
+    0 2px 5px rgba(214,58,115,0.3);
+}
+.btn.ghost{
+  background:linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.5));
+  color:var(--ink); border: 1px solid rgba(255,255,255,0.9); text-shadow: none;
+  box-shadow: inset 0 2px 4px rgba(255,255,255,1), inset 0 -2px 5px rgba(0,0,0,0.05), 0 6px 15px rgba(0,0,0,0.08);
+}
+.btn.ghost:hover{
+  background:linear-gradient(135deg, #ffffff, rgba(255,255,255,0.8));
+  color:var(--blue); border-color:var(--blue);
+  box-shadow: inset 0 3px 6px rgba(255,255,255,1), inset 0 -2px 5px rgba(0,0,0,0.05), 0 10px 20px rgba(31,79,255,0.15);
+}
+.btn.sm{padding:8px 16px;font-size:15px}
+.btn.full{display:block;width:100%}
+.btn:disabled{opacity:.6;cursor:not-allowed; transform:none!important;}
+
+/* 3D Embossed Thesis Button */
+.btn-thesis {
+  grid-column: span 3;
+  background: linear-gradient(135deg, #ffffff, #ffe3ee, #ffb6c1) !important;
+  border: 1px solid rgba(255,255,255,0.9) !important;
+  color: #c02d65 !important;
+  font-weight: 800 !important;
+  font-size: 16px !important;
+  padding: 16px 10px !important;
+  position: relative;
+  border-radius: 99px;
+  text-shadow: 0 1px 2px rgba(255,255,255,1);
+  box-shadow: 
+    inset 0 3px 5px rgba(255,255,255,1), 
+    inset 0 -3px 6px rgba(214,58,115,0.2), 
+    0 8px 20px rgba(214,58,115,0.25) !important;
+  transition: all 0.15s ease;
+}
+.btn-thesis:hover {
+  background: linear-gradient(135deg, #ffffff, #ffd1dc, #ff9eb5) !important;
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 
+    inset 0 4px 8px rgba(255,255,255,1), 
+    inset 0 -2px 4px rgba(214,58,115,0.3), 
+    0 12px 25px rgba(214,58,115,0.4) !important;
+  color: #a11f50 !important;
+}
+.btn-thesis:active {
+  transform: translateY(2px);
+  box-shadow: 
+    inset 0 5px 10px rgba(214,58,115,0.3), 
+    inset 0 -1px 2px rgba(255,255,255,0.8), 
+    0 2px 5px rgba(214,58,115,0.2) !important;
+}
+
 .band{background:linear-gradient(135deg,#d63a73,#5b4bff); box-shadow: 0 20px 50px rgba(214,58,115,.3);}
 .band p{color:rgba(255,255,255,.92)}
 .band .btn.ghost{background:transparent; border-color: #fff;}
@@ -176,9 +235,20 @@ footer{background:rgba(255,255,255,.3);backdrop-filter:blur(20px) saturate(1.5)}
 @keyframes gem{from{transform:translateY(0) rotate(-8deg)}to{transform:translateY(-60px) rotate(10deg)}}
 @keyframes twinkle{0%,100%{opacity:.2;transform:scale(.7)}50%{opacity:1;transform:scale(1.2)}}
 
+/* Left Side Crystal Buttons Grid */
+.service-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px; }
+.service-grid a { 
+    text-align: center; padding: 14px 10px; font-size: 15px; font-weight: 700; 
+    border-radius: 12px; text-decoration: none; color: var(--ink); 
+    background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.5));
+    border: 1px solid rgba(255,255,255,0.9);
+    box-shadow: inset 0 2px 4px #fff, 0 4px 10px rgba(0,0,0,0.08);
+    transition: 0.2s; 
+}
+.service-grid a:hover { color: var(--rose); transform: translateY(-2px); box-shadow: inset 0 3px 6px #fff, 0 8px 15px rgba(214,58,115,0.2); }
+
 .seo{gap:22px}.seo>div{padding:22px;border-radius:20px}
-.row,.speed,.seo>div,.service-grid a{--mx:50%;--my:50%;transition:background .25s,transform .25s,box-shadow .25s}
-.row:hover,.speed:hover,.seo>div:hover,.service-grid a:hover{background-image:radial-gradient(260px circle at var(--mx) var(--my),rgba(255,255,255,.98),rgba(255,255,255,.4) 70%);box-shadow:0 0 0 1px rgba(214,58,115,.4),0 0 26px rgba(214,58,115,.35),0 0 60px rgba(91,75,255,.25)}
+.row,.speed,.seo>div{--mx:50%;--my:50%;transition:background .25s,transform .25s,box-shadow .25s}
 nav a:not(.btn),footer a,.back{padding:7px 14px;border-radius:999px;transition:background .2s,box-shadow .2s,color .2s}
 nav a:not(.btn):hover,footer a:hover,.back:hover{color:var(--ink);background:rgba(255,255,255,.7);box-shadow:0 0 0 1px rgba(214,58,115,.35),0 0 20px rgba(214,58,115,.4)}
 .logo{transition:text-shadow .2s}.logo:hover{text-shadow:0 0 18px rgba(214,58,115,.6)}
@@ -190,19 +260,14 @@ nav a:not(.btn):hover,footer a:hover,.back:hover{color:var(--ink);background:rgb
 .or:before,.or:after{content:"";flex:1;height:1px;background:rgba(0,0,0,.1)}
 .trustpilot-container { display: flex; justify-content: center; padding: 40px 20px; }
 
-/* Left Side Crystal Buttons Grid */
-.service-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px; }
-.service-grid a { 
-    text-align: center; 
-    padding: 14px 10px; 
-    font-size: 15px; 
-    font-weight: 700; 
-    border-radius: 12px; 
-    text-decoration: none; 
-    color: var(--ink); 
-    transition: 0.2s; 
+/* Glowing Pulse Effect */
+.glow-btn, #of button[type="submit"] {
+  animation: glowPulse 2s infinite alternate;
 }
-.service-grid a:hover { color: var(--rose); transform: translateY(-2px); }
+@keyframes glowPulse {
+  from { box-shadow: inset 0 2px 3px rgba(255,255,255,0.8), inset 0 -3px 5px rgba(0,0,0,0.3), 0 0 10px rgba(214,58,115,0.4); }
+  to { box-shadow: inset 0 2px 3px rgba(255,255,255,0.8), inset 0 -3px 5px rgba(0,0,0,0.3), 0 0 25px rgba(214,58,115,0.8), 0 0 40px rgba(91,75,255,0.6); }
+}
 
 @media(max-width:800px){
   header .wrap { padding: 0 20px; }
@@ -216,47 +281,3 @@ nav a:not(.btn):hover,footer a:hover,.back:hover{color:var(--ink);background:rgb
   .service-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media(prefers-reduced-motion:reduce){*,*:before{animation:none!important;transition:none!important}.w{opacity:1;transform:none}}
-/* Glowing Pulse Effect for Calculator & Modals */
-.glow-btn, #of button[type="submit"] {
-  animation: glowPulse 2s infinite alternate;
-  border: 2px solid rgba(255,255,255,0.4) !important;
-}
-@keyframes glowPulse {
-  from { box-shadow: 0 0 10px rgba(214,58,115,0.4), 0 0 20px rgba(91,75,255,0.2); }
-  to { box-shadow: 0 0 25px rgba(214,58,115,0.8), 0 0 40px rgba(91,75,255,0.6); }
-}
-/* Beautiful Research/Thesis Button */
-.btn-thesis {
-  grid-column: span 3;
-  background: linear-gradient(135deg, rgba(255,255,255,0.9), #ffe3ee, #ffd1dc) !important;
-  border: 2px solid var(--rose) !important;
-  color: var(--rose) !important;
-  font-weight: 800 !important;
-  font-size: 16px !important;
-  padding: 16px 10px !important;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 10px 25px rgba(214,58,115,0.25), inset 0 2px 0 rgba(255,255,255,0.8) !important;
-  text-shadow: 0 1px 0 #fff;
-  transition: all 0.3s ease;
-}
-.btn-thesis::before {
-  content: '✨ ';
-  font-size: 18px;
-}
-.btn-thesis:hover {
-  background: linear-gradient(135deg, #ffe3ee, #ffb6c1) !important;
-  box-shadow: 0 15px 35px rgba(214,58,115,0.5), inset 0 2px 0 rgba(255,255,255,1) !important;
-  transform: translateY(-3px) scale(1.02);
-  color: #c02d65 !important;
-}
-
-/* Glowing Pulse Effect for Calculator & Modals */
-.glow-btn, #of button[type="submit"] {
-  animation: glowPulse 2s infinite alternate;
-  border: 2px solid rgba(255,255,255,0.4) !important;
-}
-@keyframes glowPulse {
-  from { box-shadow: 0 0 10px rgba(214,58,115,0.4), 0 0 20px rgba(91,75,255,0.2); }
-  to { box-shadow: 0 0 25px rgba(214,58,115,0.8), 0 0 40px rgba(91,75,255,0.6); }
-}
