@@ -26,22 +26,26 @@ $('er').hidden=!s;$('er').textContent=s;if(!s){cl('oM');op('dM')}};
 $('ag').onclick=async()=>{const b=$('ag');b.disabled=true;b.textContent='Saving order...';
 try{if(!db)throw Error('no connection');
 const {data,error}=await db.from('orders').insert([{name:$('nm').value.trim(),email:$('em').value.trim(),whatsapp:$('wa').value.trim(),requirements:'[UNPAID - '+(typeof SVC!=='undefined'?SVC.k:'General')+'] '+$('rq').value.trim(),delivery_time:cur+' ($'+price+')',status:'pending',terms_accepted:true}]).select();
-if(error)throw error;oid=data[0].id;const s=String(oid);
+if(error)throw error;
+oid=data[0].id;
+const s=String(oid);
 
-// 👇 FIXED URL: Changed from '/functions/send-email' to '/send-email' 👇
-fetch('/send-email', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    id: oid,
-    name: $('nm').value.trim(),
-    email: $('em').value.trim(),
-    whatsapp: $('wa').value.trim(),
-    delivery_time: cur + ' ($' + price + ')',
-    requirements: '[UNPAID - ' + (typeof SVC!=='undefined'?SVC.k:'General') + '] ' + $('rq').value.trim(),
-    approveLink: 'https://letitedit.com'
-  })
-}).catch(err => console.error('Email function failed:', err));
+// 👇 FIXED: Only send email if 'oid' is valid 👇
+if (oid) {
+  fetch('/send-email', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      id: oid,
+      name: $('nm').value.trim(),
+      email: $('em').value.trim(),
+      whatsapp: $('wa').value.trim(),
+      delivery_time: cur + ' ($' + price + ')',
+      requirements: '[UNPAID - ' + (typeof SVC!=='undefined'?SVC.k:'General') + '] ' + $('rq').value.trim(),
+      approveLink: 'https://letitedit.com'
+    })
+  }).catch(err => console.error('Email function failed:', err));
+}
 
 $('rf').textContent=s.length>12?s.slice(0,8).toUpperCase():s;$('am').textContent='$'+price;$('pl').href=PAYPAL+'/'+price+'USD';
 cl('dM');op('pM');clearInterval(poll);
