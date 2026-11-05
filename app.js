@@ -1,6 +1,9 @@
 const SUPABASE_URL='https://bjragiylhglqfodbihvd.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqcmFnaXlsaGdscWZvZGJpaHZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMjQ1NzMsImV4cCI6MjEwODkwMDU3M30.upa96t4q9W1AXIr8wry3kL_8U7L__GmTZZ3kWNjurYU';
-const PAYPAL='https://www.paypal.me/mujahidhussain78y';
+
+// 👇 YOUR UPDATED PAYPAL LINK 👇
+const PAYPAL='https://paypal.me/MujahidHussain726';
+
 const $=i=>document.getElementById(i);
 let db=null,poll,price=0,cur='',oid='',up=false;
 
