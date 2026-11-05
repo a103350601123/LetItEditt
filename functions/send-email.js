@@ -8,7 +8,7 @@ export async function onRequest(context) {
 
   // 2. Format the email with the Order Number clearly visible
   const emailBody = `
-    Hello Mujahid,
+    Hello Buzdar,
     
     You have received a new order on LetItEdit! 
     
@@ -40,7 +40,7 @@ export async function onRequest(context) {
     },
     body: JSON.stringify({
       from: "LetItEdit <onboarding@resend.dev>",
-      to: ["a1003350601123@gmail.com"],
+      to: ["apreviews@gmail.com"],
       subject: `🚨 Order #${order.id} (PENDING) - ${order.name}`,
       text: emailBody,
     })
