@@ -28,7 +28,8 @@ STEP 2: Once confirmed, email the customer to let them know they can upload thei
         "Authorization": `Bearer ${env.RESEND_API_KEY}`
       },
       body: JSON.stringify({
-        from: "LetItEdit <orders@letitedit.com>",
+        from: "LetItEdit <onboarding@resend.dev>",
+        // 👇 MUST BE YOUR RESEND LOGIN EMAIL 👇
         to: ["a1003350601123@gmail.com"], 
         subject: `🚨 Order #${order.id} (PENDING) - ${order.name}`,
         text: emailBody,
