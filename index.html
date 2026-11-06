@@ -5,82 +5,29 @@
 <link rel="stylesheet" href="/styles.css">
 <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
 
-<!-- 🚀 PROFESSIONAL EDITORS (CDNs) 🚀 -->
-<link rel="stylesheet" href="https://uicdn.toast.com/tui-color-picker/latest/tui-color-picker.css">
-<link rel="stylesheet" href="https://uicdn.toast.com/tui-image-editor/latest/tui-image-editor.css">
 <script src="https://cdn.jsdelivr.net/npm/fabric@4.5.0/dist/fabric.min.js"></script>
 <script src="https://uicdn.toast.com/tui-code-snippet/latest/tui-code-snippet.min.js"></script>
 <script src="https://uicdn.toast.com/tui-color-picker/latest/tui-color-picker.min.js"></script>
 <script src="https://uicdn.toast.com/tui-image-editor/latest/tui-image-editor.min.js"></script>
+<link rel="stylesheet" href="https://uicdn.toast.com/tui-color-picker/latest/tui-color-picker.css">
+<link rel="stylesheet" href="https://uicdn.toast.com/tui-image-editor/latest/tui-image-editor.css">
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html-docx-js/0.3.1/html-docx.js"></script>
+
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@12.1.2/dist/handsontable.full.min.css">
 <script src="https://cdn.jsdelivr.net/npm/handsontable@12.1.2/dist/handsontable.full.min.js"></script>
 
 <style>
-  /* Modal Base */
+  /* Specific styles for the editor modals */
   .overlay { z-index: 9999; }
-  .modal { max-width: 95vw; width: 1200px; height: 90vh; display: flex; flex-direction: column; padding: 20px; background: #0a0a0f; border: 1px solid var(--neon-blue); border-radius: 12px; box-shadow: 0 0 50px rgba(0, 240, 255, 0.2); }
+  .modal { max-width: 95vw; width: 1200px; height: 90vh; display: flex; flex-direction: column; }
   .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
   .modal-body { flex-grow: 1; overflow: hidden; background: #111; border-radius: 8px; position: relative; }
   .editor-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px; }
-
-  /* 🚀 FIX FOR SCREENSHOT 2: TOAST UI Overlap */
-  #tui-image-editor-container { width: 100%; height: 100%; }
-  .tui-image-editor-main-container { display: flex; flex-direction: column; height: 100%; }
-  .tui-image-editor-canvas-container { 
-      position: relative !important; 
-      flex-grow: 1; 
-      bottom: auto !important; 
-      height: calc(100% - 160px) !important; /* Forces image to shrink */
-  }
-  .tui-image-editor-submenu { 
-      position: absolute !important;
-      bottom: 0 !important; 
-      height: 160px !important; 
-      background: #1a1a1a !important; 
-      border-top: 1px solid #333; 
-      width: 100%;
-  }
-
-  /* TOAST UI Dark Theme */
-  .tui-image-editor-main { background: #111; }
-  .tui-image-editor-header { background: #1a1a1a; color: white; }
-  .tui-image-editor-help-menu { background: #1a1a1a; }
-  .tui-image-editor-menu { background: #1a1a1a; }
-
-  /* Handsontable Dark Theme */
-  .handsontable { color: #fff; }
-  .handsontable th { background: #222; color: var(--neon-blue); border-color: #444; }
-  .handsontable td { background: #111; border-color: #333; }
-  .handsontable td.current { background: #003366; }
-  .handsontable td.area { background: rgba(0, 240, 255, 0.1); }
-
-  /* Footer Links */
-  .footer-links { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
-  .footer-links a { color: var(--muted); text-decoration: none; font-size: 14px; transition: 0.2s; }
-  .footer-links a:hover { color: var(--neon-blue); }
-
-  /* 🚀 FIX FOR SCREENSHOT 1: Mobile Header & Floating Button */
   @media (max-width: 768px) {
-      /* Fix Header */
-      header .bar { flex-direction: column; height: auto; padding: 15px 10px; gap: 15px; }
-      nav { flex-wrap: wrap; justify-content: center; gap: 10px; }
-      nav a { font-size: 14px; }
-      nav .btn.sm { padding: 8px 12px; font-size: 13px; white-space: nowrap; }
-      
-      /* Fix Floating Resume Button */
-      #resumeBtn { bottom: 10px !important; padding: 10px 20px !important; font-size: 14px !important; white-space: nowrap; width: auto !important; }
-      
-      /* Fix Modals */
       .modal { width: 100vw !important; height: 100vh !important; border-radius: 0; padding: 10px; }
-      .tui-image-editor-canvas-container { height: calc(100% - 220px) !important; }
-      .tui-image-editor-submenu { height: 220px !important; }
-
-      /* Fix Document Editor Glitching */
-      #wordEditorArea { padding: 15px !important; font-size: 16px !important; /* Prevents iOS zoom */ }
-      #docEditorArea { -webkit-overflow-scrolling: touch; }
   }
 </style>
 </head><body>
@@ -116,8 +63,8 @@
       <h3>📝 Word Document</h3>
       <p>Open your DOCX file, keep its format, and edit it like a webpage.</p>
       <label class="upload-box">
-        <input type="file" accept=".doc,.docx" onchange="openWordEditor(event)">
-        <span>📄</span> Click to upload document
+        <input type="file" accept=".docx" onchange="openWordEditor(event)">
+        <span>📄</span> Click to upload document (.docx)
       </label>
     </div>
     <div class="card">
@@ -150,7 +97,6 @@
   </div>
 </footer>
 
-<!-- MODALS -->
 <div class="overlay" id="imageModal">
   <div class="modal">
     <div class="modal-header"><h2>Image Editor</h2><button class="btn ghost sm" onclick="closeModal('imageModal')">✕ Close</button></div>
@@ -182,7 +128,6 @@
   let ignoreHistoryPop = false;
 
   window.addEventListener('beforeunload', function (e) { if (isEditing) { e.preventDefault(); e.returnValue = ''; } });
-
   window.addEventListener('popstate', function (e) {
     const openModal = document.querySelector('.overlay.on');
     if (openModal) {
@@ -205,14 +150,19 @@
     if (history.state && history.state.modal) history.back();
   }
 
-  // 1. IMAGE EDITOR
+  // 1. IMAGE EDITOR (Fixed blank screen issue by forcing re-render)
   let imageEditor = null;
   function openImageEditor(event) {
-    const file = event.target.files[0]; if (!file) return;
+    const file = event.target.files[0]; 
+    if (!file) return;
+    
+    document.getElementById('tui-image-editor-container').innerHTML = '';
     openEditorModal('imageModal');
+    
     const reader = new FileReader();
     reader.onload = function(e) {
-      if (!imageEditor) {
+      // Slight delay ensures the modal has fully opened and has a proper width/height
+      setTimeout(() => {
         imageEditor = new tui.ImageEditor('#tui-image-editor-container', {
           includeUI: {
             loadImage: { path: e.target.result, name: file.name },
@@ -237,36 +187,49 @@
           cssMaxWidth: 1000, cssMaxHeight: 600,
           selectionStyle: { cornerSize: 20, rotatingPointOffset: 70 }
         });
-        document.getElementById('tui-image-editor-container').addEventListener('input', function(e) {
-            if (e.target && e.target.type === 'range') {
+        
+        document.getElementById('tui-image-editor-container').addEventListener('input', function(ev) {
+            if (ev.target && ev.target.type === 'range') {
                 const activeObj = imageEditor.getCanvas().getActiveObject();
                 if (activeObj) imageEditor.getCanvas().renderAll();
             }
         });
-      } else { imageEditor.loadImageFromURL(e.target.result, file.name); }
+      }, 100);
     };
-    reader.readAsDataURL(file); event.target.value = ''; 
+    reader.readAsDataURL(file); 
+    event.target.value = ''; 
   }
+
   function downloadImage() {
     if (!imageEditor) return;
     const link = document.createElement('a'); link.download = 'edited_image.png'; link.href = imageEditor.toDataURL(); link.click();
     closeModal('imageModal');
   }
 
-  // 2. WORD EDITOR
+  // 2. WORD EDITOR (Fixed HTML code showing issue)
   function openWordEditor(event) {
     const file = event.target.files[0]; if (!file) return;
+    
+    // Check if it's actually a docx file
+    if (!file.name.endsWith('.docx')) {
+        alert("Please upload a .docx file. Old .doc or .html files are not supported.");
+        event.target.value = '';
+        return;
+    }
+
     openEditorModal('wordModal');
     const wordArea = document.getElementById('wordEditorArea');
     wordArea.innerHTML = '<p style="text-align:center; color:#666;">Processing...</p>';
+    
     const reader = new FileReader();
     reader.onload = function(e) {
       mammoth.convertToHtml({ arrayBuffer: e.target.result })
         .then(function(result) { wordArea.innerHTML = result.value; })
-        .catch(function(err) { wordArea.innerHTML = '<p style="color:red;">Error reading file.</p>'; });
+        .catch(function(err) { wordArea.innerHTML = '<p style="color:red; text-align:center;">Error reading file. Please ensure it is a valid .docx file.</p>'; });
     };
     reader.readAsArrayBuffer(file); event.target.value = '';
   }
+
   function downloadWord() {
     const content = document.getElementById('wordEditorArea').innerHTML;
     const converted = htmlDocx.asBlob(content);
