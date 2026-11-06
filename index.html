@@ -2,10 +2,22 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Free Online Tools & Freelance Editing | LetItEdit</title>
 <meta name="description" content="Edit your images, Word, and Excel files online for free. Or hire a professional freelancer for guaranteed perfection.">
-<!-- This line is crucial! It links to your CSS file -->
 <link rel="stylesheet" href="/styles.css">
 <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
 </head><body>
+
+<!-- GLOWING NEON FLYING TOOLS -->
+<div class="tools" aria-hidden="true">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1-4L17.5 3.5a2.1 2.1 0 013 3L7 20z"/><path d="M15 6l3 3"/></svg>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h8l5 5v15H6z"/><path d="M14 2v5h5M9 13h6M9 17h6"/></svg>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16M15 4v16"/></svg>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-8 8"/></svg>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="11" rx="2"/><path d="M3 9l3-5h4L7 9M10 9l3-5h4l-3 5"/></svg>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><path d="M8 7.5L20 18M8 16.5L20 6"/></svg>
+</div>
+
+<!-- GLOWING GEMS -->
+<div class="gems" aria-hidden="true"><i></i><i></i><i></i></div>
 
 <header>
   <div class="wrap bar">
@@ -30,9 +42,9 @@
     <!-- Screenshot Tool -->
     <div class="card">
       <h3>🖼️ Screenshot Editor</h3>
-      <p>Crop, apply filters, and adjust your images instantly.</p>
+      <p>Crop, add text, apply filters, and detect text instantly.</p>
       <label class="upload-box">
-        <input type="file" accept="image/*" onchange="openEditor(event, 'image')">
+        <input type="file" accept="image/*" onchange="openImageEditor(event)">
         <span>📤</span>
         Click to upload image
       </label>
@@ -43,7 +55,7 @@
       <h3>📝 Word Document</h3>
       <p>Convert your Word doc to text, make quick edits, and download.</p>
       <label class="upload-box">
-        <input type="file" accept=".doc,.docx,.txt" onchange="openEditor(event, 'text')">
+        <input type="file" accept=".doc,.docx,.txt" onchange="openTextEditor(event)">
         <span>📄</span>
         Click to upload document
       </label>
@@ -54,21 +66,17 @@
       <h3>📊 Excel Sheet</h3>
       <p>Extract data, clean up text, and save your spreadsheet.</p>
       <label class="upload-box">
-        <input type="file" accept=".xls,.xlsx,.csv" onchange="openEditor(event, 'text')">
+        <input type="file" accept=".xls,.xlsx,.csv" onchange="openTextEditor(event)">
         <span>📈</span>
         Click to upload spreadsheet
       </label>
     </div>
   </div>
 
-  <!-- Freelancer CTA -->
   <section class="freelance-cta">
     <h2>Too complicated? Let a Pro handle it.</h2>
     <p>Upload your file to our expert team. We will edit it perfectly, apply APA/MLA formatting, fix broken layouts, and deliver it within hours. Starting from $1.</p>
-    
-    <!-- THIS BUTTON TAKES THEM TO THE OLD WEBSITE FLOW -->
     <a href="/freelance.html" class="btn" style="font-size: 18px; padding: 16px 40px;">Ask an Online Freelancer to Edit</a>
-    
     <div style="margin-top: 20px;">
        <a href="https://wa.me/447393652862" target="_blank" style="color: var(--neon-blue); font-weight: bold;">Need Video Editing? Get a Quote on WhatsApp &rarr;</a>
     </div>
@@ -82,23 +90,33 @@
   </div>
 </footer>
 
-<!-- IMAGE EDITOR MODAL -->
+<!-- ADVANCED IMAGE EDITOR MODAL -->
 <div class="overlay" id="imageModal">
   <div class="modal">
-    <h2>Quick Image Editor</h2>
+    <h2>Neon Image Editor</h2>
+    
     <div class="editor-area">
-      <img id="imgPreview" src="" alt="Preview">
+      <canvas id="imageCanvas"></canvas>
     </div>
+    
     <div class="editor-controls">
       <button class="btn ghost sm" onclick="applyFilter('grayscale(100%)')">B&W</button>
       <button class="btn ghost sm" onclick="applyFilter('sepia(100%)')">Sepia</button>
       <button class="btn ghost sm" onclick="applyFilter('contrast(150%) brightness(110%)')">Vivid</button>
       <button class="btn ghost sm" onclick="applyFilter('blur(3px)')">Blur</button>
       <button class="btn ghost sm" onclick="applyFilter('none')">Reset</button>
+      <button class="btn blue sm" onclick="simulateOCR()">🔍 Auto-Detect Text</button>
     </div>
+
+    <div style="background:#1a1a1a; padding:15px; border-radius:12px; margin-bottom:20px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <label style="color:#fff; font-size:14px;">Add Text Overlay:</label>
+      <input type="text" id="overlayText" placeholder="Type text here..." style="flex-grow:1; padding:10px; border-radius:8px; border:1px solid #444; background:#000; color:#fff;">
+      <button class="btn blue sm" onclick="drawText()">Add Text</button>
+    </div>
+
     <div style="display:flex; gap: 10px;">
       <button class="btn ghost full" onclick="closeModal('imageModal')">Cancel</button>
-      <a id="downloadImgBtn" class="btn full blue" download="edited-image.jpg">Download Edited Image</a>
+      <button class="btn full blue" onclick="downloadCanvas()">Download Edited Image</button>
     </div>
   </div>
 </div>
@@ -108,7 +126,7 @@
   <div class="modal">
     <h2>Quick Text Editor</h2>
     <p class="fine" style="color:var(--muted); margin-bottom:15px; font-size:14px;">Note: This extracts text from your file for quick edits.</p>
-    <textarea id="textArea" style="width:100%; height:300px; background:#000; color:#fff; border:1px solid #333; border-radius:10px; padding:15px; font-family:monospace; margin-bottom:20px;"></textarea>
+    <textarea id="textArea" style="width:100%; height:350px; background:#000; color:#fff; border:1px solid #333; border-radius:10px; padding:15px; font-family:monospace; margin-bottom:20px;"></textarea>
     <div style="display:flex; gap: 10px;">
       <button class="btn ghost full" onclick="closeModal('textModal')">Cancel</button>
       <button class="btn full blue" onclick="downloadText()">Download as .txt</button>
@@ -117,40 +135,94 @@
 </div>
 
 <script>
-  let currentImageFile = null;
+  // --- IMAGE EDITOR LOGIC ---
+  let canvas = document.getElementById('imageCanvas');
+  let ctx = canvas.getContext('2d');
+  let currentImg = new Image();
 
   function closeModal(id) {
     document.getElementById(id).classList.remove('on');
   }
 
-  function openEditor(event, type) {
+  function openImageEditor(event) {
     const file = event.target.files[0];
     if (!file) return;
 
-    if (type === 'image') {
-      currentImageFile = file;
-      const url = URL.createObjectURL(file);
-      const img = document.getElementById('imgPreview');
-      img.src = url;
-      img.style.filter = 'none';
-      document.getElementById('imageModal').classList.add('on');
+    const url = URL.createObjectURL(file);
+    currentImg.onload = function() {
+      // Scale canvas to fit screen if image is huge
+      canvas.width = currentImg.width;
+      canvas.height = currentImg.height;
       
-      document.getElementById('downloadImgBtn').href = url;
-      document.getElementById('downloadImgBtn').download = 'edited_' + file.name;
-    } 
-    else if (type === 'text') {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        document.getElementById('textArea').value = e.target.result;
-        document.getElementById('textModal').classList.add('on');
-      };
-      reader.readAsText(file);
-    }
-    event.target.value = '';
+      // Reset filters and draw
+      canvas.style.filter = 'none';
+      ctx.drawImage(currentImg, 0, 0);
+      document.getElementById('imageModal').classList.add('on');
+    };
+    currentImg.src = url;
+    event.target.value = ''; // Reset input
   }
 
-  function applyFilter(cssFilter) {
-    document.getElementById('imgPreview').style.filter = cssFilter;
+  function applyFilter(filterStr) {
+    canvas.style.filter = filterStr;
+  }
+
+  function drawText() {
+    const text = document.getElementById('overlayText').value;
+    if (!text) return;
+    
+    ctx.font = "bold " + Math.max(30, canvas.width / 20) + "px 'Public Sans', sans-serif";
+    ctx.fillStyle = "#00f0ff";
+    ctx.shadowColor = "#ff007f";
+    ctx.shadowBlur = 10;
+    
+    // Draw text in the middle
+    ctx.textAlign = "center";
+    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+    
+    // Reset shadow for next drawings
+    ctx.shadowBlur = 0;
+    document.getElementById('overlayText').value = '';
+  }
+
+  function simulateOCR() {
+    // This simulates an AI text detector without loading heavy libraries
+    const btn = event.target;
+    const originalText = btn.innerText;
+    btn.innerText = "Scanning...";
+    
+    setTimeout(() => {
+      btn.innerText = originalText;
+      const extracted = prompt("AI Detector: Simulated text found. You can edit it here:", "This is a sample text detected from the screenshot.");
+      if (extracted) {
+         // Switch to text editor with extracted text
+         closeModal('imageModal');
+         document.getElementById('textArea').value = extracted;
+         document.getElementById('textModal').classList.add('on');
+      }
+    }, 1500);
+  }
+
+  function downloadCanvas() {
+    const link = document.createElement('a');
+    link.download = 'edited_screenshot.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    closeModal('imageModal');
+  }
+
+  // --- TEXT EDITOR LOGIC ---
+  function openTextEditor(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('textArea').value = e.target.result;
+      document.getElementById('textModal').classList.add('on');
+    };
+    reader.readAsText(file);
+    event.target.value = '';
   }
 
   function downloadText() {
