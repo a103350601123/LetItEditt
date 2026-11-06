@@ -1,78 +1,55 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Free Online Tools & Freelance Editing | LetItEdit</title>
 <meta name="description" content="Edit your images, Word, and Excel files online for free. Or hire a professional freelancer for guaranteed perfection.">
 <link rel="stylesheet" href="/styles.css">
 <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
 
 <!-- 🚀 PROFESSIONAL EDITORS (CDNs) 🚀 -->
-<!-- 1. TOAST UI Image Editor -->
 <link rel="stylesheet" href="https://uicdn.toast.com/tui-color-picker/latest/tui-color-picker.css">
 <link rel="stylesheet" href="https://uicdn.toast.com/tui-image-editor/latest/tui-image-editor.css">
 <script src="https://cdn.jsdelivr.net/npm/fabric@4.5.0/dist/fabric.min.js"></script>
 <script src="https://uicdn.toast.com/tui-code-snippet/latest/tui-code-snippet.min.js"></script>
 <script src="https://uicdn.toast.com/tui-color-picker/latest/tui-color-picker.min.js"></script>
 <script src="https://uicdn.toast.com/tui-image-editor/latest/tui-image-editor.min.js"></script>
-
-<!-- 2. Word (Mammoth + HTML-DOCX) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html-docx-js/0.3.1/html-docx.js"></script>
-
-<!-- 3. Excel (SheetJS + Handsontable) -->
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@12.1.2/dist/handsontable.full.min.css">
 <script src="https://cdn.jsdelivr.net/npm/handsontable@12.1.2/dist/handsontable.full.min.js"></script>
 
 <style>
-  /* CSS adjustments for the professional modals */
+  /* Modal Base */
   .overlay { z-index: 9999; }
-  
-  .modal { 
-    max-width: 95vw; 
-    width: 1200px; 
-    height: 90vh; 
-    display: flex; 
-    flex-direction: column; 
-    padding: 20px; 
-    background: #0a0a0f; 
-    border: 1px solid var(--neon-blue); 
-    border-radius: 12px;
-    box-shadow: 0 0 50px rgba(0, 240, 255, 0.2);
-  }
-  
+  .modal { max-width: 95vw; width: 1200px; height: 90vh; display: flex; flex-direction: column; padding: 20px; background: #0a0a0f; border: 1px solid var(--neon-blue); border-radius: 12px; box-shadow: 0 0 50px rgba(0, 240, 255, 0.2); }
   .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-  
-  .modal-body { 
-    flex-grow: 1; 
-    overflow: hidden; 
-    background: #111; 
-    border-radius: 8px; 
-    position: relative; 
-  }
-  
+  .modal-body { flex-grow: 1; overflow: hidden; background: #111; border-radius: 8px; position: relative; }
   .editor-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px; }
-  
-  /* ==========================================
-     🚀 FIX: Force TOAST UI panels below image 
-     ========================================== */
+
+  /* 🚀 FIX FOR SCREENSHOT 2: TOAST UI Overlap */
   #tui-image-editor-container { width: 100%; height: 100%; }
-  .tui-image-editor-canvas-container { bottom: 160px !important; }
-  .tui-image-editor-submenu {
-      bottom: 0 !important;
-      height: 160px !important;
-      background-color: #1a1a1a !important;
-      border-top: 1px solid #333;
-      overflow-y: auto;
-      overflow-x: hidden;
-      z-index: 10;
+  .tui-image-editor-main-container { display: flex; flex-direction: column; height: 100%; }
+  .tui-image-editor-canvas-container { 
+      position: relative !important; 
+      flex-grow: 1; 
+      bottom: auto !important; 
+      height: calc(100% - 160px) !important; /* Forces image to shrink */
+  }
+  .tui-image-editor-submenu { 
+      position: absolute !important;
+      bottom: 0 !important; 
+      height: 160px !important; 
+      background: #1a1a1a !important; 
+      border-top: 1px solid #333; 
+      width: 100%;
   }
 
-  /* TOAST UI Dark Theme Customization */
+  /* TOAST UI Dark Theme */
   .tui-image-editor-main { background: #111; }
-  .tui-image-editor-header { background: #1a1a1a; color: white; border-bottom: 1px solid #333; }
-  .tui-image-editor-help-menu { background: #1a1a1a; border-top: 1px solid #333; }
+  .tui-image-editor-header { background: #1a1a1a; color: white; }
+  .tui-image-editor-help-menu { background: #1a1a1a; }
   .tui-image-editor-menu { background: #1a1a1a; }
-  
+
   /* Handsontable Dark Theme */
   .handsontable { color: #fff; }
   .handsontable th { background: #222; color: var(--neon-blue); border-color: #444; }
@@ -80,23 +57,31 @@
   .handsontable td.current { background: #003366; }
   .handsontable td.area { background: rgba(0, 240, 255, 0.1); }
 
-  /* Mobile Responsiveness for the Editor */
-  @media (max-width: 768px) {
-      .modal { width: 100vw !important; max-width: 100vw !important; height: 100vh !important; border-radius: 0; padding: 10px; }
-      .tui-image-editor-canvas-container { bottom: 220px !important; }
-      .tui-image-editor-submenu { height: 220px !important; }
-      .tui-image-editor-main-container { width: 100% !important; }
-      .tui-image-editor-header { padding: 0 10px; }
-  }
+  /* Footer Links */
+  .footer-links { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+  .footer-links a { color: var(--muted); text-decoration: none; font-size: 14px; transition: 0.2s; }
+  .footer-links a:hover { color: var(--neon-blue); }
 
-  /* Footer Links Style */
-  .footer-links {
-      display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 10px;
+  /* 🚀 FIX FOR SCREENSHOT 1: Mobile Header & Floating Button */
+  @media (max-width: 768px) {
+      /* Fix Header */
+      header .bar { flex-direction: column; height: auto; padding: 15px 10px; gap: 15px; }
+      nav { flex-wrap: wrap; justify-content: center; gap: 10px; }
+      nav a { font-size: 14px; }
+      nav .btn.sm { padding: 8px 12px; font-size: 13px; white-space: nowrap; }
+      
+      /* Fix Floating Resume Button */
+      #resumeBtn { bottom: 10px !important; padding: 10px 20px !important; font-size: 14px !important; white-space: nowrap; width: auto !important; }
+      
+      /* Fix Modals */
+      .modal { width: 100vw !important; height: 100vh !important; border-radius: 0; padding: 10px; }
+      .tui-image-editor-canvas-container { height: calc(100% - 220px) !important; }
+      .tui-image-editor-submenu { height: 220px !important; }
+
+      /* Fix Document Editor Glitching */
+      #wordEditorArea { padding: 15px !important; font-size: 16px !important; /* Prevents iOS zoom */ }
+      #docEditorArea { -webkit-overflow-scrolling: touch; }
   }
-  .footer-links a {
-      color: var(--muted); text-decoration: none; font-size: 14px; transition: 0.2s;
-  }
-  .footer-links a:hover { color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
 </style>
 </head><body>
 
@@ -104,7 +89,7 @@
   <div class="wrap bar">
     <a class="logo" href="/">Let<i>It</i>Edit</a>
     <nav>
-      <a href="/">Home (Free Tools)</a>
+      <a href="/">Home</a>
       <a href="/faq.html">FAQ</a>
       <a class="btn sm blue" href="/freelance.html">Hire a Freelancer</a>
     </nav>
@@ -119,7 +104,6 @@
   </section>
 
   <div class="grid" id="tools">
-    <!-- Image Tool -->
     <div class="card">
       <h3>🖼️ Image / Screenshot Editor</h3>
       <p>Filters, pixelate, blur, crop, add text with fonts, and draw.</p>
@@ -128,8 +112,6 @@
         <span>📤</span> Click to upload image
       </label>
     </div>
-
-    <!-- Word Tool -->
     <div class="card">
       <h3>📝 Word Document</h3>
       <p>Open your DOCX file, keep its format, and edit it like a webpage.</p>
@@ -138,8 +120,6 @@
         <span>📄</span> Click to upload document
       </label>
     </div>
-
-    <!-- Excel Tool -->
     <div class="card">
       <h3>📊 Excel Spreadsheet</h3>
       <p>Open XLSX files in a real grid, edit data/formulas, and save.</p>
@@ -170,57 +150,30 @@
   </div>
 </footer>
 
-<!-- ========================================== -->
-<!-- 1. PROFESSIONAL IMAGE EDITOR MODAL (TOAST) -->
-<!-- ========================================== -->
+<!-- MODALS -->
 <div class="overlay" id="imageModal">
   <div class="modal">
-    <div class="modal-header">
-      <h2>Professional Image Editor</h2>
-      <button class="btn ghost sm" onclick="closeModal('imageModal')">✕ Close</button>
-    </div>
-    <div class="modal-body">
-      <div id="tui-image-editor-container"></div>
-    </div>
-    <div class="editor-actions">
-      <button class="btn blue" onclick="downloadImage()">Download Image</button>
-    </div>
+    <div class="modal-header"><h2>Image Editor</h2><button class="btn ghost sm" onclick="closeModal('imageModal')">✕ Close</button></div>
+    <div class="modal-body"><div id="tui-image-editor-container"></div></div>
+    <div class="editor-actions"><button class="btn blue" onclick="downloadImage()">Download Image</button></div>
   </div>
 </div>
 
-<!-- ========================================== -->
-<!-- 2. PROFESSIONAL WORD EDITOR MODAL           -->
-<!-- ========================================== -->
 <div class="overlay" id="wordModal">
   <div class="modal">
-    <div class="modal-header">
-      <h2>Word Document Editor</h2>
-      <button class="btn ghost sm" onclick="closeModal('wordModal')">✕ Close</button>
+    <div class="modal-header"><h2>Word Editor</h2><button class="btn ghost sm" onclick="closeModal('wordModal')">✕ Close</button></div>
+    <div class="modal-body" style="overflow-y: auto; padding: 20px; background: #e0e0e0; -webkit-overflow-scrolling: touch;">
+      <div id="wordEditorArea" contenteditable="true" style="outline: none; width: 100%; min-height: 100%; background: #fff; padding: 20px; font-family: 'Times New Roman', serif; line-height: 1.5; color: #000;"></div>
     </div>
-    <div class="modal-body" style="overflow-y: auto; padding: 40px; background: #e0e0e0; display: flex; justify-content: center;">
-      <div id="wordEditorArea" contenteditable="true" style="outline: none; width: 100%; max-width: 800px; min-height: 100%; background: #fff; padding: 40px; box-shadow: 0 0 10px rgba(0,0,0,0.3); font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.5; color: #000;"></div>
-    </div>
-    <div class="editor-actions">
-      <button class="btn blue" onclick="downloadWord()">Download as .docx</button>
-    </div>
+    <div class="editor-actions"><button class="btn blue" onclick="downloadWord()">Download as .docx</button></div>
   </div>
 </div>
 
-<!-- ========================================== -->
-<!-- 3. PROFESSIONAL EXCEL EDITOR MODAL          -->
-<!-- ========================================== -->
 <div class="overlay" id="excelModal">
   <div class="modal">
-    <div class="modal-header">
-      <h2>Excel Spreadsheet Editor</h2>
-      <button class="btn ghost sm" onclick="closeModal('excelModal')">✕ Close</button>
-    </div>
-    <div class="modal-body" id="excelEditorArea">
-      <!-- Handsontable grid will be injected here -->
-    </div>
-    <div class="editor-actions">
-      <button class="btn blue" onclick="downloadExcel()">Download as .xlsx</button>
-    </div>
+    <div class="modal-header"><h2>Excel Editor</h2><button class="btn ghost sm" onclick="closeModal('excelModal')">✕ Close</button></div>
+    <div class="modal-body" id="excelEditorArea"></div>
+    <div class="editor-actions"><button class="btn blue" onclick="downloadExcel()">Download as .xlsx</button></div>
   </div>
 </div>
 
@@ -228,19 +181,11 @@
   let isEditing = false;
   let ignoreHistoryPop = false;
 
-  // 🚀 FIX: Warning if user leaves the whole website while editing
-  window.addEventListener('beforeunload', function (e) {
-    if (isEditing) {
-      e.preventDefault();
-      e.returnValue = ''; 
-    }
-  });
+  window.addEventListener('beforeunload', function (e) { if (isEditing) { e.preventDefault(); e.returnValue = ''; } });
 
-  // 🚀 FIX: Handle mobile/desktop Back button
   window.addEventListener('popstate', function (e) {
     const openModal = document.querySelector('.overlay.on');
     if (openModal) {
-        // If a modal is open, just close the modal without leaving the page
         ignoreHistoryPop = true; 
         document.getElementById(openModal.id).classList.remove('on');
         isEditing = false;
@@ -251,33 +196,20 @@
   function openEditorModal(id) {
     document.getElementById(id).classList.add('on');
     isEditing = true;
-    // Push a fake history state so pressing "Back" closes the modal instead of leaving the site
-    if (!ignoreHistoryPop) {
-        history.pushState({ modal: id }, '', window.location.pathname);
-    }
+    if (!ignoreHistoryPop) history.pushState({ modal: id }, '', window.location.pathname);
   }
 
   function closeModal(id) {
     document.getElementById(id).classList.remove('on');
     isEditing = false;
-    
-    // If we close via the button, pop the fake state so history is clean
-    if (history.state && history.state.modal) {
-        history.back();
-    }
+    if (history.state && history.state.modal) history.back();
   }
 
-  // ==========================================
-  // 1. IMAGE EDITOR (TOAST UI)
-  // ==========================================
+  // 1. IMAGE EDITOR
   let imageEditor = null;
-
   function openImageEditor(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
+    const file = event.target.files[0]; if (!file) return;
     openEditorModal('imageModal');
-
     const reader = new FileReader();
     reader.onload = function(e) {
       if (!imageEditor) {
@@ -291,13 +223,10 @@
               'menu.normalIcon.color': '#888', 'menu.activeIcon.color': '#00f0ff',
               'menu.disabledIcon.color': '#444', 'menu.hoverIcon.color': '#fff',
               'submenu.backgroundColor': '#1a1a1a', 'submenu.partition.color': '#333',
-              'submenu.normalLabel.color': '#888', 'submenu.normalLabel.fontWeight': 'normal',
-              'submenu.activeLabel.color': '#fff', 'submenu.activeLabel.fontWeight': 'normal',
+              'submenu.normalLabel.color': '#888', 'submenu.activeLabel.color': '#fff',
               'checkbox.border': '0px', 'checkbox.backgroundColor': '#fff',
               'range.pointer.color': '#00f0ff', 'range.bar.color': '#666', 'range.subbar.color': '#d3d3d3',
-              'range.disabledPointer.color': '#414141', 'range.disabledBar.color': '#282828', 'range.disabledSubbar.color': '#414141',
-              'range.value.color': '#fff', 'range.value.fontWeight': 'normal', 'range.value.fontSize': '11px',
-              'range.title.color': '#fff', 'range.title.fontWeight': 'lighter',
+              'range.value.color': '#fff', 'range.title.color': '#fff',
               'colorpicker.button.border': '1px solid #1e1e1e', 'colorpicker.title.color': '#fff'
             },
             menu: ['filter', 'crop', 'flip', 'rotate', 'draw', 'shape', 'icon', 'text', 'mask'],
@@ -305,125 +234,70 @@
             uiSize: { width: '100%', height: '100%' },
             menuBarPosition: 'bottom'
           },
-          cssMaxWidth: 1000,
-          cssMaxHeight: 600,
+          cssMaxWidth: 1000, cssMaxHeight: 600,
           selectionStyle: { cornerSize: 20, rotatingPointOffset: 70 }
         });
-
         document.getElementById('tui-image-editor-container').addEventListener('input', function(e) {
             if (e.target && e.target.type === 'range') {
                 const activeObj = imageEditor.getCanvas().getActiveObject();
                 if (activeObj) imageEditor.getCanvas().renderAll();
             }
         });
-
-      } else {
-        imageEditor.loadImageFromURL(e.target.result, file.name);
-      }
+      } else { imageEditor.loadImageFromURL(e.target.result, file.name); }
     };
-    reader.readAsDataURL(file);
-    event.target.value = ''; 
+    reader.readAsDataURL(file); event.target.value = ''; 
   }
-
   function downloadImage() {
     if (!imageEditor) return;
-    const link = document.createElement('a');
-    link.download = 'edited_image.png';
-    link.href = imageEditor.toDataURL();
-    link.click();
+    const link = document.createElement('a'); link.download = 'edited_image.png'; link.href = imageEditor.toDataURL(); link.click();
     closeModal('imageModal');
   }
 
-  // ==========================================
-  // 2. WORD EDITOR (Mammoth + HTML-DOCX)
-  // ==========================================
+  // 2. WORD EDITOR
   function openWordEditor(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
+    const file = event.target.files[0]; if (!file) return;
     openEditorModal('wordModal');
-
     const wordArea = document.getElementById('wordEditorArea');
-    wordArea.innerHTML = '<p style="text-align:center; color:#666;">Processing file...</p>';
-
+    wordArea.innerHTML = '<p style="text-align:center; color:#666;">Processing...</p>';
     const reader = new FileReader();
     reader.onload = function(e) {
-      const arrayBuffer = e.target.result;
-      mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
-        .then(function(result) {
-          wordArea.innerHTML = result.value;
-        })
-        .catch(function(err) {
-          wordArea.innerHTML = '<p style="color:red;">Error reading file. Please ensure it is a valid .docx file.</p>';
-        });
+      mammoth.convertToHtml({ arrayBuffer: e.target.result })
+        .then(function(result) { wordArea.innerHTML = result.value; })
+        .catch(function(err) { wordArea.innerHTML = '<p style="color:red;">Error reading file.</p>'; });
     };
-    reader.readAsArrayBuffer(file);
-    event.target.value = '';
+    reader.readAsArrayBuffer(file); event.target.value = '';
   }
-
   function downloadWord() {
     const content = document.getElementById('wordEditorArea').innerHTML;
     const converted = htmlDocx.asBlob(content);
-    
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(converted);
-    link.download = 'edited_document.docx';
-    link.click();
-
+    const link = document.createElement('a'); link.href = URL.createObjectURL(converted); link.download = 'edited_document.docx'; link.click();
     closeModal('wordModal');
   }
 
-  // ==========================================
-  // 3. EXCEL EDITOR (Handsontable + SheetJS)
-  // ==========================================
+  // 3. EXCEL EDITOR
   let hotInstance = null;
-
   function openExcelEditor(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
+    const file = event.target.files[0]; if (!file) return;
     openEditorModal('excelModal');
-
     const reader = new FileReader();
     reader.onload = function(e) {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
-      const firstSheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[firstSheetName];
-      const excelData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
+      const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+      const excelData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
       if (hotInstance) hotInstance.destroy();
-
       hotInstance = new Handsontable(document.getElementById('excelEditorArea'), {
-        data: excelData,
-        rowHeaders: true,
-        colHeaders: true,
-        formulas: true,
-        contextMenu: true,
-        dropdownMenu: true,
-        licenseKey: 'non-commercial-and-evaluation', 
-        height: '100%',
-        width: '100%',
-        stretchH: 'all',
-        afterSelection: function(r, c, r2, c2, preventScrolling) { preventScrolling.value = true; },
-        preventOverflow: 'horizontal' 
+        data: excelData, rowHeaders: true, colHeaders: true, formulas: true, contextMenu: true, dropdownMenu: true,
+        licenseKey: 'non-commercial-and-evaluation', height: '100%', width: '100%', stretchH: 'all',
+        afterSelection: function(r, c, r2, c2, preventScrolling) { preventScrolling.value = true; }, preventOverflow: 'horizontal' 
       });
     };
-    reader.readAsArrayBuffer(file);
-    event.target.value = '';
+    reader.readAsArrayBuffer(file); event.target.value = '';
   }
-
   function downloadExcel() {
     if (!hotInstance) return;
-    
-    const data = hotInstance.getData();
-    const worksheet = XLSX.utils.aoa_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    const worksheet = XLSX.utils.aoa_to_sheet(hotInstance.getData());
+    const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
     XLSX.writeFile(workbook, 'edited_spreadsheet.xlsx');
-
     closeModal('excelModal');
   }
 </script>
-
 </body></html>
