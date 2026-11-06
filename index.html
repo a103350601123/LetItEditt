@@ -60,12 +60,10 @@
       height: 100%;
   }
 
-  /* Push the image canvas up so it doesn't overlap the bottom panel */
   .tui-image-editor-canvas-container {
       bottom: 160px !important; 
   }
 
-  /* Dock the tools panel to the bottom */
   .tui-image-editor-submenu {
       bottom: 0 !important;
       height: 160px !important;
@@ -288,6 +286,19 @@
             rotatingPointOffset: 70
           }
         });
+
+        // 🚀 FIX: Force slider live preview in TOAST UI
+        // This listens to the sliders in the panels and forces an immediate canvas redraw
+        document.getElementById('tui-image-editor-container').addEventListener('input', function(e) {
+            if (e.target && e.target.type === 'range') {
+                const activeObj = imageEditor.getCanvas().getActiveObject();
+                if (activeObj) {
+                    // Live update happens when the slider moves
+                    imageEditor.getCanvas().renderAll();
+                }
+            }
+        });
+
       } else {
         // If already initialized, just load the new image
         imageEditor.loadImageFromURL(e.target.result, file.name);
@@ -378,10 +389,17 @@
         formulas: true,
         contextMenu: true,
         dropdownMenu: true,
-        licenseKey: 'non-commercial-and-evaluation', // Free license
+        licenseKey: 'non-commercial-and-evaluation', 
         height: '100%',
         width: '100%',
-        stretchH: 'all'
+        stretchH: 'all',
+        
+        // 🚀 FIX: Stop the mobile touch jump to top
+        afterSelection: function(r, c, r2, c2, preventScrolling) {
+            preventScrolling.value = true;
+        },
+        // 🚀 FIX: Stop the page from scrolling sideways on mobile
+        preventOverflow: 'horizontal' 
       });
     };
     reader.readAsArrayBuffer(file);
