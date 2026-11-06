@@ -6,20 +6,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
 
 <!-- 🚀 PROFESSIONAL FREE LIBRARIES 🚀 -->
-<!-- Fabric.js for dragging/dropping text and image editing -->
 <script src="https://cdn.jsdelivr.net/npm/fabric@5.3.0/dist/fabric.min.js"></script>
-<!-- Tesseract for Image OCR -->
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<!-- Mammoth for Word documents -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
-<!-- SheetJS for Excel sheets -->
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 
 <style>
-  /* Small CSS tweak to make the Fabric canvas responsive */
-  .canvas-container { margin: 0 auto; max-width: 100%; overflow: hidden; border-radius: 10px; }
+  .canvas-container { margin: 0 auto; max-width: 100%; overflow: hidden; border-radius: 10px; cursor: default; }
   .progress-bar { width: 100%; background: #333; border-radius: 10px; margin-top: 10px; display: none; }
   .progress-fill { height: 10px; background: var(--neon-blue); width: 0%; border-radius: 10px; transition: width 0.3s; }
+  .btn.active-tool { background: rgba(0, 240, 255, 0.2); border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); color: var(--neon-blue); }
 </style>
 </head><body>
 
@@ -53,7 +49,7 @@
   <div class="grid" id="tools">
     <div class="card">
       <h3>🖼️ Screenshot Editor</h3>
-      <p>Crop, add movable text, apply filters, and extract text using AI.</p>
+      <p>Crop, add movable text, pixelate sensitive info, and extract text using AI.</p>
       <label class="upload-box">
         <input type="file" accept="image/*" onchange="openImageEditor(event)">
         <span>📤</span>
@@ -106,12 +102,15 @@
       <button class="btn ghost sm" onclick="applyFilter('grayscale')">B&W</button>
       <button class="btn ghost sm" onclick="applyFilter('sepia')">Sepia</button>
       <button class="btn ghost sm" onclick="applyFilter('vivid')">Vivid</button>
-      <button class="btn ghost sm" onclick="applyFilter('blur')">Blur</button>
       <button class="btn ghost sm" onclick="resetFilters()">Reset</button>
+      
+      <!-- NEW PIXELATE & BLUR TOOLS -->
+      <button class="btn ghost sm" id="pixelateBtn" onclick="startSelection('pixelate')">🔲 Pixelate Area</button>
+      <button class="btn ghost sm" id="blurBtn" onclick="startSelection('blur')">💧 Blur Area</button>
+      
       <button class="btn blue sm" onclick="runOCR()" id="ocrBtn">🔍 Auto-Detect Text</button>
     </div>
 
-    <!-- OCR Progress Bar -->
     <div class="progress-bar" id="ocrProgress"><div class="progress-fill" id="ocrFill"></div></div>
 
     <div style="background:#1a1a1a; padding:15px; border-radius:12px; margin-bottom:20px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
@@ -149,8 +148,20 @@
   });
   let currentImageObj = null;
 
+  // Censor Tool variables
+  let isSelecting = false;
+  let selectionMode = null;
+  let startPoint = null;
+  let selectionRect = null;
+
   function closeModal(id) {
     document.getElementById(id).classList.remove('on');
+    // Reset tools if modal closes
+    isSelecting = false;
+    fabricCanvas.defaultCursor = 'default';
+    fabricCanvas.selection = true;
+    document.getElementById('pixelateBtn').classList.remove('active-tool');
+    document.getElementById('blurBtn').classList.remove('active-tool');
   }
 
   function openImageEditor(event) {
@@ -159,7 +170,6 @@
 
     const url = URL.createObjectURL(file);
     fabric.Image.fromURL(url, function(img) {
-      // Scale image to fit the canvas area
       const maxWidth = 800;
       const maxHeight = 500;
       let scale = 1;
@@ -184,17 +194,13 @@
 
   function applyFilter(type) {
     if (!currentImageObj) return;
-    currentImageObj.filters = []; // Reset before applying new
+    currentImageObj.filters = [];
 
-    if (type === 'grayscale') {
-      currentImageObj.filters.push(new fabric.Image.filters.Grayscale());
-    } else if (type === 'sepia') {
-      currentImageObj.filters.push(new fabric.Image.filters.Sepia());
-    } else if (type === 'vivid') {
+    if (type === 'grayscale') currentImageObj.filters.push(new fabric.Image.filters.Grayscale());
+    else if (type === 'sepia') currentImageObj.filters.push(new fabric.Image.filters.Sepia());
+    else if (type === 'vivid') {
       currentImageObj.filters.push(new fabric.Image.filters.Contrast({ contrast: 0.2 }));
       currentImageObj.filters.push(new fabric.Image.filters.Saturation({ saturation: 0.5 }));
-    } else if (type === 'blur') {
-      currentImageObj.filters.push(new fabric.Image.filters.Blur({ blur: 0.2 }));
     }
     
     currentImageObj.applyFilters();
@@ -208,6 +214,119 @@
     fabricCanvas.renderAll();
   }
 
+  // --- PIXELATE & BLUR LOGIC ---
+  function startSelection(mode) {
+    if (!currentImageObj) return;
+    isSelecting = true;
+    selectionMode = mode;
+    fabricCanvas.defaultCursor = 'crosshair';
+    fabricCanvas.isDrawingMode = false;
+    fabricCanvas.selection = false; 
+    fabricCanvas.discardActiveObject();
+    fabricCanvas.renderAll();
+    
+    // UI update
+    document.getElementById('pixelateBtn').classList.remove('active-tool');
+    document.getElementById('blurBtn').classList.remove('active-tool');
+    if (mode === 'pixelate') document.getElementById('pixelateBtn').classList.add('active-tool');
+    if (mode === 'blur') document.getElementById('blurBtn').classList.add('active-tool');
+  }
+
+  fabricCanvas.on('mouse:down', function(o) {
+    if (!isSelecting) return;
+    const pointer = fabricCanvas.getPointer(o.e);
+    startPoint = { x: pointer.x, y: pointer.y };
+    
+    selectionRect = new fabric.Rect({
+      left: startPoint.x,
+      top: startPoint.y,
+      width: 0,
+      height: 0,
+      fill: 'rgba(0, 240, 255, 0.2)',
+      stroke: '#00f0ff',
+      strokeWidth: 2,
+      strokeDashArray: [5, 5],
+      selectable: false,
+      evented: false
+    });
+    fabricCanvas.add(selectionRect);
+  });
+
+  fabricCanvas.on('mouse:move', function(o) {
+    if (!isSelecting || !startPoint) return;
+    const pointer = fabricCanvas.getPointer(o.e);
+    
+    if (startPoint.x > pointer.x) {
+      selectionRect.set({ left: Math.max(0, pointer.x) });
+    }
+    if (startPoint.y > pointer.y) {
+      selectionRect.set({ top: Math.max(0, pointer.y) });
+    }
+    
+    selectionRect.set({
+      width: Math.abs(pointer.x - startPoint.x),
+      height: Math.abs(pointer.y - startPoint.y)
+    });
+    
+    fabricCanvas.renderAll();
+  });
+
+  fabricCanvas.on('mouse:up', function(o) {
+    if (!isSelecting || !startPoint) return;
+    isSelecting = false;
+    fabricCanvas.defaultCursor = 'default';
+    fabricCanvas.selection = true;
+    document.getElementById('pixelateBtn').classList.remove('active-tool');
+    document.getElementById('blurBtn').classList.remove('active-tool');
+    
+    if (!selectionRect || selectionRect.width < 10 || selectionRect.height < 10) {
+      if (selectionRect) fabricCanvas.remove(selectionRect);
+      selectionRect = null;
+      startPoint = null;
+      return;
+    }
+    
+    applyEffectToSelection(selectionMode);
+  });
+
+  function applyEffectToSelection(mode) {
+    const bounds = selectionRect.getBoundingRect();
+    
+    // Hide the selection box temporarily so it doesn't get captured in the pixelation
+    selectionRect.set('visible', false);
+    fabricCanvas.renderAll();
+    
+    // Capture the exact cropped area from the canvas
+    const dataURL = fabricCanvas.toDataURL({
+      format: 'png',
+      left: bounds.left,
+      top: bounds.top,
+      width: bounds.width,
+      height: bounds.height
+    });
+    
+    fabricCanvas.remove(selectionRect);
+    selectionRect = null;
+    startPoint = null;
+    
+    fabric.Image.fromURL(dataURL, function(img) {
+      if (mode === 'pixelate') {
+        img.filters.push(new fabric.Image.filters.Pixelate({ blocksize: 12 }));
+      } else if (mode === 'blur') {
+        img.filters.push(new fabric.Image.filters.Blur({ blur: 0.4 }));
+      }
+      img.applyFilters();
+      img.set({
+        left: bounds.left,
+        top: bounds.top,
+        selectable: true,
+        evented: true
+      });
+      fabricCanvas.add(img);
+      fabricCanvas.setActiveObject(img);
+    });
+  }
+
   // Add Draggable, Resizable Text
   function addMovableText() {
     const text = document.getElementById('overlayText').value;
@@ -217,10 +336,10 @@
       left: fabricCanvas.getWidth() / 2,
       top: fabricCanvas.getHeight() / 2,
       fontFamily: 'Public Sans',
-      fill: '#00f0ff', // Neon Blue
+      fill: '#00f0ff', 
       fontSize: 40,
       fontWeight: 'bold',
-      shadow: 'rgba(255,0,127,0.8) 0 0 10px' // Neon Pink Glow
+      shadow: 'rgba(255,0,127,0.8) 0 0 10px' 
     });
 
     fabricCanvas.add(textObj);
@@ -228,10 +347,17 @@
     document.getElementById('overlayText').value = '';
   }
 
-  // REAL OCR FUNCTION with Progress Bar
+  // REAL OCR FUNCTION
   async function runOCR() {
     if (!currentImageObj) return;
     
+    // If user is currently drawing a box, cancel it
+    if(isSelecting) {
+       isSelecting = false;
+       if(selectionRect) fabricCanvas.remove(selectionRect);
+       fabricCanvas.defaultCursor = 'default';
+    }
+
     const btn = document.getElementById('ocrBtn');
     const progressBar = document.getElementById('ocrProgress');
     const progressFill = document.getElementById('ocrFill');
@@ -242,7 +368,6 @@
     progressFill.style.width = "0%";
 
     try {
-      // Extract the base image (without text overlays) for better OCR
       const imageUrl = currentImageObj.toDataURL();
       
       const { data: { text } } = await Tesseract.recognize(
@@ -257,7 +382,6 @@
         }
       );
       
-      // Open the Document Editor with the extracted text
       document.getElementById('docModalTitle').innerText = "Extracted Text (OCR)";
       document.getElementById('docEditorArea').innerText = text;
       currentDocType = 'text';
@@ -276,7 +400,6 @@
   }
 
   function downloadCanvas() {
-    // Hide selection borders before downloading
     fabricCanvas.discardActiveObject();
     fabricCanvas.renderAll();
     
