@@ -214,8 +214,20 @@
 </div>
 
 <script>
+  // 🚀 Safety Flag: Triggers the warning popup if user tries to leave while editing
+  let isEditing = false;
+
+  window.addEventListener('beforeunload', function (e) {
+    if (isEditing) {
+      // Standard way to trigger the browser's native "Leave site?" warning
+      e.preventDefault();
+      e.returnValue = ''; 
+    }
+  });
+
   function closeModal(id) {
     document.getElementById(id).classList.remove('on');
+    isEditing = false; // Turn off warning when they properly close the modal
   }
 
   // ==========================================
@@ -228,51 +240,29 @@
     if (!file) return;
 
     document.getElementById('imageModal').classList.add('on');
+    isEditing = true; // Turn on warning
 
     const reader = new FileReader();
     reader.onload = function(e) {
       if (!imageEditor) {
-        // Initialize TOAST UI
         imageEditor = new tui.ImageEditor('#tui-image-editor-container', {
           includeUI: {
-            loadImage: {
-              path: e.target.result,
-              name: file.name
-            },
+            loadImage: { path: e.target.result, name: file.name },
             theme: {
-              'common.bi.image': '',
-              'common.bisize.width': '0px',
-              'common.bisize.height': '0px',
-              'common.backgroundImage': 'none',
-              'common.backgroundColor': '#111',
-              'header.backgroundImage': 'none',
-              'header.backgroundColor': '#1a1a1a',
-              'header.border': '0px',
-              'menu.normalIcon.color': '#888',
-              'menu.activeIcon.color': '#00f0ff',
-              'menu.disabledIcon.color': '#444',
-              'menu.hoverIcon.color': '#fff',
-              'submenu.backgroundColor': '#1a1a1a',
-              'submenu.partition.color': '#333',
-              'submenu.normalLabel.color': '#888',
-              'submenu.normalLabel.fontWeight': 'normal',
-              'submenu.activeLabel.color': '#fff',
-              'submenu.activeLabel.fontWeight': 'normal',
-              'checkbox.border': '0px',
-              'checkbox.backgroundColor': '#fff',
-              'range.pointer.color': '#00f0ff',
-              'range.bar.color': '#666',
-              'range.subbar.color': '#d3d3d3',
-              'range.disabledPointer.color': '#414141',
-              'range.disabledBar.color': '#282828',
-              'range.disabledSubbar.color': '#414141',
-              'range.value.color': '#fff',
-              'range.value.fontWeight': 'normal',
-              'range.value.fontSize': '11px',
-              'range.title.color': '#fff',
-              'range.title.fontWeight': 'lighter',
-              'colorpicker.button.border': '1px solid #1e1e1e',
-              'colorpicker.title.color': '#fff'
+              'common.bi.image': '', 'common.bisize.width': '0px', 'common.bisize.height': '0px',
+              'common.backgroundImage': 'none', 'common.backgroundColor': '#111',
+              'header.backgroundImage': 'none', 'header.backgroundColor': '#1a1a1a', 'header.border': '0px',
+              'menu.normalIcon.color': '#888', 'menu.activeIcon.color': '#00f0ff',
+              'menu.disabledIcon.color': '#444', 'menu.hoverIcon.color': '#fff',
+              'submenu.backgroundColor': '#1a1a1a', 'submenu.partition.color': '#333',
+              'submenu.normalLabel.color': '#888', 'submenu.normalLabel.fontWeight': 'normal',
+              'submenu.activeLabel.color': '#fff', 'submenu.activeLabel.fontWeight': 'normal',
+              'checkbox.border': '0px', 'checkbox.backgroundColor': '#fff',
+              'range.pointer.color': '#00f0ff', 'range.bar.color': '#666', 'range.subbar.color': '#d3d3d3',
+              'range.disabledPointer.color': '#414141', 'range.disabledBar.color': '#282828', 'range.disabledSubbar.color': '#414141',
+              'range.value.color': '#fff', 'range.value.fontWeight': 'normal', 'range.value.fontSize': '11px',
+              'range.title.color': '#fff', 'range.title.fontWeight': 'lighter',
+              'colorpicker.button.border': '1px solid #1e1e1e', 'colorpicker.title.color': '#fff'
             },
             menu: ['filter', 'crop', 'flip', 'rotate', 'draw', 'shape', 'icon', 'text', 'mask'],
             initMenu: 'filter',
@@ -281,26 +271,17 @@
           },
           cssMaxWidth: 1000,
           cssMaxHeight: 600,
-          selectionStyle: {
-            cornerSize: 20,
-            rotatingPointOffset: 70
-          }
+          selectionStyle: { cornerSize: 20, rotatingPointOffset: 70 }
         });
 
-        // 🚀 FIX: Force slider live preview in TOAST UI
-        // This listens to the sliders in the panels and forces an immediate canvas redraw
         document.getElementById('tui-image-editor-container').addEventListener('input', function(e) {
             if (e.target && e.target.type === 'range') {
                 const activeObj = imageEditor.getCanvas().getActiveObject();
-                if (activeObj) {
-                    // Live update happens when the slider moves
-                    imageEditor.getCanvas().renderAll();
-                }
+                if (activeObj) imageEditor.getCanvas().renderAll();
             }
         });
 
       } else {
-        // If already initialized, just load the new image
         imageEditor.loadImageFromURL(e.target.result, file.name);
       }
     };
@@ -314,6 +295,8 @@
     link.download = 'edited_image.png';
     link.href = imageEditor.toDataURL();
     link.click();
+    isEditing = false; // Turn off warning after downloading
+    closeModal('imageModal');
   }
 
   // ==========================================
@@ -324,13 +307,14 @@
     if (!file) return;
 
     document.getElementById('wordModal').classList.add('on');
+    isEditing = true; // Turn on warning
+
     const wordArea = document.getElementById('wordEditorArea');
     wordArea.innerHTML = '<p style="text-align:center; color:#666;">Processing file...</p>';
 
     const reader = new FileReader();
     reader.onload = function(e) {
       const arrayBuffer = e.target.result;
-      // Convert DOCX to HTML
       mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
         .then(function(result) {
           wordArea.innerHTML = result.value;
@@ -345,13 +329,15 @@
 
   function downloadWord() {
     const content = document.getElementById('wordEditorArea').innerHTML;
-    // Convert HTML back to DOCX
     const converted = htmlDocx.asBlob(content);
     
     const link = document.createElement('a');
     link.href = URL.createObjectURL(converted);
     link.download = 'edited_document.docx';
     link.click();
+
+    isEditing = false; // Turn off warning after downloading
+    closeModal('wordModal');
   }
 
   // ==========================================
@@ -364,24 +350,18 @@
     if (!file) return;
 
     document.getElementById('excelModal').classList.add('on');
+    isEditing = true; // Turn on warning
 
     const reader = new FileReader();
     reader.onload = function(e) {
       const data = new Uint8Array(e.target.result);
-      // Parse XLSX
       const workbook = XLSX.read(data, { type: 'array' });
       const firstSheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[firstSheetName];
-      
-      // Convert to 2D Array for Handsontable
       const excelData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-      // Destroy previous instance if exists
-      if (hotInstance) {
-        hotInstance.destroy();
-      }
+      if (hotInstance) hotInstance.destroy();
 
-      // Initialize Handsontable grid
       hotInstance = new Handsontable(document.getElementById('excelEditorArea'), {
         data: excelData,
         rowHeaders: true,
@@ -393,12 +373,7 @@
         height: '100%',
         width: '100%',
         stretchH: 'all',
-        
-        // 🚀 FIX: Stop the mobile touch jump to top
-        afterSelection: function(r, c, r2, c2, preventScrolling) {
-            preventScrolling.value = true;
-        },
-        // 🚀 FIX: Stop the page from scrolling sideways on mobile
+        afterSelection: function(r, c, r2, c2, preventScrolling) { preventScrolling.value = true; },
         preventOverflow: 'horizontal' 
       });
     };
@@ -409,16 +384,14 @@
   function downloadExcel() {
     if (!hotInstance) return;
     
-    // Get data from Handsontable grid
     const data = hotInstance.getData();
-    
-    // Convert 2D Array back to Worksheet
     const worksheet = XLSX.utils.aoa_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    
-    // Download XLSX
     XLSX.writeFile(workbook, 'edited_spreadsheet.xlsx');
+
+    isEditing = false; // Turn off warning after downloading
+    closeModal('excelModal');
   }
 </script>
 
