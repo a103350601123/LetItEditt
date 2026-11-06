@@ -55,15 +55,8 @@
   /* ==========================================
      🚀 FIX: Force TOAST UI panels below image 
      ========================================== */
-  #tui-image-editor-container {
-      width: 100%;
-      height: 100%;
-  }
-
-  .tui-image-editor-canvas-container {
-      bottom: 160px !important; 
-  }
-
+  #tui-image-editor-container { width: 100%; height: 100%; }
+  .tui-image-editor-canvas-container { bottom: 160px !important; }
   .tui-image-editor-submenu {
       bottom: 0 !important;
       height: 160px !important;
@@ -95,6 +88,15 @@
       .tui-image-editor-main-container { width: 100% !important; }
       .tui-image-editor-header { padding: 0 10px; }
   }
+
+  /* Footer Links Style */
+  .footer-links {
+      display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 10px;
+  }
+  .footer-links a {
+      color: var(--muted); text-decoration: none; font-size: 14px; transition: 0.2s;
+  }
+  .footer-links a:hover { color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
 </style>
 </head><body>
 
@@ -156,7 +158,16 @@
 </main>
 
 <footer>
-  <div class="wrap"><p>© 2026 LetItEdit. Black Neon Crystal Edition.</p></div>
+  <div class="wrap">
+    <p>© 2026 LetItEdit. Black Neon Crystal Edition.</p>
+    <div class="footer-links">
+      <a href="/about.html">About Us</a>
+      <a href="/faq.html">FAQ</a>
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="/terms.html">Terms of Service</a>
+      <a href="mailto:info@letitedit.com">info@letitedit.com</a>
+    </div>
+  </div>
 </footer>
 
 <!-- ========================================== -->
@@ -214,20 +225,46 @@
 </div>
 
 <script>
-  // 🚀 Safety Flag: Triggers the warning popup if user tries to leave while editing
   let isEditing = false;
+  let ignoreHistoryPop = false;
 
+  // 🚀 FIX: Warning if user leaves the whole website while editing
   window.addEventListener('beforeunload', function (e) {
     if (isEditing) {
-      // Standard way to trigger the browser's native "Leave site?" warning
       e.preventDefault();
       e.returnValue = ''; 
     }
   });
 
+  // 🚀 FIX: Handle mobile/desktop Back button
+  window.addEventListener('popstate', function (e) {
+    const openModal = document.querySelector('.overlay.on');
+    if (openModal) {
+        // If a modal is open, just close the modal without leaving the page
+        ignoreHistoryPop = true; 
+        document.getElementById(openModal.id).classList.remove('on');
+        isEditing = false;
+        ignoreHistoryPop = false;
+    }
+  });
+
+  function openEditorModal(id) {
+    document.getElementById(id).classList.add('on');
+    isEditing = true;
+    // Push a fake history state so pressing "Back" closes the modal instead of leaving the site
+    if (!ignoreHistoryPop) {
+        history.pushState({ modal: id }, '', window.location.pathname);
+    }
+  }
+
   function closeModal(id) {
     document.getElementById(id).classList.remove('on');
-    isEditing = false; // Turn off warning when they properly close the modal
+    isEditing = false;
+    
+    // If we close via the button, pop the fake state so history is clean
+    if (history.state && history.state.modal) {
+        history.back();
+    }
   }
 
   // ==========================================
@@ -239,8 +276,7 @@
     const file = event.target.files[0];
     if (!file) return;
 
-    document.getElementById('imageModal').classList.add('on');
-    isEditing = true; // Turn on warning
+    openEditorModal('imageModal');
 
     const reader = new FileReader();
     reader.onload = function(e) {
@@ -295,7 +331,6 @@
     link.download = 'edited_image.png';
     link.href = imageEditor.toDataURL();
     link.click();
-    isEditing = false; // Turn off warning after downloading
     closeModal('imageModal');
   }
 
@@ -306,8 +341,7 @@
     const file = event.target.files[0];
     if (!file) return;
 
-    document.getElementById('wordModal').classList.add('on');
-    isEditing = true; // Turn on warning
+    openEditorModal('wordModal');
 
     const wordArea = document.getElementById('wordEditorArea');
     wordArea.innerHTML = '<p style="text-align:center; color:#666;">Processing file...</p>';
@@ -336,7 +370,6 @@
     link.download = 'edited_document.docx';
     link.click();
 
-    isEditing = false; // Turn off warning after downloading
     closeModal('wordModal');
   }
 
@@ -349,8 +382,7 @@
     const file = event.target.files[0];
     if (!file) return;
 
-    document.getElementById('excelModal').classList.add('on');
-    isEditing = true; // Turn on warning
+    openEditorModal('excelModal');
 
     const reader = new FileReader();
     reader.onload = function(e) {
@@ -390,7 +422,6 @@
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
     XLSX.writeFile(workbook, 'edited_spreadsheet.xlsx');
 
-    isEditing = false; // Turn off warning after downloading
     closeModal('excelModal');
   }
 </script>
