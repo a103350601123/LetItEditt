@@ -28,13 +28,42 @@
   .overlay { z-index: 9999; }
   .modal { max-width: 95vw; width: 100%; height: 90vh; display: flex; flex-direction: column; padding: 20px; background: #0a0a0f; border: 1px solid var(--neon-blue); }
   .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-  .modal-body { flex-grow: 1; overflow: hidden; background: #222; border-radius: 8px; position: relative; }
+  .modal-body { flex-grow: 1; overflow: hidden; background: #111; border-radius: 8px; position: relative; display: flex; flex-direction: column; }
   .editor-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px; }
+  
+  /* ==========================================
+     🚀 FIX: Force TOAST UI to stack vertically 
+     ========================================== */
+  .tui-image-editor-main-container {
+      display: flex !important;
+      flex-direction: column !important;
+      height: 100% !important;
+  }
+  .tui-image-editor-canvas-container {
+      flex: 1 !important; /* Canvas takes up remaining space */
+      height: auto !important;
+      margin-bottom: 0 !important;
+  }
+  .tui-image-editor-submenu {
+      position: static !important;
+      height: auto !important;
+      flex-shrink: 0 !important;
+      background: #1a1a1a !important;
+      border-top: 1px solid #333 !important;
+  }
+  .tui-image-editor-submenu-wrap {
+      position: static !important;
+      padding: 10px !important;
+      background: #1a1a1a !important;
+      display: flex !important;
+      justify-content: center !important;
+  }
   
   /* TOAST UI Dark Theme Customization */
   .tui-image-editor-main { background: #111; }
-  .tui-image-editor-header { background: #1a1a1a; color: white; }
-  .tui-image-editor-help-menu { background: #1a1a1a; }
+  .tui-image-editor-header { background: #1a1a1a; color: white; border-bottom: 1px solid #333; }
+  .tui-image-editor-help-menu { background: #1a1a1a; border-top: 1px solid #333; }
+  .tui-image-editor-menu { background: #1a1a1a; }
   
   /* Handsontable Dark Theme */
   .handsontable { color: #fff; }
@@ -133,8 +162,9 @@
       <h2>Word Document Editor</h2>
       <button class="btn ghost sm" onclick="closeModal('wordModal')">✕ Close</button>
     </div>
-    <div class="modal-body" style="overflow-y: auto; padding: 20px; background: #fff; color: #000;">
-      <div id="wordEditorArea" contenteditable="true" style="outline: none; min-height: 100%; font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.5;"></div>
+    <div class="modal-body" style="overflow-y: auto; padding: 40px; background: #e0e0e0; color: #000; display: flex; justify-content: center;">
+      <!-- Word Paper Look -->
+      <div id="wordEditorArea" contenteditable="true" style="outline: none; width: 100%; max-width: 800px; min-height: 100%; background: #fff; padding: 40px; box-shadow: 0 0 10px rgba(0,0,0,0.3); font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.5;"></div>
     </div>
     <div class="editor-actions">
       <button class="btn blue" onclick="downloadWord()">Download as .docx</button>
