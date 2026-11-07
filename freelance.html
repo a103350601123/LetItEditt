@@ -3,15 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hire a Freelance Editor: PDF, Word, Excel, Screenshots | LetItEdit</title>
-<meta name="description" content="Hire a freelance editor for PDF and resume formatting, Word APA/MLA formatting, Excel fixes and screenshot editing. Fast delivery from $1, free revisions.">
+<title>Hire a Freelance Editor | LetItEdit</title>
 <link rel="canonical" href="https://letitedit.com/freelance.html">
 <link rel="stylesheet" href="site.css">
-<link rel="stylesheet" href="freelance.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-<a class="skip" href="#order">Skip to the order form</a>
 
 <header>
   <div class="wrap bar">
@@ -26,50 +23,36 @@
 </header>
 
 <main>
-  <section class="page-hero">
-    <div class="wrap">
-      <h1>Let a <span>pro</span> edit it for you.</h1>
-      <p>A freelance editor formats, fixes and returns your file within hours. Prices start at $1, and revisions are free.</p>
+  <section class="hero" style="text-align: left; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 40px; align-items: start; padding: 60px 20px; max-width: 1100px; margin: 0 auto;">
+    <div>
+      <h1 style="font-size: 42px; margin-bottom: 20px; color: #fff;">Your <span style="color: #38bdf8;">resume</span>,<br>expertly edited by a real person.</h1>
+      <p style="font-size: 18px; color: var(--mute); margin-bottom: 30px;">PDF, Word, Excel, screenshot and video editing for students, job seekers and small businesses. LetItEdit looks after every file with care. Choose a service, pay, and upload. Revisions are always free.</p>
+      <a class="btn alt" href="faq.html">Read the FAQ</a>
     </div>
-  </section>
-
-  <section id="order">
-    <div class="wrap">
-      <div class="builder">
-        <h2>1. Choose a service</h2>
-        <div class="opts" id="svcOpts">
-          <button class="opt" data-svc="PDF" aria-pressed="true">PDF formatting<small>Resumes, merging, layout fixes</small></button>
-          <button class="opt" data-svc="Doc" aria-pressed="false">Word document<small>APA, MLA, headings, tables</small></button>
-          <button class="opt" data-svc="Excel" aria-pressed="false">Excel sheet<small>Formulas and data cleaning</small></button>
-          <button class="opt" data-svc="Screenshot" aria-pressed="false">Screenshot<small>Annotate, blur, crop</small></button>
-        </div>
-        <h2>2. Choose delivery speed</h2>
-        <div class="opts" id="spdOpts">
-          <button class="opt" data-spd="0" aria-pressed="false">30 minutes<small>Rush</small><b>$5</b></button>
-          <button class="opt" data-spd="1" aria-pressed="true">1 hour<small>Fast</small><b>$4</b></button>
-          <button class="opt" data-spd="2" aria-pressed="false">2 hours<small>Quick</small><b>$3</b></button>
-          <button class="opt" data-spd="3" aria-pressed="false">3 to 5 hours<small>Standard</small><b>$2</b></button>
-          <button class="opt" data-spd="4" aria-pressed="false">6 to 12 hours<small>Economy</small><b>$1</b></button>
-        </div>
-        <div class="sum">
-          <div><p class="price" id="price">$4</p><p class="what" id="what">PDF formatting, ready in 1 hour</p></div>
-          <button class="btn" id="start">Start order</button>
-        </div>
-      </div>
-      <p class="video">Need a video edited? Video projects are quoted first. <a href="https://wa.me/447393652862" rel="noopener">Message LetItEdit on WhatsApp</a>.</p>
-    </div>
-  </section>
-
-  <section>
-    <div class="wrap">
-      <h2>How ordering works</h2>
-      <p class="lead">You pay first so LetItEdit can reserve time for your job. Your file is only uploaded after payment is confirmed.</p>
-      <ol class="steps">
-        <li><h3>Order</h3><p>Pick a service and speed, then add your details and what you need.</p></li>
-        <li><h3>Pay</h3><p>LetItEdit gives you your order number and a secure way to pay.</p></li>
-        <li><h3>Payment check</h3><p>Payment is confirmed by hand, and this page updates by itself.</p></li>
-        <li><h3>Upload and receive</h3><p>Upload your file. The edited file is sent to your email or WhatsApp.</p></li>
-      </ol>
+    
+    <div class="calc-box" style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--edge); border-radius: 12px; padding: 30px;">
+      <h3 style="margin-bottom: 15px; font-size: 20px; border-bottom: 1px solid var(--edge); padding-bottom: 10px; color: #fff;">Get your price</h3>
+      <p style="font-size: 13px; color: var(--mute); margin-bottom: 15px;">Pick what you need and see the cost. No sign-up.</p>
+      
+      <label for="cSvc" style="display:block; font-size:14px; font-weight:600; color:var(--mute); margin-bottom:5px;">Service</label>
+      <select id="cSvc" style="width:100%; padding:12px; background:#060a14; border:1px solid var(--edge); color:#fff; border-radius:8px; font-size:15px; margin-bottom:15px;">
+        <option value="PDF">PDF formatting</option>
+        <option value="Doc">Word document</option>
+        <option value="Excel">Excel sheet</option>
+        <option value="Screenshot">Screenshot editing</option>
+      </select>
+      
+      <label for="cSpd" style="display:block; font-size:14px; font-weight:600; color:var(--mute); margin-bottom:5px;">Delivery speed</label>
+      <select id="cSpd" onchange="calcUpdate()" style="width:100%; padding:12px; background:#060a14; border:1px solid var(--edge); color:#fff; border-radius:8px; font-size:15px; margin-bottom:15px;">
+        <option value="0">30 minutes (rush)</option>
+        <option value="1" selected>1 hour</option>
+        <option value="2">2 hours</option>
+        <option value="3">3 to 5 hours</option>
+        <option value="4">6 to 12 hours</option>
+      </select>
+      
+      <p class="total" id="cOut" style="font-size:24px; font-weight:700; margin:20px 0; color:#38bdf8; text-align:center;">$4 for delivery in 1 hour</p>
+      <button class="btn" onclick="calcOrder()" style="width:100%; padding:15px; font-size:16px;">Order now</button>
     </div>
   </section>
 </main>
@@ -77,46 +60,11 @@
 <footer>
   <div class="wrap">
     <span>© 2026 LetItEdit</span>
-    <span><a href="about.html">About</a><a href="faq.html">FAQ</a><a href="privacy.html">Privacy policy</a><a href="terms.html">Terms of service</a><a href="mailto:hello@letitedit.com">Contact</a></span>
+    <span><a href="about.html">About</a><a href="faq.html">FAQ</a><a href="privacy.html">Privacy policy</a><a href="terms.html">Terms of service</a></span>
   </div>
 </footer>
 
-<!-- THESIS MODAL -->
-<div class="ws" id="thesisModal" role="dialog" aria-modal="true" style="align-items:center; justify-content:center; background:rgba(0,0,0,0.8); position: fixed; inset: 0; display: none;">
-  <div class="calc-box" style="max-width:500px; text-align:center; position:relative; margin:auto; z-index: 1000;">
-    <button class="btn alt sm" onclick="document.getElementById('thesisModal').classList.remove('on'); document.getElementById('thesisModal').style.display='none';" style="position:absolute; top:15px; right:15px;">✕</button>
-    <h3 style="border:none; color:#38bdf8;">Research Paper & Thesis</h3>
-    <p style="color:var(--mute); font-size:15px; margin:15px 0;">Theses and research papers require meticulous attention to structure, referencing, and formatting. Let's discuss your specific requirements to provide an accurate quote.</p>
-    <a href="https://wa.me/447393652862?text=Hi%20LetItEdit!%20I%20am%20interested%20in%20your%20Research%20Paper%20/%20Thesis%20editing%20service." target="_blank" rel="noopener" class="btn" style="background:#25D366;">Message on WhatsApp</a>
-  </div>
-</div>
-
-<!-- THIS IS THE CRITICAL LINE THAT WAS MISSING -->
-<script src="app.js?v=99"></script>
-
-<script>
-  // Handle the Thesis Modal
-  function thesisContact() {
-    const m = document.getElementById('thesisModal');
-    m.classList.add('on');
-    m.style.display = 'flex';
-  }
-
-  // Override the calculator buttons to show the Thesis modal if selected
-  document.addEventListener('DOMContentLoaded', () => {
-    const startBtn = document.getElementById('start');
-    if(startBtn) {
-      startBtn.addEventListener('click', function(e) {
-        // Find the selected service
-        const activeSvc = document.querySelector('[data-svc][aria-pressed="true"]');
-        if (activeSvc && activeSvc.dataset.svc === 'Thesis') {
-           e.preventDefault();
-           e.stopPropagation();
-           thesisContact();
-        }
-      }, true); // Use capture phase to intercept before app.js
-    }
-  });
-</script>
+<!-- THIS SCRIPT LOADS THE ORDER ENGINE -->
+<script src="app.js?v=100"></script>
 </body>
 </html>
