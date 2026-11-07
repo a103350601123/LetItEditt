@@ -1,284 +1,180 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Free Online Tools & Freelance Editing | LetItEdit</title>
-<meta name="description" content="Edit your images, Word, and Excel files online for free. Or hire a professional freelancer for guaranteed perfection.">
-<!-- CACHE BUSTER -->
-<link rel="stylesheet" href="/styles.css?v=5">
-<link href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
-
-<script src="https://cdn.jsdelivr.net/npm/fabric@4.5.0/dist/fabric.min.js"></script>
-<script src="https://uicdn.toast.com/tui-code-snippet/latest/tui-code-snippet.min.js"></script>
-<script src="https://uicdn.toast.com/tui-color-picker/latest/tui-color-picker.min.js"></script>
-<script src="https://uicdn.toast.com/tui-image-editor/latest/tui-image-editor.min.js"></script>
-<link rel="stylesheet" href="https://uicdn.toast.com/tui-color-picker/latest/tui-color-picker.css">
-<link rel="stylesheet" href="https://uicdn.toast.com/tui-image-editor/latest/tui-image-editor.css">
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html-docx-js/0.3.1/html-docx.js"></script>
-
-<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@12.1.2/dist/handsontable.full.min.css">
-<script src="https://cdn.jsdelivr.net/npm/handsontable@12.1.2/dist/handsontable.full.min.js"></script>
-
-<style>
-  .overlay { z-index: 9999; }
-  .modal { max-width: 95vw; width: 1200px; height: 90vh; display: flex; flex-direction: column; }
-  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-  .modal-body { flex-grow: 1; overflow: hidden; background: #111; border-radius: 8px; position: relative; }
-  .editor-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px; }
-  
-  /* Mobile Toggle Button for Image Editor */
-  .toggle-tools-btn { display: none; position: absolute; bottom: 20px; right: 20px; z-index: 100; }
-  @media (max-width: 768px) {
-      .modal { width: 100vw !important; height: 100vh !important; border-radius: 0; padding: 10px; }
-      .toggle-tools-btn { display: block; }
-  }
-</style>
-</head><body>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Online Image, Word and Excel Editor | LetItEdit</title>
+<meta name="description" content="Edit images, Word (.docx) and Excel (.xlsx) files free in your browser. Files stay on your device. Or hire a freelance editor from $1.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#060a14">
+<link rel="canonical" href="https://letitedit.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LetItEdit">
+<meta property="og:title" content="Free Online Image, Word and Excel Editor | LetItEdit">
+<meta property="og:description" content="Edit images, Word and Excel files in your browser. Files stay on your device. Hire a freelance editor from $1.">
+<meta property="og:url" content="https://letitedit.com/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✏️</text></svg>">
+<link rel="stylesheet" href="site.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"Organization","@id":"https://letitedit.com/#org","name":"LetItEdit","url":"https://letitedit.com/","email":"hello@letitedit.com"},
+{"@type":"WebApplication","name":"LetItEdit Online Editors","url":"https://letitedit.com/","applicationCategory":"MultimediaApplication","operatingSystem":"Any","description":"Free browser-based image, Word and Excel editors. Files stay on the user's device.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@id":"https://letitedit.com/#org"}}
+]}
+</script>
+</head>
+<body>
+<a class="skip" href="#tools">Skip to the editors</a>
 
 <header>
   <div class="wrap bar">
-    <a class="logo" href="/">Let<i>It</i>Edit</a>
-    <nav>
-      <a href="/">Home</a>
-      <a href="/faq.html">FAQ</a>
-      <a class="btn sm blue" href="/freelance.html">Hire a Freelancer</a>
+    <a class="brand" href="/">Let<b>It</b>Edit</a>
+    <nav aria-label="Main">
+      <a href="/" aria-current="page">Home</a>
+      <a href="faq.html">FAQ</a>
+      <a href="about.html">About</a>
+      <a class="btn sm" href="freelance.html">Hire a freelancer</a>
     </nav>
   </div>
 </header>
 
-<main class="wrap">
+<main>
   <section class="hero">
-    <h1>Edit it <span>Yourself</span>.<br>Or let a Pro do it.</h1>
-    <p>Use our professional tools to edit screenshots, Word docs, and Excel sheets right in your browser. Files never leave your device.</p>
-    <a href="#tools" class="btn">Start Editing Free</a>
+    <div class="wrap">
+      <h1>Edit it yourself. Or let a <span>pro</span> do it.</h1>
+      <p>Free online image, Word and Excel editors that run in your browser. Your files stay on your device. Need it done for you? Hire a freelance editor from $1.</p>
+      <div class="row">
+        <a class="btn" href="#tools">Start editing free</a>
+        <a class="btn alt" href="freelance.html">Hire a freelancer</a>
+      </div>
+    </div>
   </section>
 
-  <div class="grid" id="tools">
-    <div class="card">
-      <h3>🖼️ Image / Screenshot Editor</h3>
-      <p>Filters, pixelate, blur, crop, add text with fonts, and draw.</p>
-      <label class="upload-box">
-        <input type="file" accept="image/*" onchange="openImageEditor(event)">
-        <span>📤</span> Click to upload image
-      </label>
+  <section id="tools">
+    <div class="wrap">
+      <h2>Free online editors</h2>
+      <p class="lead">Choose a file. It opens in the editor straight away, and nothing is uploaded to a server.</p>
+      <div class="tools">
+        <label class="tool"><input type="file" id="imgIn" accept="image/*" aria-label="Upload an image to edit">
+          <span class="ico" aria-hidden="true">🖼️</span><h3>Image editor</h3>
+          <p>Crop, draw, add text, blur or pixelate private details, and adjust colours.</p>
+          <span class="go">Choose an image</span></label>
+        <label class="tool"><input type="file" id="docIn" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Upload a Word document to edit">
+          <span class="ico" aria-hidden="true">📝</span><h3>Word editor</h3>
+          <p>Open a .docx file with its layout intact, edit the text, then save or print it.</p>
+          <span class="go">Choose a .docx file</span></label>
+        <label class="tool"><input type="file" id="xlIn" accept=".xlsx,.xls,.csv" aria-label="Upload a spreadsheet to edit">
+          <span class="ico" aria-hidden="true">📊</span><h3>Excel editor</h3>
+          <p>Open a spreadsheet in a real grid, edit values and formulas, then save it.</p>
+          <span class="go">Choose a spreadsheet</span></label>
+      </div>
     </div>
-    <div class="card">
-      <h3>📝 Word Document</h3>
-      <p>Open your DOCX file, keep its format, and edit it like a webpage.</p>
-      <label class="upload-box">
-        <input type="file" accept=".docx" onchange="openWordEditor(event)">
-        <span>📄</span> Click to upload document (.docx)
-      </label>
-    </div>
-    <div class="card">
-      <h3>📊 Excel Spreadsheet</h3>
-      <p>Open XLSX files in a real grid, edit data/formulas, and save.</p>
-      <label class="upload-box">
-        <input type="file" accept=".xls,.xlsx,.csv" onchange="openExcelEditor(event)">
-        <span>📈</span> Click to upload spreadsheet
-      </label>
-    </div>
-  </div>
+  </section>
 
-  <section class="freelance-cta">
-    <h2>Too complicated? Let a Pro handle it.</h2>
-    <p>Our expert team will edit it perfectly, apply formatting, and deliver it within hours. Starting from $1.</p>
-    <a href="/freelance.html" class="btn" style="font-size: 18px; padding: 16px 40px;">Ask an Online Freelancer to Edit</a>
+  <section>
+    <div class="wrap">
+      <h2>Why people trust LetItEdit</h2>
+      <p class="lead">Clear rules, no sign-up, and a real person behind the site.</p>
+      <div class="cols">
+        <div class="card"><h3>Private by design</h3><p>The editors run inside your browser. Your image, document or spreadsheet is never sent to our servers.</p></div>
+        <div class="card"><h3>No account needed</h3><p>Open a file, edit it, and download it. There are no watermarks and no sign-up.</p></div>
+        <div class="card"><h3>Real support</h3><p>Questions about an edit or an order? Email <a href="mailto:hello@letitedit.com">hello@letitedit.com</a> or message us on <a href="https://wa.me/923456006438" rel="noopener">WhatsApp</a>.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="cta">
+        <h2>Too complicated? Let a pro handle it.</h2>
+        <p>A freelance editor will format, fix and return your file within hours. Prices start at $1, and revisions are free.</p>
+        <a class="btn" href="freelance.html">Ask a freelancer to edit it</a>
+      </div>
+    </div>
   </section>
 </main>
 
 <footer>
   <div class="wrap">
-    <p>© 2026 LetItEdit. Black Neon Crystal Edition.</p>
-    <div class="footer-links">
-      <a href="/about.html">About Us</a>
-      <a href="/faq.html">FAQ</a>
-      <a href="/privacy.html">Privacy Policy</a>
-      <a href="/terms.html">Terms of Service</a>
-      <a href="mailto:info@letitedit.com">info@letitedit.com</a>
-    </div>
+    <span>© 2026 LetItEdit</span>
+    <span><a href="about.html">About</a><a href="faq.html">FAQ</a><a href="privacy.html">Privacy policy</a><a href="terms.html">Terms of service</a><a href="mailto:hello@letitedit.com">Contact</a></span>
   </div>
 </footer>
 
-<div class="overlay" id="imageModal">
-  <div class="modal">
-    <div class="modal-header"><h2>Image Editor</h2><button class="btn ghost sm" onclick="closeModal('imageModal')">✕ Close</button></div>
-    <div class="modal-body">
-      <div id="tui-image-editor-container"></div>
-      <button class="btn blue sm toggle-tools-btn" onclick="toggleImageTools()">⇅ Toggle Tools</button>
+<!-- IMAGE EDITOR -->
+<div class="ws" id="wsImg" role="dialog" aria-modal="true" aria-label="Image editor" tabindex="-1">
+  <div class="top">
+    <h2>Image editor</h2>
+    <button class="btn alt sm" id="togglePanel" aria-expanded="true">Tools</button>
+    <button class="btn alt sm" id="undo">Undo</button>
+    <button class="btn alt sm" data-close>Close</button>
+    <button class="btn sm" id="imgDl">Download image</button>
+  </div>
+  <div class="body">
+    <div class="panel" id="panel">
+      <div class="grp"><h3>Tool</h3>
+        <div class="seg">
+          <button class="btn alt sm" data-mode="draw" aria-pressed="true">Draw</button>
+          <button class="btn alt sm" data-mode="text" aria-pressed="false">Text</button>
+          <button class="btn alt sm" data-mode="crop" aria-pressed="false">Crop</button>
+          <button class="btn alt sm" data-mode="blur" aria-pressed="false">Blur area</button>
+          <button class="btn alt sm" data-mode="pixel" aria-pressed="false">Pixelate area</button>
+          <button class="btn alt sm" id="rot">Rotate 90°</button>
+        </div>
+        <p class="note" id="hint">Drag on the image to draw.</p>
+      </div>
+      <div class="grp"><h3>Brush and text</h3>
+        <label for="pen">Colour</label><input type="color" id="pen" value="#ef4444">
+        <label for="size">Brush size</label><input type="range" id="size" min="1" max="60" value="6">
+        <label for="txt">Text to add</label><input type="text" id="txt" placeholder="Type, then tap the image" maxlength="120">
+        <label for="ff">Font</label>
+        <select id="ff"><option>Arial</option><option>Georgia</option><option>Courier New</option><option>Impact</option><option>Comic Sans MS</option><option>Times New Roman</option></select>
+        <label for="fs">Text size</label><input type="range" id="fs" min="12" max="200" value="48">
+      </div>
+      <div class="grp"><h3>Adjust the whole image</h3>
+        <label for="bri">Brightness</label><input class="adj" type="range" id="bri" min="40" max="180" value="100">
+        <label for="con">Contrast</label><input class="adj" type="range" id="con" min="40" max="180" value="100">
+        <label for="sat">Saturation</label><input class="adj" type="range" id="sat" min="0" max="200" value="100">
+        <label for="gry">Black and white</label><input class="adj" type="range" id="gry" min="0" max="100" value="0">
+        <label for="blr">Blur</label><input class="adj" type="range" id="blr" min="0" max="10" value="0">
+        <p class="note">Adjustments are applied when you download. Use Chrome, Edge or Firefox for best results.</p>
+      </div>
     </div>
-    <div class="editor-actions"><button class="btn blue" onclick="downloadImage()">Download Image</button></div>
+    <div class="stage"><div class="cvwrap"><canvas id="cv" aria-label="Image being edited"></canvas><div id="sel"></div></div></div>
   </div>
 </div>
 
-<div class="overlay" id="wordModal">
-  <div class="modal">
-    <div class="modal-header"><h2>Word Editor</h2><button class="btn ghost sm" onclick="closeModal('wordModal')">✕ Close</button></div>
-    <div class="modal-body" style="overflow-y: auto; padding: 20px; background: #e0e0e0; -webkit-overflow-scrolling: touch; touch-action: pan-y;">
-      <div id="wordEditorArea" contenteditable="true" style="outline: none; width: 100%; min-height: 100%; background: #fff; padding: 20px; font-family: 'Times New Roman', serif; line-height: 1.5; color: #000;"></div>
-    </div>
-    <div class="editor-actions"><button class="btn blue" onclick="downloadWord()">Download as .docx</button></div>
+<!-- WORD EDITOR -->
+<div class="ws" id="wsDoc" role="dialog" aria-modal="true" aria-label="Word editor" tabindex="-1">
+  <div class="top">
+    <h2>Word editor</h2>
+    <button class="btn alt sm" data-cmd="bold" aria-label="Bold"><b>B</b></button>
+    <button class="btn alt sm" data-cmd="italic" aria-label="Italic"><i>I</i></button>
+    <button class="btn alt sm" data-cmd="underline" aria-label="Underline"><u>U</u></button>
+    <button class="btn alt sm" data-cmd="insertUnorderedList" aria-label="Bulleted list">• List</button>
+    <button class="btn alt sm" data-cmd="insertOrderedList" aria-label="Numbered list">1. List</button>
+    <button class="btn alt sm" data-cmd="undo">Undo</button>
+    <button class="btn alt sm" data-cmd="redo">Redo</button>
+    <button class="btn alt sm" data-close>Close</button>
+    <button class="btn alt sm" id="docPrint">Print or save as PDF</button>
+    <button class="btn sm" id="docDl">Download .docx</button>
   </div>
+  <div class="docstage"><div id="doc"></div></div>
 </div>
 
-<div class="overlay" id="excelModal">
-  <div class="modal">
-    <div class="modal-header"><h2>Excel Editor</h2><button class="btn ghost sm" onclick="closeModal('excelModal')">✕ Close</button></div>
-    <div class="modal-body" id="excelEditorArea" style="touch-action: pan-y;"></div>
-    <div class="editor-actions"><button class="btn blue" onclick="downloadExcel()">Download as .xlsx</button></div>
+<!-- EXCEL EDITOR -->
+<div class="ws" id="wsXl" role="dialog" aria-modal="true" aria-label="Excel editor" tabindex="-1">
+  <div class="top">
+    <h2>Excel editor</h2>
+    <span class="note" style="margin:0">Formulas are kept. Cell colours may be simplified when saving.</span>
+    <button class="btn alt sm" data-close>Close</button>
+    <button class="btn sm" id="xlDl">Download .xlsx</button>
   </div>
+  <div class="tabs" id="tabs" role="group" aria-label="Sheets"></div>
+  <div class="xlstage" id="xlStage"></div>
 </div>
 
-<script>
-  let isEditing = false;
-  let ignoreHistoryPop = false;
-
-  window.addEventListener('beforeunload', function (e) { if (isEditing) { e.preventDefault(); e.returnValue = ''; } });
-  window.addEventListener('popstate', function (e) {
-    const openModal = document.querySelector('.overlay.on');
-    if (openModal) {
-        ignoreHistoryPop = true; 
-        document.getElementById(openModal.id).classList.remove('on');
-        isEditing = false;
-        document.body.classList.remove('modal-open'); // Unlock body scroll
-        ignoreHistoryPop = false;
-    }
-  });
-
-  function openEditorModal(id) {
-    document.getElementById(id).classList.add('on');
-    document.body.classList.add('modal-open'); // Lock background scroll
-    isEditing = true;
-    if (!ignoreHistoryPop) history.pushState({ modal: id }, '', window.location.pathname);
-  }
-
-  function closeModal(id) {
-    document.getElementById(id).classList.remove('on');
-    document.body.classList.remove('modal-open'); // Unlock background scroll
-    isEditing = false;
-    if (history.state && history.state.modal) history.back();
-  }
-
-  // TOGGLE IMAGE TOOLS
-  function toggleImageTools() {
-    const submenu = document.querySelector('.tui-image-editor-submenu');
-    const canvas = document.querySelector('.tui-image-editor-canvas-container');
-    if (submenu.classList.contains('hidden')) {
-        submenu.classList.remove('hidden');
-        canvas.classList.remove('expanded');
-    } else {
-        submenu.classList.add('hidden');
-        canvas.classList.add('expanded');
-    }
-  }
-
-  // 1. IMAGE EDITOR
-  let imageEditor = null;
-  function openImageEditor(event) {
-    const file = event.target.files[0]; 
-    if (!file) return;
-    
-    document.getElementById('tui-image-editor-container').innerHTML = '';
-    openEditorModal('imageModal');
-    
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      setTimeout(() => {
-        imageEditor = new tui.ImageEditor('#tui-image-editor-container', {
-          includeUI: {
-            loadImage: { path: e.target.result, name: file.name },
-            theme: {
-              'common.bi.image': '', 'common.bisize.width': '0px', 'common.bisize.height': '0px',
-              'common.backgroundImage': 'none', 'common.backgroundColor': '#111',
-              'header.backgroundImage': 'none', 'header.backgroundColor': '#1a1a1a', 'header.border': '0px',
-              'menu.normalIcon.color': '#888', 'menu.activeIcon.color': '#00f0ff',
-              'menu.disabledIcon.color': '#444', 'menu.hoverIcon.color': '#fff',
-              'submenu.backgroundColor': '#1a1a1a', 'submenu.partition.color': '#333',
-              'submenu.normalLabel.color': '#888', 'submenu.activeLabel.color': '#fff',
-              'checkbox.border': '0px', 'checkbox.backgroundColor': '#fff',
-              'range.pointer.color': '#00f0ff', 'range.bar.color': '#666', 'range.subbar.color': '#d3d3d3',
-              'range.value.color': '#fff', 'range.title.color': '#fff',
-              'colorpicker.button.border': '1px solid #1e1e1e', 'colorpicker.title.color': '#fff'
-            },
-            menu: ['filter', 'crop', 'flip', 'rotate', 'draw', 'shape', 'icon', 'text', 'mask'],
-            initMenu: 'filter',
-            uiSize: { width: '100%', height: '100%' },
-            menuBarPosition: 'bottom'
-          },
-          cssMaxWidth: 1000, cssMaxHeight: 600,
-          selectionStyle: { cornerSize: 20, rotatingPointOffset: 70 }
-        });
-        
-        document.getElementById('tui-image-editor-container').addEventListener('input', function(ev) {
-            if (ev.target && ev.target.type === 'range') {
-                const activeObj = imageEditor.getCanvas().getActiveObject();
-                if (activeObj) imageEditor.getCanvas().renderAll();
-            }
-        });
-      }, 100);
-    };
-    reader.readAsDataURL(file); 
-    event.target.value = ''; 
-  }
-
-  function downloadImage() {
-    if (!imageEditor) return;
-    const link = document.createElement('a'); link.download = 'edited_image.png'; link.href = imageEditor.toDataURL(); link.click();
-    closeModal('imageModal');
-  }
-
-  // 2. WORD EDITOR
-  function openWordEditor(event) {
-    const file = event.target.files[0]; if (!file) return;
-    if (!file.name.endsWith('.docx')) {
-        alert("Please upload a .docx file. Old .doc or .html files are not supported.");
-        event.target.value = '';
-        return;
-    }
-    openEditorModal('wordModal');
-    const wordArea = document.getElementById('wordEditorArea');
-    wordArea.innerHTML = '<p style="text-align:center; color:#666;">Processing...</p>';
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      mammoth.convertToHtml({ arrayBuffer: e.target.result })
-        .then(function(result) { wordArea.innerHTML = result.value; })
-        .catch(function(err) { wordArea.innerHTML = '<p style="color:red; text-align:center;">Error reading file. Please ensure it is a valid .docx file.</p>'; });
-    };
-    reader.readAsArrayBuffer(file); event.target.value = '';
-  }
-
-  function downloadWord() {
-    const content = document.getElementById('wordEditorArea').innerHTML;
-    const converted = htmlDocx.asBlob(content);
-    const link = document.createElement('a'); link.href = URL.createObjectURL(converted); link.download = 'edited_document.docx'; link.click();
-    closeModal('wordModal');
-  }
-
-  // 3. EXCEL EDITOR
-  let hotInstance = null;
-  function openExcelEditor(event) {
-    const file = event.target.files[0]; if (!file) return;
-    openEditorModal('excelModal');
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-      const excelData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
-      if (hotInstance) hotInstance.destroy();
-      hotInstance = new Handsontable(document.getElementById('excelEditorArea'), {
-        data: excelData, rowHeaders: true, colHeaders: true, formulas: true, contextMenu: true, dropdownMenu: true,
-        licenseKey: 'non-commercial-and-evaluation', height: '100%', width: '100%', stretchH: 'all',
-        afterSelection: function(r, c, r2, c2, preventScrolling) { preventScrolling.value = true; }, preventOverflow: 'horizontal' 
-      });
-    };
-    reader.readAsArrayBuffer(file); event.target.value = '';
-  }
-  function downloadExcel() {
-    if (!hotInstance) return;
-    const worksheet = XLSX.utils.aoa_to_sheet(hotInstance.getData());
-    const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    XLSX.writeFile(workbook, 'edited_spreadsheet.xlsx');
-    closeModal('excelModal');
-  }
-</script>
-</body></html>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="tools.js" defer></script>
+</body>
+</html>
