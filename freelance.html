@@ -56,6 +56,20 @@
           <button class="btn" id="start">Start order</button>
         </div>
       </div>
+      <p class="video">Need a video edited? Video projects are quoted first. <a href="https://wa.me/447393652862" rel="noopener">Message LetItEdit on WhatsApp</a>.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>How ordering works</h2>
+      <p class="lead">You pay first so LetItEdit can reserve time for your job. Your file is only uploaded after payment is confirmed.</p>
+      <ol class="steps">
+        <li><h3>Order</h3><p>Pick a service and speed, then add your details and what you need.</p></li>
+        <li><h3>Pay</h3><p>LetItEdit gives you your order number and a secure way to pay.</p></li>
+        <li><h3>Payment check</h3><p>Payment is confirmed by hand, and this page updates by itself.</p></li>
+        <li><h3>Upload and receive</h3><p>Upload your file. The edited file is sent to your email or WhatsApp.</p></li>
+      </ol>
     </div>
   </section>
 </main>
@@ -63,209 +77,46 @@
 <footer>
   <div class="wrap">
     <span>© 2026 LetItEdit</span>
-    <span><a href="about.html">About</a><a href="faq.html">FAQ</a><a href="privacy.html">Privacy policy</a><a href="terms.html">Terms of service</a></span>
+    <span><a href="about.html">About</a><a href="faq.html">FAQ</a><a href="privacy.html">Privacy policy</a><a href="terms.html">Terms of service</a><a href="mailto:hello@letitedit.com">Contact</a></span>
   </div>
 </footer>
 
-<!-- Step 1: details -->
-<div class="ov" id="ovOrder" role="dialog" aria-modal="true" aria-labelledby="tOrder">
-  <div class="modal">
-    <button class="x" data-x="ovOrder" aria-label="Close">×</button>
-    <p class="stepno">Step 1 of 3: Your details</p>
-    <h2 id="tOrder">Order details</h2>
-    <form id="orderForm" novalidate>
-      <div class="fld" id="g-name"><label for="name">Full name</label><input id="name" autocomplete="name"><small>Enter your full name.</small></div>
-      <p class="hint">Add <strong>one</strong> way to reach you: your email <strong>or</strong> your WhatsApp number.</p>
-      <div class="fld" id="g-email"><label for="email">Email address</label><input id="email" type="email" placeholder="you@example.com" autocomplete="email"><small>Enter a valid email address.</small></div>
-      <div class="or">or</div>
-      <div class="fld" id="g-wa"><label for="wa">WhatsApp number</label><input id="wa" type="tel" placeholder="+1 555 123 4567" autocomplete="off"><small>Enter your WhatsApp number with country code.</small></div>
-      <div class="fld" id="g-req"><label for="req">What do you need done?</label><textarea id="req" rows="3" placeholder="Example: Format my resume to one page."></textarea><small>Describe the job in at least 10 characters.</small></div>
-      <p class="total" id="total"></p>
-      <p class="err" id="orderErr" hidden></p>
-      <button class="btn full" id="orderBtn" type="submit">Continue to payment</button>
-    </form>
+<!-- THESIS MODAL -->
+<div class="ws" id="thesisModal" role="dialog" aria-modal="true" style="align-items:center; justify-content:center; background:rgba(0,0,0,0.8); position: fixed; inset: 0; display: none;">
+  <div class="calc-box" style="max-width:500px; text-align:center; position:relative; margin:auto; z-index: 1000;">
+    <button class="btn alt sm" onclick="document.getElementById('thesisModal').classList.remove('on'); document.getElementById('thesisModal').style.display='none';" style="position:absolute; top:15px; right:15px;">✕</button>
+    <h3 style="border:none; color:#38bdf8;">Research Paper & Thesis</h3>
+    <p style="color:var(--mute); font-size:15px; margin:15px 0;">Theses and research papers require meticulous attention to structure, referencing, and formatting. Let's discuss your specific requirements to provide an accurate quote.</p>
+    <a href="https://wa.me/447393652862?text=Hi%20LetItEdit!%20I%20am%20interested%20in%20your%20Research%20Paper%20/%20Thesis%20editing%20service." target="_blank" rel="noopener" class="btn" style="background:#25D366;">Message on WhatsApp</a>
   </div>
 </div>
 
-<!-- Step 2: payment -->
-<div class="ov" id="ovPay" role="dialog" aria-modal="true" aria-labelledby="tPay">
-  <div class="modal">
-    <button class="x" data-x="ovPay" aria-label="Close">×</button>
-    <p class="stepno">Step 2 of 3: Payment</p>
-    <h2 id="tPay">Pay for your order</h2>
-    <p class="fine">Your order is saved. Your order number is:</p>
-    <div class="ref" id="ref"></div>
-    <p class="fine" id="payText">Amount to pay: <strong id="payAmt"></strong>. Quote your order number when you pay.</p>
-    <a class="btn full" id="payLink" href="#" target="_blank" rel="noopener" hidden>Pay now</a>
-    <div class="wait"><span class="spin"></span><span>Waiting for LetItEdit to confirm your payment. Keep this tab open.</span></div>
-    <p class="fine" style="text-align:center; margin-top:15px;"><a href="#" onclick="cancelOrder(event)" style="color:#fca5a5; font-weight:bold; text-decoration:underline;">Cancel this order and go back</a></p>
-  </div>
-</div>
-
-<!-- Step 3: upload -->
-<div class="ov" id="ovUp" role="dialog" aria-modal="true" aria-labelledby="tUp">
-  <div class="modal">
-    <p class="stepno">Step 3 of 3: Upload</p>
-    <h2 id="tUp"><span class="ok">Payment confirmed.</span> Upload your file</h2>
-    <form id="upForm">
-      <div class="drop"><input type="file" id="file" required aria-label="Choose your file"></div>
-      <p class="fine">Maximum file size is 20 MB.</p>
-      <p class="err" id="upErr" hidden></p>
-      <button class="btn full" id="upBtn" type="submit">Upload file</button>
-    </form>
-  </div>
-</div>
-
-<!-- Done -->
-<div class="ov" id="ovDone" role="dialog" aria-modal="true" aria-labelledby="tDone">
-  <div class="modal">
-    <h2 id="tDone"><span class="ok">Order received.</span></h2>
-    <p class="fine" style="font-size:16px;color:var(--ink)">Thank you. LetItEdit has your file and will deliver the edited version to your email or WhatsApp within your chosen delivery time.</p>
-    <p class="hint">Need changes? Reply to the delivery message within 48 hours and LetItEdit will revise it for free.</p>
-    <button class="btn full" id="finish">Return to home</button>
-  </div>
-</div>
+<!-- THIS IS THE CRITICAL LINE THAT WAS MISSING -->
+<script src="app.js?v=99"></script>
 
 <script>
-/* ---- Settings ---- */
-const SUPABASE_URL='https://bjragiylhglqfodbihvd.supabase.co';
-const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqcmFnaXlsaGdscWZvZGJpaHZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMjQ1NzMsImV4cCI6MjEwODkwMDU3M30.upa96t4q9W1AXIr8wry3kL_8U7L__GmTZZ3kWNjurYU';
-const PAY_LINK='';
-
-const $=s=>document.querySelector(s);
-let db=null;
-try{db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}catch(e){console.error('Supabase init failed',e)}
-const SERVICES={PDF:['PDF formatting','.pdf'],Doc:['Word document','.doc,.docx'],Excel:['Excel sheet','.xls,.xlsx'],Screenshot:['Screenshot editing','image/*']};
-const SPEEDS=[['30 minutes',5],['1 hour',4],['2 hours',3],['3 to 5 hours',2],['6 to 12 hours',1]];
-let svc='PDF',spd=1,poll=null,uploaded=false;
-
-function render(){
-  const s=SPEEDS[spd];
-  $('#price').textContent='$'+s[1];
-  $('#what').textContent=SERVICES[svc][0]+', ready in '+s[0];
-  document.querySelectorAll('[data-svc]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.svc===svc));
-  document.querySelectorAll('[data-spd]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.spd===spd));
-}
-document.querySelectorAll('[data-svc]').forEach(b=>b.onclick=()=>{svc=b.dataset.svc;render()});
-document.querySelectorAll('[data-spd]').forEach(b=>b.onclick=()=>{spd=+b.dataset.spd;render()});
-const show=id=>$('#'+id).classList.add('on'),hide=id=>$('#'+id).classList.remove('on');
-
-document.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>{
-  if(b.dataset.x==='ovPay') closePay(); else hide(b.dataset.x);
-});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){hide('ovOrder');if($('#ovPay').classList.contains('on'))closePay()}});
-
-$('#start').onclick=()=>{
-  const s=SPEEDS[spd];
-  $('#total').textContent='Total: $'+s[1]+' for '+SERVICES[svc][0]+', ready in '+s[0];
-  $('#orderErr').hidden=true;show('ovOrder');$('#name').focus();
-};
-
-function pick(e){
-  const mail=e.target.id==='email',other=$(mail?'#wa':'#email'),has=e.target.value.trim()!=='';
-  if(has)other.value='';
-  const g=$(mail?'#g-wa':'#g-email');g.classList.toggle('skip',has);if(has)g.classList.remove('bad');
-  $(mail?'#g-email':'#g-wa').classList.remove('skip');$('#orderErr').hidden=true;
-}
-$('#email').addEventListener('input',pick);$('#wa').addEventListener('input',pick);
-document.addEventListener('input',e=>{const g=e.target.closest('.fld');if(g)g.classList.remove('bad')});
-
-function validate(){
-  const v={name:$('#name').value.trim(),email:$('#email').value.trim(),wa:$('#wa').value.trim(),req:$('#req').value.trim()};
-  const none=!v.email&&!v.wa;
-  const bad={'g-name':v.name.length<3,'g-email':!!v.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email),'g-wa':!!v.wa&&v.wa.length<7,'g-req':v.req.length<10};
-  const e=$('#orderErr');e.hidden=!none;
-  if(none)e.textContent='Please add your email or your WhatsApp number. You only need one.';
-  let ok=!none;
-  for(const k in bad){$('#'+k).classList.toggle('bad',bad[k]);if(bad[k])ok=false}
-  return ok;
-}
-
-$('#orderForm').onsubmit=async e=>{
-  e.preventDefault();
-  if(!validate())return;
-  const err=$('#orderErr'),btn=$('#orderBtn');err.hidden=true;
-  if(!db){err.textContent='Could not connect. Please refresh the page and try again.';err.hidden=false;return}
-  btn.disabled=true;btn.textContent='Saving your order...';
-  const s=SPEEDS[spd];
-  try{
-    const {data,error}=await db.from('orders').insert([{
-      name:$('#name').value.trim(),email:$('#email').value.trim(),whatsapp:$('#wa').value.trim(),
-      requirements:'[UNPAID - '+svc+'] '+$('#req').value.trim(),
-      delivery_time:s[0]+' ($'+s[1]+')',status:'pending'
-    }]).select();
-    if(error)throw error;
-    const o={id:data[0].id,price:s[1],svc:svc};
-    localStorage.setItem('pendingOrder',JSON.stringify(o));
-    hide('ovOrder');openPay(o);
-  }catch(ex){
-    err.textContent='Your order could not be saved ('+ex.message+'). Please try again.';err.hidden=false;
-  }finally{btn.disabled=false;btn.textContent='Continue to payment'}
-};
-
-function openPay(o){
-  const id=String(o.id);
-  $('#ref').textContent=id.length>12?id.slice(0,8).toUpperCase():id;
-  $('#payAmt').textContent='$'+o.price;
-  const l=$('#payLink');l.hidden=!PAY_LINK;if(PAY_LINK)l.href=PAY_LINK;
-  $('#file').setAttribute('accept',SERVICES[o.svc]?SERVICES[o.svc][1]:'');
-  window.curOrder=o;show('ovPay');startPoll(o.id);
-}
-
-function closePay(){
-  hide('ovPay');
-  if(poll) clearInterval(poll);
-  const o=JSON.parse(localStorage.getItem('pendingOrder')||'null');
-  if(o && !document.getElementById('resume')) resumeBtn(o);
-}
-
-function cancelOrder(e){
-  if(e) e.preventDefault();
-  localStorage.removeItem('pendingOrder');
-  const r=document.getElementById('resume'); if(r)r.remove();
-  hide('ovPay');
-  if(poll) clearInterval(poll);
-}
-
-function startPoll(id){
-  if(poll)clearInterval(poll);
-  poll=setInterval(async()=>{
-    if(!db)return;
-    const {data}=await db.from('orders').select('status').eq('id',id).single();
-    if(data&&data.status==='paid'){
-      clearInterval(poll);localStorage.removeItem('pendingOrder');hide('ovPay');
-      const r=$('#resume');if(r)r.remove();
-      uploaded=false;show('ovUp');
-    }
-  },3000);
-}
-function resumeBtn(o){
-  if($('#resume'))return;
-  const b=document.createElement('button');
-  b.id='resume';b.className='btn';b.textContent='Resume order: waiting for payment';
-  b.onclick=()=>{b.remove();openPay(o)};document.body.appendChild(b);
-}
-
-$('#upForm').onsubmit=async e=>{
-  e.preventDefault();
-  const err=$('#upErr'),btn=$('#upBtn'),f=$('#file').files[0];err.hidden=true;
-  if(!f||!db||!window.curOrder)return;
-  if(f.size>20*1024*1024){err.textContent='That file is over 20 MB.';err.hidden=false;return}
-  btn.disabled=true;btn.textContent='Uploading...';
-  const id=window.curOrder.id,path=id+'/'+Date.now()+'_'+f.name.replace(/[^\w.\-]/g,'_');
-  try{
-    const {error:se}=await db.storage.from('uploads').upload(path,f);if(se)throw se;
-    const {error:de}=await db.from('orders').update({file_url:path,status:'completed'}).eq('id',id);if(de)throw de;
-    uploaded=true;hide('ovUp');show('ovDone');
-  }catch(ex){
-    err.textContent='Upload failed ('+ex.message+').';err.hidden=false;
-    btn.disabled=false;btn.textContent='Upload file';
+  // Handle the Thesis Modal
+  function thesisContact() {
+    const m = document.getElementById('thesisModal');
+    m.classList.add('on');
+    m.style.display = 'flex';
   }
-};
-$('#finish').onclick=()=>{uploaded=true;location.href='/'};
-window.addEventListener('beforeunload',e=>{if($('#ovUp').classList.contains('on')&&!uploaded){e.preventDefault();e.returnValue=''}});
-const pend=JSON.parse(localStorage.getItem('pendingOrder')||'null');if(pend)resumeBtn(pend);
-render();
+
+  // Override the calculator buttons to show the Thesis modal if selected
+  document.addEventListener('DOMContentLoaded', () => {
+    const startBtn = document.getElementById('start');
+    if(startBtn) {
+      startBtn.addEventListener('click', function(e) {
+        // Find the selected service
+        const activeSvc = document.querySelector('[data-svc][aria-pressed="true"]');
+        if (activeSvc && activeSvc.dataset.svc === 'Thesis') {
+           e.preventDefault();
+           e.stopPropagation();
+           thesisContact();
+        }
+      }, true); // Use capture phase to intercept before app.js
+    }
+  });
 </script>
 </body>
 </html>
