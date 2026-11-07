@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /order
+Disallow: /approve-order
+
+Sitemap: https://letitedit.com/sitemap.xml
