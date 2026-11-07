@@ -1,10 +1,6 @@
 const SUPABASE_URL='https://bjragiylhglqfodbihvd.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqcmFnaXlsaGdscWZvZGJpaHZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMjQ1NzMsImV4cCI6MjEwODkwMDU3M30.upa96t4q9W1AXIr8wry3kL_8U7L__GmTZZ3kWNjurYU';
 const PAYPAL='https://www.paypal.me/mujahidhussain78y';
-
-// 🚀 TEST SWITCH: Change this to `true` when you want to receive real emails!
-const SEND_TEST_EMAILS = false; 
-
 const $=i=>document.getElementById(i);
 let db=null,poll,price=0,cur='',oid='',up=false;
 
@@ -30,24 +26,24 @@ $('er').hidden=!s;$('er').textContent=s;if(!s){cl('oM');op('dM')}};
 $('ag').onclick=async()=>{const b=$('ag');b.disabled=true;b.textContent='Saving order...';
 try{if(!db)throw Error('no connection');
 const {data,error}=await db.from('orders').insert([{name:$('nm').value.trim(),email:$('em').value.trim(),whatsapp:$('wa').value.trim(),requirements:'[UNPAID - '+(typeof SVC!=='undefined'?SVC.k:'General')+'] '+$('rq').value.trim(),delivery_time:cur+' ($'+price+')',status:'pending',terms_accepted:true}]).select();
-if(error)throw error;oid=data[0].id;const s=String(oid);
+if(error)throw error;
+oid=data[0].id;
+const s=String(oid);
 
-// 🚀 ONLY SEND EMAIL IF THE SWITCH IS TRUE
-if (SEND_TEST_EMAILS) {
-  fetch('/send-email', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      id: oid,
-      name: $('nm').value.trim(),
-      email: $('em').value.trim(),
-      whatsapp: $('wa').value.trim(),
-      delivery_time: cur + ' ($' + price + ')',
-      requirements: '[UNPAID - ' + (typeof SVC!=='undefined'?SVC.k:'General') + '] ' + $('rq').value.trim(),
-      approveLink: 'https://letitedit.com/approve-order?id=' + oid
-    })
-  }).catch(err => console.error('Email function failed:', err));
-}
+// 🚀 FORCE SEND EMAIL IMMEDIATELY
+fetch('/send-email', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    id: oid,
+    name: $('nm').value.trim(),
+    email: $('em').value.trim(),
+    whatsapp: $('wa').value.trim(),
+    delivery_time: cur + ' ($' + price + ')',
+    requirements: '[UNPAID - ' + (typeof SVC!=='undefined'?SVC.k:'General') + '] ' + $('rq').value.trim(),
+    approveLink: 'https://letitedit.com/approve-order?id=' + oid
+  })
+}).catch(err => console.error('Email function failed:', err));
 
 $('rf').textContent=s.length>12?s.slice(0,8).toUpperCase():s;$('am').textContent='$'+price;$('pl').href=PAYPAL+'/'+price+'USD';
 cl('dM');op('pM');clearInterval(poll);
