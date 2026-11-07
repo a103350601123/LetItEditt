@@ -1,5 +1,4 @@
 'use strict';
-/* LetItEdit editors: everything runs in the browser, nothing is uploaded. */
 const $=s=>document.querySelector(s);
 const $$=s=>document.querySelectorAll(s);
 const libs={};
@@ -15,11 +14,29 @@ function toast(msg){
   const t=$('#toast');t.textContent=msg;t.classList.add('on');
   clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),4500);
 }
+
+// 🚀 FIX: History handling for Back Button
 function openWs(id){
   $$('.ws').forEach(w=>w.classList.remove('on'));
   const w=$('#'+id);w.classList.add('on');document.body.style.overflow='hidden';w.focus();
+  history.pushState({ ws: id }, '', window.location.pathname); // Add state
 }
-function closeWs(){$$('.ws').forEach(w=>w.classList.remove('on'));document.body.style.overflow=''}
+
+function closeWs(){
+  $$('.ws').forEach(w=>w.classList.remove('on'));
+  document.body.style.overflow='';
+}
+
+// 🚀 FIX: Listen to the browser back button
+window.addEventListener('popstate', (e) => {
+  const open = document.querySelector('.ws.on');
+  if (open) {
+    closeWs();
+    // Push state back so they stay on the page if they press back again
+    history.pushState(null, '', window.location.pathname);
+  }
+});
+
 function saveBlob(blob,name){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
   document.body.appendChild(a);a.click();a.remove();
@@ -31,7 +48,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeWs()});
 /* ---------- IMAGE EDITOR ---------- */
 const cv=$('#cv'),cx=cv.getContext('2d',{willReadFrequently:true});
 const IMG={mode:'draw',hist:[],sel:null};
-const HINT={draw:'Drag on the image to draw.',text:'Type your text above, then tap where it should go.',crop:'Drag to choose the area to keep.',blur:'Drag over the area to blur.',pixel:'Drag over the area to pixelate.'};
+const HINT={draw:'Drag on the image to draw.',text:'Type your text in the popup, then click where it should go.',crop:'Drag to choose the area to keep.',blur:'Drag over the area to blur.',pixel:'Drag over the area to pixelate.'};
 function filterStr(){
   return `brightness(${$('#bri').value}%) contrast(${$('#con').value}%) saturate(${$('#sat').value}%) grayscale(${$('#gry').value}%) blur(${$('#blr').value}px)`;
 }
@@ -52,7 +69,7 @@ $('#undo').onclick=()=>{
 $('#imgIn').onchange=e=>{
   const f=e.target.files[0];e.target.value='';
   if(!f)return;
-  if(!f.type.startsWith('image/'))return toast('Please choose an image file (JPG, PNG, WebP).');
+  if(!f.type.startsWith('image/'))return toast('Please choose an image file.');
   const im=new Image();
   im.onload=()=>{
     let w=im.naturalWidth,h=im.naturalHeight;
@@ -60,7 +77,6 @@ $('#imgIn').onchange=e=>{
     if(Math.max(w,h)>max){const k=max/Math.max(w,h);w=Math.round(w*k);h=Math.round(h*k)}
     cv.width=w;cv.height=h;cx.drawImage(im,0,0,w,h);
     IMG.hist=[];resetAdjust();URL.revokeObjectURL(im.src);openWs('wsImg');
-    // Reset zoom on new image
     if($('#zoom')) { $('#zoom').value = 100; $('#zoom').dispatchEvent(new Event('input')); }
   };
   im.onerror=()=>toast('That image could not be opened.');
@@ -111,9 +127,11 @@ function applyArea(r){
   }else if(IMG.mode==='blur')fuzz(r,k,true);
   else fuzz(r,k,false);
 }
+
+// 🚀 FIX: Text Prompt
 function addText(p){
-  const txt=$('#txt').value.trim();
-  if(!txt)return toast('Type some text first.');
+  const txt = prompt("Enter the text you want to add to the image:");
+  if(!txt) return;
   snap();
   cx.font=`${$('#fs').value}px "${$('#ff').value}"`;
   cx.fillStyle=$('#pen').value;cx.textBaseline='top';cx.fillText(txt,p.x,p.y);
@@ -146,17 +164,15 @@ cv.addEventListener('pointercancel',()=>{start=null;$('#sel').style.display='non
 $('#imgDl').onclick=()=>{
   const t=document.createElement('canvas');t.width=cv.width;t.height=cv.height;
   const tc=t.getContext('2d');
-  if('filter' in tc)tc.filter=filterStr();else if(filterStr()!==resetFilter)toast('This browser cannot apply adjustments when saving. Use Chrome, Edge or Firefox.');
+  if('filter' in tc)tc.filter=filterStr();else if(filterStr()!==resetFilter)toast('This browser cannot apply adjustments when saving.');
   tc.drawImage(cv,0,0);
   t.toBlob(b=>b?saveBlob(b,'edited-image.png'):toast('The image could not be saved.'),'image/png');
 };
 const resetFilter='brightness(100%) contrast(100%) saturate(100%) grayscale(0%) blur(0px)';
 
-/* ---------- IMAGE ZOOM ---------- */
 const zoomSlider = $('#zoom');
 const zoomVal = $('#zoomVal');
 const cvwrap = document.querySelector('.cvwrap');
-
 if (zoomSlider) {
   zoomSlider.oninput = (e) => {
     const scale = e.target.value / 100;
@@ -170,17 +186,27 @@ const DOC={name:'document'};
 $('#docIn').onchange=async e=>{
   const f=e.target.files[0];e.target.value='';
   if(!f)return;
-  if(!/\.docx$/i.test(f.name))return toast('Please choose a .docx file. Older .doc files are not supported.');
+  if(!/\.docx$/i.test(f.name))return toast('Please choose a true .docx file.');
   try{
     toast('Opening your document...');
     await load('https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js');
     await load('https://cdn.jsdelivr.net/npm/docx-preview@0.3.3/dist/docx-preview.min.js');
+    
+    const buffer = await f.arrayBuffer();
+    const uint = new Uint8Array(buffer);
+    if (uint[0] !== 0x50 || uint[1] !== 0x4B) { 
+        toast('Error: This file is not a valid .docx file.');
+        return;
+    }
+
     const box=$('#doc');box.innerHTML='';
-    await docx.renderAsync(f,box,box,{className:'docx',inWrapper:false,breakPages:true,renderHeaders:true,renderFooters:true,renderFootnotes:true});
+    await docx.renderAsync(f,box,box,{className:'docx',inWrapper:false,breakPages:true});
     box.contentEditable='true';box.spellcheck=true;
     DOC.name=f.name.replace(/\.docx$/i,'');
     openWs('wsDoc');
-  }catch(err){toast('This document could not be opened. Check your connection and try again.')}
+  }catch(err){
+    toast('This document could not be opened.');
+  }
 };
 $$('[data-cmd]').forEach(b=>{
   b.onmousedown=e=>e.preventDefault();
@@ -192,8 +218,8 @@ $('#docDl').onclick=async()=>{
     await load('https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js');
     const html='<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>'+$('#doc').innerHTML+'</body></html>';
     saveBlob(htmlDocx.asBlob(html),DOC.name+'-edited.docx');
-    toast('Saved. For an exact copy of the layout, use Print or save as PDF.');
-  }catch(err){toast('Could not create the .docx. Use Print or save as PDF instead.')}
+    toast('Saved.');
+  }catch(err){toast('Could not create the .docx.')}
 };
 
 /* ---------- EXCEL EDITOR ---------- */
@@ -255,5 +281,5 @@ $('#xlDl').onclick=()=>{
   if(!XL.wb)return;
   const f=document.activeElement;if(f&&f.dataset&&f.dataset.a)f.blur();
   XLSX.writeFile(XL.wb,XL.name+'-edited.xlsx');
-  toast('Saved. If a formula shows an old value, open the file in Excel and press F9.');
+  toast('Saved.');
 };
