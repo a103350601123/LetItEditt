@@ -38,7 +38,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeWs()});
 /* ---------- IMAGE EDITOR ---------- */
 const cv=$('#cv'),cx=cv.getContext('2d',{willReadFrequently:true});
 const IMG={mode:'draw',hist:[],sel:null,baseData:null};
-const HINT={draw:'Drag on the image to draw.',text:'Click on image, type text, then drag it to position.',crop:'Drag to choose the area to keep.',blur:'Drag over the area to blur.',pixel:'Drag over the area to pixelate.'};
+const HINT={draw:'Drag on the image to draw.',text:'Click on image, type text, then drag it. Click outside to stamp.',crop:'Drag to choose the area to keep.',blur:'Drag over the area to blur.',pixel:'Drag over the area to pixelate.'};
 
 function filterStr(){
   return `brightness(${$('#bri').value}%) contrast(${$('#con').value}%) saturate(${$('#sat').value}%) grayscale(${$('#gry').value}%) blur(${$('#blr').value}px)`;
@@ -56,7 +56,7 @@ $('#undo').onclick=()=>{
   const h=IMG.hist.pop();
   if(!h)return toast('Nothing to undo.');
   cv.width=h.width;cv.height=h.height;cx.putImageData(h,0,0);
-  IMG.baseData = cx.getImageData(0,0,cv.width,cv.height); // update base
+  IMG.baseData = cx.getImageData(0,0,cv.width,cv.height);
 };
 $('#imgIn').onchange=e=>{
   const f=e.target.files[0];e.target.value='';
@@ -70,6 +70,7 @@ $('#imgIn').onchange=e=>{
     cv.width=w;cv.height=h;cx.drawImage(im,0,0,w,h);
     IMG.hist=[];resetAdjust();URL.revokeObjectURL(im.src);
     IMG.baseData = cx.getImageData(0,0,cv.width,cv.height);
+    textState = null;
     openWs('wsImg');
   };
   im.onerror=()=>toast('That image could not be opened.');
@@ -80,6 +81,11 @@ $$('[data-mode]').forEach(b=>b.onclick=()=>{
   $$('[data-mode]').forEach(x=>x.setAttribute('aria-pressed',x===b));
   $('#hint').textContent=HINT[IMG.mode];
   cv.style.cursor=IMG.mode==='text'?'move':'crosshair';
+  if (IMG.mode !== 'text' && textState) {
+      // Stamp text if changing tools
+      textState = null;
+      IMG.baseData = cx.getImageData(0,0,cv.width,cv.height);
+  }
 });
 $('#togglePanel').onclick=e=>{
   const p=$('#panel');p.classList.toggle('hide');
@@ -123,25 +129,48 @@ function applyArea(r){
   IMG.baseData = cx.getImageData(0,0,cv.width,cv.height);
 }
 
-/* NEW: Draggable Text State */
+/* TEXT LAYER LOGIC */
 let textState = null;
 
 function redrawWithText() {
   if (!IMG.baseData) return;
   cx.putImageData(IMG.baseData, 0, 0);
   if (textState) {
-    cx.font=`${$('#fs').value}px "${$('#ff').value}"`;
-    cx.fillStyle=$('#pen').value;
+    cx.font=`${textState.size}px "${$('#ff').value}"`;
+    cx.fillStyle=textState.color;
     cx.textBaseline='top';
     cx.fillText(textState.text, textState.x, textState.y);
-    // Draw dashed box around text to show it's movable
+    
     const metrics = cx.measureText(textState.text);
     cx.strokeStyle = '#38bdf8';
     cx.setLineDash([4, 4]);
-    cx.strokeRect(textState.x - 4, textState.y - 4, metrics.width + 8, parseInt($('#fs').value) + 8);
+    cx.strokeRect(textState.x - 4, textState.y - 4, metrics.width + 8, textState.size + 8);
     cx.setLineDash([]);
   }
 }
+
+// Listen to font size and color changes and update active text
+const fsInput = document.getElementById('fs');
+const fsVal = document.getElementById('fsVal');
+const fsPlus = document.getElementById('fsPlus');
+const fsMinus = document.getElementById('fsMinus');
+const penColor = document.getElementById('pen');
+
+if(fsPlus && fsMinus) {
+  fsPlus.onclick = () => {
+    let val = parseInt(fsInput.value) + 4; if(val > 200) val = 200;
+    fsInput.value = val; fsVal.textContent = val;
+    if(textState) { textState.size = val; redrawWithText(); }
+  };
+  fsMinus.onclick = () => {
+    let val = parseInt(fsInput.value) - 4; if(val < 12) val = 12;
+    fsInput.value = val; fsVal.textContent = val;
+    if(textState) { textState.size = val; redrawWithText(); }
+  };
+}
+penColor.oninput = (e) => {
+  if(textState) { textState.color = e.target.value; redrawWithText(); }
+};
 
 let start=null;
 cv.addEventListener('pointerdown',e=>{
@@ -149,27 +178,33 @@ cv.addEventListener('pointerdown',e=>{
   
   if(IMG.mode==='text') {
     if (textState) {
-      // Check if click is inside the text box to drag it
       const metrics = cx.measureText(textState.text);
       const w = metrics.width;
-      const h = parseInt($('#fs').value);
+      const h = textState.size;
       if (p.x >= textState.x - 10 && p.x <= textState.x + w + 10 && 
           p.y >= textState.y - 10 && p.y <= textState.y + h + 10) {
         textState.isDragging = true;
+        textState.offsetX = p.x - textState.x;
+        textState.offsetY = p.y - textState.y;
         return;
       } else {
-        // Clicked outside: Stamp the text permanently
         snap();
         textState = null;
         IMG.baseData = cx.getImageData(0,0,cv.width,cv.height);
         return;
       }
     }
-    // Create new text
     const txt = prompt("Enter the text you want to add:");
     if (!txt) return;
-    textState = { text: txt, x: p.x, y: p.y, isDragging: false };
-    IMG.baseData = cx.getImageData(0,0,cv.width,cv.height); // Save clean background
+    textState = { 
+        text: txt, 
+        x: p.x, 
+        y: p.y, 
+        isDragging: false, 
+        size: parseInt(fsInput.value), 
+        color: penColor.value 
+    };
+    IMG.baseData = cx.getImageData(0,0,cv.width,cv.height);
     redrawWithText();
     return;
   }
@@ -182,8 +217,8 @@ cv.addEventListener('pointermove',e=>{
   const p=pos(e);
   
   if(textState && textState.isDragging) {
-    textState.x = p.x - (cx.measureText(textState.text).width / 2);
-    textState.y = p.y - (parseInt($('#fs').value) / 2);
+    textState.x = p.x - textState.offsetX;
+    textState.y = p.y - textState.offsetY;
     redrawWithText();
     return;
   }
@@ -318,23 +353,3 @@ $('#xlDl').onclick=()=>{
   XLSX.writeFile(XL.wb,XL.name+'-edited.xlsx');
   toast('Saved.');
 };
-/* ---------- TEXT SIZE BUTTONS ---------- */
-const fsInput = document.getElementById('fs');
-const fsVal = document.getElementById('fsVal');
-const fsPlus = document.getElementById('fsPlus');
-const fsMinus = document.getElementById('fsMinus');
-
-if(fsPlus && fsMinus && fsVal && fsInput) {
-  fsPlus.onclick = () => {
-    let val = parseInt(fsInput.value) + 4;
-    if(val > 200) val = 200;
-    fsInput.value = val;
-    fsVal.textContent = val;
-  };
-  fsMinus.onclick = () => {
-    let val = parseInt(fsInput.value) - 4;
-    if(val < 12) val = 12;
-    fsInput.value = val;
-    fsVal.textContent = val;
-  };
-}
