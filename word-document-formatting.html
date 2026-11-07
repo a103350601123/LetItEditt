@@ -1,23 +1,43 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Word Document Formatting | LetItEdit</title>
-<link rel="stylesheet" href="/styles.css">
-</head><body>
-<div class="tools" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1-4L17.5 3.5a2.1 2.1 0 013 3L7 20z"/><path d="M15 6l3 3"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h8l5 5v15H6z"/><path d="M14 2v5h5M9 13h6M9 17h6"/></svg></div>
-<div class="gems" aria-hidden="true"><i></i><i></i><i></i><b>✦</b><b>✦</b><b>✦</b><b>✦</b><b>✦</b><b>✦</b></div>
-<header><div class="wrap bar"><a class="logo" href="/">Let<i>It</i>Edit</a><nav aria-label="Main"><a href="/">Home</a><a href="/about.html">About</a><a href="/faq.html">FAQ</a><a class="btn sm" href="https://wa.me/923456006438" target="_blank" rel="noopener">Message on WhatsApp</a></nav></div></header>
-<main class="wrap">
-<div class="svc">
-<a class="back" href="/">&larr; Back to services</a>
-<h1>Word document formatting</h1>
-<p>LetItEdit applies APA or MLA styling, fixes formatting and proofreads your text.</p>
-<p class="note">Introductory prices are shown below. You pay first, and you upload your file after LetItEdit confirms payment.</p>
-<h2 style="font-size:22px">Choose delivery speed</h2>
-<div class="speeds" id="speeds"></div>
-</div>
+<meta name="description" content="APA and MLA styling, headings, tables and reference lists.">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/">Let<b>It</b>Edit</a>
+    <nav aria-label="Main">
+      <a href="/">Home</a>
+      <a href="faq.html">FAQ</a>
+      <a href="freelance.html">Hire a freelancer</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap" style="padding: 60px 20px; max-width: 800px; margin: 0 auto; position: relative; z-index: 1;">
+  <a href="freelance.html" style="color: var(--muted); font-size: 14px; text-decoration: none; display: inline-block; margin-bottom: 20px;">&larr; Back to services</a>
+  <h1 style="font-size: 40px; margin-bottom: 15px; color: #fff;">Word formatting</h1>
+  <p style="font-size: 18px; color: var(--muted); margin-bottom: 30px;">LetItEdit applies APA or MLA styling, fixes formatting and proofreads your text.</p>
+  <div class="note" style="font-size: 14px; background: rgba(59,130,246,0.1); border-left: 4px solid var(--blue); padding: 15px; border-radius: 4px; margin-bottom: 30px; color: #cbd5e1;">
+    Introductory prices are shown below. You pay first, and you upload your file after LetItEdit confirms payment.
+  </div>
+  <h2 style="font-size: 24px; margin-bottom: 10px; color: #fff;">Choose delivery speed</h2>
+  <div class="speeds" id="speeds"></div>
 </main>
-<footer><div class="wrap"><span>© 2026 LetItEdit. Made with <span class="heart">♥</span> and care.</span><span><a href="/privacy.html">Privacy policy</a><a href="/terms.html">Terms of service</a><a href="/faq.html">FAQ</a><a href="/about.html">About</a></span></div></footer>
+<footer>
+  <div class="wrap">
+    <span>© 2026 LetItEdit</span>
+    <span><a href="about.html">About</a><a href="faq.html">FAQ</a><a href="privacy.html">Privacy policy</a><a href="terms.html">Terms of service</a></span>
+  </div>
+</footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>var SVC={"k": "Doc", "a": ".doc,.docx", "pr": [["30 mins", 5], ["1 hour", 4], ["2 hours", 3], ["3-5 hours", 2], ["6-12 hours", 1]]};</script>
-<script src="/app.js"></script>
-</body></html>
+<script>
+var SVC = {"k": "Doc", "a": ".doc,.docx", "pr": [["30 mins", 5], ["1 hour", 4], ["2 hours", 3], ["3-5 hours", 2], ["6-12 hours", 1]]};
+</script>
+<script src="app.js?v=5"></script>
+</body>
+</html>
