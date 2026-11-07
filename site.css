@@ -111,8 +111,8 @@ footer a { color: var(--muted); margin-left: 15px; }
   width: 100%; padding: 8px; border-radius: 6px; background: #1e293b; border: 1px solid var(--border); color: #fff;
 }
 .panel input[type="color"] { height: 40px; cursor: pointer; }
-.stage { flex: 1; background: #000; display: flex; align-items: center; justify-content: center; overflow: auto; padding: 20px; }
-.cvwrap { position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+.stage { flex: 1; background: #000; display: flex; align-items: flex-start; justify-content: flex-start; overflow: auto; padding: 40px; }
+.cvwrap { position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.5); transform-origin: top left; transition: transform 0.1s ease; }
 #cv { max-width: 100%; max-height: 100%; display: block; cursor: crosshair; }
 #sel { position: absolute; border: 2px dashed #fff; background: rgba(59,130,246,0.3); display: none; pointer-events: none; }
 
@@ -136,16 +136,6 @@ footer a { color: var(--muted); margin-left: 15px; }
 }
 #toast.on { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-/* Mobile Responsive Fixes */
-@media (max-width: 768px) {
-  .hero h1 { font-size: 36px; }
-  .ws .body { flex-direction: column; }
-  .panel { width: 100%; height: 250px; border-right: none; border-bottom: 1px solid var(--border); position: static; transform: none; }
-  .panel.hide { display: none; }
-  .stage { min-height: 300px; }
-  .docstage { padding: 10px; }
-  #doc { padding: 20px; }
-}
 /* --- FREELANCE PAGE SPECIFIC STYLES --- */
 .freelance-hero .wrap { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: start; text-align: left; padding-top: 40px; }
 .freelance-hero h1 { font-size: 42px; margin-bottom: 20px; }
@@ -167,13 +157,19 @@ footer a { color: var(--muted); margin-left: 15px; }
 .service-item p { font-size: 13px; color: var(--muted); margin: 0; }
 .service-item .price { font-weight: 700; color: var(--blue); font-size: 16px; }
 
-/* --- IMAGE EDITOR ZOOM --- */
+/* Zoom Controls */
 .zoom-controls { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
 .zoom-controls input[type="range"] { flex-grow: 1; }
-.stage { overflow: auto; align-items: flex-start; justify-content: flex-start; padding: 40px; } 
-.cvwrap { transform-origin: top left; transition: transform 0.1s ease; }
 
-@media (max-width: 800px) {
+/* Mobile Responsive Fixes */
+@media (max-width: 768px) {
+  .hero h1 { font-size: 36px; }
+  .ws .body { flex-direction: column; }
+  .panel { width: 100%; height: 250px; border-right: none; border-bottom: 1px solid var(--border); position: static; transform: none; }
+  .panel.hide { display: none; }
+  .stage { min-height: 300px; padding: 20px; }
+  .docstage { padding: 10px; }
+  #doc { padding: 20px; }
   .freelance-hero .wrap { grid-template-columns: 1fr; text-align: center; }
   .freelance-hero h1 { font-size: 32px; }
 }
