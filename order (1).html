@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Order Details | LetItEdit</title>
+<meta name="description" content="Enter your order details, accept the terms and pay with PayPal.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#060a14">
+<link rel="canonical" href="https://letitedit.com/order">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LetItEdit">
+<meta property="og:title" content="Order Details | LetItEdit">
+<meta property="og:description" content="Enter your order details, accept the terms and pay with PayPal.">
+<meta property="og:url" content="https://letitedit.com/order">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✏️</text></svg>">
+<link rel="stylesheet" href="/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header><div class="wrap bar"><a class="brand" href="/">Let<b>It</b>Edit</a><button class="menu" id="menu" aria-label="Menu" aria-expanded="false" aria-controls="nav">☰</button><nav id="nav" aria-label="Main"><a href="/tools">Free tools</a><a href="/how-to-use">How to use</a><a href="/faq">FAQ</a><a class="btn sm" href="/freelance">Hire a freelancer</a></nav></div></header>
+<main id="main" class="orderwrap">
+<h1 style="font-size:clamp(28px,5vw,40px);margin-bottom:6px">Your order</h1>
+<p class="fine" style="margin-bottom:18px"><a href="/freelance">Back to services</a></p>
+<div class="sumcard"><div><strong id="sName"></strong><p class="what" id="sTime" style="margin:0"></p></div><div class="price" id="sPrice"></div></div>
+<p class="hint" id="info" hidden></p>
+<div class="builder" style="padding:24px">
+<form id="form" novalidate>
+<div class="fld" id="g-name"><label for="name">Full name</label><input id="name" autocomplete="name"><small>Enter your full name.</small></div>
+<p class="hint">Add <strong>one</strong> way to reach you: your email <strong>or</strong> your WhatsApp number. You don’t need both. Your finished file will be sent there.</p>
+<div class="fld" id="g-email"><label for="email">Email address</label><input id="email" type="email" placeholder="you@example.com" autocomplete="email"><small>Enter a valid email address.</small></div>
+<div class="or">or</div>
+<div class="fld" id="g-wa"><label for="wa">WhatsApp number</label><input id="wa" type="tel" placeholder="+1 555 123 4567" autocomplete="off"><small>Enter your WhatsApp number with country code.</small></div>
+<div class="fld" id="g-req"><label for="req">Order details: what do you need done?</label><textarea id="req" rows="4" maxlength="3000" placeholder="Example: Blur the account number and add arrows to steps 1 to 3."></textarea><small>Describe the job in at least 10 characters.</small></div>
+<label class="check" id="g-agree"><input type="checkbox" id="agree"><span>I have read and agree to the <a href="/terms" target="_blank" rel="noopener">Terms of Service</a>. I understand that <strong>LetItEdit is not responsible for how I use the edited file, and I am solely liable for its use.</strong></span></label>
+<p class="err" id="err" hidden></p>
+<button class="btn full" id="go" type="submit">Proceed to payment</button>
+</form></div></main>
+<footer><div class="wrap"><span>© 2026 LetItEdit. Free online tools and freelance editing.</span><span><a href="/tools">Free tools</a><a href="/freelance">Hire a freelancer</a><a href="/how-to-use">How to use</a><a href="/faq">FAQ</a><a href="/terms">Terms</a><a href="/privacy">Privacy</a><a href="mailto:hello@letitedit.com">Contact</a></span></div></footer>
+
+<div class="ov" id="ovPay" role="dialog" aria-modal="true" aria-labelledby="tPay"><div class="modal">
+<button class="x" id="payX" aria-label="Close">×</button>
+<p class="stepno">Step 1 of 2: Payment</p><h2 id="tPay">Pay with PayPal</h2>
+<p class="fine">Your order is saved. Your order number is:</p><div class="ref" id="ref"></div>
+<p class="fine">Amount to pay: <strong id="payAmt"></strong>. Pay on PayPal, and type your order number in the payment note.</p>
+<a class="btn full" id="payLink" href="#" target="_blank" rel="noopener">Pay with PayPal</a>
+<div class="wait"><span class="spin"></span><span id="waitTxt">Waiting for LetItEdit to approve your payment. Keep this tab open.</span></div>
+<p class="fine" id="mailNote" role="status"></p>
+<button class="btn alt sm" id="retryMail" hidden>Send the confirmation email again</button>
+<div class="cancelbox"><button class="btn alt full" id="cancelOrder" type="button">Cancel this order</button><p class="fine" id="cancelNote">Cancel only if you have not paid. If you already paid, message LetItEdit on WhatsApp.</p></div>
+<p class="fine">Closing this window is fine. Your order is saved on this device, and you can resume it later. Need help? <a href="https://wa.me/923456006438" rel="noopener">Message LetItEdit on WhatsApp</a>.</p>
+</div></div>
+<div class="ov" id="ovUp" role="dialog" aria-modal="true" aria-labelledby="tUp"><div class="modal">
+<p class="stepno">Step 2 of 2: Upload</p><h2 id="tUp"><span class="ok">Payment approved.</span> Upload your file</h2>
+<form id="upForm"><div class="drop"><input type="file" id="file" required aria-label="Choose your file"></div>
+<p class="fine">Maximum file size is 20 MB.</p><p class="err" id="upErr" hidden></p>
+<button class="btn full" id="upBtn" type="submit">Upload file</button></form>
+<button class="btn alt full" id="later" type="button" style="margin-top:10px">Finish later</button>
+<p class="fine">Your order is saved on this device. To cancel or ask for a refund, <a href="https://wa.me/923456006438" rel="noopener">message LetItEdit on WhatsApp</a> with your order number.</p></div></div>
+<div class="ov" id="ovDone" role="dialog" aria-modal="true" aria-labelledby="tDone"><div class="modal">
+<h2 id="tDone"><span class="ok">Order received.</span></h2>
+<p class="fine" style="font-size:16px;color:var(--ink)">Thank you. LetItEdit has your file and will deliver the edited version to your email or WhatsApp within your chosen delivery time.</p>
+<p class="hint">Need changes? Reply to the delivery message within 48 hours and LetItEdit will revise it for free.</p>
+<a class="btn full" href="/">Return to home</a></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
+<script src="/site.js" defer></script>
+<script src="/order.js" defer></script>
+</body>
+</html>
