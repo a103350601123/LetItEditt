@@ -10,7 +10,7 @@
 <body>
 <a class="skip" href="#tools">Skip to the editors</a>
 
-<!-- 🚀 BACKGROUND TOOLS ADDED HERE -->
+<!-- BACKGROUND TOOLS -->
 <div class="tools" aria-hidden="true">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1-4L17.5 3.5a2.1 2.1 0 013 3L7 20z"/><path d="M15 6l3 3"/></svg>
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h8l5 5v15H6z"/><path d="M14 2v5h5M9 13h6M9 17h6"/></svg>
@@ -45,7 +45,8 @@
     <div class="wrap">
       <h2>Free online editors</h2>
       <p class="lead">Choose a file. It opens in the editor straight away.</p>
-      <div class="tools">
+      <!-- FIXED CLASS NAME HERE -->
+      <div class="tool-grid">
         <label class="tool"><input type="file" id="imgIn" accept="image/*">
           <span class="ico" aria-hidden="true">🖼️</span><h3>Image editor</h3>
           <p>Crop, draw, add text, blur or pixelate private details.</p>
@@ -130,7 +131,6 @@
 <div class="ws" id="wsDoc" role="dialog" aria-modal="true" tabindex="-1">
   <div class="top">
     <h2>Word editor</h2>
-    <!-- 🚀 ADDED MORE BUTTONS -->
     <button class="btn alt sm" data-cmd="bold"><b>B</b></button>
     <button class="btn alt sm" data-cmd="italic"><i>I</i></button>
     <button class="btn alt sm" data-cmd="underline"><u>U</u></button>
