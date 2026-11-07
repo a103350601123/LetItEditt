@@ -5,23 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Free Online Image, Word and Excel Editor | LetItEdit</title>
 <meta name="description" content="Edit images, Word (.docx) and Excel (.xlsx) files free in your browser. Files stay on your device. Or hire a freelance editor from $1.">
-<meta name="robots" content="index, follow, max-image-preview:large">
-<meta name="theme-color" content="#060a14">
-<link rel="canonical" href="https://letitedit.com/">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="LetItEdit">
-<meta property="og:title" content="Free Online Image, Word and Excel Editor | LetItEdit">
-<meta property="og:description" content="Edit images, Word and Excel files in your browser. Files stay on your device. Hire a freelance editor from $1.">
-<meta property="og:url" content="https://letitedit.com/">
-<meta name="twitter:card" content="summary">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✏️</text></svg>">
 <link rel="stylesheet" href="site.css">
-<script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[
-{"@type":"Organization","@id":"https://letitedit.com/#org","name":"LetItEdit","url":"https://letitedit.com/","email":"hello@letitedit.com"},
-{"@type":"WebApplication","name":"LetItEdit Online Editors","url":"https://letitedit.com/","applicationCategory":"MultimediaApplication","operatingSystem":"Any","description":"Free browser-based image, Word and Excel editors. Files stay on the user's device.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@id":"https://letitedit.com/#org"}}
-]}
-</script>
 </head>
 <body>
 <a class="skip" href="#tools">Skip to the editors</a>
@@ -129,7 +113,16 @@
         <label for="txt">Text to add</label><input type="text" id="txt" placeholder="Type, then tap the image" maxlength="120">
         <label for="ff">Font</label>
         <select id="ff"><option>Arial</option><option>Georgia</option><option>Courier New</option><option>Impact</option><option>Comic Sans MS</option><option>Times New Roman</option></select>
-        <label for="fs">Text size</label><input type="range" id="fs" min="12" max="200" value="48">
+        
+        <!-- TEXT SIZE BUTTONS FIXED HERE -->
+        <label>Text size</label>
+        <div style="display: flex; align-items: center; gap: 10px; margin-top: 4px;">
+          <button type="button" class="btn alt sm" id="fsMinus" style="padding: 4px 12px; font-size: 18px;">−</button>
+          <span id="fsVal" style="color: #fff; font-weight: bold; width: 30px; text-align: center;">48</span>
+          <button type="button" class="btn alt sm" id="fsPlus" style="padding: 4px 12px; font-size: 18px;">+</button>
+        </div>
+        <input type="hidden" id="fs" value="48">
+        
       </div>
       <div class="grp"><h3>Adjust the whole image</h3>
         <label for="bri">Brightness</label><input class="adj" type="range" id="bri" min="40" max="180" value="100">
@@ -176,5 +169,11 @@
 
 <div id="toast" role="status" aria-live="polite"></div>
 <script src="tools.js" defer></script>
+<script>
+  // OFFLINE SUPPORT (SERVICE WORKER)
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed', err));
+  }
+</script>
 </body>
 </html>
