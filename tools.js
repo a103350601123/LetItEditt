@@ -60,6 +60,8 @@ $('#imgIn').onchange=e=>{
     if(Math.max(w,h)>max){const k=max/Math.max(w,h);w=Math.round(w*k);h=Math.round(h*k)}
     cv.width=w;cv.height=h;cx.drawImage(im,0,0,w,h);
     IMG.hist=[];resetAdjust();URL.revokeObjectURL(im.src);openWs('wsImg');
+    // Reset zoom on new image
+    if($('#zoom')) { $('#zoom').value = 100; $('#zoom').dispatchEvent(new Event('input')); }
   };
   im.onerror=()=>toast('That image could not be opened.');
   im.src=URL.createObjectURL(f);
@@ -149,6 +151,19 @@ $('#imgDl').onclick=()=>{
   t.toBlob(b=>b?saveBlob(b,'edited-image.png'):toast('The image could not be saved.'),'image/png');
 };
 const resetFilter='brightness(100%) contrast(100%) saturate(100%) grayscale(0%) blur(0px)';
+
+/* ---------- IMAGE ZOOM ---------- */
+const zoomSlider = $('#zoom');
+const zoomVal = $('#zoomVal');
+const cvwrap = document.querySelector('.cvwrap');
+
+if (zoomSlider) {
+  zoomSlider.oninput = (e) => {
+    const scale = e.target.value / 100;
+    cvwrap.style.transform = `scale(${scale})`;
+    zoomVal.textContent = `${e.target.value}%`;
+  };
+}
 
 /* ---------- WORD EDITOR ---------- */
 const DOC={name:'document'};
