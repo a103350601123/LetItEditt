@@ -44,10 +44,17 @@
     <button class="btn alt sm" id="togglePanel" aria-expanded="true">Tools</button>
     <button class="btn alt sm" id="undo">Undo</button>
     <button class="btn alt sm" id="redo">Redo</button>
-    <span class="zoom"><button class="btn alt sm" id="zOut" aria-label="Zoom out">−</button><span id="zoomLbl">Fit</span><button class="btn alt sm" id="zIn" aria-label="Zoom in">+</button><button class="btn alt sm" id="zFit">Fit</button></span>
     <select id="fmt" aria-label="Download format"><option value="image/png">PNG</option><option value="image/jpeg">JPG</option><option value="image/webp">WebP</option></select>
     <button class="btn alt sm" data-close>Close</button>
     <button class="btn sm" id="imgDl">Download image</button>
+  </div>
+  <div class="viewbar" role="group" aria-label="Zoom">
+    <button class="btn alt sm" id="zOut" aria-label="Zoom out">−</button>
+    <input type="range" id="zRange" min="10" max="400" value="100" aria-label="Zoom level">
+    <button class="btn alt sm" id="zIn" aria-label="Zoom in">+</button>
+    <span id="zoomLbl">Fit</span>
+    <button class="btn alt sm" id="zFit">Fit</button>
+    <button class="btn alt sm" id="z100">100%</button>
   </div>
   <div class="body">
     <div class="panel" id="panel">
@@ -62,19 +69,25 @@
           <button class="btn alt sm" data-mode="crop" aria-pressed="false">Crop</button>
           <button class="btn alt sm" data-mode="blur" aria-pressed="false">Blur area</button>
           <button class="btn alt sm" data-mode="pixel" aria-pressed="false">Pixelate area</button>
+          <button class="btn alt sm" data-mode="pan" aria-pressed="false">Move view</button>
           <button class="btn alt sm" id="rot">Rotate 90°</button>
           <button class="btn alt sm" id="flip">Flip</button>
-          <button class="btn alt sm" id="badgeReset">Reset numbers</button>
         </div>
         <p class="note" id="hint">Drag on the image to draw.</p>
       </div>
-      <div class="grp"><h3>Style</h3>
+      <div class="grp"><h3>Drawing style</h3>
         <label for="pen">Colour</label><input type="color" id="pen" value="#ef4444">
         <label for="size">Line size</label><input type="range" id="size" min="1" max="40" value="6">
-        <label for="txt">Text to add</label><input type="text" id="txt" placeholder="Type, then tap the image" maxlength="160">
+        <button class="btn alt sm" id="badgeReset" style="width:100%;margin-top:8px">Restart step numbers</button>
+      </div>
+      <div class="grp"><h3>Text</h3>
+        <label for="txt">Text</label><input type="text" id="txt" placeholder="Your text" maxlength="160">
         <label for="ff">Font</label>
-        <select id="ff"><option>Arial</option><option>Georgia</option><option>Courier New</option><option>Impact</option><option>Comic Sans MS</option><option>Times New Roman</option></select>
-        <label for="fs">Text size</label><input type="range" id="fs" min="12" max="200" value="48">
+        <select id="ff"><option>Arial</option><option>Georgia</option><option>Courier New</option><option>Impact</option><option>Comic Sans MS</option><option>Times New Roman</option><option>Verdana</option><option>Trebuchet MS</option></select>
+        <label for="fs">Text size</label><input type="range" id="fs" min="12" max="300" value="48">
+        <label for="tcol">Text colour</label><input type="color" id="tcol" value="#ffffff">
+        <button class="btn alt sm" id="txtDel" style="width:100%;margin-top:8px">Delete selected text</button>
+        <p class="note">Choose the Text tool, tap the image to add text, tap a text to select it, and drag it to move it. Font, size and colour change the selected text.</p>
       </div>
       <div class="grp"><h3>Adjust the whole image</h3>
         <label for="bri">Brightness</label><input class="adj" type="range" id="bri" min="40" max="180" value="100">
@@ -85,7 +98,7 @@
         <p class="note">Adjustments are applied when you download. Use Chrome, Edge or Firefox for best results.</p>
       </div>
     </div>
-    <div class="stage"><div class="cvwrap"><canvas id="cv" aria-label="Image being edited"></canvas><div id="sel"></div></div></div>
+    <div class="stage" id="stageImg"><div class="cvwrap"><canvas id="cv" aria-label="Image being edited"></canvas><canvas id="ov" aria-hidden="true"></canvas><div id="sel"></div></div></div>
   </div>
 </div>
 
@@ -94,11 +107,12 @@
   <div class="top">
     <h2>Text extractor</h2>
     <label for="ocrLang" class="note" style="margin:0">Language</label>
-    <select id="ocrLang"><option value="eng">English</option><option value="urd">Urdu</option><option value="ara">Arabic</option><option value="hin">Hindi</option><option value="spa">Spanish</option><option value="fra">French</option><option value="deu">German</option></select>
+    <select id="ocrLang" aria-label="Language of the text"><option value="eng">English</option><option value="urd">Urdu</option><option value="eng+urd">English + Urdu</option><option value="ara">Arabic</option><option value="hin">Hindi</option><option value="spa">Spanish</option><option value="fra">French</option><option value="deu">German</option></select>
     <button class="btn alt sm" id="ocrRun">Extract again</button>
     <button class="btn alt sm" id="ocrCopy">Copy text</button>
     <button class="btn alt sm" data-close>Close</button>
-    <button class="btn sm" id="ocrDl">Download .txt</button>
+    <select id="ocrFmt" aria-label="Save as"><option value="txt">Text (.txt)</option><option value="docx">Word (.docx)</option><option value="pdf">PDF (.pdf)</option><option value="html">Web page (.html)</option><option value="md">Markdown (.md)</option><option value="csv">Spreadsheet (.csv)</option></select>
+    <button class="btn sm" id="ocrDl">Save text</button>
   </div>
   <div class="split"><div><img id="ocrImg" alt="Image to extract text from"></div><div><p class="note" id="ocrStat" style="margin:0 0 8px" role="status"></p><textarea id="ocrText" aria-label="Extracted text"></textarea></div></div>
 </div>
@@ -108,12 +122,32 @@
   <div class="top">
     <h2>PDF editor</h2>
     <span class="note" id="pdfCount" style="margin:0"></span>
+    <button class="btn alt sm" id="togglePdf" aria-expanded="true">Tools</button>
     <button class="btn alt sm" id="pdfUndo">Undo</button>
     <button class="btn alt sm" data-close>Close</button>
     <button class="btn sm" id="pdfDl">Download PDF</button>
   </div>
   <div class="body">
-    <div class="panel">
+    <div class="panel" id="pdfPanel">
+      <div class="grp"><h3>Edit on the page</h3>
+        <div class="seg">
+          <button class="btn alt sm" data-pm="select" aria-pressed="true">Select</button>
+          <button class="btn alt sm" data-pm="text" aria-pressed="false">Add text</button>
+          <button class="btn alt sm" data-pm="white" aria-pressed="false">Whiteout and replace</button>
+          <label class="btn alt sm" style="cursor:pointer">Add picture<input type="file" id="pdfImg" accept="image/*" hidden></label>
+        </div>
+        <p class="note" id="pdfHint">Select an item to edit it. Drag its ✥ corner to move it and its round corner to resize it.</p>
+      </div>
+      <div class="grp"><h3>Text style</h3>
+        <label for="pFont">Font</label>
+        <select id="pFont"><option value="helv">Helvetica (Arial)</option><option value="times">Times Roman</option><option value="cour">Courier</option></select>
+        <div class="seg" style="margin-top:8px"><button class="btn alt sm" id="pBold" aria-pressed="false"><b>Bold</b></button><button class="btn alt sm" id="pItal" aria-pressed="false"><i>Italic</i></button></div>
+        <label for="pSize">Size</label><input type="range" id="pSize" min="6" max="120" value="18">
+        <label for="pCol">Colour</label><input type="color" id="pCol" value="#000000">
+        <button class="btn alt sm" id="pDel" style="width:100%;margin-top:8px">Delete selected item</button>
+        <button class="btn sm" id="pApply" style="width:100%;margin-top:8px">Apply edits to the PDF</button>
+        <p class="note">Whiteout covers the old text with the page colour and adds new text in the closest matching font. The old text may still exist inside the file, so do not use it to hide private data.</p>
+      </div>
       <div class="grp"><h3>Pages</h3>
         <button class="btn alt sm" id="pdfRot" style="width:100%">Rotate all pages 90°</button>
         <label for="pdfDel">Delete pages (example: 2,5-7)</label><input type="text" id="pdfDel" placeholder="2,5-7">
@@ -129,9 +163,8 @@
         <label for="pdfWm">Watermark text</label><input type="text" id="pdfWm" placeholder="CONFIDENTIAL" maxlength="40">
         <button class="btn alt sm" id="pdfWmGo" style="width:100%;margin-top:6px">Add watermark</button>
       </div>
-      <p class="note">The preview uses your browser's PDF viewer. On some phones it shows only the first page, but your edits still apply to the whole file.</p>
     </div>
-    <div class="stage" style="padding:0"><iframe id="pdfView" class="pdfview" title="PDF preview"></iframe></div>
+    <div class="stage" id="pdfStage" style="padding:0"><div id="pdfPages"></div></div>
   </div>
 </div>
 
@@ -165,6 +198,11 @@
   <div class="xlstage" id="xlStage"></div>
 </div>
 
+<div class="ov" id="ovLeave" role="alertdialog" aria-modal="true" aria-labelledby="tLeave"><div class="modal">
+<h2 id="tLeave">Save your work?</h2>
+<p class="fine" style="font-size:16px;color:var(--ink)">You have unsaved changes. If you leave now, they will be lost.</p>
+<div style="display:grid;gap:10px;margin-top:14px"><button class="btn" id="leaveSave">Save a copy, then leave</button><button class="btn alt" id="leaveKeep">Keep editing</button><button class="btn alt" id="leaveNo">Leave without saving</button></div>
+</div></div>
 <script src="/site.js" defer></script>
 <script src="/tools.js" defer></script>
 </body>
