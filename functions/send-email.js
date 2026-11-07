@@ -3,8 +3,12 @@ export async function onRequestPost(context) {
     const { request, env } = context;
     const order = await request.json();
 
+    if (!order.id) {
+      return new Response(JSON.stringify({ error: "Missing order ID" }), { status: 400 });
+    }
+
     const emailBody = `
-🚨 ORDER NUMBER: #${order.id} 🚨
+🚨 NEW ORDER: #${order.id} 🚨
 Status: PENDING PAYMENT
 
 Name: ${order.name}
@@ -15,10 +19,7 @@ Delivery Speed: ${order.delivery_time}
 Requirements:
 ${order.requirements}
 
-STEP 1: Check your PayPal account for a payment matching Order #${order.id}.
-STEP 2: Once confirmed, email the customer to let them know they can upload their file.
-
-👉 ${order.approveLink || ''}
+👉 Approve link: ${order.approveLink || ''}
 `;
 
     const res = await fetch("https://api.resend.com/emails", {
@@ -28,21 +29,28 @@ STEP 2: Once confirmed, email the customer to let them know they can upload thei
         "Authorization": `Bearer ${env.RESEND_API_KEY}`
       },
       body: JSON.stringify({
+        // 👇 MUST USE ONBOARDING EMAIL IF DOMAIN IS DELETED 👇
         from: "LetItEdit <onboarding@resend.dev>",
-        // 👇 MUST BE YOUR RESEND LOGIN EMAIL 👇
+        
+        // 👇 MUST BE THE EMAIL YOU USED TO SIGN UP FOR RESEND 👇
         to: ["a1003350601123@gmail.com"], 
-        subject: `🚨 Order #${order.id} (PENDING) - ${order.name}`,
+        
+        subject: `🚨 Order #${order.id} - ${order.name}`,
         text: emailBody,
       })
     });
 
+    const data = await res.json();
+    
+    // If Resend rejects it, print the exact error to Cloudflare Logs
     if (!res.ok) {
-      const errorData = await res.json();
-      return new Response(JSON.stringify({ error: errorData.message }), { status: 500 });
+      console.error("Resend Error:", data);
+      return new Response(JSON.stringify({ error: data.message }), { status: 500 });
     }
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (error) {
+    console.error("Function Error:", error.message);
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 }
