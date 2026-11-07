@@ -30,7 +30,7 @@ if(error)throw error;
 oid=data[0].id;
 const s=String(oid);
 
-// 🚀 FORCE SEND EMAIL IMMEDIATELY
+// 🚀 THIS SENDS THE EMAIL
 fetch('/send-email', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
