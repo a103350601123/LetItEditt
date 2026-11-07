@@ -1,121 +1,115 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hire a Freelancer | LetItEdit</title>
 <meta name="description" content="Hire a real person to edit your PDF, Word, Excel, or CV documents. Fast delivery, free revisions.">
 <link rel="canonical" href="https://letitedit.com/freelance.html">
-<!-- CACHE BUSTER -->
-<link rel="stylesheet" href="/styles.css?v=5">
+<link rel="stylesheet" href="site.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head><body>
+</head>
+<body>
 
 <header>
-  <div class="wrap bar" style="justify-content: flex-end;">
+  <div class="wrap bar">
+    <a class="brand" href="/">Let<b>It</b>Edit</a>
     <nav aria-label="Main">
-      <a href="/">Home (Free Tools)</a>
-      <a href="/faq.html">FAQ</a>
-      <a class="btn sm blue" href="/">Back to Home</a>
+      <a href="/">Home</a>
+      <a href="faq.html">FAQ</a>
+      <a href="about.html">About</a>
+      <a class="btn sm" href="/">Free Editors</a>
     </nav>
   </div>
 </header>
 
 <main>
-<div class="view on">
-<section class="hero">
-<div class="wrap">
-<div>
-<h1>Your <span class="rot" id="rot">resume</span>,<br>expertly edited by a real person.</h1>
-<p class="sub">PDF, Word, Excel, screenshot and video editing for students, job seekers and small businesses. LetItEdit looks after every file with care. Choose a service, pay, and upload. Revisions are always free.</p>
-<div class="cta">
-<a class="btn ghost glow-btn" href="/faq.html">Read the FAQ</a>
-</div>
+  <section class="hero freelance-hero">
+    <div class="wrap">
+      <div>
+        <h1>Your <span>resume</span>,<br>expertly edited by a real person.</h1>
+        <p class="sub">PDF, Word, Excel, screenshot and video editing for students, job seekers and small businesses. LetItEdit looks after every file with care. Choose a service, pay, and upload. Revisions are always free.</p>
+        <a class="btn alt" href="faq.html">Read the FAQ</a>
+      </div>
+      
+      <div class="calc-box">
+        <h3>Get your price</h3>
+        <p style="font-size:13px; color:var(--muted);">Pick what you need and see the cost. No sign-up.</p>
+        <label for="cSvc">Service</label>
+        <select id="cSvc">
+          <option value="PDF">PDF formatting</option>
+          <option value="Doc">Word document</option>
+          <option value="Excel">Excel sheet</option>
+          <option value="Screenshot">Screenshot editing</option>
+          <option value="Thesis">Research Paper / Thesis</option>
+        </select>
+        
+        <label for="cSpd">Delivery speed</label>
+        <select id="cSpd" onchange="calcUpdate()">
+          <option value="0">30 minutes (rush)</option>
+          <option value="1" selected>1 hour</option>
+          <option value="2">2 hours</option>
+          <option value="3">3 to 5 hours</option>
+          <option value="4">6 to 12 hours</option>
+        </select>
+        
+        <p class="total" id="cOut">$4 for delivery in 1 hour</p>
+        <button class="btn" onclick="calcOrder()">Order now</button>
+      </div>
+    </div>
+  </section>
 
-<div class="service-grid">
-  <a href="/pdf-editing-service.html">PDF</a>
-  <a href="/cv-creation-editing.html">CV</a>
-  <a href="/word-document-formatting.html">Word</a>
-  <a href="/excel-data-cleaning-formulas.html">Excel</a>
-  <a href="/screenshot-editing-annotation.html">Screenshot</a>
-  <a href="/video-editing-service.html">Video</a>
-  <a href="#" onclick="thesisContact(); return false;" class="btn-thesis">Research Paper / Thesis</a>
-</div>
-
-</div>
-
-<div class="paper calc" aria-label="Price calculator">
-<h3>Get your price</h3>
-<p class="fine" style="margin-top:0">Pick what you need and see the cost. No sign-up.</p>
-<div class="fld"><label for="cSvc">Service</label>
-<select id="cSvc">
-  <option value="PDF">PDF formatting</option>
-  <option value="Doc">Word document</option>
-  <option value="Excel">Excel sheet</option>
-  <option value="Screenshot">Screenshot editing</option>
-  <option value="Thesis">Research Paper / Thesis</option>
-</select></div>
-<div class="fld"><label for="cSpd">Delivery speed</label>
-<select id="cSpd" onchange="calcUpdate()"><option value="0">30 minutes (rush)</option><option value="1" selected>1 hour</option><option value="2">2 hours</option><option value="3">3 to 5 hours</option><option value="4">6 to 12 hours</option></select></div>
-<p class="total" id="cOut">$4 for delivery in 1 hour</p>
-<button class="btn full glow-btn" onclick="calcOrder()">Order now</button>
-</div>
-
-</div>
-</section>
-
-<section id="services" class="wash">
-<div class="wrap">
-<h2>Choose a service</h2>
-<p class="lead">Pick one to see delivery times and prices.</p>
-<div class="rows">
-<a class="row" href="/pdf-editing-service.html" style="text-decoration:none"><h3>PDF formatting</h3><span>Resumes, merged or split files, broken layouts and spacing.</span><b>From $1</b></a>
-<a class="row" href="/cv-creation-editing.html" style="text-decoration:none"><h3>CV Creation</h3><span>Professional CV building, ATS optimization.</span><b>From $5</b></a>
-<a class="row" href="/word-document-formatting.html" style="text-decoration:none"><h3>Word documents</h3><span>APA and MLA styling, headings, tables and reference lists.</span><b>From $1</b></a>
-<a class="row" href="/excel-data-cleaning-formulas.html" style="text-decoration:none"><h3>Excel sheets</h3><span>Fix formulas, clean messy data, format charts and tables.</span><b>From $1</b></a>
-<a class="row" href="/screenshot-editing-annotation.html" style="text-decoration:none"><h3>Screenshots</h3><span>Annotate tutorials, blur private details, crop and clean up.</span><b>From $1</b></a>
-<a class="row" href="/video-editing-service.html" style="text-decoration:none"><h3>Video editing</h3><span>Short-form cuts, captions and pacing, quoted on WhatsApp.</span><b>Get a quote</b></a>
-<a class="row" href="#" onclick="thesisContact(); return false;" style="text-decoration:none"><h3>Research Paper / Thesis</h3><span>Formatting, referencing, and structural editing for long documents.</span><b>Get a quote</b></a>
-</div>
-</div>
-</section>
-
-<section>
-<div class="wrap">
-<h2>How ordering works</h2>
-<p class="lead">You pay first so LetItEdit can reserve time for your job. Your file is only uploaded after LetItEdit confirms payment.</p>
-<ol class="steps">
-<li><h3>Order</h3><p>Pick a service and speed, then enter your details and what you need.</p></li>
-<li><h3>Pay</h3><p>Pay through PayPal and quote your order number in the payment note.</p></li>
-<li><h3>Payment check</h3><p>LetItEdit checks the payment in its email and confirms your order.</p></li>
-<li><h3>Upload and receive</h3><p>Upload your file. LetItEdit edits it and sends it back by email or WhatsApp.</p></li>
-</ol>
-</div>
-</section>
-</div>
+  <section class="wrap" style="padding: 40px 20px;">
+    <h2>Choose a service</h2>
+    <p class="lead" style="text-align:left; margin-bottom:20px;">Pick one to see delivery times and prices.</p>
+    
+    <div class="freelance-services">
+      <a href="pdf-editing-service.html" class="service-item">
+        <div><h4>PDF formatting</h4><p>Resumes, merged or split files, broken layouts.</p></div>
+        <span class="price">From $1</span>
+      </a>
+      <a href="cv-creation-editing.html" class="service-item">
+        <div><h4>CV Creation</h4><p>Professional CV building, ATS optimization.</p></div>
+        <span class="price">From $5</span>
+      </a>
+      <a href="word-document-formatting.html" class="service-item">
+        <div><h4>Word documents</h4><p>APA and MLA styling, headings, tables and references.</p></div>
+        <span class="price">From $1</span>
+      </a>
+      <a href="excel-data-cleaning-formulas.html" class="service-item">
+        <div><h4>Excel sheets</h4><p>Fix formulas, clean messy data, format charts.</p></div>
+        <span class="price">From $1</span>
+      </a>
+      <a href="screenshot-editing-annotation.html" class="service-item">
+        <div><h4>Screenshots</h4><p>Annotate tutorials, blur private details, crop and clean.</p></div>
+        <span class="price">From $1</span>
+      </a>
+      <a href="video-editing-service.html" class="service-item">
+        <div><h4>Video editing</h4><p>Short-form cuts, captions and pacing.</p></div>
+        <span class="price">Get a quote</span>
+      </a>
+      <a href="#" onclick="thesisContact(); return false;" class="service-item" style="border-color:var(--blue);">
+        <div><h4>Research Paper / Thesis</h4><p>Formatting, referencing, and structural editing.</p></div>
+        <span class="price">Get a quote</span>
+      </a>
+    </div>
+  </section>
 </main>
 
 <footer>
   <div class="wrap">
-    <p>© 2026 LetItEdit. Black Neon Crystal Edition.</p>
-    <div class="footer-links">
-      <a href="/about.html">About Us</a>
-      <a href="/faq.html">FAQ</a>
-      <a href="/privacy.html">Privacy Policy</a>
-      <a href="/terms.html">Terms of Service</a>
-      <a href="mailto:info@letitedit.com">info@letitedit.com</a>
-    </div>
+    <span>© 2026 LetItEdit</span>
+    <span><a href="about.html">About</a><a href="faq.html">FAQ</a><a href="privacy.html">Privacy policy</a><a href="terms.html">Terms of service</a></span>
   </div>
 </footer>
 
-<div class="overlay" id="thesisModal" role="dialog" aria-modal="true">
-  <div class="modal" style="text-align: center; border-top: 5px solid var(--neon-pink);">
-    <button class="x" onclick="document.getElementById('thesisModal').classList.remove('on')" aria-label="Close">×</button>
-    <h3 style="color: var(--neon-pink); margin-bottom: 15px; font-size: 26px;">Research Paper & Thesis Editing</h3>
-    <p style="color: #ddd; font-size: 16px; margin-bottom: 20px; line-height: 1.6;">
-      Theses and research papers require meticulous attention to structure, referencing, and formatting guidelines. 
-      <br><br>
-      Let's discuss your specific requirements to provide you with an accurate quote and timeline.
-    </p>
-    <p class="fine" style="margin-bottom: 20px;">Tap below to start the conversation on WhatsApp.</p>
-    <a href="https://wa.me/447393652862?text=Hi%20LetItEdit!%20I%20am%20interested%20in%20your%20Research%20Paper%20/%20Thesis%20editing%20service." target="_blank" rel="noopener" class="btn full glow-btn" style="background: linear-gradient(135deg, #25D366, #128C7E); border-color: #25D366;">Message on WhatsApp</a>
+<!-- THESIS MODAL -->
+<div class="ws" id="thesisModal" role="dialog" aria-modal="true" style="align-items:center; justify-content:center; background:rgba(0,0,0,0.8);">
+  <div class="calc-box" style="max-width:500px; text-align:center; position:relative;">
+    <button class="btn alt sm" onclick="document.getElementById('thesisModal').classList.remove('on')" style="position:absolute; top:15px; right:15px;">✕</button>
+    <h3 style="border:none; color:var(--blue);">Research Paper & Thesis</h3>
+    <p style="color:var(--muted); font-size:15px; margin:15px 0;">Theses and research papers require meticulous attention to structure, referencing, and formatting. Let's discuss your specific requirements to provide an accurate quote.</p>
+    <a href="https://wa.me/447393652862?text=Hi%20LetItEdit!%20I%20am%20interested%20in%20your%20Research%20Paper%20/%20Thesis%20editing%20service." target="_blank" rel="noopener" class="btn" style="background:#25D366;">Message on WhatsApp</a>
   </div>
 </div>
 
@@ -124,7 +118,7 @@
 function thesisContact() {
   document.getElementById('thesisModal').classList.add('on');
 }
-document.querySelector('.paper.calc button.btn').onclick = function(e) {
+document.querySelector('.calc-box button.btn').onclick = function(e) {
   const selectedService = document.getElementById('cSvc').value;
   if (selectedService === 'Thesis') {
     e.preventDefault();
@@ -135,10 +129,11 @@ document.querySelector('.paper.calc button.btn').onclick = function(e) {
 };
 document.getElementById('cSvc').addEventListener('change', function() {
   if (this.value === 'Thesis') {
-    document.getElementById('cOut').textContent = 'Requires custom quote (Click Order Now)';
+    document.getElementById('cOut').textContent = 'Requires custom quote';
   } else {
     if (typeof calcUpdate === 'function') calcUpdate();
   }
 });
 </script>
-</body></html>
+</body>
+</html>
