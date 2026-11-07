@@ -318,3 +318,23 @@ $('#xlDl').onclick=()=>{
   XLSX.writeFile(XL.wb,XL.name+'-edited.xlsx');
   toast('Saved.');
 };
+/* ---------- TEXT SIZE BUTTONS ---------- */
+const fsInput = document.getElementById('fs');
+const fsVal = document.getElementById('fsVal');
+const fsPlus = document.getElementById('fsPlus');
+const fsMinus = document.getElementById('fsMinus');
+
+if(fsPlus && fsMinus && fsVal && fsInput) {
+  fsPlus.onclick = () => {
+    let val = parseInt(fsInput.value) + 4;
+    if(val > 200) val = 200;
+    fsInput.value = val;
+    fsVal.textContent = val;
+  };
+  fsMinus.onclick = () => {
+    let val = parseInt(fsInput.value) - 4;
+    if(val < 12) val = 12;
+    fsInput.value = val;
+    fsVal.textContent = val;
+  };
+}
