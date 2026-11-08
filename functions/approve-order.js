@@ -1,32 +1,38 @@
 export async function onRequestGet(context) {
-  const { request, env } = context;
-  const url = new URL(request.url);
-  const id = url.searchParams.get("id");
-
-  if (!id) {
-    return new Response("Missing order ID in the link.", { status: 400 });
-  }
-
-  const SUPABASE_URL = 'https://bjragiylhglqfodbihvd.supabase.co';
-  const SERVICE_KEY = env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!SERVICE_KEY) {
-    return new Response("Server Error: SUPABASE_SERVICE_ROLE_KEY is missing from Cloudflare settings.", { status: 500 });
-  }
-
   try {
+    const { request, env } = context;
+    const url = new URL(request.url);
+    const id = url.searchParams.get("id");
+
+    if (!id || id === "undefined" || id === "null") {
+      return new Response("❌ Error: The approval link is missing the Order ID. Check the email link.", { status: 400 });
+    }
+
+    const SUPABASE_URL = 'https://bjragiylhglqfodbihvd.supabase.co';
+    const SERVICE_KEY = env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!SERVICE_KEY) {
+      return new Response("❌ Error: The SUPABASE_SERVICE_ROLE_KEY is missing from your Cloudflare settings.", { status: 500 });
+    }
+
+    // Update Supabase status to 'paid'
     const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${id}`, {
       method: "PATCH",
       headers: {
         "apikey": SERVICE_KEY,
         "Authorization": `Bearer ${SERVICE_KEY}`,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
       },
       body: JSON.stringify({ status: "paid" })
     });
 
-    if (!res.ok) throw new Error(await res.text());
+    if (!res.ok) {
+      const errorText = await res.text();
+      return new Response(`❌ Supabase Error: ${errorText}`, { status: 500 });
+    }
 
+    // Success Page
     return new Response(`
       <!DOCTYPE html>
       <html>
@@ -44,7 +50,7 @@ export async function onRequestGet(context) {
         <div class="card">
             <h1>✅ Order Approved</h1>
             <p>Order <strong>#${id}</strong> has been marked as <strong>paid</strong>.</p>
-            <p>The user's page will now automatically unlock and allow them to upload their file.</p>
+            <p>The user's screen will now unlock and allow them to upload their file.</p>
             <a href="/" class="btn">Return to Website</a>
         </div>
       </body>
@@ -52,6 +58,6 @@ export async function onRequestGet(context) {
     `, { headers: { "Content-Type": "text/html" } });
 
   } catch (error) {
-    return new Response(`<h1>❌ Error</h1><p>${error.message}</p>`, { status: 500, headers: { "Content-Type": "text/html" } });
+    return new Response(`❌ System Error: ${error.message}`, { status: 500 });
   }
 }
