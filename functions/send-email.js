@@ -1,33 +1,49 @@
 export async function onRequestPost(context) {
   try {
     const { request, env } = context;
-    const order = await request.json();
+    const body = await request.json();
 
-    // Print exactly what data we received (you can see this in Cloudflare logs)
-    console.log("RECEIVED DATA:", JSON.stringify(order));
+    // 1. Check if Claude set up a Supabase Webhook (data nested in `record`)
+    // or if it's a direct fetch (data is the body itself)
+    const order = body.record || body;
 
-    if (!order.id) {
+    // 2. Automatically detect the variables Claude used
+    const id = order.id || order.order_id || order.orderId;
+    const name = order.name || order.fullName || order.full_name || order.customer_name || order.customerName || 'Not provided';
+    const email = order.email || order.emailAddress || order.email_address || order.customer_email || 'Not provided';
+    const whatsapp = order.whatsapp || order.phone || order.phoneNumber || order.customer_phone || 'Not provided';
+    const delivery = order.delivery_time || order.deliveryTime || order.speed || order.delivery || 'Not provided';
+    const reqs = order.requirements || order.notes || order.description || order.project_details || 'Not provided';
+    
+    // 3. Generate the Approve Link
+    let link = order.approveLink || order.approve_link || order.link;
+    if (!link && id) {
+      link = `https://letitedit.com/approve-order?id=${id}`;
+    }
+
+    if (!id) {
+      console.error("Missing ID. Payload received:", JSON.stringify(body));
       return new Response(JSON.stringify({ error: "Missing order ID" }), { status: 400 });
     }
 
     const emailBody = `
-🚨 NEW ORDER: #${order.id} 🚨
+🚨 NEW ORDER: #${id} 🚨
 Status: PENDING PAYMENT
 
 Customer Details:
 -----------------
-Name: ${order.name || 'Not provided'}
-Email: ${order.email || 'Not provided'}
-WhatsApp: ${order.whatsapp || 'Not provided'}
-Delivery Speed: ${order.delivery_time || 'Not provided'}
+Name: ${name}
+Email: ${email}
+WhatsApp: ${whatsapp}
+Delivery Speed: ${delivery}
 
 Requirements:
-${order.requirements || 'Not provided'}
+${reqs}
 
-STEP 1: Check your PayPal account for a payment matching Order #${order.id}.
+STEP 1: Check your PayPal account for a payment matching Order #${id}.
 STEP 2: Once confirmed, click the link below to unlock their file upload:
 
-👉 ${order.approveLink || 'No link provided'}
+👉 ${link}
 `;
 
     const res = await fetch("https://api.resend.com/emails", {
@@ -39,7 +55,7 @@ STEP 2: Once confirmed, click the link below to unlock their file upload:
       body: JSON.stringify({
         from: "LetItEdit <orders@letitedit.com>",
         to: ["a1003350601123@gmail.com"], 
-        subject: `🚨 Order #${order.id} - ${order.name || 'New Order'}`,
+        subject: `🚨 Order #${id} - ${name}`,
         text: emailBody,
       })
     });
