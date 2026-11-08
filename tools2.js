@@ -357,5 +357,5 @@ $$('.ws').forEach(w=>{
     $('#helpWa').href='https://wa.me/923456006438?text='+encodeURIComponent('Hi LetItEdit, I need help with the '+title+' tool.');
     hp.classList.add('on');
   };
-  w.querySelector('.top').insertBefore(b,w.querySelector('[dat-close]'));
+  w.querySelector('.top').insertBefore(b,w.querySelector('[data-close]'));
 });
