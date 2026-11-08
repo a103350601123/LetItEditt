@@ -3,9 +3,32 @@ export async function onRequestPost(context) {
     const { request, env } = context;
     const order = await request.json();
 
+    // Print exactly what data we received (you can see this in Cloudflare logs)
+    console.log("RECEIVED DATA:", JSON.stringify(order));
+
     if (!order.id) {
       return new Response(JSON.stringify({ error: "Missing order ID" }), { status: 400 });
     }
+
+    const emailBody = `
+🚨 NEW ORDER: #${order.id} 🚨
+Status: PENDING PAYMENT
+
+Customer Details:
+-----------------
+Name: ${order.name || 'Not provided'}
+Email: ${order.email || 'Not provided'}
+WhatsApp: ${order.whatsapp || 'Not provided'}
+Delivery Speed: ${order.delivery_time || 'Not provided'}
+
+Requirements:
+${order.requirements || 'Not provided'}
+
+STEP 1: Check your PayPal account for a payment matching Order #${order.id}.
+STEP 2: Once confirmed, click the link below to unlock their file upload:
+
+👉 ${order.approveLink || 'No link provided'}
+`;
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -16,8 +39,8 @@ export async function onRequestPost(context) {
       body: JSON.stringify({
         from: "LetItEdit <orders@letitedit.com>",
         to: ["a1003350601123@gmail.com"], 
-        subject: `🚨 Order #${order.id} - ${order.name}`,
-        text: `New Order #${order.id}\n\nName: ${order.name}\nEmail: ${order.email}\nWhatsApp: ${order.whatsapp}\nSpeed: ${order.delivery_time}\n\nRequirements:\n${order.requirements}\n\nClick here to approve and unlock upload:\n${order.approveLink}`
+        subject: `🚨 Order #${order.id} - ${order.name || 'New Order'}`,
+        text: emailBody,
       })
     });
 
