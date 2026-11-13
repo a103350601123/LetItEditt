@@ -2,323 +2,396 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Text Sanitizer & Formatter | LetitEdit</title>
-  <meta name="description" content="Professionally sanitize your text. Fix typos, remove gibberish, optimize spacing, and format text instantly.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TextPolish Pro | Advanced Text Cleaner</title>
+  <meta name="description" content="Professionally refine your text. Fix typos, remove gibberish, optimize spacing, and format text instantly.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
-  <link rel="stylesheet" href="../../assets/css/style.css">
-
+  
   <style>
     /* =========================================
-       LetitEdit Light Theme Layout
+       TextPolish Pro - Original Design System
        ========================================= */
     :root {
       --brand: #6366f1; /* Indigo */
       --brand-hover: #4f46e5;
       --brand-light: #e0e7ff;
-      
-      --sidebar-bg: #ffffff;
-      --sidebar-border: #e2e8f0;
-      --sidebar-text: #1e293b;
-      --sidebar-muted: #64748b;
-      
-      --main-bg: #f1f5f9;
-      --card-bg: #ffffff;
+      --bg-main: #f1f5f9;
+      --bg-sidebar: #ffffff;
       --text-main: #0f172a;
       --text-muted: #64748b;
       --border-color: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
     }
 
-    html, body {
-      height: 100%; margin: 0; padding: 0; overflow: hidden;
-      background: var(--main-bg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg-main);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
-    .app-container { display: flex; height: 100vh; width: 100vw; position: relative; }
+    /* --- Top Navigation --- */
+    .top-nav {
+      height: 64px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 10;
+    }
+    
+    .logo {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--brand);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .logo-badge {
+      font-size: 11px;
+      background: var(--brand-light);
+      color: var(--brand);
+      padding: 2px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
 
-    /* --- Left Sidebar (WHITE) --- */
+    .nav-actions { display: flex; gap: 12px; align-items: center; }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    
+    .btn-primary {
+      background: var(--brand);
+      color: white;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+    .btn-primary:hover { background: var(--brand-hover); transform: translateY(-1px); }
+    
+    .btn-outline {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+    .btn-outline:hover { background: #f8fafc; border-color: #cbd5e1; }
+
+    /* --- App Layout --- */
+    .app-body { display: flex; flex: 1; overflow: hidden; position: relative; }
+
+    /* --- Sidebar --- */
     .sidebar {
-      width: 380px; height: 100%; background: var(--sidebar-bg); border-right: 1px solid var(--sidebar-border);
-      display: flex; flex-direction: column; transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 100; box-shadow: 2px 0 10px rgba(0,0,0,0.03);
+      width: 380px;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 5;
     }
-    .app-container.hide-sidebar .sidebar { margin-left: -380px; }
+    
+    .sidebar.hidden { margin-left: -380px; }
+    .sidebar::-webkit-scrollbar { width: 6px; }
+    .sidebar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
     .sidebar-header {
-      padding: 20px; border-bottom: 1px solid var(--sidebar-border);
-      display: flex; align-items: center; justify-content: space-between; background: var(--sidebar-bg);
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      font-weight: 800;
+      font-size: 14px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8fafc;
+      position: sticky;
+      top: 0;
     }
-    .sidebar-header h2 { font-size: 18px; font-weight: 800; color: var(--text-main); margin: 0; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px; }
-    .pro-badge { font-size: 10px; color: var(--brand); background: var(--brand-light); padding: 2px 8px; border-radius: 6px; font-weight: 800; }
 
-    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-    .sidebar-scroll::-webkit-scrollbar { width: 6px; }
-    .sidebar-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-
-    /* Accordion */
-    details { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; transition: all 0.2s; }
-    details[open] { background: #ffffff; border-color: var(--brand); box-shadow: 0 4px 12px rgba(99,102,241,0.08); }
-    summary {
-      padding: 14px 16px; font-size: 14px; font-weight: 700; color: var(--text-main); cursor: pointer;
-      list-style: none; display: flex; align-items: center; gap: 10px; user-select: none; transition: background 0.2s;
+    .settings-group { border-bottom: 1px solid var(--border-color); }
+    
+    .settings-header {
+      padding: 16px 20px;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text-main);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      background: #ffffff;
+      transition: background 0.2s;
     }
-    summary:hover { background: #f1f5f9; }
-    summary::after { content: '▼'; font-size: 10px; color: var(--sidebar-muted); margin-left: auto; transition: transform 0.3s; }
-    details[open] summary::after { transform: rotate(180deg); color: var(--brand); }
+    .settings-header:hover { background: #f8fafc; }
+    .settings-header span { transition: transform 0.3s; color: var(--text-muted); }
+    .settings-group.open .settings-header span { transform: rotate(180deg); color: var(--brand); }
     
-    .summary-icon { width: 18px; height: 18px; color: var(--sidebar-muted); transition: color 0.2s; }
-    details[open] .summary-icon { color: var(--brand); }
+    .settings-content {
+      display: none;
+      padding: 0 20px 16px 20px;
+      background: #ffffff;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .settings-group.open .settings-content { display: flex; }
 
-    .options-list { padding: 0 16px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+    /* Custom Toggle Switch */
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13.5px;
+      color: var(--text-main);
+      cursor: pointer;
+      padding: 6px 0;
+    }
+    .toggle-row:hover { color: var(--brand); }
 
-    /* Toggle Switch (Light) */
-    .toggle-row { display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 6px 0; }
-    .toggle-row span { font-size: 13px; font-weight: 500; color: var(--sidebar-text); padding-right: 12px; }
-    
-    .switch { position: relative; display: inline-block; width: 38px; height: 22px; flex-shrink: 0; }
+    .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 20px; }
-    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: #fff; transition: .3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: var(--shadow-sm); }
     input:checked + .slider { background-color: var(--brand); }
     input:checked + .slider:before { transform: translateX(16px); }
 
-    /* Radio Buttons */
-    .radio-group { display: flex; flex-direction: column; gap: 10px; padding-top: 4px; }
-    .radio-row { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: var(--sidebar-text); font-weight: 500; }
-    .radio-row input { accent-color: var(--brand); width: 16px; height: 16px; cursor: pointer; }
-
     /* Number Inputs */
-    .input-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--sidebar-text); }
-    .input-row input[type="number"] { width: 50px; padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; background: #ffffff; color: var(--text-main); outline: none; }
-
-    /* --- Right Editor Area --- */
-    .main-editor { flex: 1; display: flex; flex-direction: column; background: var(--main-bg); position: relative; }
-
-    .editor-header {
-      min-height: 64px; background: #ffffff; border-bottom: 1px solid var(--border-color);
-      display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 10; flex-wrap: wrap; gap: 12px;
+    .input-row { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--text-main); }
+    .input-row input[type="number"] {
+      width: 50px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-main); outline: none;
     }
-    
-    .toggle-btn { background: #ffffff; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 8px; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: var(--text-main); cursor: pointer; transition: all 0.2s; }
-    .toggle-btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
 
-    .action-buttons { display: flex; gap: 10px; align-items: center; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; font-weight: 700; cursor: pointer; transition: all 0.2s; border-radius: 8px; border: none; padding: 10px 20px; font-size: 14px; }
-    .btn-primary { background: var(--brand); color: #fff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
-    .btn-primary:hover { background: var(--brand-hover); transform: translateY(-1px); }
-    .btn-outline { background: #fff; border: 1px solid var(--border-color); color: var(--text-main); }
-    .btn-outline:hover { background: #f8fafc; border-color: #cbd5e1; }
+    /* Radio Group */
+    .radio-row {
+      display: flex; align-items: center; gap: 8px; font-size: 13.5px; cursor: pointer; color: var(--text-main);
+    }
+    .radio-row input { accent-color: var(--brand); width: 16px; height: 16px; }
 
-    /* Split View */
-    .split-view { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 24px; overflow: hidden; }
-    
-    .textarea-wrapper {
-      display: flex; flex-direction: column; background: #ffffff; border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid var(--border-color); overflow: hidden;
+    /* --- Editor Area --- */
+    .editor-area {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 20px;
+      background: var(--bg-main);
+      overflow: hidden;
+    }
+
+    .pane {
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
       transition: border-color 0.2s;
     }
-    .textarea-wrapper:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-light); }
-    
-    .textarea-header {
-      padding: 14px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: #f8fafc;
+    .pane:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-light); }
+
+    .pane-header {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border-color);
+      background: #f8fafc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
     }
-    .textarea-header span { font-weight: 700; font-size: 14px; color: var(--text-main); }
-    .textarea-header small { font-size: 12px; color: var(--text-muted); font-weight: 600; background: #e2e8f0; padding: 2px 8px; border-radius: 6px; }
 
     textarea {
-      flex: 1; width: 100%; padding: 20px; border: none; outline: none; resize: none;
-      font-family: inherit; font-size: 15px; line-height: 1.6; color: var(--text-main); background: #ffffff;
+      flex: 1;
+      width: 100%;
+      padding: 20px;
+      border: none;
+      outline: none;
+      resize: none;
+      font-family: inherit;
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--text-main);
+      background: transparent;
     }
-    .output-area { background: #fafafa; color: #334155; }
 
-    .mobile-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+    .output-pane textarea { background: #fafafa; color: #334155; }
 
-    @media (max-width: 900px) {
-      .sidebar { position: absolute; left: 0; top: 0; height: 100%; }
-      .app-container.hide-sidebar .sidebar { margin-left: -380px; }
-      .mobile-overlay.show { opacity: 1; pointer-events: auto; }
-      .editor-header { padding: 12px; justify-content: center; }
-      .toggle-btn span { display: none; }
-      .toggle-btn { padding: 10px; }
-      .split-view { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; padding: 12px; gap: 16px; }
-      .action-buttons { width: 100%; justify-content: space-between; }
+    /* --- Responsive Layout --- */
+    @media (max-width: 1024px) {
+      .sidebar { position: absolute; left: 0; top: 0; height: 100%; box-shadow: 10px 0 25px rgba(0,0,0,0.1); }
+      .sidebar.hidden { margin-left: -380px; }
+      .editor-area { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .top-nav { padding: 0 16px; }
+      .nav-actions .btn span { display: none; }
+      .nav-actions .btn { padding: 10px 14px; }
+      .editor-area { padding: 12px; gap: 12px; }
     }
   </style>
 </head>
 <body>
 
-  <div class="app-container" id="appLayout">
+  <!-- Top Navigation -->
+  <header class="top-nav">
+    <div class="logo">
+      ✨ TextPolish <span class="logo-badge">PRO</span>
+    </div>
+    <div class="nav-actions">
+      <button class="btn btn-outline" onclick="clearAll()">🗑️ <span>Clear</span></button>
+      <button class="btn btn-primary" onclick="copyOutput()">📋 <span>Copy Result</span></button>
+    </div>
+  </header>
+
+  <!-- Main App -->
+  <div class="app-body">
     
-    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
-
-    <!-- LEFT: Settings Panel -->
-    <aside class="sidebar">
+    <!-- Sidebar (Settings) -->
+    <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <h2>LetitEdit <span class="pro-badge">PRO</span></h2>
-        <button class="btn btn-outline" onclick="toggleSidebar()" style="padding:6px 10px;">✕</button>
+        <span>Configuration</span>
+        <button class="btn btn-outline" onclick="toggleSidebar()" style="padding: 4px 8px;">✕</button>
       </div>
-      
-      <div class="sidebar-scroll">
-        
-        <!-- Intelligent Refinement -->
-        <details open>
-          <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Intelligent Refinement</summary>
-          <div class="options-list">
-            <label class="toggle-row"><span>Auto-Correct Typos & Stutters</span><div class="switch"><input type="checkbox" id="optSpelling" checked><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Remove Duplicate Words (is is)</span><div class="switch"><input type="checkbox" id="optDupWords" checked><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Fix Excess Punctuation (,!!!)</span><div class="switch"><input type="checkbox" id="optPunct" checked><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Fix Spacing After Punctuation</span><div class="switch"><input type="checkbox" id="optPunctSpace" checked><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Convert Shorthand (u → you)</span><div class="switch"><input type="checkbox" id="optShorthand" checked><span class="slider"></span></div></label>
-          </div>
-        </details>
 
-        <!-- Spatial Formatting -->
-        <details>
-          <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg> Spatial Formatting</summary>
-          <div class="options-list">
-            <label class="toggle-row"><span>Trim Edges</span><div class="switch"><input type="checkbox" id="optTrim" checked><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Remove Leading Spaces</span><div class="switch"><input type="checkbox" id="optLead" checked><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Remove Trailing Spaces</span><div class="switch"><input type="checkbox" id="optTrail" checked><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Merge Extra Spaces</span><div class="switch"><input type="checkbox" id="optMultiSpace" checked><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Merge Empty Lines</span><div class="switch"><input type="checkbox" id="optMultiBlank" checked><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Eliminate Blank Lines</span><div class="switch"><input type="checkbox" id="optBlankLines"><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Remove All Line Breaks</span><div class="switch"><input type="checkbox" id="optAllBreaks"><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Line Breaks to Space</span><div class="switch"><input type="checkbox" id="optBreakToSpace"><span class="slider"></span></div></label>
-            <div class="input-row">
-              <label class="switch"><input type="checkbox" id="optSpacesToTab"><span class="slider"></span></label>
-              <span>Replace</span><input type="number" id="numSpacesToTab" value="4" min="1"><span>spaces with Tab</span>
-            </div>
-            <div class="input-row">
-              <label class="switch"><input type="checkbox" id="optTabToSpaces"><span class="slider"></span></label>
-              <span>Replace Tab with</span><input type="number" id="numTabToSpaces" value="4" min="1"><span>spaces</span>
-            </div>
+      <!-- Whitespace -->
+      <div class="settings-group open">
+        <div class="settings-header" onclick="toggleGroup(this)">Spatial Formatting <span>▼</span></div>
+        <div class="settings-content">
+          <label class="toggle-row"><span>Trim Edges</span><div class="switch"><input type="checkbox" id="trim" checked><span class="slider"></span></div></label>
+          <label class="toggle-row"><span>Remove Leading Spaces</span><div class="switch"><input type="checkbox" id="leadSpaces" checked><span class="slider"></span></div></label>
+          <label class="toggle-row"><span>Remove Trailing Spaces</span><div class="switch"><input type="checkbox" id="trailSpaces" checked><span class="slider"></span></div></label>
+          <label class="toggle-row"><span>Merge Extra Spaces</span><div class="switch"><input type="checkbox" id="multiSpaces" checked><span class="slider"></span></div></label>
+          <label class="toggle-row"><span>Merge Empty Lines</span><div class="switch"><input type="checkbox" id="multiBlanks" checked><span class="slider"></span></div></label>
+          <label class="toggle-row"><span>Remove Blank Lines</span><div class="switch"><input type="checkbox" id="removeBlanks"><span class="slider"></span></div></label>
+          <label class="toggle-row"><span>Flatten to Single Line</span><div class="switch"><input type="checkbox" id="flatten"><span class="slider"></span></div></label>
+          <div class="input-row">
+            <label class="switch"><input type="checkbox" id="spacesToTab"><span class="slider"></span></label>
+            <span>Replace</span><input type="number" id="numSpacesToTab" value="4" min="1"><span>spaces with Tab</span>
           </div>
-        </details>
-
-        <!-- Symbol Purge -->
-        <details>
-          <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg> Symbol Purge</summary>
-          <div class="options-list">
-            <label class="toggle-row"><span>Remove Emojis</span><div class="switch"><input type="checkbox" id="optEmoji" checked><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Remove Punctuation</span><div class="switch"><input type="checkbox" id="optPunctOnly"><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Remove Accents (é → e)</span><div class="switch"><input type="checkbox" id="optAccents"><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Keep Alphanumeric Only</span><div class="switch"><input type="checkbox" id="optAlnum"><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Remove Special Symbols</span><div class="switch"><input type="checkbox" id="optSpecial"><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Remove All Digits</span><div class="switch"><input type="checkbox" id="optNumbers"><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Remove Non-ASCII Characters</span><div class="switch"><input type="checkbox" id="optNonAscii"><span class="slider"></span></div></label>
+          <div class="input-row">
+            <label class="switch"><input type="checkbox" id="tabToSpaces"><span class="slider"></span></label>
+            <span>Replace Tab with</span><input type="number" id="numTabToSpaces" value="4" min="1"><span>spaces</span>
           </div>
-        </details>
-
-        <!-- Markup Stripper -->
-        <details>
-          <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg> Markup Stripper</summary>
-          <div class="options-list">
-            <label class="toggle-row"><span>Strip HTML Tags</span><div class="switch"><input type="checkbox" id="optHtml" checked><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Unescape HTML Entities</span><div class="switch"><input type="checkbox" id="optHtmlEntity"><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Decode URL Characters (%20)</span><div class="switch"><input type="checkbox" id="optUrlDecode"><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Remove BBCode</span><div class="switch"><input type="checkbox" id="optBbcode"><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Remove IDs</span><div class="switch"><input type="checkbox" id="optIds"><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Remove Classes</span><div class="switch"><input type="checkbox" id="optClasses"><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Remove Inline Styles</span><div class="switch"><input type="checkbox" id="optStyles"><span class="slider"></span></div></label>
-          </div>
-        </details>
-
-        <!-- Data Redaction -->
-        <details>
-          <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg> Data Redaction</summary>
-          <div class="options-list">
-            <label class="toggle-row"><span>Redact Emails</span><div class="switch"><input type="checkbox" id="optEmails"><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Remove URLs</span><div class="switch"><input type="checkbox" id="optUrls"><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Convert URLs to Links</span><div class="switch"><input type="checkbox" id="optUrlLinks"><span class="slider"></span></div></label>
-          </div>
-        </details>
-
-        <!-- Case Engineering -->
-        <details>
-          <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg> Case & Styling</summary>
-          <div class="options-list">
-            <div class="radio-group">
-              <label class="radio-row"><input type="radio" name="case" value="none" checked> Original Case</label>
-              <label class="radio-row"><input type="radio" name="case" value="upper"> UPPERCASE</label>
-              <label class="radio-row"><input type="radio" name="case" value="lower"> lowercase</label>
-              <label class="radio-row"><input type="radio" name="case" value="sentence"> Sentence case.</label>
-              <label class="radio-row"><input type="radio" name="case" value="capitalize"> Capitalize Each Word</label>
-            </div>
-            <label class="toggle-row"><span>Remove Duplicate Lines</span><div class="switch"><input type="checkbox" id="optDupLines"><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Smart Quotes to Regular</span><div class="switch"><input type="checkbox" id="optSmartToReg"><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Regular Quotes to Smart</span><div class="switch"><input type="checkbox" id="optRegToSmart"><span class="slider"></span></div></label>
-            <div class="input-row">
-              <label class="switch"><input type="checkbox" id="optTrimLeft"><span class="slider"></span></label>
-              <span>Remove</span><input type="number" id="numTrimLeft" value="3" min="1"><span>chars from Left</span>
-            </div>
-            <div class="input-row">
-              <label class="switch"><input type="checkbox" id="optTrimRight"><span class="slider"></span></label>
-              <span>Remove</span><input type="number" id="numTrimRight" value="3" min="1"><span>chars from Right</span>
-            </div>
-          </div>
-        </details>
-
+        </div>
       </div>
+
+      <!-- Characters -->
+      <div class="settings-group">
+        <div class="settings-header" onclick="toggleGroup(this)">Symbol Purge <span>▼</span></div>
+        <div class="settings-content">
+          <label class="toggle-row"><span>Remove Emojis</span><div class="switch"><input type="checkbox" id="stripEmojis" checked><span class="slider"></span></div></label>
+          <label class="toggle-row"><span>Remove Punctuation</span><div class="switch"><input type="checkbox" id="removePunct"><span class="slider"></span></div></label>
+          <label class="toggle-row"><span>Standardize Accents (é → e)</span><div class="switch"><input type="checkbox" id="removeAccents"><span class="slider"></span></div></label>
+          <label class="toggle-row"><span>Keep Alphanumeric Only</span><div class="switch"><input type="checkbox" id="alnumOnly"><span class="slider"></span></div></label>
+          <label class="toggle-row"><span>Remove Special Symbols</span><div class="switch"><input type="checkbox" id="removeSpecial"><span class="slider"></span></div></label>
+          <label class="toggle-row"><span>Remove All Digits</span><div class="switch"><input type="checkbox" id="removeNumbers"><span class="slider"></span></div></label>
+          <label class="toggle-row"><span>Remove Non-ASCII Characters</span><div class="switch"><input type="checkbox" id="removeNonAscii"><span class="slider"></span></div></label>
+        </div>
+      </div>
+
+      <!-- HTML -->
+      <div class="settings-group">
+        <div class="settings-header" onclick="toggleGroup(this)">Markup Stripper <span>▼</span></div>
+        <div class="settings-content">
+          <label class="toggle-row"><span>Strip HTML Tags</span><div class="switch"><input type="checkbox" id="stripHtml" checked><span class="slider"></span></div></label>
+          <label class="toggle-row"><span>Unescape HTML Entities</span><div class="switch"><input type="checkbox" id="decodeEntities"><span class="slider"></span></div></label>
+          <label class="toggle-row"><span>Decode URL Chars (%20)</span><div class="switch"><input type="checkbox" id="decodeUrl"><span class="slider"></span></div></label>
+          <label class="toggle-row"><span>Remove BBCode ([b])</span><div class="switch"><input type="checkbox" id="removeBbcode"><span class="slider"></span></div></label>
+          <label class="toggle-row"><span>Remove IDs</span><div class="switch"><input type="checkbox" id="removeIds"><span class="slider"></span></div></label>
+          <label class="toggle-row"><span>Remove Classes</span><div class="switch"><input type="checkbox" id="removeClasses"><span class="slider"></span></div></label>
+          <label class="toggle-row"><span>Remove Inline Styles</span><div class="switch"><input type="checkbox" id="removeStyles"><span class="slider"></span></div></label>
+        </div>
+      </div>
+
+      <!-- Privacy -->
+      <div class="settings-group">
+        <div class="settings-header" onclick="toggleGroup(this)">Data Redaction <span>▼</span></div>
+        <div class="settings-content">
+          <label class="toggle-row"><span>Mask Emails</span><div class="switch"><input type="checkbox" id="stripEmails"><span class="slider"></span></div></label>
+          <label class="toggle-row"><span>Remove Web URLs</span><div class="switch"><input type="checkbox" id="stripUrls"><span class="slider"></span></div></label>
+        </div>
+      </div>
+
+      <!-- Formatting -->
+      <div class="settings-group">
+        <div class="settings-header" onclick="toggleGroup(this)">Case & Styling <span>▼</span></div>
+        <div class="settings-content">
+          <div class="radio-row"><input type="radio" name="case" value="none" checked> Original Case</div>
+          <div class="radio-row"><input type="radio" name="case" value="upper"> UPPERCASE</div>
+          <div class="radio-row"><input type="radio" name="case" value="lower"> lowercase</div>
+          <div class="radio-row"><input type="radio" name="case" value="sentence"> Sentence case.</div>
+          <div class="radio-row"><input type="radio" name="case" value="capitalize"> Title Case</div>
+          <label class="toggle-row" style="margin-top:8px;"><span>Remove Duplicate Lines</span><div class="switch"><input type="checkbox" id="removeDupLines"><span class="slider"></span></div></label>
+          <label class="toggle-row"><span>Smart Quotes to Regular</span><div class="switch"><input type="checkbox" id="smartToReg"><span class="slider"></span></div></label>
+        </div>
+      </div>
+
     </aside>
 
-    <!-- RIGHT: Editor Area -->
-    <main class="main-editor">
-      <header class="editor-header">
-        <div style="display:flex; align-items:center; gap:16px;">
-          <button class="toggle-btn" onclick="toggleSidebar()">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            <span>Controls</span>
-          </button>
+    <!-- Editor Panes -->
+    <main class="editor-area">
+      
+      <!-- Raw Input -->
+      <div class="pane">
+        <div class="pane-header">
+          <span>Raw Input</span>
+          <small id="inputStats" style="background:#e2e8f0; padding:2px 8px; border-radius:6px; color:#64748b;">0 words</small>
         </div>
-        
-        <div class="action-buttons">
-          <button class="btn btn-outline" onclick="clearAll()">Reset Canvas</button>
-          <button class="btn btn-primary" onclick="copyOutput()">📋 Extract Result</button>
-        </div>
-      </header>
-
-      <div class="split-view">
-        <!-- Input -->
-        <div class="textarea-wrapper">
-          <div class="textarea-header">
-            <span>Raw Input</span>
-            <small id="inputStats">0 words</small>
-          </div>
-          <textarea id="textInput" placeholder="Drop your unformatted text here..."></textarea>
-        </div>
-
-        <!-- Output -->
-        <div class="textarea-wrapper">
-          <div class="textarea-header">
-            <span>Refined Output</span>
-            <small id="outputStats">0 words</small>
-          </div>
-          <textarea id="textOutput" class="output-area" readonly placeholder="Your perfectly formatted text will materialize here..."></textarea>
-        </div>
+        <textarea id="textInput" placeholder="Drop your unformatted text here..."></textarea>
       </div>
-    </main>
 
+      <!-- Refined Output -->
+      <div class="pane output-pane">
+        <div class="pane-header">
+          <span>Refined Output</span>
+          <small id="outputStats" style="background:#e2e8f0; padding:2px 8px; border-radius:6px; color:#64748b;">0 words</small>
+        </div>
+        <textarea id="textOutput" readonly placeholder="Your perfectly formatted text will materialize here..."></textarea>
+      </div>
+
+    </main>
   </div>
 
   <script>
-    // === DOM Elements ===
-    const appLayout = document.getElementById('appLayout');
-    const mobileOverlay = document.getElementById('mobileOverlay');
+    // === Core Application Logic ===
     const textInput = document.getElementById('textInput');
     const textOutput = document.getElementById('textOutput');
     const inputs = document.querySelectorAll('.switch input, input[name="case"], input[type="number"]');
+    const sidebar = document.getElementById('sidebar');
 
-    // === SAFE DICTIONARY (NO GUESSING) ===
-    // We ONLY fix words that are 100% known typos or shorthand.
-    // If a word is not in here, it is left completely alone (preserving all languages).
+    // Completely safe, non-destructive typo fixer
     const exactTypos = {
-      // English Shorthand
       "u": "you", "ur": "your", "r": "are", "w/": "with", "w/o": "without", "b/c": "because",
       "b4": "before", "btw": "between", "yr": "year", "yrs": "years", "n": "and", "thx": "thanks",
       "pls": "please", "plz": "please", "im": "I'm", "ive": "I've", "dont": "don't", "cant": "can't",
       "wont": "won't", "youre": "you're", "theyre": "they're", "alot": "a lot",
-      
-      // Specific Typos
       "nam": "name", "righ": "right", "wwhat": "what", "whhat": "what", "wass": "was", 
       "cantt": "can't", "thiss": "this", "thatt": "that", "annd": "and", "arr": "are", 
       "nott": "not", "yoou": "you", "wherre": "where", "witth": "with", "bee": "be", 
@@ -331,8 +404,12 @@
     };
 
     function toggleSidebar() {
-      appLayout.classList.toggle('hide-sidebar');
-      if (window.innerWidth <= 900) mobileOverlay.classList.toggle('show');
+      sidebar.classList.toggle('hidden');
+    }
+
+    function toggleGroup(header) {
+      const group = header.parentElement;
+      group.classList.toggle('open');
     }
 
     let debounceTimer;
@@ -341,137 +418,100 @@
       debounceTimer = setTimeout(processText, 100);
     }
 
-    // === CORE ENGINE ===
     function processText() {
       let text = textInput.value;
       
-      // --- 1. MARKUP STRIPPER ---
-      if (document.getElementById('optHtml').checked) text = text.replace(/<[^>]*>/g, '');
-      if (document.getElementById('optIds').checked) text = text.replace(/\s+id\s*=\s*["'][^"']*["']/gi, '');
-      if (document.getElementById('optClasses').checked) text = text.replace(/\s+class\s*=\s*["'][^"']*["']/gi, '');
-      if (document.getElementById('optStyles').checked) text = text.replace(/\s+style\s*=\s*["'][^"']*["']/gi, '');
-      if (document.getElementById('optHtmlEntity').checked) {
+      // 1. HTML Stripper
+      if (document.getElementById('stripHtml').checked) text = text.replace(/<[^>]*>/g, '');
+      if (document.getElementById('removeIds').checked) text = text.replace(/\s+id\s*=\s*["'][^"']*["']/gi, '');
+      if (document.getElementById('removeClasses').checked) text = text.replace(/\s+class\s*=\s*["'][^"']*["']/gi, '');
+      if (document.getElementById('removeStyles').checked) text = text.replace(/\s+style\s*=\s*["'][^"']*["']/gi, '');
+      if (document.getElementById('decodeEntities').checked) {
         const doc = new DOMParser().parseFromString(text, 'text/html');
         text = doc.documentElement.textContent || doc.body.textContent || "";
       }
-      if (document.getElementById('optUrlDecode').checked) {
+      if (document.getElementById('decodeUrl').checked) {
         try { text = decodeURIComponent(text); } catch(e) {}
       }
-      if (document.getElementById('optBbcode').checked) text = text.replace(/\[\/?[a-z0-9= "'-]+\]/gi, '');
+      if (document.getElementById('removeBbcode').checked) text = text.replace(/\[\/?[a-z0-9= "'-]+\]/gi, '');
 
-      // --- 2. INTELLIGENT REFINEMENT ---
-      if (document.getElementById('optDupWords').checked) {
-        text = text.replace(/\b(\w+)\s+\1\b/gi, '$1');
+      // 2. Intelligent Typo & Stutter Fixing
+      if (document.getElementById('removeDupLines').checked) {
+        text = [...new Set(text.split('\n'))].join('\n');
       }
-      
-      if (document.getElementById('optSpelling').checked) {
-        let words = text.split(/(\s+)/);
-        for (let i = 0; i < words.length; i++) {
-          let word = words[i];
-          if (!word.trim()) continue;
-          
-          let match = word.match(/^([^a-zA-Z]*)([a-zA-Z]+)([^a-zA-Z]*)$/);
-          if (!match) continue;
-          
-          let pre = match[1], core = match[2], post = match[3];
-          let lower = core.toLowerCase();
-          let fixed = core;
 
-          // Step A: Exact Typo Match (e.g., "righ" -> "right")
-          if (exactTypos[lower]) {
-            fixed = exactTypos[lower];
-          } 
-          // Step B: Stutter Reduction (e.g., "pleaaaase" -> "please", "wwwhat" -> "what")
-          else {
-            let reduced = lower.replace(/([a-zA-Z])\1{2,}/g, '$1');
-            // Only use the reduced version if it's a valid short word, else keep original
-            // Actually, just safely reducing 3+ letters is safe across all languages.
-            // We don't guess dictionary words. We just remove obvious stutters.
-            if (reduced !== lower) {
-               fixed = reduced;
-            }
-          }
+      // Fix duplicate words (is is)
+      text = text.replace(/\b(\w+)\s+\1\b/gi, '$1');
 
-          // Remove pure gibberish (no vowels, length > 2)
-          if (fixed.length > 2 && !/[aeiouy]/i.test(fixed)) {
-            fixed = '';
-          }
+      let words = text.split(/(\s+)/);
+      for (let i = 0; i < words.length; i++) {
+        let word = words[i];
+        if (!word.trim()) continue;
+        
+        let match = word.match(/^([^a-zA-Z]*)([a-zA-Z]+)([^a-zA-Z]*)$/);
+        if (!match) continue;
+        
+        let pre = match[1], core = match[2], post = match[3];
+        let lower = core.toLowerCase();
+        let fixed = core;
 
-          // Restore Capitalization
-          if (fixed && core[0] === core[0].toUpperCase()) {
-            fixed = fixed.charAt(0).toUpperCase() + fixed.slice(1);
-          }
-
-          words[i] = pre + fixed + post;
+        if (exactTypos[lower]) {
+          fixed = exactTypos[lower];
+        } else {
+          let reduced = lower.replace(/([a-zA-Z])\1{2,}/g, '$1');
+          if (reduced !== lower) fixed = reduced;
         }
-        text = words.join('');
+
+        if (fixed.length > 2 && !/[aeiouy]/i.test(fixed)) fixed = '';
+        if (fixed && core[0] === core[0].toUpperCase()) fixed = fixed.charAt(0).toUpperCase() + fixed.slice(1);
+        
+        words[i] = pre + fixed + post;
       }
+      text = words.join('');
 
-      if (document.getElementById('optShorthand').checked) {
-        const pattern = new RegExp('\\b(' + Object.keys(exactTypos).join('|') + ')\\b', 'gi');
-        text = text.replace(pattern, match => exactTypos[match.toLowerCase()] || match);
-      }
-
-      // --- 3. PUNCTUATION FIXES ---
-      if (document.getElementById('optPunct').checked) {
-        text = text.replace(/([,!?])\1+/g, '$1'); 
-        text = text.replace(/\.{4,}/g, '...'); 
-      }
-      if (document.getElementById('optPunctSpace').checked) {
-        text = text.replace(/\s+([.,!?])/g, '$1'); 
-        text = text.replace(/([.,!?])(?=[^\s\d])/g, '$1 '); 
-      }
-
-      // --- 4. LINKS & EMAILS ---
-      if (document.getElementById('optEmails').checked) text = text.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '');
-      if (document.getElementById('optUrls').checked) text = text.replace(/https?:\/\/[^\s]+/g, '');
-      if (document.getElementById('optUrlLinks').checked && !document.getElementById('optUrls').checked) text = text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
-
-      // --- 5. SYMBOL PURGE ---
-      if (document.getElementById('optEmoji').checked) text = text.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '');
-      if (document.getElementById('optPunctOnly').checked) text = text.replace(/[^\w\s]|_/g, '');
-      if (document.getElementById('optAccents').checked) text = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      if (document.getElementById('optAlnum').checked) text = text.replace(/[^a-zA-Z0-9\s]/g, '');
-      if (document.getElementById('optSpecial').checked) text = text.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '');
-      if (document.getElementById('optNumbers').checked) text = text.replace(/[0-9]/g, '');
-      if (document.getElementById('optNonAscii').checked) text = text.replace(/[^\x00-\x7F]/g, '');
-
-      // --- 6. SPATIAL FORMATTING ---
-      if (document.getElementById('optTrim').checked) text = text.trim();
-      if (document.getElementById('optLead').checked) text = text.replace(/^[ \t]+/gm, '');
-      if (document.getElementById('optTrail').checked) text = text.replace(/[ \t]+$/gm, '');
-      if (document.getElementById('optBlankLines').checked) text = text.replace(/^\s*[\r\n]/gm, '');
+      // 3. Punctuation & Spacing
+      if (document.getElementById('trim').checked) text = text.trim();
+      if (document.getElementById('leadSpaces').checked) text = text.replace(/^[ \t]+/gm, '');
+      if (document.getElementById('trailSpaces').checked) text = text.replace(/[ \t]+$/gm, '');
+      if (document.getElementById('removeBlanks').checked) text = text.replace(/^\s*[\r\n]/gm, '');
       
-      if (document.getElementById('optBreakToSpace').checked) {
+      if (document.getElementById('flatten').checked) {
         text = text.replace(/[\r\n]+/g, ' ');
       } else {
-        if (document.getElementById('optMultiSpace').checked) text = text.replace(/[ \t]+/g, ' ');
-        if (document.getElementById('optMultiBlank').checked) text = text.replace(/\n{3,}/g, '\n\n');
+        if (document.getElementById('multiSpaces').checked) text = text.replace(/[ \t]+/g, ' ');
+        if (document.getElementById('multiBlanks').checked) text = text.replace(/\n{3,}/g, '\n\n');
       }
-      if (document.getElementById('optAllBreaks').checked) text = text.replace(/[\r\n]+/g, ' ');
 
-      if (document.getElementById('optSpacesToTab').checked) {
+      if (document.getElementById('spacesToTab').checked) {
         const count = parseInt(document.getElementById('numSpacesToTab').value) || 4;
         text = text.replace(new RegExp(' '.repeat(count), 'g'), '\t');
       }
-      if (document.getElementById('optTabToSpaces').checked) {
+      if (document.getElementById('tabToSpaces').checked) {
         const count = parseInt(document.getElementById('numTabToSpaces').value) || 4;
         text = text.replace(/\t/g, ' '.repeat(count));
       }
 
-      // --- 7. CASE & STYLING ---
+      // 4. Privacy Redaction
+      if (document.getElementById('stripEmails').checked) text = text.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '[EMAIL_REDACTED]');
+      if (document.getElementById('stripUrls').checked) text = text.replace(/https?:\/\/[^\s]+/g, '');
+
+      // 5. Symbol Purge
+      if (document.getElementById('stripEmojis').checked) text = text.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '');
+      if (document.getElementById('removePunct').checked) text = text.replace(/[^\w\s]|_/g, '');
+      if (document.getElementById('removeAccents').checked) text = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      if (document.getElementById('alnumOnly').checked) text = text.replace(/[^a-zA-Z0-9\s]/g, '');
+      if (document.getElementById('removeSpecial').checked) text = text.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '');
+      if (document.getElementById('removeNumbers').checked) text = text.replace(/[0-9]/g, '');
+      if (document.getElementById('removeNonAscii').checked) text = text.replace(/[^\x00-\x7F]/g, '');
+
+      // 6. Case Transformation
       const caseVal = document.querySelector('input[name="case"]:checked').value;
       if (caseVal === 'upper') text = text.toUpperCase();
       else if (caseVal === 'lower') text = text.toLowerCase();
       else if (caseVal === 'sentence') text = text.toLowerCase().replace(/(^\s*\w|[.!?]\s*\w)/g, c => c.toUpperCase());
       else if (caseVal === 'capitalize') text = text.replace(/\b\w/g, c => c.toUpperCase());
 
-      if (document.getElementById('optDupLines').checked) text = [...new Set(text.split('\n'))].join('\n');
-      if (document.getElementById('optSmartToReg').checked) text = text.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"');
-      if (document.getElementById('optRegToSmart').checked) text = text.replace(/'/g, '\u2019').replace(/"/g, '\u201D');
-
-      if (document.getElementById('optTrimLeft').checked) text = text.slice(parseInt(document.getElementById('numTrimLeft').value) || 0);
-      if (document.getElementById('optTrimRight').checked) text = text.slice(0, -(parseInt(document.getElementById('numTrimRight').value) || 0));
+      if (document.getElementById('smartToReg').checked) text = text.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"');
 
       // Update Output
       textOutput.value = text;
@@ -479,10 +519,10 @@
     }
 
     function updateStats() {
-      const inWords = textInput.value.trim() ? textInput.value.trim().split(/\s+/).length : 0;
-      const outWords = textOutput.value.trim() ? textOutput.value.trim().split(/\s+/).length : 0;
-      document.getElementById('inputStats').textContent = inWords + (inWords === 1 ? ' word' : ' words');
-      document.getElementById('outputStats').textContent = outWords + (outWords === 1 ? ' word' : ' words');
+      const inW = textInput.value.trim() ? textInput.value.trim().split(/\s+/).length : 0;
+      const outW = textOutput.value.trim() ? textOutput.value.trim().split(/\s+/).length : 0;
+      document.getElementById('inputStats').textContent = inW + (inW === 1 ? ' word' : ' words');
+      document.getElementById('outputStats').textContent = outW + (outW === 1 ? ' word' : ' words');
     }
 
     function clearAll() {
@@ -494,17 +534,17 @@
     function copyOutput() {
       if (!textOutput.value) return;
       navigator.clipboard.writeText(textOutput.value).then(() => {
-        const btn = event.target;
-        const originalText = btn.innerHTML;
+        const btn = event.target.closest('button');
+        const originalHTML = btn.innerHTML;
         btn.innerHTML = "✅ Copied!";
-        setTimeout(() => btn.innerHTML = originalText, 2000);
-      }).catch(err => {
-        alert("Failed to copy text.");
-      });
+        setTimeout(() => btn.innerHTML = originalHTML, 2000);
+      }).catch(err => alert("Failed to copy text."));
     }
 
     textInput.addEventListener('input', triggerProcess);
     inputs.forEach(input => input.addEventListener('change', triggerProcess));
+    
+    // Initial run
     window.addEventListener('DOMContentLoaded', processText);
 
   </script>
