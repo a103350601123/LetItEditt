@@ -3,263 +3,867 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Text to Handwriting Converter | MyUtility</title>
+  <title>Text to Handwriting Converter | LetitEdit</title>
   <meta name="description" content="Convert typed text into realistic handwritten pages. Choose fonts, paper styles, and download as PNG or PDF.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛠️</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✍️</text></svg>">
   <link rel="stylesheet" href="../../assets/css/style.css">
+  
   <!-- Google Fonts for Handwriting -->
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Homemade+Apple&family=Indie+Flower&family=Kalam:wght@300;400;700&family=Patrick+Hand&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Homemade+Apple&family=Indie+Flower&family=Kalam:wght@300;400;700&family=Patrick+Hand&family=Shadows+Into+Light&family=Reenie+Beanie&family=Nothing+You+Could+Do&family=Cedarville+Cursive&family=Dawning+of+a+New+Day&family=Zeyada&family=Gloria+Hallelujah&display=swap" rel="stylesheet">
+  
   <!-- jsPDF for PDF Generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  
+
   <style>
-    .preview-container { background: #fff; padding: 1rem; border-radius: var(--radius); box-shadow: var(--shadow); text-align: center; overflow: auto; }
-    #handwritingCanvas { max-width: 100%; height: auto; border: 1px solid var(--border-color); }
-    .font-options { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-    .font-btn { padding: 0.8rem; border: 2px solid var(--border-color); border-radius: var(--radius); cursor: pointer; text-align: left; background: var(--card-bg); color: var(--text-color); transition: all 0.2s; }
-    .font-btn:hover { border-color: var(--primary-color); }
-    .font-btn.active { border-color: var(--primary-color); background: var(--input-bg); }
-    .font-btn span { font-size: 1.2rem; display: block; margin-bottom: 0.2rem; }
-    .font-btn small { color: #64748b; font-size: 0.75rem; }
-    .download-actions { display: flex; gap: 1rem; margin-top: 1rem; }
+    /* Scoped styles for the Handwriting Tool */
+    .wth-app {
+      --wth-brand: #1F1BC9;
+      --wth-brand-dk: #15119B;
+      --wth-brand-lt: #EEEDFF;
+      --wth-green: #1E8E5A;
+      --wth-ink: #0F172A;
+      --wth-body: #414A5C;
+      --wth-mute: #6B7590;
+      --wth-line: #E4E7F2;
+      --wth-line2: #CDD3E6;
+      --wth-soft: #F6F8FC;
+      --wth-r: 14px;
+      --wth-sh: 0 6px 24px rgba(17,20,60,.09);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--wth-body);
+      background: var(--wth-soft);
+      padding-bottom: 40px;
+    }
+    .wth-app * { box-sizing: border-box; }
+    .wth-app h2, .wth-app h3 { color: var(--wth-ink); margin: 0 0 10px; text-align: left; font-family: inherit; }
+    .wth-app p { margin: 0 0 10px; }
+
+    /* Hero Section */
+    .wth-hero {
+      position: relative; overflow: hidden; text-align: center;
+      padding: 46px 22px 74px; color: #fff;
+      background: linear-gradient(90deg, transparent 0, transparent calc(9% - 1px), rgba(255,140,150,.4) calc(9% - 1px), rgba(255,140,150,.4) calc(9% + 1px), transparent calc(9% + 1px)),
+                  repeating-linear-gradient(180deg, transparent 0, transparent 33px, rgba(255,255,255,.08) 33px, rgba(255,255,255,.08) 34px),
+                  linear-gradient(140deg, #0E1250 0%, #1A1690 48%, #1F1BC9 100%);
+    }
+    .wth-hero > * { position: relative; z-index: 1; }
+    .wth-hand { position: absolute !important; z-index: 0 !important; right: 5%; top: 26px; transform: rotate(-7deg); font-family: "Homemade Apple", cursive; font-size: 30px; color: rgba(255,255,255,.2); pointer-events: none; }
+    .wth-hand.two { right: auto; left: 11%; top: auto; bottom: 26px; transform: rotate(4deg); font-family: "Caveat", cursive; font-size: 36px; color: rgba(255,224,138,.25); }
+    .wth-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); color: #fff; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 999px; margin-bottom: 16px; }
+    .wth-hero h2 { color: #fff; font-size: 38px; font-weight: 800; letter-spacing: -.5px; margin: 0 0 12px; text-align: center; }
+    .wth-hero h2 span { color: #FFE08A; }
+    .wth-hero p { color: rgba(255,255,255,.86); max-width: 640px; margin: 0 auto 18px; font-size: 17px; }
+
+    /* Layout */
+    .wth-shell {
+      max-width: 1280px; margin: -46px auto 0; padding: 0 20px; position: relative; z-index: 2;
+      display: grid; grid-template-columns: minmax(330px, 410px) minmax(0, 1fr);
+      grid-template-areas: "text preview" "style preview"; gap: 18px; align-items: start;
+    }
+    .wth-card { background: #fff; border: 1px solid var(--wth-line); border-radius: var(--wth-r); box-shadow: var(--wth-sh); padding: 22px; }
+    .wth-text-card { grid-area: text; }
+    .wth-style-card { grid-area: style; }
+    .wth-preview { grid-area: preview; padding: 0; overflow: hidden; position: sticky; top: 16px; display: flex; flex-direction: column; max-height: calc(100vh - 140px); }
+    
+    .wth-sec + .wth-sec { border-top: 1px dashed var(--wth-line2); margin-top: 20px; padding-top: 20px; }
+    .wth-sec-h { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .wth-num { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--wth-brand); color: #fff; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+    .wth-app .wth-sec-h h3 { font-size: 18px; font-weight: 700; margin: 0; }
+    .wth-count { margin-left: auto; font-size: 13px; font-weight: 600; color: var(--wth-brand); background: var(--wth-brand-lt); padding: 3px 10px; border-radius: 999px; }
+    
+    /* Forms */
+    .wth-field { margin-bottom: 12px; }
+    .wth-field label { display: block; font-size: 13px; font-weight: 600; color: var(--wth-ink); margin-bottom: 5px; }
+    .wth-app .wth-input, .wth-app .wth-select, .wth-app .wth-textarea {
+      width: 100%; min-height: 44px; font: inherit; font-size: 15px; color: var(--wth-ink);
+      background: #fff; border: 1.5px solid var(--wth-line2); border-radius: 10px; padding: 9px 12px; outline: none; transition: border-color .15s;
+    }
+    .wth-app .wth-textarea { min-height: 150px; resize: vertical; line-height: 1.55; }
+    .wth-app .wth-input:focus, .wth-app .wth-select:focus, .wth-app .wth-textarea:focus { border-color: var(--wth-brand); }
+    .wth-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* Buttons & Links */
+    .wth-app .wth-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      min-height: 42px; padding: 9px 16px; font: inherit; font-size: 15px; font-weight: 700;
+      border-radius: 10px; border: 1.5px solid transparent; cursor: pointer; background: var(--wth-brand); color: #fff; transition: 0.2s;
+    }
+    .wth-app .wth-btn:hover { background: var(--wth-brand-dk); }
+    .wth-app .wth-btn-ghost { background: #fff; color: var(--wth-brand); border-color: var(--wth-line2); }
+    .wth-app .wth-btn-ghost:hover { background: var(--wth-brand-lt); border-color: var(--wth-brand); }
+    .wth-app .wth-btn-sm { min-height: 36px; padding: 6px 12px; font-size: 14px; }
+    .wth-app .wth-link { background: none; border: 0; padding: 0; color: var(--wth-brand); font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; }
+    .wth-app .wth-link:hover { text-decoration: underline; }
+    .wth-links { display: flex; gap: 16px; margin-top: 8px; }
+
+    /* Font Picker */
+    .wth-fonts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .wth-app .wth-font {
+      display: flex; flex-direction: column; padding: 7px 10px; background: #fff; border: 1.5px solid var(--wth-line2); border-radius: 10px; cursor: pointer; text-align: left; transition: 0.15s;
+    }
+    .wth-app .wth-font:hover { border-color: var(--wth-brand); }
+    .wth-app .wth-font.on { background: var(--wth-brand-lt); border-color: var(--wth-brand); }
+    .wth-font-s { font-size: 22px; color: #1C3F94; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .wth-font-n { font-size: 12px; font-weight: 600; color: var(--wth-mute); white-space: nowrap; }
+
+    /* Paper Picker */
+    .wth-papers { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .wth-app .wth-paper { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 6px 4px; background: #fff; border: 1.5px solid var(--wth-line2); border-radius: 10px; cursor: pointer; font-size: 12px; font-weight: 600; }
+    .wth-app .wth-paper.on { border-color: var(--wth-brand); background: var(--wth-brand-lt); }
+    .wth-pp { display: block; width: 34px; height: 42px; border: 1px solid #D5DAE6; border-radius: 3px; background: #fff; }
+    .wth-pp-ruled { background: linear-gradient(90deg, transparent 7px, rgba(222,70,80,.6) 7px, rgba(222,70,80,.6) 8px, transparent 8px), repeating-linear-gradient(180deg, #fff 0, #fff 6px, rgba(76,138,206,.6) 6px, rgba(76,138,206,.6) 7px); }
+    .wth-pp-grid { background: repeating-linear-gradient(90deg, transparent 0, transparent 5px, rgba(80,140,210,.45) 5px, rgba(80,140,210,.45) 6px), repeating-linear-gradient(180deg, #fff 0, #fff 5px, rgba(80,140,210,.45) 5px, rgba(80,140,210,.45) 6px); }
+    .wth-pp-legal { background: linear-gradient(90deg, transparent 6px, rgba(222,70,80,.6) 6px, rgba(222,70,80,.6) 7px, transparent 7px, transparent 9px, rgba(222,70,80,.6) 9px, rgba(222,70,80,.6) 10px, transparent 10px), repeating-linear-gradient(180deg, #FCF3A5 0, #FCF3A5 6px, rgba(84,118,168,.55) 6px, rgba(84,118,168,.55) 7px); }
+    .wth-pp-dotted { background: radial-gradient(circle, rgba(70,80,110,.55) 0.8px, transparent 1.2px) 0 0/6px 6px, #fff; }
+
+    /* Ink Picker */
+    .wth-inks { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    .wth-app .wth-ink { width: 34px; height: 34px; border-radius: 50%; cursor: pointer; border: 3px solid #fff; box-shadow: 0 0 0 1.5px var(--wth-line2); transition: 0.15s; padding: 0; }
+    .wth-app .wth-ink.on { box-shadow: 0 0 0 2.5px var(--wth-brand); }
+    .wth-custom { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--wth-mute); cursor: pointer; }
+    .wth-app .wth-custom input[type="color"] { width: 34px; height: 34px; border: 1.5px solid var(--wth-line2); border-radius: 50%; padding: 0; cursor: pointer; background: none; }
+    .wth-app .wth-custom.on input[type="color"] { box-shadow: 0 0 0 2.5px var(--wth-brand); }
+
+    /* Sliders */
+    .wth-ranges { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; }
+    .wth-range { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0 8px; }
+    .wth-range label { margin: 0; }
+    .wth-range output { font-size: 13px; font-weight: 700; color: var(--wth-brand); }
+    .wth-app .wth-range input[type="range"] { grid-column: 1 / -1; width: 100%; accent-color: var(--wth-brand); cursor: pointer; }
+    .wth-check { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--wth-ink); margin: 14px 0 0; cursor: pointer; }
+    .wth-check input { width: 18px; height: 18px; accent-color: var(--wth-brand); }
+
+    /* Preview Area */
+    .wth-pv-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--wth-line); background: #fff; }
+    .wth-pv-title { display: flex; align-items: baseline; gap: 8px; }
+    .wth-pv-title b { font-size: 16px; color: var(--wth-ink); }
+    .wth-pv-title span { font-size: 13px; color: var(--wth-mute); }
+    .wth-pv-actions { display: flex; gap: 8px; }
+    .wth-pages { flex: 1; overflow: auto; background: #E6E9F1; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 22px; min-height: 420px; }
+    .wth-page { width: 100%; max-width: 760px; }
+    .wth-page canvas { display: block; width: 100%; height: auto; background: #fff; box-shadow: 0 2px 4px rgba(15,23,42,.08), 0 10px 28px rgba(15,23,42,.14); border-radius: 2px; }
+    
+    /* Responsive */
+    @media (max-width: 980px) {
+      .wth-shell { grid-template-columns: 1fr; grid-template-areas: "text" "preview" "style"; }
+      .wth-preview { position: relative; top: auto; max-height: none; }
+      .wth-ranges { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      .wth-hero h2 { font-size: 28px; }
+      .wth-shell { padding: 0 12px; }
+      .wth-papers { grid-template-columns: repeat(3, 1fr); }
+      .wth-ranges { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
-<body>
-  <header class="header">
-    <a href="../../index.html" class="logo">MyUtility</a>
+<body class="wth-app">
+  
+  <header class="header" style="background: #fff; position: relative; z-index: 10;">
+    <a href="../../index.html" class="logo">LetitEdit</a>
     <button id="themeToggle" class="btn btn-outline btn-sm" aria-label="Toggle Dark Mode">🌙</button>
   </header>
 
-  <main class="container">
-    <div style="margin-bottom: 2rem;">
-      <h1 style="font-size: 1.8rem;">Text to Handwriting</h1>
-      <p style="color: #64748b;">Convert typed text into realistic handwritten pages.</p>
+  <!-- Hero Section -->
+  <section class="wth-hero">
+    <span class="wth-hand" aria-hidden="true">Dear diary,</span>
+    <span class="wth-hand two" aria-hidden="true">due Monday!</span>
+    <div class="wth-badge">✍️ Free Online Tool — No Signup</div>
+    <h2>Text to Handwriting <span>Converter</span></h2>
+    <p>Type or paste your text and turn it into realistic handwriting on notebook paper. Pick a handwriting font, ink color and paper, then download it as a PNG image or PDF.</p>
+  </section>
+
+  <div class="wth-shell">
+    <!-- Left Column: Controls -->
+    <div class="wth-card wth-text-card">
+      <div class="wth-sec-h">
+        <span class="wth-num">1</span><h3>Your text</h3>
+        <span class="wth-count" id="wth-count">0 words</span>
+      </div>
+      <div class="wth-field">
+        <label for="wth-title">Title <span style="font-weight:400;color:#6B7590;">(optional)</span></label>
+        <input class="wth-input" id="wth-title" type="text" placeholder="e.g. The Water Cycle" autocomplete="off">
+      </div>
+      <div class="wth-field">
+        <label for="wth-text">Text</label>
+        <textarea class="wth-textarea" id="wth-text" placeholder="Type or paste the text you want to turn into handwriting…"></textarea>
+      </div>
+      <div class="wth-links">
+        <button type="button" class="wth-link" id="wth-sample">Use sample text</button>
+        <button type="button" class="wth-link" id="wth-clear">Clear text</button>
+      </div>
     </div>
 
-    <div class="tool-layout">
-      <div>
-        <div class="card" style="margin-bottom: 1.5rem;">
-          <h3>1. Your Text</h3>
-          <div class="form-group">
-            <label>Title (optional, centered and underlined)</label>
-            <input type="text" id="titleInput" placeholder="The Water Cycle">
-          </div>
-          <div class="form-group">
-            <label>Text</label>
-            <textarea id="textInput" rows="10" placeholder="Water is always on the move..."></textarea>
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <small style="color: #64748b;"><span id="wordCount">0</span> words</small>
-            <div style="display: flex; gap: 0.5rem;">
-              <button class="btn btn-outline btn-sm" onclick="useSampleText()">Use sample text</button>
-              <button class="btn btn-outline btn-sm" onclick="clearText()">Clear text</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-bottom: 1.5rem;">
-          <h3>2. Handwriting</h3>
-          <div class="font-options">
-            <button class="font-btn active" data-font="'Caveat', cursive" style="font-family: 'Caveat', cursive;">
-              <span>Hello there</span><small>Caveat · Neat</small>
-            </button>
-            <button class="font-btn" data-font="'Homemade Apple', cursive" style="font-family: 'Homemade Apple', cursive;">
-              <span>Hello there</span><small>Homemade Apple · Joined</small>
-            </button>
-            <button class="font-btn" data-font="'Kalam', cursive" style="font-family: 'Kalam', cursive;">
-              <span>Hello there</span><small>Kalam · Hindi + English</small>
-            </button>
-            <button class="font-btn" data-font="'Indie Flower', cursive" style="font-family: 'Indie Flower', cursive;">
-              <span>Hello there</span><small>Indie Flower · Rounded</small>
-            </button>
-            <button class="font-btn" data-font="'Shadows Into Light', cursive" style="font-family: 'Shadows Into Light', cursive;">
-              <span>Hello there</span><small>Shadows Into Light · Light</small>
-            </button>
-            <button class="font-btn" data-font="'Patrick Hand', cursive" style="font-family: 'Patrick Hand', cursive;">
-              <span>Hello there</span><small>Patrick Hand · Print</small>
-            </button>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>3. Paper & Ink</h3>
-          <div class="form-group">
-            <label>Paper Style</label>
-            <select id="paperStyle">
-              <option value="ruled">Ruled (Notebook)</option>
-              <option value="grid">Grid</option>
-              <option value="plain">Plain</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Ink Color</label>
-            <select id="inkColor">
-              <option value="#1e3a8a">Dark Blue</option>
-              <option value="#000000">Black</option>
-              <option value="#1d4ed8">Blue</option>
-              <option value="#b91c1c">Red</option>
-            </select>
-          </div>
-        </div>
+    <div class="wth-card wth-style-card">
+      <!-- Font Picker -->
+      <div class="wth-sec">
+        <div class="wth-sec-h"><span class="wth-num">2</span><h3>Handwriting</h3></div>
+        <div class="wth-fonts" id="wth-fonts"></div>
+        <label class="wth-btn wth-btn-ghost wth-btn-sm" for="wth-font-file" style="margin-top:12px; width:100%;">⬆ Use your own font file</label>
+        <input type="file" id="wth-font-file" accept=".ttf,.otf,.woff,.woff2" hidden>
       </div>
 
-      <div class="preview-container">
-        <h3 style="text-align: left; margin-bottom: 1rem;">Preview <span style="font-size: 0.8rem; font-weight: normal; color: #64748b;">1 page · A4</span></h3>
-        <canvas id="handwritingCanvas"></canvas>
+      <!-- Paper & Ink -->
+      <div class="wth-sec">
+        <div class="wth-sec-h"><span class="wth-num">3</span><h3>Paper & ink</h3></div>
+        <div style="font-size:13px; font-weight:700; margin-bottom:8px; color:#0F172A;">Paper</div>
+        <div class="wth-papers" id="wth-papers"></div>
         
-        <div class="download-actions">
-          <button class="btn btn-primary" onclick="downloadPNG()" style="flex: 1;">📥 PNG</button>
-          <button class="btn btn-primary" onclick="downloadPDF()" style="flex: 1;">📄 PDF</button>
+        <div style="font-size:13px; font-weight:700; margin:14px 0 8px; color:#0F172A;">Ink color</div>
+        <div class="wth-inks" id="wth-inks">
+          <label class="wth-custom" id="wth-custom-wrap" title="Pick any ink color">
+            <input type="color" id="wth-custom" value="#5B2A86"> Custom
+          </label>
         </div>
-        <p style="font-size: 0.75rem; color: #64748b; margin-top: 0.5rem;">Nothing is uploaded. Your text stays in your browser.</p>
+
+        <div class="wth-grid2" style="margin-top:14px">
+          <div class="wth-field">
+            <label for="wth-page">Page size</label>
+            <select class="wth-select" id="wth-page">
+              <option value="a4">A4</option>
+              <option value="letter">US Letter</option>
+            </select>
+          </div>
+          <div class="wth-field">
+            <label for="wth-effect">Look</label>
+            <select class="wth-select" id="wth-effect">
+              <option value="clean">Clean</option>
+              <option value="scan">Scanned</option>
+              <option value="photo">Photo (soft shadow)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fine-tune -->
+      <div class="wth-sec">
+        <div class="wth-sec-h"><span class="wth-num">4</span><h3>Fine-tune</h3></div>
+        <div class="wth-ranges">
+          <div class="wth-range">
+            <label for="wth-size">Font size</label><output id="wth-size-v">34px</output>
+            <input type="range" id="wth-size" min="18" max="64" step="1" value="34">
+          </div>
+          <div class="wth-range">
+            <label for="wth-gap">Line spacing</label><output id="wth-gap-v">56px</output>
+            <input type="range" id="wth-gap" min="36" max="96" step="1" value="56">
+          </div>
+          <div class="wth-range">
+            <label for="wth-letter">Letter spacing</label><output id="wth-letter-v">0px</output>
+            <input type="range" id="wth-letter" min="-2" max="12" step="0.5" value="0">
+          </div>
+          <div class="wth-range">
+            <label for="wth-word">Word spacing</label><output id="wth-word-v">0px</output>
+            <input type="range" id="wth-word" min="-8" max="40" step="1" value="0">
+          </div>
+          <div class="wth-range" style="grid-column: 1 / -1;">
+            <label for="wth-mess">Natural variation</label><output id="wth-mess-v">4/10</output>
+            <input type="range" id="wth-mess" min="0" max="10" step="1" value="4">
+          </div>
+        </div>
+        <label class="wth-check"><input type="checkbox" id="wth-indent"> Indent the first line of each paragraph</label>
+        
+        <div style="display:flex; gap:10px; align-items:center; margin-top:16px;">
+          <button type="button" class="wth-btn wth-btn-ghost wth-btn-sm" id="wth-shuffle">🔀 Shuffle handwriting</button>
+          <button type="button" class="wth-link" id="wth-reset">Reset style</button>
+        </div>
       </div>
     </div>
-  </main>
+
+    <!-- Right Column: Preview -->
+    <div class="wth-card wth-preview">
+      <div class="wth-pv-bar">
+        <div class="wth-pv-title">
+          <b>Preview</b><span id="wth-info">1 page</span>
+        </div>
+        <div class="wth-pv-actions">
+          <button type="button" class="wth-btn wth-btn-ghost wth-btn-sm" id="wth-png">⬇ PNG</button>
+          <button type="button" class="wth-btn wth-btn-sm" id="wth-pdf">⬇ PDF</button>
+        </div>
+      </div>
+      <div class="wth-pages" id="wth-pages">
+        <!-- Canvases will be injected here -->
+      </div>
+    </div>
+  </div>
 
   <script src="../../assets/js/common.js"></script>
   <script>
-    const canvas = document.getElementById('handwritingCanvas');
-    const ctx = canvas.getContext('2d');
-    const textInput = document.getElementById('textInput');
-    const titleInput = document.getElementById('titleInput');
-    const wordCountEl = document.getElementById('wordCount');
+    // === Configuration Data ===
+    const FONTS = [
+      { id: 'caveat', name: 'Caveat', tag: 'Neat' },
+      { id: 'homemade', name: 'Homemade Apple', tag: 'Joined-up' },
+      { id: 'kalam', name: 'Kalam', tag: 'Hindi + English' },
+      { id: 'indie', name: 'Indie Flower', tag: 'Rounded' },
+      { id: 'shadows', name: 'Shadows Into Light', tag: 'Light' },
+      { id: 'patrick', name: 'Patrick Hand', tag: 'Print' },
+      { id: 'reenie', name: 'Reenie Beanie', tag: 'Quick notes' },
+      { id: 'nothing', name: 'Nothing You Could Do', tag: 'Slanted' },
+      { id: 'cedarville', name: 'Cedarville Cursive', tag: 'Cursive' },
+      { id: 'dawning', name: 'Dawning of a New Day', tag: 'Loose' },
+      { id: 'zeyada', name: 'Zeyada', tag: 'Messy' },
+      { id: 'gloria', name: 'Gloria Hallelujah', tag: 'Playful' }
+    ];
 
-    const PAGE_WIDTH = 794; // A4 at 96 DPI
-    const PAGE_HEIGHT = 1123;
+    const PAPERS = [
+      { id: 'ruled', name: 'Ruled' },
+      { id: 'plain', name: 'Plain' },
+      { id: 'grid', name: 'Grid' },
+      { id: 'legal', name: 'Legal' },
+      { id: 'dotted', name: 'Dotted' }
+    ];
+
+    const INKS = [
+      { id: 'blue', name: 'Blue pen', c: '#1C3F94' },
+      { id: 'black', name: 'Black pen', c: '#1E1E26' },
+      { id: 'red', name: 'Red pen', c: '#C3262F' },
+      { id: 'green', name: 'Green pen', c: '#1D7A43' },
+      { id: 'pencil', name: 'Pencil', c: '#404046' }
+    ];
+
+    const SIZES = {
+      a4: { w: 1240, h: 1754, pw: 595.28, ph: 841.89, label: 'A4' },
+      letter: { w: 1275, h: 1650, pw: 612, ph: 792, label: 'US Letter' }
+    };
+
+    const SAMPLE_TITLE = "The Water Cycle";
+    const SAMPLE_TEXT = `Water is always on the move. The sun heats oceans, lakes and rivers, and some of that water turns into vapor that rises into the air. This step is called evaporation.\n\nAs the vapor rises, it cools and turns back into tiny droplets that form clouds. This is called condensation. When the droplets join together and get too heavy, they fall back to the ground as rain, snow, sleet or hail. We call this precipitation.\n\nThe water then collects in oceans, lakes, rivers and under the ground, and the whole cycle starts again. Without the water cycle, plants, animals and people would not have the fresh water they need to live.`;
+
+    // === State ===
+    let state = {
+      title: SAMPLE_TITLE,
+      text: SAMPLE_TEXT,
+      font: 'caveat',
+      paper: 'ruled',
+      ink: 'blue',
+      custom: '#5B2A86',
+      page: 'a4',
+      effect: 'clean',
+      size: 34,
+      gap: 56,
+      letter: 0,
+      word: 0,
+      mess: 4,
+      indent: false,
+      seed: 1
+    };
+
+    // Custom font variables
+    let customFamily = '';
+    let customCount = 0;
+    let lastGoogleFont = state.font;
+    let pageCanvases = [];
+
+    // === DOM Elements ===
+    const titleEl = document.getElementById('wth-title');
+    const textEl = document.getElementById('wth-text');
+    const fontsEl = document.getElementById('wth-fonts');
+    const papersEl = document.getElementById('wth-papers');
+    const inksEl = document.getElementById('wth-inks');
+    const customWrap = document.getElementById('wth-custom-wrap');
+    const customEl = document.getElementById('wth-custom');
+
+    // === Helpers ===
+    function $(id) { return document.getElementById(id); }
     
-    let currentFont = "'Caveat', cursive";
-    let currentInk = '#1e3a8a';
-    let currentPaper = 'ruled';
+    function mulberry32(a) {
+      return function() {
+        a |= 0; a = a + 0x6D2B79F5 | 0;
+        var t = Math.imul(a ^ a >>> 15, 1 | a);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      }
+    }
+
+    function hexA(hex, a) {
+      var h = String(hex || '#000000').replace('#', '');
+      if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+      var n = parseInt(h, 16) || 0;
+      return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')';
+    }
+
+    function inkColor() {
+      if (state.ink === 'custom') return state.custom;
+      return (INKS.find(i => i.id === state.ink) || INKS[0]).c;
+    }
+
+    // === UI Initialization ===
+    function initUI() {
+      // Fonts
+      FONTS.forEach(f => {
+        let b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'wth-font';
+        b.dataset.id = f.id;
+        b.innerHTML = `<span class="wth-font-s" style="font-family:'${f.name}', cursive;">Hello there</span><span class="wth-font-n">${f.name} · ${f.tag}</span>`;
+        b.onclick = () => { state.font = f.id; lastGoogleFont = f.id; syncUI(); render(); };
+        fontsEl.appendChild(b);
+      });
+
+      // Papers
+      PAPERS.forEach(p => {
+        let b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'wth-paper';
+        b.dataset.id = p.id;
+        b.innerHTML = `<span class="wth-pp wth-pp-${p.id}"></span>${p.name}`;
+        b.onclick = () => { state.paper = p.id; syncUI(); render(); };
+        papersEl.appendChild(b);
+      });
+
+      // Inks
+      INKS.forEach(k => {
+        let b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'wth-ink';
+        b.dataset.id = k.id;
+        b.style.background = k.c;
+        b.title = k.name;
+        b.onclick = () => { state.ink = k.id; syncUI(); render(); };
+        inksEl.insertBefore(b, customWrap);
+      });
+
+      // Inputs
+      titleEl.value = state.title;
+      textEl.value = state.text;
+      updateWordCount();
+
+      titleEl.addEventListener('input', () => { state.title = titleEl.value; render(); });
+      textEl.addEventListener('input', () => { state.text = textEl.value; updateWordCount(); render(); });
+      
+      $('wth-sample').onclick = () => { state.title = SAMPLE_TITLE; state.text = SAMPLE_TEXT; titleEl.value = state.title; textEl.value = state.text; updateWordCount(); render(); };
+      $('wth-clear').onclick = () => { state.title = ''; state.text = ''; titleEl.value = ''; textEl.value = ''; updateWordCount(); render(); };
+
+      $('wth-page').value = state.page;
+      $('wth-page').onchange = (e) => { state.page = e.target.value; render(); };
+      
+      $('wth-effect').value = state.effect;
+      $('wth-effect').onchange = (e) => { state.effect = e.target.value; render(); };
+
+      // Sliders
+      const sliders = [
+        { id: 'size', unit: 'px' }, { id: 'gap', unit: 'px' }, 
+        { id: 'letter', unit: 'px' }, { id: 'word', unit: 'px' }, 
+        { id: 'mess', unit: '/10', zero: 'Off' }
+      ];
+
+      sliders.forEach(s => {
+        const el = $('wth-' + s.id);
+        const out = $('wth-' + s.id + '-v');
+        el.value = state[s.id];
+        out.textContent = s.id === 'mess' && state[s.id] === 0 ? 'Off' : state[s.id] + s.unit;
+        
+        el.addEventListener('input', () => {
+          state[s.id] = parseFloat(el.value) || 0;
+          out.textContent = s.id === 'mess' && state[s.id] === 0 ? 'Off' : state[s.id] + s.unit;
+          render();
+        });
+      });
+
+      // Checkbox
+      $('wth-indent').checked = state.indent;
+      $('wth-indent').onchange = (e) => { state.indent = e.target.checked; render(); };
+
+      // Custom Ink
+      customEl.value = state.custom;
+      customEl.addEventListener('input', () => { state.ink = 'custom'; state.custom = customEl.value; syncUI(); render(); });
+      customEl.addEventListener('click', () => { if(state.ink !== 'custom') { state.ink = 'custom'; syncUI(); render(); }});
+
+      // Shuffle & Reset
+      $('wth-shuffle').onclick = () => {
+        state.seed = 1 + Math.floor(Math.random() * 99999);
+        if (state.mess === 0) { state.mess = 4; syncUI(); }
+        render();
+      };
+      $('wth-reset').onclick = () => {
+        state.size = 34; state.gap = 56; state.letter = 0; state.word = 0; state.mess = 4; state.indent = false;
+        syncUI(); render();
+      };
+
+      // Download buttons
+      $('wth-png').onclick = downloadPNG;
+      $('wth-pdf').onclick = downloadPDF;
+
+      // Custom Font Upload
+      const fileEl = $('wth-font-file');
+      fileEl.addEventListener('change', () => {
+        const f = fileEl.files && fileEl.files[0];
+        fileEl.value = '';
+        if (!f) return;
+        if (f.size > 15 * 1024 * 1024) { alert('Font file is too big (15 MB max).'); return; }
+        
+        f.arrayBuffer().then(buf => {
+          const fam = 'WTH Custom Font ' + (++customCount);
+          return new FontFace(fam, buf).load().then(face => {
+            document.fonts.add(face);
+            customFamily = fam;
+            const label = f.name.replace(/\.[^.]+$/, '').slice(0, 40) || 'Your font';
+            
+            let old = fontsEl.querySelector('[data-id="custom"]');
+            let b = document.createElement('button');
+            b.type = 'button'; b.className = 'wth-font'; b.dataset.id = 'custom';
+            b.innerHTML = `<span class="wth-font-s" style="font-family:'${fam}', cursive;">Hello there</span><span class="wth-font-n">${label}</span>`;
+            b.onclick = () => { state.font = 'custom'; syncUI(); render(); };
+            
+            if (old) fontsEl.replaceChild(b, old);
+            else fontsEl.insertBefore(b, fontsEl.firstChild);
+            
+            state.font = 'custom';
+            syncUI(); render();
+          });
+        }).catch(() => alert('Could not read the font file.'));
+      });
+    }
+
+    function syncUI() {
+      // Fonts
+      Array.from(fontsEl.children).forEach(el => {
+        el.classList.toggle('on', el.dataset.id === state.font);
+      });
+      // Papers
+      Array.from(papersEl.children).forEach(el => {
+        el.classList.toggle('on', el.dataset.id === state.paper);
+      });
+      // Inks
+      Array.from(inksEl.children).forEach(el => {
+        if (el.classList.contains('wth-custom')) return;
+        el.classList.toggle('on', el.dataset.id === state.ink);
+      });
+      customWrap.classList.toggle('on', state.ink === 'custom');
+
+      // Selects
+      $('wth-page').value = state.page;
+      $('wth-effect').value = state.effect;
+      $('wth-indent').checked = state.indent;
+
+      // Sliders
+      ['size','gap','letter','word','mess'].forEach(id => {
+        $('wth-' + id).value = state[id];
+        const unit = id === 'mess' ? '/10' : 'px';
+        $('wth-' + id + '-v').textContent = (id === 'mess' && state[id] === 0) ? 'Off' : state[id] + unit;
+      });
+    }
 
     function updateWordCount() {
-      const text = textInput.value.trim();
-      wordCountEl.textContent = text ? text.split(/\s+/).length : 0;
+      const text = textEl.value.trim();
+      const count = text ? text.split(/\s+/).length : 0;
+      $('wth-count').textContent = count + (count === 1 ? ' word' : ' words');
     }
 
-    function useSampleText() {
-      titleInput.value = "The Water Cycle";
-      textInput.value = `Water is always on the move. The sun heats oceans, lakes and rivers, and some of that water turns into vapor that rises into the air. This step is called evaporation.\n\nAs the vapor rises, it cools and turns back into tiny droplets that form clouds. This is called condensation. When the droplets join together and get too heavy, they fall back to the ground as rain, snow, sleet or hail. We call this precipitation.`;
-      updateWordCount();
-      renderCanvas();
-    }
+    // === Rendering Engine ===
+    function layout(fam) {
+      const P = SIZES[state.page] || SIZES.a4;
+      const lined = state.paper === 'ruled' || state.paper === 'legal';
+      
+      let L = { W: P.w, H: P.h, gap: state.gap, rule: 3 };
+      L.top = lined ? 196 : 170;
+      L.mx = lined ? 168 : 120;
+      L.tx = lined ? L.mx + 24 : L.mx;
+      L.rx = P.w - 96;
+      L.maxW = L.rx - L.tx;
+      L.perPage = Math.max(1, Math.floor((P.h - 104 - L.top) / L.gap) + 1);
 
-    function clearText() {
-      titleInput.value = "";
-      textInput.value = "";
-      updateWordCount();
-      renderCanvas();
-    }
+      let m = document.createElement('canvas').getContext('2d');
+      m.font = '100px "' + fam + '"';
+      let xh = m.measureText('x').actualBoundingBoxAscent;
+      let norm = (xh && xh > 5) ? Math.max(0.55, Math.min(2.4, 50 / xh)) : 1;
+      
+      L.fs = Math.round(state.size * norm * 10) / 10;
+      m.font = L.fs + 'px "' + fam + '"';
+      L.space = Math.max(L.fs * 0.14, m.measureText(' ').width + state.word);
+      
+      let v = state.mess;
+      let rnd = mulberry32(state.seed * 7919 + 13);
 
-    document.querySelectorAll('.font-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentFont = btn.getAttribute('data-font');
-        renderCanvas();
-      });
-    });
-
-    document.getElementById('paperStyle').addEventListener('change', (e) => { currentPaper = e.target.value; renderCanvas(); });
-    document.getElementById('inkColor').addEventListener('change', (e) => { currentInk = e.target.value; renderCanvas(); });
-
-    function renderCanvas() {
-      canvas.width = PAGE_WIDTH;
-      canvas.height = PAGE_HEIGHT;
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, PAGE_WIDTH, PAGE_HEIGHT);
-      drawPaper();
-
-      ctx.fillStyle = currentInk;
-      ctx.font = `28px ${currentFont}`;
-      ctx.textBaseline = 'top';
-
-      let y = 80;
-      const marginX = 50;
-      const lineHeight = 36;
-
-      if (titleInput.value.trim()) {
-        ctx.font = `bold 32px ${currentFont}`;
-        ctx.textAlign = 'center';
-        ctx.fillText(titleInput.value.trim(), PAGE_WIDTH / 2, y);
-        const textWidth = ctx.measureText(titleInput.value.trim()).width;
-        ctx.beginPath();
-        ctx.moveTo((PAGE_WIDTH / 2) - (textWidth / 2), y + 34);
-        ctx.lineTo((PAGE_WIDTH / 2) + (textWidth / 2), y + 34);
-        ctx.strokeStyle = currentInk;
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        y += 60;
-        ctx.font = `28px ${currentFont}`;
-        ctx.textAlign = 'left';
+      function wWidth(t) {
+        let w = m.measureText(t).width;
+        if (state.letter) w += state.letter * Array.from(t).length;
+        return w;
       }
 
-      const text = textInput.value;
-      const paragraphs = text.split('\n');
+      let lines = [];
+      let title = state.title.trim();
+      if (title) {
+        lines.push({ words: [{ t: title, w: wWidth(title), sc: 1 }], center: true, underline: true });
+      }
 
-      paragraphs.forEach(para => {
-        if (para.trim() === '') { y += lineHeight; return; }
-        const words = para.split(' ');
-        let line = '';
+      let cur = null, curW = 0;
 
-        words.forEach(word => {
-          const testLine = line + word + ' ';
-          if (ctx.measureText(testLine).width > (PAGE_WIDTH - marginX * 2) && line !== '') {
-            ctx.fillText(line.trim(), marginX, y);
-            y += lineHeight;
-            line = word + ' ';
-          } else {
-            line = testLine;
+      function newLine(indent) {
+        cur = { words: [], indent: indent || 0 };
+        curW = cur.indent;
+      }
+
+      function add(t) {
+        let sc = 1 + (rnd() * 2 - 1) * v * 0.004;
+        let w = wWidth(t) * sc;
+        let room = L.maxW - cur.indent;
+        
+        if (w > room) {
+          let g = Array.from(t), chunk = '';
+          for (let i = 0; i < g.length; i++) {
+            if (chunk && wWidth(chunk + g[i]) * sc > L.maxW) {
+              add2(chunk, sc);
+              chunk = '';
+            }
+            chunk += g[i];
           }
-        });
-        ctx.fillText(line.trim(), marginX, y);
-        y += lineHeight + 10; 
+          if (chunk) add2(chunk, sc);
+          return;
+        }
+        add2(t, sc, w);
+      }
+
+      function add2(t, sc, w) {
+        if (w === undefined) w = wWidth(t) * sc;
+        let need = (cur.words.length ? L.space : 0) + w;
+        if (cur.words.length && curW + need > L.maxW) {
+          lines.push(cur);
+          newLine(0);
+          need = w;
+        }
+        cur.words.push({ t, w, sc });
+        curW += need;
+      }
+
+      let paras = state.text.replace(/\r\n?/g, '\n').split('\n');
+      paras.forEach(p => {
+        let words = p.split(/[ \t]+/).filter(Boolean);
+        if (!words.length) { lines.push({ words: [] }); return; }
+        newLine(state.indent ? L.fs * 1.6 : 0);
+        words.forEach(add);
+        lines.push(cur);
       });
+      
+      while (lines.length && !lines[lines.length - 1].words.length) lines.pop();
+
+      let pages = [];
+      for (let i = 0; i < lines.length; i += L.perPage) {
+        pages.push(lines.slice(i, i + L.perPage));
+      }
+      if (!pages.length) pages.push([]);
+      
+      L.pages = pages;
+      L.rnd = rnd;
+      return L;
     }
 
-    function drawPaper() {
-      ctx.strokeStyle = '#e2e8f0';
-      ctx.lineWidth = 1;
-      const lineSpacing = 36;
-      const startY = 80;
-      const marginX = 50;
+    function drawPaper(ctx, W, H, L) {
+      let p = state.paper, y, x, cell;
+      ctx.fillStyle = p === 'legal' ? '#FCF3A5' : '#FFFFFF';
+      ctx.fillRect(0, 0, W, H);
 
-      if (currentPaper === 'ruled') {
-        for (let y = startY + lineSpacing; y < PAGE_HEIGHT; y += lineSpacing) {
-          ctx.beginPath(); ctx.moveTo(marginX, y); ctx.lineTo(PAGE_WIDTH - marginX, y); ctx.stroke();
-        }
-        ctx.strokeStyle = '#fca5a5';
-        ctx.beginPath(); ctx.moveTo(marginX - 10, 0); ctx.lineTo(marginX - 10, PAGE_HEIGHT); ctx.stroke();
-      } else if (currentPaper === 'grid') {
-        for (let x = marginX; x < PAGE_WIDTH - marginX; x += lineSpacing) {
-          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, PAGE_HEIGHT); ctx.stroke();
-        }
-        for (let y = startY; y < PAGE_HEIGHT; y += lineSpacing) {
-          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(PAGE_WIDTH, y); ctx.stroke();
+      function line(x1, y1, x2, y2) {
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      }
+
+      if (p === 'ruled' || p === 'legal') {
+        ctx.strokeStyle = p === 'legal' ? 'rgba(84,118,168,.45)' : 'rgba(76,138,206,.45)';
+        ctx.lineWidth = 2;
+        let y0 = L.top + L.rule - L.gap;
+        if (y0 < 70) y0 = L.top + L.rule;
+        for (y = y0; y <= H - 56; y += L.gap) line(0, y, W, y);
+        
+        ctx.strokeStyle = 'rgba(222,70,80,.55)';
+        line(L.mx, 0, L.mx, H);
+        if (p === 'legal') line(L.mx - 9, 0, L.mx - 9, H);
+      } else if (p === 'grid' || p === 'dotted') {
+        cell = L.gap / 2;
+        let sy = (L.top + L.rule) % cell, sx = L.mx % cell;
+        
+        if (p === 'grid') {
+          ctx.strokeStyle = 'rgba(80,140,210,.26)'; ctx.lineWidth = 1.3;
+          for (y = sy; y <= H; y += cell) line(0, y, W, y);
+          for (x = sx; x <= W; x += cell) line(x, 0, x, H);
+        } else {
+          ctx.fillStyle = 'rgba(70,80,110,.4)';
+          for (y = sy; y <= H; y += cell) {
+            for (x = sx; x <= W; x += cell) {
+              ctx.beginPath(); ctx.arc(x, y, 1.9, 0, 6.2832); ctx.fill();
+            }
+          }
         }
       }
     }
 
+    function applyEffect(c, n) {
+      let e = state.effect, W = c.width, H = c.height, ctx = c.getContext('2d');
+      if (e === 'scan') {
+        ctx.globalAlpha = 0.1; ctx.fillStyle = 'rgba(40,40,40,.035)'; ctx.fillRect(0, 0, W, H);
+        let o = document.createElement('canvas'); o.width = W; o.height = H;
+        let x = o.getContext('2d'); x.fillStyle = '#E9E9E7'; x.fillRect(0, 0, W, H);
+        let ang = (((state.seed * 37 + n * 11) % 9) - 4) * 0.0011;
+        x.translate(W / 2, H / 2); x.rotate(ang); x.scale(0.982, 0.982);
+        x.shadowColor = 'rgba(0,0,0,.18)'; x.shadowBlur = 10;
+        x.drawImage(c, -W / 2, -H / 2);
+        return o;
+      }
+      if (e === 'photo') {
+        let g = ctx.createLinearGradient(0, 0, W, H);
+        g.addColorStop(0, 'rgba(255,248,230,.10)'); g.addColorStop(0.55, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(35,25,5,.22)');
+        ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+        let r = ctx.createRadialGradient(W * 0.42, H * 0.38, Math.min(W, H) * 0.3, W / 2, H / 2, Math.max(W, H) * 0.78);
+        r.addColorStop(0, 'rgba(0,0,0,0)'); r.addColorStop(1, 'rgba(0,0,0,.17)');
+        ctx.fillStyle = r; ctx.fillRect(0, 0, W, H);
+      }
+      return c;
+    }
+
+    function drawPage(L, lines, n, fam) {
+      let W = L.W, H = L.H, v = state.mess, rnd = L.rnd;
+      let c = document.createElement('canvas'); c.width = W; c.height = H;
+      let ctx = c.getContext('2d');
+      drawPaper(ctx, W, H, L);
+
+      let tl = document.createElement('canvas'); tl.width = W; tl.height = H;
+      let t = tl.getContext('2d');
+      let ink = inkColor(), pencil = state.ink === 'pencil';
+      
+      t.font = L.fs + 'px "' + fam + '"';
+      t.textBaseline = 'alphabetic';
+      t.fillStyle = ink; t.strokeStyle = ink;
+      t.shadowColor = hexA(ink, pencil ? 0.2 : 0.45); t.shadowBlur = pencil ? 0.6 : 1.3;
+
+      for (let k = 0; k < lines.length; k++) {
+        let ln = lines[k];
+        if (!ln.words.length) continue;
+        
+        let base = L.top + k * L.gap - 2;
+        let drift = (rnd() * 2 - 1) * v * 0.5;
+        let lineW = 0;
+        ln.words.forEach((o, i) => { lineW += o.w + (i ? L.space : 0); });
+        
+        let x = L.tx + (ln.indent || 0) + (rnd() * 2 - 1) * v * 0.6;
+        if (ln.center) x = L.tx + Math.max(0, (L.maxW - lineW) / 2);
+        let x0 = x;
+
+        for (let i = 0; i < ln.words.length; i++) {
+          let o = ln.words[i];
+          let prog = (x - L.tx) / L.maxW;
+          let dy = drift * prog * 2 + (rnd() * 2 - 1) * v * 0.28;
+          let rot = (rnd() * 2 - 1) * v * 0.0022;
+          
+          t.save();
+          t.translate(x, base + dy);
+          t.rotate(rot);
+          if (o.sc !== 1) t.scale(o.sc, o.sc);
+          t.globalAlpha = Math.max(0.74, 1 - rnd() * v * 0.022);
+          
+          if (state.letter) {
+            let gx = 0, g = Array.from(o.t);
+            for (let j = 0; j < g.length; j++) {
+              t.fillText(g[j], gx, (rnd() * 2 - 1) * v * 0.12);
+              gx += document.createElement('canvas').getContext('2d').measureText(g[j]).width + state.letter;
+            }
+          } else {
+            t.fillText(o.t, 0, 0);
+          }
+          t.restore();
+          x += o.w + L.space + (rnd() * 2 - 1) * v * 0.5;
+        }
+
+        // Underline for title
+        if (ln.underline) {
+          let x1 = x - L.space, uy = base + L.fs * 0.2;
+          t.save();
+          t.lineWidth = Math.max(1.6, L.fs * 0.045); t.lineCap = 'round'; t.globalAlpha = 0.92;
+          t.beginPath(); t.moveTo(x0 - 6, uy);
+          t.lineTo(x1, uy);
+          t.stroke(); t.restore();
+        }
+      }
+
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.globalAlpha = pencil ? 0.9 : 0.97;
+      ctx.drawImage(tl, 0, 0);
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = 1;
+      
+      return applyEffect(c, n);
+    }
+
+    function render() {
+      let fam = (state.font === 'custom' && customFamily) ? customFamily : (FONTS.find(f => f.id === state.font) || FONTS[0]).name;
+      
+      if (window.document.fonts && window.document.fonts.load) {
+        document.fonts.load('40px "' + fam + '"', state.text.slice(0, 50) || 'Hello').then(() => {
+          try {
+            let L = layout(fam);
+            let list = [];
+            for (let i = 0; i < L.pages.length; i++) {
+              list.push(drawPage(L, L.pages[i], i, fam));
+            }
+            pageCanvases = list;
+            showPages();
+          } catch (e) { console.error(e); }
+        }).catch(() => {
+           // Fallback if font fails to load
+           let L = layout(fam);
+           let list = [];
+           for (let i = 0; i < L.pages.length; i++) list.push(drawPage(L, L.pages[i], i, fam));
+           pageCanvases = list;
+           showPages();
+        });
+      }
+    }
+
+    function showPages() {
+      let box = $('wth-pages');
+      let n = pageCanvases.length;
+      let wraps = box.querySelectorAll('.wth-page');
+      
+      for (let i = 0; i < n; i++) {
+        let w = wraps[i];
+        if (!w) {
+          w = document.createElement('div');
+          w.className = 'wth-page';
+          box.appendChild(w);
+        }
+        let cv = pageCanvases[i];
+        let old = w.querySelector('canvas');
+        if (old) w.replaceChild(cv, old);
+        else w.appendChild(cv);
+      }
+      
+      for (let j = wraps.length - 1; j >= n; j--) box.removeChild(wraps[j]);
+      
+      let P = SIZES[state.page] || SIZES.a4;
+      $('wth-info').textContent = n + (n === 1 ? ' page' : ' pages') + ' · ' + P.label;
+    }
+
+    // === Download Handlers ===
     function downloadPNG() {
-      const link = document.createElement('a');
-      link.download = 'handwriting.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
+      if (!pageCanvases.length) return;
+      pageCanvases.forEach((cv, i) => {
+        setTimeout(() => {
+          let a = document.createElement('a');
+          a.download = 'handwriting' + (pageCanvases.length > 1 ? '-page-' + (i + 1) : '') + '.png';
+          a.href = cv.toDataURL('image/png');
+          a.click();
+        }, i * 450);
+      });
     }
 
     function downloadPDF() {
+      if (!pageCanvases.length) return;
       const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF('p', 'px', 'a4');
-      const imgData = canvas.toDataURL('image/jpeg', 1.0);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      let P = SIZES[state.page] || SIZES.a4;
+      let pdf = new jsPDF('p', 'pt', [P.pw, P.ph]);
       
-      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+      pageCanvases.forEach((cv, i) => {
+        if (i > 0) pdf.addPage([P.pw, P.ph]);
+        let imgData = cv.toDataURL('image/jpeg', 0.92);
+        pdf.addImage(imgData, 'JPEG', 0, 0, P.pw, P.ph);
+      });
+      
       pdf.save('handwriting.pdf');
     }
 
-    textInput.addEventListener('input', () => { updateWordCount(); renderCanvas(); });
-    titleInput.addEventListener('input', renderCanvas);
-    useSampleText();
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      initUI();
+      render();
+    });
+
   </script>
 </body>
 </html>
