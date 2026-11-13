@@ -23,19 +23,6 @@
       --text-muted: #64748b;
       --border-color: #e2e8f0;
       --shadow-md: 0 4px 12px rgba(0,0,0,0.05);
-
-      /* Category Colors */
-      --c-name: #2563eb; --bg-name: #dbeafe;
-      --c-email: #0d9488; --bg-email: #ccfbf1;
-      --c-phone: #0284c7; --bg-phone: #e0f2fe;
-      --c-addr: #d97706; --bg-addr: #fef3c7;
-      --c-money: #16a34a; --bg-money: #dcfce7;
-      --c-id: #9333ea; --bg-id: #f3e8ff;
-      --c-secret: #e11d48; --bg-secret: #ffe4e6;
-      --c-net: #475569; --bg-net: #e2e8f0;
-      --c-user: #ea580c; --bg-user: #ffedd5;
-      --c-url: #0891b2; --bg-url: #cffafe;
-      --c-date: #db2777; --bg-date: #fce7f3;
     }
 
     [data-theme="dark"] {
@@ -44,18 +31,6 @@
       --text-main: #e2e8f0;
       --text-muted: #94a3b8;
       --border-color: #334155;
-      /* Darker bgs for dark mode */
-      --bg-name: #1e3a8a; --c-name: #93c5fd;
-      --bg-email: #115e59; --c-email: #5eead4;
-      --bg-phone: #075985; --c-phone: #7dd3fc;
-      --bg-addr: #78350f; --c-addr: #fcd34d;
-      --bg-money: #14532d; --c-money: #86efac;
-      --bg-id: #4c1d95; --c-id: #d8b4fe;
-      --bg-secret: #881337; --c-secret: #fda4af;
-      --bg-net: #334155; --c-net: #cbd5e1;
-      --bg-user: #7c2d12; --c-user: #fdba74;
-      --bg-url: #164e63; --c-url: #67e8f9;
-      --bg-date: #831843; --c-date: #f9a8d4;
     }
 
     html, body {
@@ -104,37 +79,31 @@
     .sidebar-scroll::-webkit-scrollbar { width: 6px; }
     .sidebar-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
-    /* Chip Grid */
-    .chip-section { margin-bottom: 12px; }
-    .chip-section-title { font-size: 12px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; }
+    /* Modern Button Grid */
+    .chip-section-title { font-size: 12px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; }
     
-    .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     
     .chip {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;
-      border: 1px solid var(--border-color); background: transparent; color: var(--text-muted);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 600;
+      border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main);
       cursor: pointer; transition: all 0.2s; user-select: none;
     }
     
-    .chip:hover { background: rgba(0,0,0,0.02); }
+    .chip:hover { border-color: var(--brand); background: var(--bg-color); }
     
-    /* Active states per category */
-    .chip.active.c-name { background: var(--bg-name); color: var(--c-name); border-color: var(--c-name); }
-    .chip.active.c-email { background: var(--bg-email); color: var(--c-email); border-color: var(--c-email); }
-    .chip.active.c-phone { background: var(--bg-phone); color: var(--c-phone); border-color: var(--c-phone); }
-    .chip.active.c-addr { background: var(--bg-addr); color: var(--c-addr); border-color: var(--c-addr); }
-    .chip.active.c-money { background: var(--bg-money); color: var(--c-money); border-color: var(--c-money); }
-    .chip.active.c-id { background: var(--bg-id); color: var(--c-id); border-color: var(--c-id); }
-    .chip.active.c-secret { background: var(--bg-secret); color: var(--c-secret); border-color: var(--c-secret); }
-    .chip.active.c-net { background: var(--bg-net); color: var(--c-net); border-color: var(--c-net); }
-    .chip.active.c-user { background: var(--bg-user); color: var(--c-user); border-color: var(--c-user); }
-    .chip.active.c-url { background: var(--bg-url); color: var(--c-url); border-color: var(--c-url); }
-    .chip.active.c-date { background: var(--bg-date); color: var(--c-date); border-color: var(--c-date); }
+    .chip.active {
+      background: var(--brand); color: #fff; border-color: var(--brand);
+      box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3);
+    }
 
-    .chip .count { font-size: 11px; background: rgba(0,0,0,0.08); padding: 0 6px; border-radius: 10px; }
-    .chip.active .count { background: rgba(255,255,255,0.4); }
-    [data-theme="dark"] .chip.active .count { background: rgba(0,0,0,0.4); color: #fff; }
+    .chip .count { 
+      font-size: 11px; background: #f1f5f9; color: var(--text-muted); 
+      padding: 2px 6px; border-radius: 6px; font-weight: 700;
+    }
+    .chip.active .count { background: rgba(255,255,255,0.2); color: #fff; }
+    .chip .count:empty { display: none; }
 
     /* Custom Inputs */
     .field { display: flex; flex-direction: column; gap: 6px; margin-top: 16px; }
@@ -219,11 +188,9 @@
         
         <div class="sidebar-scroll">
           
-          <!-- Chip Grid -->
-          <div class="chip-section">
-            <div class="chip-grid" id="chipGrid">
-              <!-- Chips injected by JS -->
-            </div>
+          <!-- Button Grid -->
+          <div class="chip-grid" id="chipGrid">
+            <!-- Chips injected by JS -->
           </div>
 
           <!-- Manual Words -->
@@ -237,7 +204,7 @@
             <label style="color: var(--brand);">Put real values back (Restore)</label>
             <textarea id="restoreInput" placeholder="Paste AI reply here containing labels like [EMAIL_1]..."></textarea>
             <button class="btn btn-outline" style="width:100%; margin-top:8px;" onclick="restoreText()">Restore Values</button>
-            <textarea id="restoreOutput" readonly placeholder="Restored text will appear here..." style="margin-top:8px; background: #e0e7ff; color: #000;"></textarea>
+            <textarea id="restoreOutput" readonly placeholder="Restored text will appear here..." style="margin-top:8px; background: var(--bg-color); color: var(--text-main);"></textarea>
           </div>
 
         </div>
@@ -295,17 +262,17 @@
 
     // === Categories Configuration ===
     const CATEGORIES = [
-      { id: 'name', label: 'Names', class: 'c-name' },
-      { id: 'email', label: 'Emails', class: 'c-email' },
-      { id: 'phone', label: 'Phone numbers', class: 'c-phone' },
-      { id: 'addr', label: 'Addresses', class: 'c-addr' },
-      { id: 'money', label: 'Cards & bank', class: 'c-money' },
-      { id: 'id', label: 'SSNs & IDs', class: 'c-id' },
-      { id: 'secret', label: 'Keys & passwords', class: 'c-secret' },
-      { id: 'net', label: 'IP addresses', class: 'c-net' },
-      { id: 'user', label: 'Usernames', class: 'c-user' },
-      { id: 'url', label: 'URLs & domains', class: 'c-url' },
-      { id: 'date', label: 'Dates', class: 'c-date' }
+      { id: 'name', label: 'Names' },
+      { id: 'email', label: 'Emails' },
+      { id: 'phone', label: 'Phone numbers' },
+      { id: 'addr', label: 'Addresses' },
+      { id: 'money', label: 'Cards & bank' },
+      { id: 'id', label: 'SSNs & IDs' },
+      { id: 'secret', label: 'Keys & passwords' },
+      { id: 'net', label: 'IP addresses' },
+      { id: 'user', label: 'Usernames' },
+      { id: 'url', label: 'URLs & domains' },
+      { id: 'date', label: 'Dates' }
     ];
 
     // Active state map
@@ -315,12 +282,12 @@
     // Redaction map to hold original values
     let redactionMap = {};
 
-    // === Build Chips UI ===
+    // === Build Buttons UI ===
     function buildChips() {
       chipGrid.innerHTML = '';
       CATEGORIES.forEach(cat => {
         const btn = document.createElement('button');
-        btn.className = `chip active ${cat.class}`;
+        btn.className = `chip active`;
         btn.dataset.id = cat.id;
         btn.innerHTML = `<span>${cat.label}</span><span class="count" id="cnt-${cat.id}"></span>`;
         btn.onclick = () => {
@@ -415,7 +382,6 @@
     // Helper to mask text and store in map
     function maskToken(original, type) {
       // Remove punctuation from match for cleaner map keys, but preserve the punctuation in output
-      // e.g., "user@email.com," -> label: "[EMAIL_1],"
       let core = original;
       let pre = '', post = '';
       const match = original.match(/^([^a-zA-Z0-9]*)(.*?)([^a-zA-Z0-9]*)$/);
