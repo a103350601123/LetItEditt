@@ -156,7 +156,6 @@
 </head>
 <body>
 
-  <!-- REMOVED 'hide-sidebar' class so it is visible by default -->
   <div class="app-container" id="appLayout">
     
     <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
@@ -175,7 +174,7 @@
           <div class="control-title">Text Input</div>
           <div class="field">
             <label>Title (Optional)</label>
-            <input type="text" id="inputTitle" class="input-box" placeholder="e.g. Chapter 1">
+            <input type="text" id="inputTitle" class="input-box" placeholder="e.g. Meeting Notes">
           </div>
           <div class="field">
             <label>Your Text</label>
@@ -313,10 +312,13 @@
   </div>
 
   <script>
-    // === State ===
+    // === State (New Default Text) ===
+    const defaultTitle = "A Letter to Sarah";
+    const defaultText = "Dear Sarah,\n\nI am having the most wonderful time on my trip. The mountains here are absolutely breathtaking, and the fresh air is exactly what I needed. Yesterday, we hiked up to a beautiful lake hidden in the valley. I wish you could have been there to see it!\n\nI will bring you back a souvenir. See you soon!\n\nLove,\nAlex";
+
     const state = {
-      title: "The Water Cycle",
-      text: "Water is always on the move. The sun heats oceans, lakes and rivers, and some of that water turns into vapor that rises into the air. This step is called evaporation.\n\nAs the vapor rises, it cools and turns back into tiny droplets that form clouds. This is called condensation. When the droplets join together and get too heavy, they fall back to the ground as rain, snow, sleet or hail. We call this precipitation.",
+      title: defaultTitle,
+      text: defaultText,
       font: 'Caveat',
       paper: 'ruled',
       ink: '#1C3F94',
@@ -498,9 +500,11 @@
     }
 
     function useSampleText() {
-      inputTitle.value = "The Water Cycle";
-      inputText.value = "Water is always on the move. The sun heats oceans, lakes and rivers, and some of that water turns into vapor that rises into the air. This step is called evaporation.\n\nAs the vapor rises, it cools and turns back into tiny droplets that form clouds. This is called condensation. When the droplets join together and get too heavy, they fall back to the ground as rain, snow, sleet or hail. We call this precipitation.";
-      state.title = inputTitle.value; state.text = inputText.value; render();
+      inputTitle.value = defaultTitle;
+      inputText.value = defaultText;
+      state.title = defaultTitle; 
+      state.text = defaultText; 
+      render();
     }
 
     function clearText() {
