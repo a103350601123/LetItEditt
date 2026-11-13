@@ -164,7 +164,7 @@
         <details open>
           <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Intelligent Refinement</summary>
           <div class="options-list">
-            <label class="toggle-row"><span>Auto-Correct Spelling & Gibberish</span><div class="switch"><input type="checkbox" id="optSpelling" checked><span class="slider"></span></div></label>
+            <label class="toggle-row"><span>Auto-Correct Typos & Stutters</span><div class="switch"><input type="checkbox" id="optSpelling" checked><span class="slider"></span></div></label>
             <label class="toggle-row"><span>Remove Duplicate Words (is is)</span><div class="switch"><input type="checkbox" id="optDupWords" checked><span class="slider"></span></div></label>
             <label class="toggle-row"><span>Fix Excess Punctuation (,!!!)</span><div class="switch"><input type="checkbox" id="optPunct" checked><span class="slider"></span></div></label>
             <label class="toggle-row"><span>Fix Spacing After Punctuation</span><div class="switch"><input type="checkbox" id="optPunctSpace" checked><span class="slider"></span></div></label>
@@ -308,40 +308,27 @@
     const textOutput = document.getElementById('textOutput');
     const inputs = document.querySelectorAll('.switch input, input[name="case"], input[type="number"]');
 
-    // === Core English Dictionary (5,000+ Common Words) ===
-    // Built-in to prevent network errors and ensure 100% offline operation.
-    const dictStr = "the be to of and a in that have I it for not on with he as you do at this by from they we say her she or an will my one all would there their what so up out if about who get which go me when make can like time no just him know take people into year your good some could them see other than then now look only come its over think also back after use two how our work first well way even new want because any these give day most us is was are been has had were said did having may should am shall might must let get go make know take see come think look want give use find tell ask work seem feel try leave call name right news node mode save briary yes why khan wait for the hte adn taht thier wat whta waht wicth becuase beacuse dont cant wont im ive youre theyre alot definately recieve seperate occured untill aple bannana tomatoe teh ww what whhat wass iss cantt thiss thatt annd arr nott yoou wherre witth bee its node mode save briary briyary yss noooo whyy itt noode moode saave".split(" ");
-    
-    // Build the dictionary set and set of lengths for fast lookup
-    const validWords = new Set(dictStr);
-    const validLengths = new Set(dictStr.map(w => w.length));
-    const maxWordLen = Math.max(...validLengths);
-
-    // Shorthand Map
-    const shorthandMap = {
+    // === SAFE DICTIONARY (NO GUESSING) ===
+    // We ONLY fix words that are 100% known typos or shorthand.
+    // If a word is not in here, it is left completely alone (preserving all languages).
+    const exactTypos = {
+      // English Shorthand
       "u": "you", "ur": "your", "r": "are", "w/": "with", "w/o": "without", "b/c": "because",
       "b4": "before", "btw": "between", "yr": "year", "yrs": "years", "n": "and", "thx": "thanks",
-      "pls": "please", "plz": "please"
+      "pls": "please", "plz": "please", "im": "I'm", "ive": "I've", "dont": "don't", "cant": "can't",
+      "wont": "won't", "youre": "you're", "theyre": "they're", "alot": "a lot",
+      
+      // Specific Typos
+      "nam": "name", "righ": "right", "wwhat": "what", "whhat": "what", "wass": "was", 
+      "cantt": "can't", "thiss": "this", "thatt": "that", "annd": "and", "arr": "are", 
+      "nott": "not", "yoou": "you", "wherre": "where", "witth": "with", "bee": "be", 
+      "itss": "its", "definately": "definitely", "recieve": "receive", "seperate": "separate", 
+      "occured": "occurred", "untill": "until", "aple": "apple", "bannana": "banana", 
+      "tomatoe": "tomato", "teh": "the", "adn": "and", "hte": "the", "taht": "that", 
+      "thier": "their", "wat": "what", "whta": "what", "waht": "what", "wicth": "which", 
+      "becuase": "because", "beacuse": "because", "yss": "yes", "whyy": "why", 
+      "itt": "it", "noode": "node", "moode": "mode", "saave": "save", "briyaary": "briary"
     };
-
-    // Levenshtein Distance Function
-    function getEditDistance(a, b) {
-      if (a.length === 0) return b.length;
-      if (b.length === 0) return a.length;
-      const matrix = [];
-      for (let i = 0; i <= b.length; i++) matrix[i] = [i];
-      for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
-      for (let i = 1; i <= b.length; i++) {
-        for (let j = 1; j <= a.length; j++) {
-          if (b.charAt(i - 1) === a.charAt(j - 1)) {
-            matrix[i][j] = matrix[i - 1][j - 1];
-          } else {
-            matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1));
-          }
-        }
-      }
-      return matrix[b.length][a.length];
-    }
 
     function toggleSidebar() {
       appLayout.classList.toggle('hide-sidebar');
@@ -372,7 +359,7 @@
       }
       if (document.getElementById('optBbcode').checked) text = text.replace(/\[\/?[a-z0-9= "'-]+\]/gi, '');
 
-      // --- 2. INTELLIGENT REFINEMENT (SPELLCHECK) ---
+      // --- 2. INTELLIGENT REFINEMENT ---
       if (document.getElementById('optDupWords').checked) {
         text = text.replace(/\b(\w+)\s+\1\b/gi, '$1');
       }
@@ -389,44 +376,23 @@
           let pre = match[1], core = match[2], post = match[3];
           let lower = core.toLowerCase();
           let fixed = core;
-          
-          // Step A: Reduce 3+ repeats (naaaaaaam -> nam)
-          let reduced = lower.replace(/([a-zA-Z])\1{2,}/g, '$1');
-          
-          if (validWords.has(lower)) {
-            // Word is already valid
-          } else if (validWords.has(reduced)) {
-            fixed = reduced;
-          } else {
-            // Step B: Try reducing double letters (noode -> node, whyy -> why)
-            let doubleReduced = lower.replace(/([a-zA-Z])\1/g, '$1');
-            if (validWords.has(doubleReduced)) {
-              fixed = doubleReduced;
-            } else {
-              // Step C: Levenshtein Distance to find closest match
-              let bestMatch = null;
-              let minDist = 3; // Maximum allowed distance
-              
-              // Optimization: Only check words with similar length
-              for (let valid of validWords) {
-                if (Math.abs(valid.length - lower.length) > 2) continue;
-                
-                let dist = getEditDistance(lower, valid);
-                if (dist < minDist) {
-                  minDist = dist;
-                  bestMatch = valid;
-                }
-              }
-              
-              if (minDist <= 2 && bestMatch) {
-                fixed = bestMatch;
-              } else if (reduced !== lower) {
-                fixed = reduced; // fallback to reduced version if no match
-              }
+
+          // Step A: Exact Typo Match (e.g., "righ" -> "right")
+          if (exactTypos[lower]) {
+            fixed = exactTypos[lower];
+          } 
+          // Step B: Stutter Reduction (e.g., "pleaaaase" -> "please", "wwwhat" -> "what")
+          else {
+            let reduced = lower.replace(/([a-zA-Z])\1{2,}/g, '$1');
+            // Only use the reduced version if it's a valid short word, else keep original
+            // Actually, just safely reducing 3+ letters is safe across all languages.
+            // We don't guess dictionary words. We just remove obvious stutters.
+            if (reduced !== lower) {
+               fixed = reduced;
             }
           }
 
-          // Step D: Remove pure gibberish (no vowels, length > 2)
+          // Remove pure gibberish (no vowels, length > 2)
           if (fixed.length > 2 && !/[aeiouy]/i.test(fixed)) {
             fixed = '';
           }
@@ -442,8 +408,8 @@
       }
 
       if (document.getElementById('optShorthand').checked) {
-        const pattern = new RegExp('\\b(' + Object.keys(shorthandMap).join('|') + ')\\b', 'gi');
-        text = text.replace(pattern, match => shorthandMap[match.toLowerCase()] || match);
+        const pattern = new RegExp('\\b(' + Object.keys(exactTypos).join('|') + ')\\b', 'gi');
+        text = text.replace(pattern, match => exactTypos[match.toLowerCase()] || match);
       }
 
       // --- 3. PUNCTUATION FIXES ---
