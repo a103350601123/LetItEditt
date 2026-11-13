@@ -4,9 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Advanced Text Cleaner & Formatter | LetitEdit</title>
-  <meta name="description" content="Clean your text instantly. Fix punctuation, remove stutters, strip HTML, and format text professionally.">
+  <meta name="description" content="Clean your text instantly. Fix punctuation, correct spelling, remove gibberish, strip HTML, and format text professionally.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧹</text></svg>">
   <link rel="stylesheet" href="../../assets/css/style.css">
+
+  <!-- Spell Checker Libraries (nspell + en-US dictionary) -->
+  <script src="https://cdn.jsdelivr.net/npm/nspell@2.1.5/browser.js"></script>
 
   <style>
     /* =========================================
@@ -70,6 +73,7 @@
     }
     input:checked + .slider { background-color: #6366f1; }
     input:checked + .slider:before { transform: translateX(16px); }
+    input:disabled + .slider { opacity: 0.5; cursor: not-allowed; }
 
     /* Radio Buttons for Case */
     .radio-group { display: flex; flex-direction: column; gap: 8px; }
@@ -151,8 +155,8 @@
           <summary>Auto-Correction & Fixes</summary>
           <div class="options-list">
             <label class="toggle-row">
-              <span>Fix spellings & remove gibberish</span>
-              <div class="switch"><input type="checkbox" id="optFixSpelling" checked><span class="slider"></span></div>
+              <span>Real Spellcheck & Remove Gibberish <span id="spellStatus" style="font-size:10px; color:#f59e0b; font-weight:bold;">(Loading Dict...)</span></span>
+              <div class="switch"><input type="checkbox" id="optFixSpelling" checked disabled><span class="slider"></span></div>
             </label>
             <label class="toggle-row">
               <span>Remove stutters (wwwhat → what)</span>
@@ -281,19 +285,24 @@
     // All checkboxes and radios
     const inputs = document.querySelectorAll('.switch input, input[name="case"]');
 
-    // Dictionary of common typos
-    const typoDict = {
-      "wwhat": "what", "whhat": "what", "wass": "was", "iss": "is",
-      "namne": "name", "cantt": "cant", "thiss": "this", "thatt": "that",
-      "annd": "and", "arr": "are", "nott": "not", "yoou": "you",
-      "wherre": "where", "witth": "with", "bee": "be", "itss": "its",
-      "alot": "a lot", "definately": "definitely", "recieve": "receive",
-      "seperate": "separate", "occured": "occurred", "untill": "until",
-      "aple": "apple", "bannana": "banana", "tomatoe": "tomato",
-      "teh": "the", "adn": "and", "hte": "the", "taht": "that",
-      "thier": "their", "wat": "what", "whta": "what", "waht": "what",
-      "wicth": "which", "becuase": "because", "beacuse": "because"
-    };
+    // Spell Checker Variables
+    let spell = null;
+
+    // === Load Dictionary ===
+    Promise.all([
+      fetch('https://cdn.jsdelivr.net/npm/dictionary-en-us@3.0.0/index.aff').then(r => r.text()),
+      fetch('https://cdn.jsdelivr.net/npm/dictionary-en-us@3.0.0/index.dic').then(r => r.text())
+    ]).then(([aff, dic]) => {
+      spell = nspell(aff, dic);
+      // Enable the toggle and hide loading text
+      document.getElementById('spellStatus').style.display = 'none';
+      document.getElementById('optFixSpelling').disabled = false;
+      processText(); // Re-run to fix any text already pasted
+    }).catch(err => {
+      document.getElementById('spellStatus').textContent = '(Offline)';
+      document.getElementById('spellStatus').style.color = '#ef4444';
+      console.error('Failed to load spellchecker', err);
+    });
 
     // === Sidebar Toggle ===
     function toggleSidebar() {
@@ -305,7 +314,7 @@
     function processText() {
       let text = textInput.value;
       
-      // --- 1. HTML & CODE (Run first to avoid stripping words inside HTML) ---
+      // --- 1. HTML & CODE ---
       if (document.getElementById('optStripHtml').checked) {
         text = text.replace(/<[^>]*>/g, '');
       }
@@ -320,17 +329,15 @@
         text = text.replace(/\[[^\]]+\]/g, '');
       }
 
-      // --- 2. AUTO-CORRECTION & SPELLING ---
-      if (document.getElementById('optFixSpelling').checked) {
-        let words = text.split(/(\s+)/); // Keep spaces
-        const validVowelLess = ['by', 'my', 'fly', 'cry', 'try', 'why', 'shy', 'gym', 'sky', 'hymn', 'nth', 'tsk'];
-
+      // --- 2. REAL SPELLCHECK & GIBBERISH REMOVAL ---
+      if (document.getElementById('optFixSpelling').checked && spell) {
+        let words = text.split(/(\s+)/);
         for (let i = 0; i < words.length; i++) {
           let word = words[i];
           if (!word.trim()) continue;
           
-          // Separate punctuation from the word (e.g. "(hello)" -> "(", "hello", ")")
-          let match = word.match(/^([^a-zA-Z]*)([a-zA-Z]+)([^a-zA-Z]*)$/);
+          // Separate leading/trailing punctuation from the core word (e.g., "(namne)" -> "(", "namne", ")")
+          let match = word.match(/^([^a-zA-Z]*)([a-zA-Z']+)([^a-zA-Z]*)$/);
           if (!match) continue;
           
           let prePunct = match[1];
@@ -338,48 +345,51 @@
           let postPunct = match[3];
           let lower = core.toLowerCase();
           
-          // A. Dictionary lookup
-          if (typoDict[lower]) {
-            let fixed = typoDict[lower];
-            if (core[0] === core[0].toUpperCase()) fixed = fixed.charAt(0).toUpperCase() + fixed.slice(1);
-            words[i] = prePunct + fixed + postPunct;
-            continue;
-          }
-          
-          // B. Remove start stutters (wwhat -> what)
-          let startFixed = core.replace(/^([a-zA-Z])\1+/g, '$1');
-          if (startFixed !== core) {
-             words[i] = prePunct + startFixed + postPunct;
-             core = startFixed;
-             lower = core.toLowerCase();
+          // If it's a valid dictionary word, skip it
+          if (spell.correct(lower)) continue;
+          if (core[0] === core[0].toUpperCase() && spell.correct(core)) continue;
+
+          // A. Remove pure gibberish (no vowels, length > 2) e.g., "dkj", "ddll"
+          if (core.length > 2 && !/[aeiouy]/i.test(core)) {
+              words[i] = '';
+              continue;
           }
 
-          // C. Remove gibberish (no vowels, length > 2) e.g. dkj, ddll
-          if (!/[aeiouyAEIOUY]/.test(core) && !validVowelLess.includes(lower)) {
-            words[i] = ''; 
-            continue;
+          // B. Remove pure stutters (e.g., "kkk", "wwww")
+          if (/^([a-zA-Z])\1+$/.test(core)) {
+              words[i] = '';
+              continue;
           }
 
-          // D. Remove single repeated letters (wwww -> w)
-          if (core.length === 1 && !['a', 'i', 'A', 'I'].includes(core)) {
-            words[i] = '';
+          // C. Get spelling suggestions (e.g., "namne" -> "name")
+          let suggestions = spell.suggest(lower);
+          if (suggestions && suggestions.length > 0) {
+              let best = suggestions[0];
+              // Preserve original capitalization
+              if (core[0] === core[0].toUpperCase()) {
+                  best = best.charAt(0).toUpperCase() + best.slice(1);
+              }
+              words[i] = prePunct + best + postPunct;
+          } else {
+              // If no suggestion and it's short gibberish, remove it
+              if (core.length <= 3 && !['a', 'i', 'an', 'in', 'on', 'at', 'to', 'do', 'go', 'no', 'so', 'up', 'us', 'we', 'he', 'me', 'my', 'by'].includes(lower)) {
+                  words[i] = '';
+              }
           }
         }
         text = words.join('');
-      }
-
-      // Stutter fix for words > 3 letters (sooo -> so)
-      if (document.getElementById('optFixStutter').checked) {
+      } 
+      // Fallback if spellcheck is disabled but stutter fix is on
+      else if (document.getElementById('optFixStutter').checked) {
         text = text.replace(/\b(\w)\1{2,}/gi, '$1');
       }
 
-      // Fix Excessive Punctuation
+      // --- 3. PUNCTUATION FIXES ---
       if (document.getElementById('optFixPunct').checked) {
         text = text.replace(/([,!?])\1+/g, '$1'); // Reduces ,,, to , and !!! to !
         text = text.replace(/\.{4,}/g, '...'); // Reduces .... to ...
       }
 
-      // Fix Punctuation Spacing
       if (document.getElementById('optFixPunctSpace').checked) {
         // Removes spaces BEFORE punctuation: "word ," -> "word,"
         text = text.replace(/\s+([.,!?])/g, '$1');
@@ -387,7 +397,7 @@
         text = text.replace(/([.,!?])(?=[^\s\d])/g, '$1 ');
       }
 
-      // --- 3. LINKS & EMAILS ---
+      // --- 4. LINKS & EMAILS ---
       if (document.getElementById('optStripEmails').checked) {
         text = text.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '');
       }
@@ -395,7 +405,7 @@
         text = text.replace(/https?:\/\/[^\s]+/g, '');
       }
 
-      // --- 4. CHARACTERS ---
+      // --- 5. CHARACTERS ---
       if (document.getElementById('optStripEmoji').checked) {
         text = text.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '');
       }
@@ -415,7 +425,7 @@
         text = text.replace(/[0-9]/g, '');
       }
 
-      // --- 5. WHITESPACE ---
+      // --- 6. WHITESPACE ---
       if (document.getElementById('optTrim').checked) {
         text = text.trim();
       }
@@ -435,7 +445,7 @@
         text = text.replace(/[\r\n]+/g, ' ');
       }
 
-      // --- 6. CASE TRANSFORMATION ---
+      // --- 7. CASE TRANSFORMATION ---
       const caseVal = document.querySelector('input[name="case"]:checked').value;
       if (caseVal === 'upper') {
         text = text.toUpperCase();
