@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Privacy Redactor | LetitEdit</title>
-  <meta name="description" content="Securely redact sensitive data like emails, phone numbers, and names before pasting into AI tools. Restore the original text later.">
+  <title>Privacy Redactor Pro | LetitEdit</title>
+  <meta name="description" content="Securely redact sensitive data like emails, phone numbers, names, and API keys before pasting into AI tools.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
   <link rel="stylesheet" href="../../assets/css/style.css">
 
@@ -23,6 +23,19 @@
       --text-muted: #64748b;
       --border-color: #e2e8f0;
       --shadow-md: 0 4px 12px rgba(0,0,0,0.05);
+
+      /* Category Colors */
+      --c-name: #2563eb; --bg-name: #dbeafe;
+      --c-email: #0d9488; --bg-email: #ccfbf1;
+      --c-phone: #0284c7; --bg-phone: #e0f2fe;
+      --c-addr: #d97706; --bg-addr: #fef3c7;
+      --c-money: #16a34a; --bg-money: #dcfce7;
+      --c-id: #9333ea; --bg-id: #f3e8ff;
+      --c-secret: #e11d48; --bg-secret: #ffe4e6;
+      --c-net: #475569; --bg-net: #e2e8f0;
+      --c-user: #ea580c; --bg-user: #ffedd5;
+      --c-url: #0891b2; --bg-url: #cffafe;
+      --c-date: #db2777; --bg-date: #fce7f3;
     }
 
     [data-theme="dark"] {
@@ -31,6 +44,18 @@
       --text-main: #e2e8f0;
       --text-muted: #94a3b8;
       --border-color: #334155;
+      /* Darker bgs for dark mode */
+      --bg-name: #1e3a8a; --c-name: #93c5fd;
+      --bg-email: #115e59; --c-email: #5eead4;
+      --bg-phone: #075985; --c-phone: #7dd3fc;
+      --bg-addr: #78350f; --c-addr: #fcd34d;
+      --bg-money: #14532d; --c-money: #86efac;
+      --bg-id: #4c1d95; --c-id: #d8b4fe;
+      --bg-secret: #881337; --c-secret: #fda4af;
+      --bg-net: #334155; --c-net: #cbd5e1;
+      --bg-user: #7c2d12; --c-user: #fdba74;
+      --bg-url: #164e63; --c-url: #67e8f9;
+      --bg-date: #831843; --c-date: #f9a8d4;
     }
 
     html, body {
@@ -58,16 +83,16 @@
     .btn-danger { background: #fee2e2; color: #ef4444; border: 1px solid transparent; }
     .btn-danger:hover { background: #fecaca; }
 
-    /* --- App Body (Sidebar + Editor) --- */
+    /* --- App Body --- */
     .app-body { display: flex; flex: 1; overflow: hidden; position: relative; }
 
     /* --- Left Sidebar --- */
     .sidebar {
-      width: 380px; height: 100%; background: var(--card-bg); border-right: 1px solid var(--border-color);
+      width: 400px; height: 100%; background: var(--card-bg); border-right: 1px solid var(--border-color);
       display: flex; flex-direction: column; transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 90; box-shadow: 2px 0 10px rgba(0,0,0,0.03);
     }
-    .app-body.hide-sidebar .sidebar { margin-left: -380px; }
+    .app-body.hide-sidebar .sidebar { margin-left: -400px; }
 
     .sidebar-header {
       padding: 16px 20px; border-bottom: 1px solid var(--border-color);
@@ -79,39 +104,47 @@
     .sidebar-scroll::-webkit-scrollbar { width: 6px; }
     .sidebar-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
-    /* Accordion */
-    details { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; transition: all 0.2s; }
-    details[open] { background: var(--card-bg); border-color: var(--brand); box-shadow: 0 4px 12px rgba(99,102,241,0.08); }
-    summary { padding: 14px 16px; font-size: 14px; font-weight: 700; cursor: pointer; list-style: none; display: flex; align-items: center; gap: 10px; user-select: none; transition: background 0.2s; }
-    summary:hover { background: rgba(0,0,0,0.02); }
-    summary::after { content: '▼'; font-size: 10px; color: var(--text-muted); margin-left: auto; transition: transform 0.3s; }
-    details[open] summary::after { transform: rotate(180deg); color: var(--brand); }
+    /* Chip Grid */
+    .chip-section { margin-bottom: 12px; }
+    .chip-section-title { font-size: 12px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; }
     
-    .summary-icon { width: 18px; height: 18px; color: var(--text-muted); transition: color 0.2s; }
-    details[open] .summary-icon { color: var(--brand); }
+    .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;
+      border: 1px solid var(--border-color); background: transparent; color: var(--text-muted);
+      cursor: pointer; transition: all 0.2s; user-select: none;
+    }
+    
+    .chip:hover { background: rgba(0,0,0,0.02); }
+    
+    /* Active states per category */
+    .chip.active.c-name { background: var(--bg-name); color: var(--c-name); border-color: var(--c-name); }
+    .chip.active.c-email { background: var(--bg-email); color: var(--c-email); border-color: var(--c-email); }
+    .chip.active.c-phone { background: var(--bg-phone); color: var(--c-phone); border-color: var(--c-phone); }
+    .chip.active.c-addr { background: var(--bg-addr); color: var(--c-addr); border-color: var(--c-addr); }
+    .chip.active.c-money { background: var(--bg-money); color: var(--c-money); border-color: var(--c-money); }
+    .chip.active.c-id { background: var(--bg-id); color: var(--c-id); border-color: var(--c-id); }
+    .chip.active.c-secret { background: var(--bg-secret); color: var(--c-secret); border-color: var(--c-secret); }
+    .chip.active.c-net { background: var(--bg-net); color: var(--c-net); border-color: var(--c-net); }
+    .chip.active.c-user { background: var(--bg-user); color: var(--c-user); border-color: var(--c-user); }
+    .chip.active.c-url { background: var(--bg-url); color: var(--c-url); border-color: var(--c-url); }
+    .chip.active.c-date { background: var(--bg-date); color: var(--c-date); border-color: var(--c-date); }
 
-    .options-list { padding: 0 16px 16px 16px; display: flex; flex-direction: column; gap: 14px; }
+    .chip .count { font-size: 11px; background: rgba(0,0,0,0.08); padding: 0 6px; border-radius: 10px; }
+    .chip.active .count { background: rgba(255,255,255,0.4); }
+    [data-theme="dark"] .chip.active .count { background: rgba(0,0,0,0.4); color: #fff; }
 
-    /* Custom Controls */
-    .field { display: flex; flex-direction: column; gap: 6px; }
+    /* Custom Inputs */
+    .field { display: flex; flex-direction: column; gap: 6px; margin-top: 16px; }
     .field label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-    .field input[type="text"], .field textarea {
+    .field textarea {
       width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color);
       font-family: inherit; font-size: 14px; color: var(--text-main); outline: none; background: var(--card-bg);
-      transition: border-color 0.2s;
+      transition: border-color 0.2s; min-height: 60px; resize: vertical;
     }
-    .field input[type="text"]:focus, .field textarea:focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-light); }
-    .field textarea { resize: vertical; min-height: 60px; }
-
-    /* Toggles */
-    .toggle-row { display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 6px 0; }
-    .toggle-row span { font-size: 13px; font-weight: 500; color: var(--text-main); padding-right: 12px; }
-    .switch { position: relative; display: inline-block; width: 38px; height: 22px; flex-shrink: 0; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 20px; }
-    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-    input:checked + .slider { background-color: var(--brand); }
-    input:checked + .slider:before { transform: translateX(16px); }
+    .field textarea:focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-light); }
 
     /* --- Right Editor Area --- */
     .main-editor { flex: 1; display: flex; flex-direction: column; position: relative; }
@@ -180,50 +213,32 @@
       <!-- LEFT: Settings Sidebar -->
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-          <h2>Redaction Settings</h2>
+          <h2>What to hide</h2>
           <button class="btn btn-outline" onclick="toggleSidebar()" style="padding:4px 8px;">✕</button>
         </div>
         
         <div class="sidebar-scroll">
           
-          <!-- Section 1: Automatic Detection -->
-          <details open>
-            <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Auto-Detection</summary>
-            <div class="options-list">
-              <label class="toggle-row"><span>Hide Emails</span><div class="switch"><input type="checkbox" id="optEmail" checked><span class="slider"></span></div></label>
-              <label class="toggle-row"><span>Hide Phone Numbers</span><div class="switch"><input type="checkbox" id="optPhone" checked><span class="slider"></span></div></label>
-              <label class="toggle-row"><span>Hide Credit Cards</span><div class="switch"><input type="checkbox" id="optCard" checked><span class="slider"></span></div></label>
-              <label class="toggle-row"><span>Hide SSN / IDs</span><div class="switch"><input type="checkbox" id="optSsn" checked><span class="slider"></span></div></label>
-              <label class="toggle-row"><span>Hide IP Addresses</span><div class="switch"><input type="checkbox" id="optIp" checked><span class="slider"></span></div></label>
+          <!-- Chip Grid -->
+          <div class="chip-section">
+            <div class="chip-grid" id="chipGrid">
+              <!-- Chips injected by JS -->
             </div>
-          </details>
+          </div>
 
-          <!-- Section 2: Manual Redaction -->
-          <details open>
-            <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg> Custom Words</summary>
-            <div class="options-list">
-              <div class="field">
-                <label>Comma-separated words</label>
-                <textarea id="customWords" placeholder="Project Falcon, Acme Corp..."></textarea>
-              </div>
-            </div>
-          </details>
+          <!-- Manual Words -->
+          <div class="field">
+            <label>Always hide these words</label>
+            <textarea id="customWords" placeholder="Separate with commas..."></textarea>
+          </div>
 
-          <!-- Section 3: Restore Settings -->
-          <details>
-            <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Restoration</summary>
-            <div class="options-list">
-              <div class="field">
-                <label>Paste AI Reply Here to Restore</label>
-                <textarea id="restoreInput" placeholder="Paste text containing [EMAIL_1]..."></textarea>
-              </div>
-              <button class="btn btn-outline" style="width:100%; margin-top:8px;" onclick="restoreText()">Restore Values</button>
-              <div class="field" style="margin-top:8px;">
-                <label>Restored Output</label>
-                <textarea id="restoreOutput" readonly placeholder="Original text will appear here..."></textarea>
-              </div>
-            </div>
-          </details>
+          <!-- Restoration -->
+          <div class="field" style="margin-top: 24px; padding-top: 16px; border-top: 1px dashed var(--border-color);">
+            <label style="color: var(--brand);">Put real values back (Restore)</label>
+            <textarea id="restoreInput" placeholder="Paste AI reply here containing labels like [EMAIL_1]..."></textarea>
+            <button class="btn btn-outline" style="width:100%; margin-top:8px;" onclick="restoreText()">Restore Values</button>
+            <textarea id="restoreOutput" readonly placeholder="Restored text will appear here..." style="margin-top:8px; background: #e0e7ff; color: #000;"></textarea>
+          </div>
 
         </div>
       </aside>
@@ -249,7 +264,7 @@
               <span>Original Text</span>
               <small id="inputStats">0 chars</small>
             </div>
-            <textarea id="textInput" placeholder="Paste your sensitive text here. Emails, phones, cards, and custom words will be hidden automatically..."></textarea>
+            <textarea id="textInput" placeholder="Paste your sensitive text here..."></textarea>
           </div>
 
           <!-- Output -->
@@ -258,7 +273,7 @@
               <span>Redacted Output</span>
               <small id="outputStats">0 chars</small>
             </div>
-            <textarea id="textOutput" class="output-area" readonly placeholder="Your safe text will appear here..."></textarea>
+            <textarea id="textOutput" class="output-area" readonly placeholder="Safe text will appear here..."></textarea>
           </div>
         </div>
       </main>
@@ -273,19 +288,49 @@
     const mobileOverlay = document.getElementById('mobileOverlay');
     const textInput = document.getElementById('textInput');
     const textOutput = document.getElementById('textOutput');
-    
-    const optEmail = document.getElementById('optEmail');
-    const optPhone = document.getElementById('optPhone');
-    const optCard = document.getElementById('optCard');
-    const optSsn = document.getElementById('optSsn');
-    const optIp = document.getElementById('optIp');
     const customWords = document.getElementById('customWords');
-
     const restoreInput = document.getElementById('restoreInput');
     const restoreOutput = document.getElementById('restoreOutput');
+    const chipGrid = document.getElementById('chipGrid');
 
-    // State
-    let redactionMap = {}; // { "[EMAIL_1]": "user@example.com" }
+    // === Categories Configuration ===
+    const CATEGORIES = [
+      { id: 'name', label: 'Names', class: 'c-name' },
+      { id: 'email', label: 'Emails', class: 'c-email' },
+      { id: 'phone', label: 'Phone numbers', class: 'c-phone' },
+      { id: 'addr', label: 'Addresses', class: 'c-addr' },
+      { id: 'money', label: 'Cards & bank', class: 'c-money' },
+      { id: 'id', label: 'SSNs & IDs', class: 'c-id' },
+      { id: 'secret', label: 'Keys & passwords', class: 'c-secret' },
+      { id: 'net', label: 'IP addresses', class: 'c-net' },
+      { id: 'user', label: 'Usernames', class: 'c-user' },
+      { id: 'url', label: 'URLs & domains', class: 'c-url' },
+      { id: 'date', label: 'Dates', class: 'c-date' }
+    ];
+
+    // Active state map
+    let activeCats = {};
+    CATEGORIES.forEach(c => activeCats[c.id] = true); // Default all on
+
+    // Redaction map to hold original values
+    let redactionMap = {};
+
+    // === Build Chips UI ===
+    function buildChips() {
+      chipGrid.innerHTML = '';
+      CATEGORIES.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = `chip active ${cat.class}`;
+        btn.dataset.id = cat.id;
+        btn.innerHTML = `<span>${cat.label}</span><span class="count" id="cnt-${cat.id}"></span>`;
+        btn.onclick = () => {
+          activeCats[cat.id] = !activeCats[cat.id];
+          btn.classList.toggle('active', activeCats[cat.id]);
+          processText();
+        };
+        chipGrid.appendChild(btn);
+      });
+    }
 
     // === Sidebar Toggle ===
     function toggleSidebar() {
@@ -293,7 +338,7 @@
       if (window.innerWidth <= 900) mobileOverlay.classList.toggle('show');
     }
 
-    // === Core Engine ===
+    // === Core Redaction Engine ===
     let debounceTimer;
     function triggerProcess() {
       clearTimeout(debounceTimer);
@@ -302,7 +347,10 @@
 
     function processText() {
       let text = textInput.value;
-      redactionMap = {}; // Reset map on every run
+      redactionMap = {}; // Reset map
+      
+      // Reset counts
+      CATEGORIES.forEach(c => document.getElementById(`cnt-${c.id}`).textContent = '');
 
       if (!text) {
         textOutput.value = '';
@@ -310,47 +358,101 @@
         return;
       }
 
-      // 1. Auto-Detect Patterns
-      if (optEmail.checked) {
-        text = text.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, (match) => maskToken(match, 'EMAIL'));
-      }
-      if (optPhone.checked) {
-        text = text.replace(/(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g, (match) => {
-          // Avoid matching card numbers (13-16 digits)
-          if (match.replace(/\D/g, '').length > 11) return match;
-          return maskToken(match, 'PHONE');
+      // 1. Regex Patterns for Auto-Detection
+      const patterns = {
+        email: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
+        phone: /(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g,
+        money: /\b(?:\d[ -]*?){13,16}\b/g,
+        id: /\b\d{3}-\d{2}-\d{4}\b/g, // SSN
+        net: /\b(?:\d{1,3}\.){3}\d{1,3}\b/g, // IPv4
+        url: /(https?:\/\/[^\s]+)/g,
+        date: /\b(?:\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}|\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},?\s+\d{4})\b/gi,
+        secret: /(?:password|passwd|pwd|secret|token|api_key|apikey)\s*[:=]\s*["']?([^"'\s]+)["']?/gi,
+        addr: /\b\d{1,5}\s+(?:[A-Za-z0-9]+\s+){1,3}(?:Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Lane|Ln|Drive|Dr|Court|Ct|Way|Terrace|Ter|Place|Pl)\b/gi,
+        user: /(?:\/Users\/|\/home\/|[Uu]ser\s*[:=]\s*)([A-Za-z0-9._-]+)/g,
+        name: /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+\b/g // Simple heuristic: Two capitalized words
+      };
+
+      // Apply patterns
+      for (const [catId, regex] of Object.entries(patterns)) {
+        if (!activeCats[catId]) continue;
+
+        text = text.replace(regex, (match, p1) => {
+          // Special handling for key/value pairs (user, secret) to only redact the value, not the key
+          if (catId === 'secret' || catId === 'user') {
+            if (!p1) return match;
+            const safeVal = maskToken(p1, catId);
+            return match.replace(p1, safeVal);
+          }
+          
+          // Don't mask if it's obviously a card number but we are processing phone
+          if (catId === 'phone' && match.replace(/\D/g, '').length > 11) return match;
+
+          // Don't mask common stop words as names
+          if (catId === 'name') {
+            const stopWords = ['The', 'This', 'That', 'With', 'From', 'Your', 'Dear', 'Best', 'Regards'];
+            const words = match.split(/\s+/);
+            if (words.some(w => stopWords.includes(w))) return match;
+          }
+
+          return maskToken(match, catId);
         });
-      }
-      if (optCard.checked) {
-        text = text.replace(/\b(?:\d[ -]*?){13,16}\b/g, (match) => maskToken(match, 'CARD'));
-      }
-      if (optSsn.checked) {
-        text = text.replace(/\b\d{3}-\d{2}-\d{4}\b/g, (match) => maskToken(match, 'SSN'));
-      }
-      if (optIp.checked) {
-        text = text.replace(/\b(?:\d{1,3}\.){3}\d{1,3}\b/g, (match) => maskToken(match, 'IP'));
       }
 
       // 2. Custom Words
       const customList = customWords.value.split(',').map(w => w.trim()).filter(w => w);
       customList.forEach(word => {
-        // Escape special characters for regex
         const safeWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const regex = new RegExp(`\\b${safeWord}\\b`, 'gi');
-        text = text.replace(regex, (match) => maskToken(match, 'TERM'));
+        text = text.replace(regex, (match) => maskToken(match, 'term'));
       });
 
       textOutput.value = text;
       updateStats(text.length);
+      updateCounts();
     }
 
-    // Helper to mask and store original value
+    // Helper to mask text and store in map
     function maskToken(original, type) {
-      // Count how many of this type we have
-      const count = Object.keys(redactionMap).filter(k => k.startsWith(`[${type}_`)).length + 1;
-      const label = `[${type}_${count}]`;
-      redactionMap[label] = original;
-      return label;
+      // Remove punctuation from match for cleaner map keys, but preserve the punctuation in output
+      // e.g., "user@email.com," -> label: "[EMAIL_1],"
+      let core = original;
+      let pre = '', post = '';
+      const match = original.match(/^([^a-zA-Z0-9]*)(.*?)([^a-zA-Z0-9]*)$/);
+      if (match) {
+        pre = match[1]; core = match[2]; post = match[3];
+      }
+
+      if (!core) return original;
+
+      // Check if this exact string is already mapped
+      for (const [k, v] of Object.entries(redactionMap)) {
+        if (v === core) return pre + k + post; // Reuse existing label
+      }
+
+      const count = Object.keys(redactionMap).filter(k => k.startsWith(`[${type.toUpperCase()}_`)).length + 1;
+      const label = `[${type.toUpperCase()}_${count}]`;
+      redactionMap[label] = core;
+      
+      return pre + label + post;
+    }
+
+    function updateCounts() {
+      const counts = {};
+      Object.keys(redactionMap).forEach(label => {
+        const type = label.split('_')[0].replace('[', '').toLowerCase();
+        counts[type] = (counts[type] || 0) + 1;
+      });
+
+      CATEGORIES.forEach(cat => {
+        const el = document.getElementById(`cnt-${cat.id}`);
+        if (counts[cat.id]) {
+          el.textContent = counts[cat.id];
+          el.style.display = 'inline-block';
+        } else {
+          el.style.display = 'none';
+        }
+      });
     }
 
     // === Restoration Engine ===
@@ -358,10 +460,12 @@
       let text = restoreInput.value;
       if (!text) return;
 
-      // Replace all known labels with original values
-      for (const [label, original] of Object.entries(redactionMap)) {
-        // Replace exact label match
-        text = text.split(label).join(original);
+      // Sort labels by length descending to prevent [EMAIL_1] replacing part of [EMAIL_10]
+      const sortedLabels = Object.keys(redactionMap).sort((a, b) => b.length - a.length);
+      
+      for (const label of sortedLabels) {
+        // Replace all occurrences of the label with the original value
+        text = text.split(label).join(redactionMap[label]);
       }
 
       restoreOutput.value = text;
@@ -405,13 +509,10 @@
     // === Event Listeners ===
     textInput.addEventListener('input', triggerProcess);
     customWords.addEventListener('input', triggerProcess);
-    
-    [optEmail, optPhone, optCard, optSsn, optIp].forEach(el => {
-      el.addEventListener('change', triggerProcess);
-    });
 
     // Initial setup
     window.addEventListener('DOMContentLoaded', () => {
+      buildChips();
       processText();
       textInput.focus();
     });
