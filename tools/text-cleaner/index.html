@@ -8,9 +8,6 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧹</text></svg>">
   <link rel="stylesheet" href="../../assets/css/style.css">
 
-  <!-- Spell Checker Libraries (nspell + en-US dictionary) -->
-  <script src="https://cdn.jsdelivr.net/npm/nspell@2.1.5/browser.js"></script>
-
   <style>
     /* =========================================
        LetitEdit App Layout - Text Cleaner
@@ -37,7 +34,7 @@
     .sidebar-header h2 { font-size: 18px; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px; }
 
     .sidebar-scroll {
-      flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px;
+      flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px;
     }
     .sidebar-scroll::-webkit-scrollbar { width: 6px; }
     .sidebar-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -49,31 +46,33 @@
     details[open] { background: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
     summary {
       padding: 14px 16px; font-size: 14px; font-weight: 700; color: #1e293b; cursor: pointer;
-      list-style: none; display: flex; justify-content: space-between; align-items: center;
+      list-style: none; display: flex; align-items: center; gap: 10px;
       user-select: none; transition: background 0.2s;
     }
     summary:hover { background: #f1f5f9; }
-    summary::after { content: '▼'; font-size: 10px; color: #94a3b8; transition: transform 0.3s; }
+    summary::after { content: '▼'; font-size: 10px; color: #94a3b8; margin-left: auto; transition: transform 0.3s; }
     details[open] summary::after { transform: rotate(180deg); }
     
+    /* SVG Icons in Summary */
+    .summary-icon { width: 18px; height: 18px; color: #6366f1; }
+
     .options-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 12px; border-top: 1px solid #e2e8f0; }
 
     /* Custom Toggle Switch */
     .toggle-row { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
     .toggle-row span { font-size: 13px; font-weight: 500; color: #475569; padding-right: 10px; }
-    .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
+    .switch { position: relative; display: inline-block; width: 38px; height: 22px; flex-shrink: 0; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider {
       position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
       background-color: #cbd5e1; transition: .3s; border-radius: 20px;
     }
     .slider:before {
-      position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
-      background-color: white; transition: .3s; border-radius: 50%;
+      position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px;
+      background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
     input:checked + .slider { background-color: #6366f1; }
     input:checked + .slider:before { transform: translateX(16px); }
-    input:disabled + .slider { opacity: 0.5; cursor: not-allowed; }
 
     /* Radio Buttons for Case */
     .radio-group { display: flex; flex-direction: column; gap: 8px; }
@@ -152,11 +151,11 @@
         
         <!-- Auto-Correction & Fixes -->
         <details open>
-          <summary>Auto-Correction & Fixes</summary>
+          <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Auto-Correction</summary>
           <div class="options-list">
             <label class="toggle-row">
-              <span>Real Spellcheck & Remove Gibberish <span id="spellStatus" style="font-size:10px; color:#f59e0b; font-weight:bold;">(Loading Dict...)</span></span>
-              <div class="switch"><input type="checkbox" id="optFixSpelling" checked disabled><span class="slider"></span></div>
+              <span>Smart Spellcheck & Gibberish Removal</span>
+              <div class="switch"><input type="checkbox" id="optFixSpelling" checked><span class="slider"></span></div>
             </label>
             <label class="toggle-row">
               <span>Remove stutters (wwwhat → what)</span>
@@ -175,20 +174,21 @@
 
         <!-- Whitespace -->
         <details>
-          <summary>Whitespace Management</summary>
+          <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg> Whitespace</summary>
           <div class="options-list">
             <label class="toggle-row"><span>Smart Trim (Start & End)</span><div class="switch"><input type="checkbox" id="optTrim" checked><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Remove indents (leading spaces)</span><div class="switch"><input type="checkbox" id="optLeadSpaces" checked><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Collapse extra spaces</span><div class="switch"><input type="checkbox" id="optMultiSpace" checked><span class="slider"></span></div></label>
+            <label class="toggle-row"><span>Remove leading spaces</span><div class="switch"><input type="checkbox" id="optLeadSpaces" checked><span class="slider"></span></div></label>
+            <label class="toggle-row"><span>Remove trailing spaces</span><div class="switch"><input type="checkbox" id="optTrailSpaces" checked><span class="slider"></span></div></label>
+            <label class="toggle-row"><span>Collapse multiple spaces</span><div class="switch"><input type="checkbox" id="optMultiSpace" checked><span class="slider"></span></div></label>
             <label class="toggle-row"><span>Collapse empty lines</span><div class="switch"><input type="checkbox" id="optMultiBlank" checked><span class="slider"></span></div></label>
+            <label class="toggle-row"><span>Remove blank lines</span><div class="switch"><input type="checkbox" id="optRemoveBlank"><span class="slider"></span></div></label>
             <label class="toggle-row"><span>Remove all line breaks</span><div class="switch"><input type="checkbox" id="optRemoveAllBreaks"><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Remove blank/empty lines</span><div class="switch"><input type="checkbox" id="optRemoveBlank"><span class="slider"></span></div></label>
           </div>
         </details>
 
         <!-- Characters -->
         <details>
-          <summary>Character & Symbol Filter</summary>
+          <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg> Characters</summary>
           <div class="options-list">
             <label class="toggle-row"><span>Remove Emoticons & Emojis</span><div class="switch"><input type="checkbox" id="optStripEmoji" checked><span class="slider"></span></div></label>
             <label class="toggle-row"><span>Remove punctuation marks</span><div class="switch"><input type="checkbox" id="optRemovePunct"><span class="slider"></span></div></label>
@@ -199,20 +199,20 @@
           </div>
         </details>
 
-        <!-- HTML -->
+        <!-- Code & Web -->
         <details>
-          <summary>Web & Code Formatting</summary>
+          <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg> Web & Code</summary>
           <div class="options-list">
             <label class="toggle-row"><span>Strip all HTML tags</span><div class="switch"><input type="checkbox" id="optStripHtml" checked><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Convert HTML Entities (&amp; → &)</span><div class="switch"><input type="checkbox" id="optDecodeEntities"><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Decode URL characters (%20)</span><div class="switch"><input type="checkbox" id="optDecodeUrl"><span class="slider"></span></div></label>
+            <label class="toggle-row"><span>Decode HTML Entities (&amp; → &)</span><div class="switch"><input type="checkbox" id="optDecodeEntities"><span class="slider"></span></div></label>
+            <label class="toggle-row"><span>Decode URL chars (%20)</span><div class="switch"><input type="checkbox" id="optDecodeUrl"><span class="slider"></span></div></label>
             <label class="toggle-row"><span>Remove BBCode ([b], [img])</span><div class="switch"><input type="checkbox" id="optRemoveBBcode"><span class="slider"></span></div></label>
           </div>
         </details>
 
-        <!-- Links -->
+        <!-- Privacy -->
         <details>
-          <summary>Privacy & Links</summary>
+          <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg> Privacy & Links</summary>
           <div class="options-list">
             <label class="toggle-row"><span>Mask/Remove all emails</span><div class="switch"><input type="checkbox" id="optStripEmails"><span class="slider"></span></div></label>
             <label class="toggle-row"><span>Remove all web URLs</span><div class="switch"><input type="checkbox" id="optRemoveUrls"><span class="slider"></span></div></label>
@@ -221,7 +221,7 @@
 
         <!-- Formatting -->
         <details>
-          <summary>Text Transformation</summary>
+          <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg> Text Transformation</summary>
           <div class="options-list">
             <div class="radio-group">
               <label class="radio-row"><input type="radio" name="case" value="none" checked> Original Case</label>
@@ -229,6 +229,7 @@
               <label class="radio-row"><input type="radio" name="case" value="lower"> lowercase</label>
               <label class="radio-row"><input type="radio" name="case" value="sentence"> Sentence case.</label>
               <label class="radio-row"><input type="radio" name="case" value="capitalize"> Capitalize Each Word</label>
+              <label class="radio-row"><input type="radio" name="case" value="alternate"> aLtErNaTiNg CaSe</label>
             </div>
           </div>
         </details>
@@ -285,29 +286,30 @@
     // All checkboxes and radios
     const inputs = document.querySelectorAll('.switch input, input[name="case"]');
 
-    // Spell Checker Variables
-    let spell = null;
-
-    // === Load Dictionary ===
-    Promise.all([
-      fetch('https://cdn.jsdelivr.net/npm/dictionary-en-us@3.0.0/index.aff').then(r => r.text()),
-      fetch('https://cdn.jsdelivr.net/npm/dictionary-en-us@3.0.0/index.dic').then(r => r.text())
-    ]).then(([aff, dic]) => {
-      spell = nspell(aff, dic);
-      // Enable the toggle and hide loading text
-      document.getElementById('spellStatus').style.display = 'none';
-      document.getElementById('optFixSpelling').disabled = false;
-      processText(); // Re-run to fix any text already pasted
-    }).catch(err => {
-      document.getElementById('spellStatus').textContent = '(Offline)';
-      document.getElementById('spellStatus').style.color = '#ef4444';
-      console.error('Failed to load spellchecker', err);
-    });
+    // Local Dictionary of common typos (Instant & Offline)
+    const typoDict = {
+      "namne": "name", "wwhat": "what", "whhat": "what", "wass": "was", "iss": "is",
+      "cantt": "cant", "thiss": "this", "thatt": "that", "annd": "and", "arr": "are",
+      "nott": "not", "yoou": "you", "wherre": "where", "witth": "with", "bee": "be",
+      "itss": "its", "alot": "a lot", "definately": "definitely", "recieve": "receive",
+      "seperate": "separate", "occured": "occurred", "untill": "until", "aple": "apple",
+      "bannana": "banana", "tomatoe": "tomato", "teh": "the", "adn": "and", "hte": "the",
+      "taht": "that", "thier": "their", "wat": "what", "whta": "what", "waht": "what",
+      "wicth": "which", "becuase": "because", "beacuse": "because", "dont": "don't",
+      "cant": "can't", "wont": "won't", "im": "I'm", "ive": "I've"
+    };
 
     // === Sidebar Toggle ===
     function toggleSidebar() {
       appLayout.classList.toggle('hide-sidebar');
       if (window.innerWidth <= 900) mobileOverlay.classList.toggle('show');
+    }
+
+    // Debounce to prevent lag while typing
+    let debounceTimer;
+    function triggerProcess() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(processText, 100);
     }
 
     // === Core Engine ===
@@ -330,14 +332,15 @@
       }
 
       // --- 2. REAL SPELLCHECK & GIBBERISH REMOVAL ---
-      if (document.getElementById('optFixSpelling').checked && spell) {
+      if (document.getElementById('optFixSpelling').checked) {
         let words = text.split(/(\s+)/);
+        
         for (let i = 0; i < words.length; i++) {
           let word = words[i];
           if (!word.trim()) continue;
           
-          // Separate leading/trailing punctuation from the core word (e.g., "(namne)" -> "(", "namne", ")")
-          let match = word.match(/^([^a-zA-Z]*)([a-zA-Z']+)([^a-zA-Z]*)$/);
+          // Separate punctuation from the word (e.g., "(namne)" -> "(", "namne", ")")
+          let match = word.match(/^([^a-zA-Z]*)([a-zA-Z]+)([^a-zA-Z]*)$/);
           if (!match) continue;
           
           let prePunct = match[1];
@@ -345,42 +348,37 @@
           let postPunct = match[3];
           let lower = core.toLowerCase();
           
-          // If it's a valid dictionary word, skip it
-          if (spell.correct(lower)) continue;
-          if (core[0] === core[0].toUpperCase() && spell.correct(core)) continue;
+          // A. Check Local Dictionary
+          if (typoDict[lower]) {
+            let fixed = typoDict[lower];
+            if (core[0] === core[0].toUpperCase()) fixed = fixed.charAt(0).toUpperCase() + fixed.slice(1);
+            words[i] = prePunct + fixed + postPunct;
+            continue;
+          }
 
-          // A. Remove pure gibberish (no vowels, length > 2) e.g., "dkj", "ddll"
+          // B. Remove pure gibberish (no vowels, length > 2) e.g., "dkj", "ddll"
           if (core.length > 2 && !/[aeiouy]/i.test(core)) {
               words[i] = '';
               continue;
           }
 
-          // B. Remove pure stutters (e.g., "kkk", "wwww")
+          // C. Remove pure stutters (e.g., "kkk", "wwww")
           if (/^([a-zA-Z])\1+$/.test(core)) {
               words[i] = '';
               continue;
           }
 
-          // C. Get spelling suggestions (e.g., "namne" -> "name")
-          let suggestions = spell.suggest(lower);
-          if (suggestions && suggestions.length > 0) {
-              let best = suggestions[0];
-              // Preserve original capitalization
-              if (core[0] === core[0].toUpperCase()) {
-                  best = best.charAt(0).toUpperCase() + best.slice(1);
-              }
-              words[i] = prePunct + best + postPunct;
-          } else {
-              // If no suggestion and it's short gibberish, remove it
-              if (core.length <= 3 && !['a', 'i', 'an', 'in', 'on', 'at', 'to', 'do', 'go', 'no', 'so', 'up', 'us', 'we', 'he', 'me', 'my', 'by'].includes(lower)) {
-                  words[i] = '';
-              }
+          // D. Fix start stutters (e.g., "wwwhat" -> "what")
+          let startFixed = core.replace(/^([a-zA-Z])\1+/gi, '$1');
+          if (startFixed !== core) {
+             words[i] = prePunct + startFixed + postPunct;
           }
         }
         text = words.join('');
-      } 
-      // Fallback if spellcheck is disabled but stutter fix is on
-      else if (document.getElementById('optFixStutter').checked) {
+      }
+
+      // Stutter fix (sooo -> so)
+      if (document.getElementById('optFixStutter').checked) {
         text = text.replace(/\b(\w)\1{2,}/gi, '$1');
       }
 
@@ -391,10 +389,8 @@
       }
 
       if (document.getElementById('optFixPunctSpace').checked) {
-        // Removes spaces BEFORE punctuation: "word ," -> "word,"
-        text = text.replace(/\s+([.,!?])/g, '$1');
-        // Adds space AFTER punctuation if missing: "word.Another" -> "word. Another"
-        text = text.replace(/([.,!?])(?=[^\s\d])/g, '$1 ');
+        text = text.replace(/\s+([.,!?])/g, '$1'); // "word ," -> "word,"
+        text = text.replace(/([.,!?])(?=[^\s\d])/g, '$1 '); // "word.Another" -> "word. Another"
       }
 
       // --- 4. LINKS & EMAILS ---
@@ -426,24 +422,13 @@
       }
 
       // --- 6. WHITESPACE ---
-      if (document.getElementById('optTrim').checked) {
-        text = text.trim();
-      }
-      if (document.getElementById('optLeadSpaces').checked) {
-        text = text.replace(/^[ \t]+/gm, '');
-      }
-      if (document.getElementById('optRemoveBlank').checked) {
-        text = text.replace(/^\s*[\r\n]/gm, '');
-      }
-      if (document.getElementById('optMultiSpace').checked) {
-        text = text.replace(/[ \t]+/g, ' ');
-      }
-      if (document.getElementById('optMultiBlank').checked) {
-        text = text.replace(/\n{3,}/g, '\n\n');
-      }
-      if (document.getElementById('optRemoveAllBreaks').checked) {
-        text = text.replace(/[\r\n]+/g, ' ');
-      }
+      if (document.getElementById('optTrim').checked) text = text.trim();
+      if (document.getElementById('optLeadSpaces').checked) text = text.replace(/^[ \t]+/gm, '');
+      if (document.getElementById('optTrailSpaces').checked) text = text.replace(/[ \t]+$/gm, '');
+      if (document.getElementById('optRemoveBlank').checked) text = text.replace(/^\s*[\r\n]/gm, '');
+      if (document.getElementById('optMultiSpace').checked) text = text.replace(/[ \t]+/g, ' ');
+      if (document.getElementById('optMultiBlank').checked) text = text.replace(/\n{3,}/g, '\n\n');
+      if (document.getElementById('optRemoveAllBreaks').checked) text = text.replace(/[\r\n]+/g, ' ');
 
       // --- 7. CASE TRANSFORMATION ---
       const caseVal = document.querySelector('input[name="case"]:checked').value;
@@ -455,6 +440,16 @@
         text = text.toLowerCase().replace(/(^\s*\w|[.!?]\s*\w)/g, c => c.toUpperCase());
       } else if (caseVal === 'capitalize') {
         text = text.replace(/\b\w/g, c => c.toUpperCase());
+      } else if (caseVal === 'alternate') {
+        let chars = text.split('');
+        let upper = false;
+        for (let i = 0; i < chars.length; i++) {
+          if (/[a-zA-Z]/.test(chars[i])) {
+            chars[i] = upper ? chars[i].toUpperCase() : chars[i].toLowerCase();
+            upper = !upper;
+          }
+        }
+        text = chars.join('');
       }
 
       // Update Output
@@ -490,9 +485,9 @@
     }
 
     // === Event Listeners ===
-    textInput.addEventListener('input', processText);
+    textInput.addEventListener('input', triggerProcess);
     inputs.forEach(input => {
-      input.addEventListener('change', processText);
+      input.addEventListener('change', triggerProcess);
     });
 
     window.addEventListener('DOMContentLoaded', () => {
