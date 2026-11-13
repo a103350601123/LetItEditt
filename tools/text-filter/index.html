@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Text Filter Studio | LetitEdit</title>
-  <meta name="description" content="Professionally filter, highlight, remove, or replace words in your text. Supports Regex and advanced matching.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔍</text></svg>">
+  <title>Text Refinery Pro | LetitEdit</title>
+  <meta name="description" content="Professionally refine, filter, highlight, or mask words in your text. Supports advanced Regex and dynamic styling.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💎</text></svg>">
   <link rel="stylesheet" href="../../assets/css/style.css">
 
   <style>
     /* =========================================
-       LetitEdit Unified Layout
+       LetitEdit Unified Layout (Text Refinery)
        ========================================= */
     :root {
       --brand: #6366f1;
@@ -23,6 +23,8 @@
       --text-muted: #64748b;
       --border-color: #e2e8f0;
       --shadow-md: 0 4px 12px rgba(0,0,0,0.05);
+      
+      --hl-default: #fef08a; /* Default yellow */
     }
 
     [data-theme="dark"] {
@@ -92,7 +94,7 @@
 
     .options-list { padding: 0 16px 16px 16px; display: flex; flex-direction: column; gap: 14px; }
 
-    /* Custom Controls in Sidebar */
+    /* Custom Controls */
     .field { display: flex; flex-direction: column; gap: 6px; }
     .field label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
     .field input[type="text"], .field textarea {
@@ -112,6 +114,11 @@
     .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
     input:checked + .slider { background-color: var(--brand); }
     input:checked + .slider:before { transform: translateX(16px); }
+
+    /* Color Picker */
+    .color-picker { -webkit-appearance: none; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; padding: 0; }
+    .color-picker::-webkit-color-swatch-wrapper { padding: 0; }
+    .color-picker::-webkit-color-swatch { border: 1px solid var(--border-color); border-radius: 8px; }
 
     /* --- Right Editor Area --- */
     .main-editor { flex: 1; display: flex; flex-direction: column; position: relative; }
@@ -144,15 +151,21 @@
       flex: 1; width: 100%; padding: 20px; border: none; outline: none; resize: none;
       font-family: inherit; font-size: 15px; line-height: 1.6; color: var(--text-main); background: transparent;
     }
-    .output-area { background: rgba(0,0,0,0.02); color: var(--text-main); white-space: pre-wrap; }
+    
+    /* Output Rendering */
+    .output-render { 
+      flex: 1; width: 100%; padding: 20px; overflow-y: auto; font-size: 15px; line-height: 1.6; 
+      background: rgba(0,0,0,0.02); white-space: pre-wrap; word-wrap: break-word;
+    }
 
-    /* Highlight style for output */
-    .highlight {
-      background-color: #fde047; /* Tailwind yellow-300 */
+    /* The custom highlight class */
+    .refined-token {
+      background-color: var(--hl-default);
       color: #000;
-      border-radius: 3px;
-      padding: 0 2px;
+      border-radius: 4px;
+      padding: 0 4px;
       font-weight: 600;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
 
     .mobile-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); z-index: 80; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
@@ -174,7 +187,7 @@
     
     <!-- Top Header -->
     <header class="header">
-      <a href="../../index.html" class="logo">🔍 Text Filter <span class="badge">PRO</span></a>
+      <a href="../../index.html" class="logo">💎 Text Refinery <span class="badge">PRO</span></a>
       <div class="nav-actions">
         <button id="themeToggle" class="btn btn-outline" aria-label="Toggle Dark Mode">🌙</button>
         <button class="btn btn-danger" onclick="clearAll()">🗑️ <span>Clear</span></button>
@@ -189,57 +202,62 @@
       <!-- LEFT: Settings Sidebar -->
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-          <h2>Filter Configuration</h2>
+          <h2>Refinery Controls</h2>
           <button class="btn btn-outline" onclick="toggleSidebar()" style="padding:4px 8px;">✕</button>
         </div>
         
         <div class="sidebar-scroll">
           
-          <!-- Section 1: Highlight Words -->
+          <!-- Section 1: Highlighting -->
           <details open>
-            <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg> Highlight Words</summary>
+            <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg> Emphasize Tokens</summary>
             <div class="options-list">
               <div class="field">
-                <label>Words to Highlight</label>
-                <textarea id="highlightInput" placeholder="word1, word2, phrase..."></textarea>
+                <label>Terms to Highlight (Comma Separated)</label>
+                <textarea id="highlightInput" placeholder="important, urgent, secret..."></textarea>
+              </div>
+              <div class="toggle-row">
+                <span>Highlight Color</span>
+                <input type="color" id="highlightColor" class="color-picker" value="#fef08a">
               </div>
             </div>
           </details>
 
-          <!-- Section 2: Remove Words -->
+          <!-- Section 2: Removal & Masking -->
           <details open>
-            <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg> Remove Words</summary>
+            <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg> Exclude & Mask</summary>
             <div class="options-list">
               <div class="field">
-                <label>Words to Remove</label>
-                <textarea id="removeInput" placeholder="word1, word2, phrase..."></textarea>
+                <label>Terms to Remove/Mask</label>
+                <textarea id="removeInput" placeholder="badword, sensitive_data..."></textarea>
               </div>
+              <label class="toggle-row"><span>Mask with Asterisks (****)</span><div class="switch"><input type="checkbox" id="optMask"><span class="slider"></span></div></label>
             </div>
           </details>
 
-          <!-- Section 3: Replace Words -->
+          <!-- Section 3: Mutation (Replace) -->
           <details>
-            <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg> Replace Words</summary>
+            <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg> Token Mutation</summary>
             <div class="options-list">
               <div class="field">
-                <label>Find (Separate with commas)</label>
-                <textarea id="findInput" placeholder="old_word1, old_word2"></textarea>
+                <label>Find Term</label>
+                <input type="text" id="findInput" placeholder="e.g. old_word">
               </div>
               <div class="field">
                 <label>Replace With</label>
-                <input type="text" id="replaceInput" placeholder="new_word">
+                <input type="text" id="replaceInput" placeholder="e.g. new_word">
               </div>
             </div>
           </details>
 
-          <!-- Section 4: Advanced Matching -->
+          <!-- Section 4: Engine Parameters -->
           <details>
-            <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Advanced Options</summary>
+            <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Engine Parameters</summary>
             <div class="options-list">
-              <label class="toggle-row"><span>Case Sensitive Match</span><div class="switch"><input type="checkbox" id="optCaseSensitive"><span class="slider"></span></div></label>
-              <label class="toggle-row"><span>Match Whole Words Only</span><div class="switch"><input type="checkbox" id="optWholeWord" checked><span class="slider"></span></div></label>
-              <label class="toggle-row"><span>Enable Regex (Advanced)</span><div class="switch"><input type="checkbox" id="optRegex"><span class="slider"></span></div></label>
-              <label class="toggle-row"><span>Keep Only Matching Lines</span><div class="switch"><input type="checkbox" id="optKeepOnly"><span class="slider"></span></div></label>
+              <label class="toggle-row"><span>Case Sensitive Matching</span><div class="switch"><input type="checkbox" id="optCaseSensitive"><span class="slider"></span></div></label>
+              <label class="toggle-row"><span>Whole Word Match Only</span><div class="switch"><input type="checkbox" id="optWholeWord" checked><span class="slider"></span></div></label>
+              <label class="toggle-row"><span>Enable Regex Engine</span><div class="switch"><input type="checkbox" id="optRegex"><span class="slider"></span></div></label>
+              <label class="toggle-row"><span>Extract Target Lines Only</span><div class="switch"><input type="checkbox" id="optExtract"><span class="slider"></span></div></label>
             </div>
           </details>
 
@@ -267,17 +285,17 @@
               <span>Raw Input</span>
               <small id="inputStats">0 chars</small>
             </div>
-            <textarea id="textInput" placeholder="Paste your text here. Highlight and remove words will appear here..."></textarea>
+            <textarea id="textInput" placeholder="Paste your text here. The refinery process happens instantly..."></textarea>
           </div>
 
           <!-- Output -->
           <div class="textarea-wrapper">
             <div class="textarea-header">
-              <span>Filtered Output</span>
+              <span>Refined Output</span>
               <small id="outputStats">0 chars</small>
             </div>
-            <div id="textOutput" class="output-area" style="flex:1; overflow-y:auto; padding:20px; font-size:15px; line-height:1.6;">
-                <!-- Highlighted HTML will be injected here -->
+            <div id="textOutput" class="output-render">
+              <!-- Rendered HTML appears here -->
             </div>
           </div>
         </div>
@@ -295,6 +313,7 @@
     const textOutput = document.getElementById('textOutput');
     
     const highlightInput = document.getElementById('highlightInput');
+    const highlightColor = document.getElementById('highlightColor');
     const removeInput = document.getElementById('removeInput');
     const findInput = document.getElementById('findInput');
     const replaceInput = document.getElementById('replaceInput');
@@ -302,7 +321,8 @@
     const optCaseSensitive = document.getElementById('optCaseSensitive');
     const optWholeWord = document.getElementById('optWholeWord');
     const optRegex = document.getElementById('optRegex');
-    const optKeepOnly = document.getElementById('optKeepOnly');
+    const optMask = document.getElementById('optMask');
+    const optExtract = document.getElementById('optExtract');
 
     // === Sidebar Toggle ===
     function toggleSidebar() {
@@ -324,7 +344,10 @@
 
     function processText() {
       let text = textInput.value;
-      let output = text; // Start with original text
+      let output = text; 
+
+      // Update Color Variable
+      document.documentElement.style.setProperty('--hl-default', highlightColor.value);
 
       if (!text) {
         textOutput.innerHTML = '';
@@ -336,41 +359,40 @@
       const isRegex = optRegex.checked;
       const isWholeWord = optWholeWord.checked;
 
-      // --- 1. Build Regex Flags ---
       let flags = 'g';
       if (!isCaseSensitive) flags += 'i';
 
-      // --- 2. Process Replacements ---
-      const findWords = findInput.value.split(',').map(w => w.trim()).filter(w => w);
+      // --- 1. Process Token Mutation (Find & Replace) ---
+      const findWord = findInput.value.trim();
       const replaceWith = replaceInput.value;
-
-      findWords.forEach(word => {
+      if (findWord) {
         try {
-          let pattern = isRegex ? word : escapeRegExp(word);
+          let pattern = isRegex ? findWord : escapeRegExp(findWord);
           if (!isRegex && isWholeWord) pattern = `\\b${pattern}\\b`;
           const regex = new RegExp(pattern, flags);
           output = output.replace(regex, replaceWith);
-        } catch (e) {
-          console.warn('Invalid regex for find:', word);
-        }
-      });
+        } catch (e) { console.warn('Invalid Regex'); }
+      }
 
-      // --- 3. Process Removals ---
+      // --- 2. Process Exclusions (Remove / Mask) ---
       const removeWords = removeInput.value.split(',').map(w => w.trim()).filter(w => w);
-
       removeWords.forEach(word => {
         try {
           let pattern = isRegex ? word : escapeRegExp(word);
           if (!isRegex && isWholeWord) pattern = `\\b${pattern}\\b`;
           const regex = new RegExp(pattern, flags);
-          output = output.replace(regex, '');
-        } catch (e) {
-          console.warn('Invalid regex for remove:', word);
-        }
+          
+          if (optMask.checked) {
+            // Replace with asterisks of the same length
+            output = output.replace(regex, (match) => '*'.repeat(match.length));
+          } else {
+            // Remove entirely
+            output = output.replace(regex, '');
+          }
+        } catch (e) { console.warn('Invalid Regex'); }
       });
 
-      // --- 4. Process Highlighting (Returns HTML) ---
-      // We need to escape the output first to prevent XSS, then apply highlighting
+      // --- 3. Process Highlighting ---
       let htmlOutput = output
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
@@ -379,28 +401,26 @@
         .replace(/'/g, '&#039;');
 
       const highlightWords = highlightInput.value.split(',').map(w => w.trim()).filter(w => w);
-
       highlightWords.forEach(word => {
         try {
           let pattern = isRegex ? word : escapeRegExp(word);
           if (!isRegex && isWholeWord) pattern = `\\b${pattern}\\b`;
           const regex = new RegExp(pattern, flags);
-          htmlOutput = htmlOutput.replace(regex, '<span class="highlight">$&</span>');
-        } catch (e) {
-          console.warn('Invalid regex for highlight:', word);
-        }
+          htmlOutput = htmlOutput.replace(regex, '<span class="refined-token">$&</span>');
+        } catch (e) { console.warn('Invalid Regex'); }
       });
 
-      // --- 5. Keep Only Matching Lines ---
-      if (optKeepOnly.checked && highlightWords.length > 0) {
+      // --- 4. Process Extraction ---
+      if (optExtract.checked && highlightWords.length > 0) {
         const lines = htmlOutput.split('\n');
-        const keptLines = lines.filter(line => line.includes('<span class="highlight">'));
+        const keptLines = lines.filter(line => line.includes('class="refined-token"'));
         htmlOutput = keptLines.join('\n');
       }
 
-      // Update Output
       textOutput.innerHTML = htmlOutput;
-      updateStats(output.length);
+      
+      // Update stats based on text content, not HTML length
+      updateStats(textOutput.innerText.length);
     }
 
     function updateStats(length) {
@@ -423,10 +443,9 @@
 
     function copyOutput() {
       if (!textOutput.innerHTML) return;
-      // Copy only the text content, not the HTML tags
-      const textToCopy = textOutput.innerText;
       
-      navigator.clipboard.writeText(textToCopy).then(() => {
+      // Copy only text, strip HTML tags
+      navigator.clipboard.writeText(textOutput.innerText).then(() => {
         const btn = document.querySelector('.btn-primary');
         const originalText = btn.innerHTML;
         btn.innerHTML = "✅ Copied!";
@@ -444,7 +463,7 @@
     // === Event Listeners ===
     const allInputs = [
       textInput, highlightInput, removeInput, findInput, replaceInput,
-      optCaseSensitive, optWholeWord, optRegex, optKeepOnly
+      highlightColor, optCaseSensitive, optWholeWord, optRegex, optMask, optExtract
     ];
 
     allInputs.forEach(el => {
