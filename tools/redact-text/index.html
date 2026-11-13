@@ -10,7 +10,7 @@
 
   <style>
     /* =========================================
-       LetitEdit Unified Layout (Redactor)
+       LetitEdit Original UI (Redactor)
        ========================================= */
     :root {
       --brand: #6366f1;
@@ -75,39 +75,97 @@
     }
     .sidebar-header h2 { font-size: 16px; font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 20px; }
     .sidebar-scroll::-webkit-scrollbar { width: 6px; }
     .sidebar-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
-    /* Modern Solid Button Grid */
-    .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+    /* Custom Chip Grid */
+    .chip-section-title { font-size: 12px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; }
     
-    .redact-btn {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 14px; border-radius: 8px; font-size: 13px; font-weight: 600;
-      border: 1px solid transparent; background: var(--brand); color: #fff;
+    .chip-container { display: flex; flex-wrap: wrap; gap: 8px; }
+    
+    /* Core Chip Styles */
+    .privacy-chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;
+      border: 1.5px solid var(--border-color); background: var(--card-bg); color: var(--text-muted);
       cursor: pointer; transition: all 0.2s; user-select: none;
-      box-shadow: 0 2px 4px rgba(99,102,241,0.2);
     }
     
-    .redact-btn:hover { background: var(--brand-hover); }
-    
-    /* Inactive state (if user turns it off) */
-    .redact-btn.inactive {
-      background: var(--card-bg); color: var(--text-muted); border-color: var(--border-color);
-      box-shadow: none;
-    }
-    .redact-btn.inactive:hover { background: var(--bg-color); }
+    .privacy-chip:hover { background: var(--bg-color); }
 
-    .redact-btn .count { 
-      font-size: 11px; background: rgba(255,255,255,0.2); color: #fff; 
-      padding: 2px 8px; border-radius: 12px; font-weight: 700;
+    /* Checkbox inside the chip */
+    .privacy-chip .chip-box {
+      width: 16px; height: 16px; border-radius: 4px; border: 2px solid #cbd5e1;
+      display: flex; align-items: center; justify-content: center; transition: all 0.2s;
     }
-    .redact-btn.inactive .count { background: var(--bg-color); color: var(--text-muted); }
-    .redact-btn .count:empty { display: none; }
+    .privacy-chip .chip-box svg { width: 10px; height: 10px; stroke: #fff; stroke-width: 3; fill: none; opacity: 0; }
+    
+    /* Count Badge */
+    .privacy-chip .count {
+      font-size: 11px; background: #e2e8f0; color: #64748b;
+      padding: 1px 6px; border-radius: 10px; font-weight: 700;
+    }
+    .privacy-chip .count:empty { display: none; }
+
+    /* Category Specific Colors (Inactive state: soft bg, colored text) */
+    .privacy-chip.active.c-name { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+    .privacy-chip.active.c-name .chip-box { background: #2563eb; border-color: #2563eb; }
+    .privacy-chip.active.c-name .chip-box svg { opacity: 1; }
+    .privacy-chip.active.c-name .count { background: #dbeafe; color: #2563eb; }
+
+    .privacy-chip.active.c-email { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
+    .privacy-chip.active.c-email .chip-box { background: #16a34a; border-color: #16a34a; }
+    .privacy-chip.active.c-email .chip-box svg { opacity: 1; }
+    .privacy-chip.active.c-email .count { background: #dcfce7; color: #16a34a; }
+
+    .privacy-chip.active.c-phone { background: #f0f9ff; color: #0284c7; border-color: #bae6fd; }
+    .privacy-chip.active.c-phone .chip-box { background: #0284c7; border-color: #0284c7; }
+    .privacy-chip.active.c-phone .chip-box svg { opacity: 1; }
+    .privacy-chip.active.c-phone .count { background: #e0f2fe; color: #0284c7; }
+
+    .privacy-chip.active.c-addr { background: #fffbeb; color: #d97706; border-color: #fde68a; }
+    .privacy-chip.active.c-addr .chip-box { background: #d97706; border-color: #d97706; }
+    .privacy-chip.active.c-addr .chip-box svg { opacity: 1; }
+    .privacy-chip.active.c-addr .count { background: #fef3c7; color: #d97706; }
+
+    .privacy-chip.active.c-money { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+    .privacy-chip.active.c-money .chip-box { background: #15803d; border-color: #15803d; }
+    .privacy-chip.active.c-money .chip-box svg { opacity: 1; }
+    .privacy-chip.active.c-money .count { background: #dcfce7; color: #15803d; }
+
+    .privacy-chip.active.c-id { background: #faf5ff; color: #9333ea; border-color: #e9d5ff; }
+    .privacy-chip.active.c-id .chip-box { background: #9333ea; border-color: #9333ea; }
+    .privacy-chip.active.c-id .chip-box svg { opacity: 1; }
+    .privacy-chip.active.c-id .count { background: #f3e8ff; color: #9333ea; }
+
+    .privacy-chip.active.c-secret { background: #fff1f2; color: #e11d48; border-color: #fecdd3; }
+    .privacy-chip.active.c-secret .chip-box { background: #e11d48; border-color: #e11d48; }
+    .privacy-chip.active.c-secret .chip-box svg { opacity: 1; }
+    .privacy-chip.active.c-secret .count { background: #ffe4e6; color: #e11d48; }
+
+    .privacy-chip.active.c-net { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+    .privacy-chip.active.c-net .chip-box { background: #475569; border-color: #475569; }
+    .privacy-chip.active.c-net .chip-box svg { opacity: 1; }
+    .privacy-chip.active.c-net .count { background: #e2e8f0; color: #475569; }
+
+    .privacy-chip.active.c-user { background: #fff7ed; color: #ea580c; border-color: #fed7aa; }
+    .privacy-chip.active.c-user .chip-box { background: #ea580c; border-color: #ea580c; }
+    .privacy-chip.active.c-user .chip-box svg { opacity: 1; }
+    .privacy-chip.active.c-user .count { background: #ffedd5; color: #ea580c; }
+
+    .privacy-chip.active.c-url { background: #ecfeff; color: #0891b2; border-color: #a5f3fc; }
+    .privacy-chip.active.c-url .chip-box { background: #0891b2; border-color: #0891b2; }
+    .privacy-chip.active.c-url .chip-box svg { opacity: 1; }
+    .privacy-chip.active.c-url .count { background: #cffafe; color: #0891b2; }
+
+    .privacy-chip.active.c-date { background: #fdf2f8; color: #db2777; border-color: #fbcfe8; }
+    .privacy-chip.active.c-date .chip-box { background: #db2777; border-color: #db2777; }
+    .privacy-chip.active.c-date .chip-box svg { opacity: 1; }
+    .privacy-chip.active.c-date .count { background: #fce7f3; color: #db2777; }
 
     /* Custom Inputs */
-    .field { display: flex; flex-direction: column; gap: 6px; margin-top: 16px; }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
     .field label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
     .field textarea {
       width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color);
@@ -189,9 +247,9 @@
         
         <div class="sidebar-scroll">
           
-          <!-- Button Grid -->
-          <div class="button-grid" id="buttonGrid">
-            <!-- Buttons injected by JS -->
+          <!-- Chip Grid -->
+          <div class="chip-container" id="chipContainer">
+            <!-- Chips injected by JS -->
           </div>
 
           <!-- Manual Words -->
@@ -201,7 +259,7 @@
           </div>
 
           <!-- Restoration -->
-          <div class="field" style="margin-top: 24px; padding-top: 16px; border-top: 1px dashed var(--border-color);">
+          <div class="field" style="margin-top: 10px; padding-top: 16px; border-top: 1px dashed var(--border-color);">
             <label style="color: var(--brand);">Put real values back (Restore)</label>
             <textarea id="restoreInput" placeholder="Paste AI reply here containing labels like [EMAIL_1]..."></textarea>
             <button class="btn btn-outline" style="width:100%; margin-top:8px;" onclick="restoreText()">Restore Values</button>
@@ -259,21 +317,21 @@
     const customWords = document.getElementById('customWords');
     const restoreInput = document.getElementById('restoreInput');
     const restoreOutput = document.getElementById('restoreOutput');
-    const buttonGrid = document.getElementById('buttonGrid');
+    const chipContainer = document.getElementById('chipContainer');
 
     // === Categories Configuration ===
     const CATEGORIES = [
-      { id: 'name', label: 'Names' },
-      { id: 'email', label: 'Emails' },
-      { id: 'phone', label: 'Phone numbers' },
-      { id: 'addr', label: 'Addresses' },
-      { id: 'money', label: 'Cards & bank' },
-      { id: 'id', label: 'SSNs & IDs' },
-      { id: 'secret', label: 'Keys & passwords' },
-      { id: 'net', label: 'IP addresses' },
-      { id: 'user', label: 'Usernames' },
-      { id: 'url', label: 'URLs & domains' },
-      { id: 'date', label: 'Dates' }
+      { id: 'name', label: 'Names', class: 'c-name' },
+      { id: 'email', label: 'Emails', class: 'c-email' },
+      { id: 'phone', label: 'Phone numbers', class: 'c-phone' },
+      { id: 'addr', label: 'Addresses', class: 'c-addr' },
+      { id: 'money', label: 'Cards & bank', class: 'c-money' },
+      { id: 'id', label: 'SSNs & IDs', class: 'c-id' },
+      { id: 'secret', label: 'Keys & passwords', class: 'c-secret' },
+      { id: 'net', label: 'IP addresses', class: 'c-net' },
+      { id: 'user', label: 'Usernames', class: 'c-user' },
+      { id: 'url', label: 'URLs & domains', class: 'c-url' },
+      { id: 'date', label: 'Dates', class: 'c-date' }
     ];
 
     // Active state map
@@ -283,24 +341,31 @@
     // Redaction map to hold original values
     let redactionMap = {};
 
-    // === Build Buttons UI ===
+    // === Build Chips UI ===
     function buildChips() {
-      buttonGrid.innerHTML = '';
+      chipContainer.innerHTML = '';
       CATEGORIES.forEach(cat => {
         const btn = document.createElement('button');
-        btn.className = `redact-btn`; // Default is active (solid blue)
+        // Set active class and color class by default
+        btn.className = `privacy-chip active ${cat.class}`;
         btn.dataset.id = cat.id;
-        btn.innerHTML = `<span>${cat.label}</span><span class="count" id="cnt-${cat.id}"></span>`;
+        
+        // Inject inner HTML (checkbox + label + count)
+        btn.innerHTML = `
+          <div class="chip-box">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <span>${cat.label}</span>
+          <span class="count" id="cnt-${cat.id}"></span>
+        `;
+        
         btn.onclick = () => {
           activeCats[cat.id] = !activeCats[cat.id];
-          if(activeCats[cat.id]) {
-            btn.classList.remove('inactive');
-          } else {
-            btn.classList.add('inactive');
-          }
+          btn.classList.toggle('active', activeCats[cat.id]);
           processText();
         };
-        buttonGrid.appendChild(btn);
+        
+        chipContainer.appendChild(btn);
       });
     }
 
@@ -322,7 +387,10 @@
       redactionMap = {}; // Reset map
       
       // Reset counts
-      CATEGORIES.forEach(c => document.getElementById(`cnt-${c.id}`).textContent = '');
+      CATEGORIES.forEach(c => {
+        const el = document.getElementById(`cnt-${c.id}`);
+        if(el) el.textContent = '';
+      });
 
       if (!text) {
         textOutput.value = '';
@@ -417,11 +485,13 @@
 
       CATEGORIES.forEach(cat => {
         const el = document.getElementById(`cnt-${cat.id}`);
-        if (counts[cat.id]) {
-          el.textContent = counts[cat.id];
-          el.style.display = 'inline-block';
-        } else {
-          el.style.display = 'none';
+        if (el) {
+          if (counts[cat.id]) {
+            el.textContent = counts[cat.id];
+            el.style.display = 'inline-block';
+          } else {
+            el.style.display = 'none';
+          }
         }
       });
     }
