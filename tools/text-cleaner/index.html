@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text Cleaner & Formatter | MyUtility</title>
+  <meta name="description" content="Clean your text quickly by removing unwanted characters, spaces, symbols, emojis, blank lines, and more.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛠️</text></svg>">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    .options-panel { max-height: 75vh; overflow-y: auto; }
+    .options-category { margin-bottom: 1rem; border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; }
+    .category-header { background: var(--primary-color); color: white; padding: 0.5rem 1rem; cursor: pointer; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+    .category-body { padding: 1rem; background: var(--card-bg); display: block; }
+    .category-body.hidden { display: none; }
+    .text-area-wrapper { position: relative; }
+    .text-area-wrapper .btn-copy { position: absolute; top: 5px; right: 5px; }
+    .radio-group { display: flex; flex-direction: column; gap: 0.3rem; }
+    .radio-group label { display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <a href="../../index.html" class="logo">MyUtility</a>
+    <button id="themeToggle" class="btn btn-outline btn-sm" aria-label="Toggle Dark Mode">🌙</button>
+  </header>
+
+  <main class="container">
+    <div style="margin-bottom: 2rem;">
+      <h1 style="font-size: 1.8rem;">Text Cleaner & Formatter</h1>
+      <p style="color: #64748b;">Clean your text quickly and effortlessly with this powerful tool.</p>
+    </div>
+
+    <div class="tool-layout">
+      <div>
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="margin: 0;">Your Text</h3>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <span style="font-size: 0.9rem;">Wrap lines</span>
+              <div class="switch">
+                <input type="checkbox" id="wrapLines" checked onchange="document.getElementById('textInput').style.whiteSpace = this.checked ? 'pre-wrap' : 'pre'; document.getElementById('textInput').style.overflowX = this.checked ? 'hidden' : 'auto';">
+                <span class="slider"></span>
+              </div>
+            </label>
+          </div>
+          
+          <div class="text-area-wrapper">
+            <textarea id="textInput" rows="15" style="white-space: pre-wrap;" placeholder="Copy and paste your text here, change the settings below and see the results in real-time."></textarea>
+            <button class="btn btn-outline btn-sm btn-copy" onclick="copyToClipboard('textInput')" title="Copy">📋</button>
+          </div>
+
+          <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+            <button class="btn btn-primary" onclick="applyClean(true)">CLEAN TEXT</button>
+            <button class="btn btn-outline" onclick="undoClean()">UNDO</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card options-panel">
+        <h3 style="margin-bottom: 1rem;">Options</h3>
+
+        <div class="options-category">
+          <div class="category-header" onclick="toggleCategory(this)">Whitespace <span>▼</span></div>
+          <div class="category-body">
+            <div class="toggle-row"><span>Trim</span><label class="switch"><input type="checkbox" id="optTrim" checked><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Remove leading spaces</span><label class="switch"><input type="checkbox" id="optLeadSpaces" checked><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Remove trailing spaces</span><label class="switch"><input type="checkbox" id="optTrailSpaces" checked><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Replace 4 space(s) with 1 tab</span><label class="switch"><input type="checkbox" id="optSpacesToTab"><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Replace 1 tab with 4 space(s)</span><label class="switch"><input type="checkbox" id="optTabToSpaces"><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Remove blank/empty lines</span><label class="switch"><input type="checkbox" id="optRemoveBlank"><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Replace line break with space</span><label class="switch"><input type="checkbox" id="optBreakToSpace"><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Multiple spaces to single</span><label class="switch"><input type="checkbox" id="optMultiSpace" checked><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Multiple blank lines to single</span><label class="switch"><input type="checkbox" id="optMultiBlank" checked><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Remove all line breaks</span><label class="switch"><input type="checkbox" id="optRemoveAllBreaks"><span class="slider"></span></label></div>
+          </div>
+        </div>
+
+        <div class="options-category">
+          <div class="category-header" onclick="toggleCategory(this)">Characters <span>▼</span></div>
+          <div class="category-body">
+            <div class="toggle-row"><span>Remove punctuation marks</span><label class="switch"><input type="checkbox" id="optRemovePunct"><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Strip all emojis</span><label class="switch"><input type="checkbox" id="optStripEmoji" checked><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Remove letter accents (diacritics)</span><label class="switch"><input type="checkbox" id="optRemoveAccents"><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Normalize unicode letters/characters</span><label class="switch"><input type="checkbox" id="optNormalizeUnicode"><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Remove replacement character</span><label class="switch"><input type="checkbox" id="optRemoveReplChar"><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Remove non-ASCII characters</span><label class="switch"><input type="checkbox" id="optRemoveNonAscii"><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Remove non-alphanumeric characters</span><label class="switch"><input type="checkbox" id="optRemoveNonAlnum"><span class="slider"></span></label></div>
+          </div>
+        </div>
+
+        <div class="options-category">
+          <div class="category-header" onclick="toggleCategory(this)">HTML <span>▼</span></div>
+          <div class="category-body">
+            <div class="toggle-row"><span>Unescape HTML tags</span><label class="switch"><input type="checkbox" id="optUnescapeHtml"><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Strip all HTML tags</span><label class="switch"><input type="checkbox" id="optStripHtml" checked><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Remove all ids</span><label class="switch"><input type="checkbox" id="optRemoveIds"><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Remove all classes</span><label class="switch"><input type="checkbox" id="optRemoveClasses"><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Remove inline styles</span><label class="switch"><input type="checkbox" id="optRemoveStyles"><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Decode HTML Character Entities</span><label class="switch"><input type="checkbox" id="optDecodeEntities"><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Decode URL-encoded characters</span><label class="switch"><input type="checkbox" id="optDecodeUrl"><span class="slider"></span></label></div>
+          </div>
+        </div>
+
+        <div class="options-category">
+          <div class="category-header" onclick="toggleCategory(this)">Others & Links <span>▼</span></div>
+          <div class="category-body">
+            <div class="toggle-row"><span>Strip all e-mails</span><label class="switch"><input type="checkbox" id="optStripEmails"><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Remove BBCode tags (Forum)</span><label class="switch"><input type="checkbox" id="optRemoveBBcode"><span class="slider"></span></label></div>
+            <div class="toggle-row"><span>Remove all web urls</span><label class="switch"><input type="checkbox" id="optRemoveUrls"><span class="slider"></span></label></div>
+          </div>
+        </div>
+
+        <div class="options-category">
+          <div class="category-header" onclick="toggleCategory(this)">Text Formatting <span>▼</span></div>
+          <div class="category-body">
+            <div class="form-group">
+              <label>Letter Case:</label>
+              <div class="radio-group">
+                <label><input type="radio" name="case" value="upper"> Uppercase</label>
+                <label><input type="radio" name="case" value="lower"> Lowercase</label>
+                <label><input type="radio" name="case" value="sentence"> Sentence case</label>
+                <label><input type="radio" name="case" value="capitalize"> Capitalize each word</label>
+                <label><input type="radio" name="case" value="none" checked> Do not change</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/common.js"></script>
+  <script>
+    let previousText = '';
+
+    function toggleCategory(header) {
+      const body = header.nextElementSibling;
+      body.classList.toggle('hidden');
+      header.querySelector('span').textContent = body.classList.contains('hidden') ? '▶' : '▼';
+    }
+
+    function applyClean(userClicked = false) {
+      const input = document.getElementById('textInput');
+      let text = input.value;
+      if (!text) return;
+
+      if (userClicked) previousText = text; 
+
+      if (document.getElementById('optStripHtml').checked) text = text.replace(/<[^>]*>/g, '');
+      if (document.getElementById('optUnescapeHtml').checked) {
+        const doc = new DOMParser().parseFromString(text, 'text/html');
+        text = doc.documentElement.textContent || doc.body.textContent || "";
+      }
+      if (document.getElementById('optRemoveIds').checked) text = text.replace(/id="[^"]*"/g, '').replace(/id='[^']*'/g, '');
+      if (document.getElementById('optRemoveClasses').checked) text = text.replace(/class="[^"]*"/g, '').replace(/class='[^']*'/g, '');
+      if (document.getElementById('optRemoveStyles').checked) text = text.replace(/style="[^"]*"/g, '').replace(/style='[^']*'/g, '');
+      if (document.getElementById('optDecodeEntities').checked) { const txt = document.createElement('textarea'); txt.innerHTML = text; text = txt.value; }
+      if (document.getElementById('optDecodeUrl').checked) { try { text = decodeURIComponent(text); } catch(e) {} }
+
+      if (document.getElementById('optRemoveBBcode').checked) text = text.replace(/\[[^\]]+\]/g, '');
+      if (document.getElementById('optStripEmails').checked) text = text.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '');
+      if (document.getElementById('optRemoveUrls').checked) text = text.replace(/https?:\/\/[^\s]+/g, '');
+
+      if (document.getElementById('optStripEmoji').checked) text = text.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '');
+      if (document.getElementById('optRemovePunct').checked) text = text.replace(/[^\w\s]|_/g, '');
+      if (document.getElementById('optRemoveAccents').checked) text = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      if (document.getElementById('optNormalizeUnicode').checked) text = text.normalize('NFC');
+      if (document.getElementById('optRemoveReplChar').checked) text = text.replace(/\uFFFD/g, '');
+      if (document.getElementById('optRemoveNonAscii').checked) text = text.replace(/[^\x00-\x7F]/g, '');
+      if (document.getElementById('optRemoveNonAlnum').checked) text = text.replace(/[^a-zA-Z0-9\s]/g, '');
+
+      if (document.getElementById('optTrim').checked) text = text.trim();
+      if (document.getElementById('optLeadSpaces').checked) text = text.replace(/^[ \t]+/gm, '');
+      if (document.getElementById('optTrailSpaces').checked) text = text.replace(/[ \t]+$/gm, '');
+      if (document.getElementById('optRemoveBlank').checked) text = text.replace(/^\s*[\r\n]/gm, '');
+      if (document.getElementById('optBreakToSpace').checked) text = text.replace(/\n/g, ' ');
+      if (document.getElementById('optMultiSpace').checked) text = text.replace(/[ \t]+/g, ' ');
+      if (document.getElementById('optMultiBlank').checked) text = text.replace(/\n{3,}/g, '\n\n');
+      if (document.getElementById('optRemoveAllBreaks').checked) text = text.replace(/[\r\n]+/g, ' ');
+      if (document.getElementById('optSpacesToTab').checked) text = text.replace(/ {4}/g, '\t');
+      if (document.getElementById('optTabToSpaces').checked) text = text.replace(/\t/g, '    ');
+
+      const caseVal = document.querySelector('input[name="case"]:checked').value;
+      if (caseVal === 'upper') text = text.toUpperCase();
+      if (caseVal === 'lower') text = text.toLowerCase();
+      if (caseVal === 'sentence') text = text.toLowerCase().replace(/(^\s*\w|[.!?]\s*\w)/g, c => c.toUpperCase());
+      if (caseVal === 'capitalize') text = text.replace(/\b\w/g, c => c.toUpperCase());
+
+      input.value = text.trim();
+    }
+
+    function undoClean() {
+      if (previousText) {
+        document.getElementById('textInput').value = previousText;
+      }
+    }
+
+    document.querySelectorAll('.switch input, input[name="case"]').forEach(el => {
+      el.addEventListener('change', () => applyClean(false));
+    });
+  </script>
+</body>
+</html>
