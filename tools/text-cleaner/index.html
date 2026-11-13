@@ -286,7 +286,6 @@
     const inputs = document.querySelectorAll('.switch input, input[name="case"]');
 
     // === Enhanced Offline Dictionary ===
-    // Includes specific fixes for stutters mapped to full words
     const typoDict = {
       "nam": "name", "righ": "right", "wwhat": "what", "whhat": "what", 
       "wass": "was", "iss": "is", "cantt": "can't", "thiss": "this", 
@@ -334,8 +333,8 @@
       }
 
       // --- 2. INTELLIGENT SPELLCHECK & GIBBERISH REMOVAL ---
-      // Step A: Fix repeated words (e.g., "is is" -> "is")
       if (document.getElementById('optFixSpelling').checked) {
+        // Step A: Fix duplicated words (e.g., "is is" -> "is")
         text = text.replace(/\b(\w+)\s+\1\b/gi, '$1');
 
         // Step B: Process word by word
@@ -345,7 +344,7 @@
           let word = words[i];
           if (!word.trim()) continue;
           
-          // Extract punctuation around the word (e.g., "nam," -> "nam", ",")
+          // Extract punctuation around the word (e.g., "naaaaaaam," -> "naaaaaaam", ",")
           let match = word.match(/^([^a-zA-Z]*)([a-zA-Z]+)([^a-zA-Z]*)$/);
           if (!match) continue;
           
@@ -355,7 +354,7 @@
           let lower = core.toLowerCase();
 
           // Step C: Normalize ANY repeating characters (e.g., "naaaaaaam" -> "nam")
-          // This explicitly catches middle repeats like "naaaaaaam" -> "nam"
+          // The regex \1{2,} looks for 3 or more of the exact same character in a row.
           let reduced = lower.replace(/([a-zA-Z])\1{2,}/g, '$1'); 
           
           // Step D: Dictionary Check
@@ -385,11 +384,6 @@
           }
         }
         text = words.join('');
-      }
-
-      // Global Stutter Fix (redundant but safe)
-      if (document.getElementById('optFixStutter').checked) {
-        text = text.replace(/\b(\w)\1{2,}/gi, '$1');
       }
 
       // --- 3. PUNCTUATION FIXES ---
