@@ -146,16 +146,16 @@
       
       <div class="sidebar-scroll">
         
-        <!-- Auto-Correction & Fixes (NEW) -->
+        <!-- Auto-Correction & Fixes -->
         <details open>
           <summary>Auto-Correction & Fixes</summary>
           <div class="options-list">
             <label class="toggle-row">
-              <span>Fix common typos (iss → is)</span>
-              <div class="switch"><input type="checkbox" id="optFixTypos" checked><span class="slider"></span></div>
+              <span>Fix spellings & remove gibberish</span>
+              <div class="switch"><input type="checkbox" id="optFixSpelling" checked><span class="slider"></span></div>
             </label>
             <label class="toggle-row">
-              <span>Remove 3+ letter stutters (wwwhat)</span>
+              <span>Remove stutters (wwwhat → what)</span>
               <div class="switch"><input type="checkbox" id="optFixStutter" checked><span class="slider"></span></div>
             </label>
             <label class="toggle-row">
@@ -281,14 +281,18 @@
     // All checkboxes and radios
     const inputs = document.querySelectorAll('.switch input, input[name="case"]');
 
-    // Dictionary of common typos (Safe to use without breaking real words)
+    // Dictionary of common typos
     const typoDict = {
-      "iss": "is", "wass": "was", "whhat": "what", "wwhat": "what", "thee": "the",
-      "thiss": "this", "thatt": "that", "annd": "and", "arr": "are", "nott": "not",
-      "yoou": "you", "wherre": "where", "witth": "with", "bee": "be", "itss": "its",
+      "wwhat": "what", "whhat": "what", "wass": "was", "iss": "is",
+      "namne": "name", "cantt": "cant", "thiss": "this", "thatt": "that",
+      "annd": "and", "arr": "are", "nott": "not", "yoou": "you",
+      "wherre": "where", "witth": "with", "bee": "be", "itss": "its",
       "alot": "a lot", "definately": "definitely", "recieve": "receive",
       "seperate": "separate", "occured": "occurred", "untill": "until",
-      "aple": "apple", "bannana": "banana", "carrot": "carrot", "tomatoe": "tomato"
+      "aple": "apple", "bannana": "banana", "tomatoe": "tomato",
+      "teh": "the", "adn": "and", "hte": "the", "taht": "that",
+      "thier": "their", "wat": "what", "whta": "what", "waht": "what",
+      "wicth": "which", "becuase": "because", "beacuse": "because"
     };
 
     // === Sidebar Toggle ===
@@ -301,42 +305,7 @@
     function processText() {
       let text = textInput.value;
       
-      // --- 1. AUTO-CORRECTION & FIXES ---
-      
-      // Fix Dictionary Typos
-      if (document.getElementById('optFixTypos').checked) {
-        text = text.replace(/\b[a-zA-Z]+\b/g, function(w) {
-          let lower = w.toLowerCase();
-          if (typoDict[lower]) {
-            // Preserve capitalization if original word was capitalized
-            if (w[0] === w[0].toUpperCase()) {
-              return typoDict[lower].charAt(0).toUpperCase() + typoDict[lower].slice(1);
-            }
-            return typoDict[lower];
-          }
-          return w;
-        });
-      }
-
-      // Fix Stutters (Only removes if a letter repeats 3 or more times, e.g. "sooo" -> "so", "wwwhat" -> "what")
-      if (document.getElementById('optFixStutter').checked) {
-        text = text.replace(/\b(\w)\1{2,}/gi, '$1');
-      }
-
-      // Fix Excessive Punctuation
-      if (document.getElementById('optFixPunct').checked) {
-        text = text.replace(/([,!?])\1+/g, '$1'); // Reduces ,,, to , and !!! to !
-      }
-
-      // Fix Punctuation Spacing
-      if (document.getElementById('optFixPunctSpace').checked) {
-        // Removes spaces BEFORE punctuation: "word ," -> "word,"
-        text = text.replace(/\s+([.,!?])/g, '$1');
-        // Adds space AFTER punctuation if missing: "word.Another" -> "word. Another"
-        text = text.replace(/([.,!?])(?=[^\s\d])/g, '$1 ');
-      }
-
-      // --- 2. HTML & CODE ---
+      // --- 1. HTML & CODE (Run first to avoid stripping words inside HTML) ---
       if (document.getElementById('optStripHtml').checked) {
         text = text.replace(/<[^>]*>/g, '');
       }
@@ -349,6 +318,73 @@
       }
       if (document.getElementById('optRemoveBBcode').checked) {
         text = text.replace(/\[[^\]]+\]/g, '');
+      }
+
+      // --- 2. AUTO-CORRECTION & SPELLING ---
+      if (document.getElementById('optFixSpelling').checked) {
+        let words = text.split(/(\s+)/); // Keep spaces
+        const validVowelLess = ['by', 'my', 'fly', 'cry', 'try', 'why', 'shy', 'gym', 'sky', 'hymn', 'nth', 'tsk'];
+
+        for (let i = 0; i < words.length; i++) {
+          let word = words[i];
+          if (!word.trim()) continue;
+          
+          // Separate punctuation from the word (e.g. "(hello)" -> "(", "hello", ")")
+          let match = word.match(/^([^a-zA-Z]*)([a-zA-Z]+)([^a-zA-Z]*)$/);
+          if (!match) continue;
+          
+          let prePunct = match[1];
+          let core = match[2];
+          let postPunct = match[3];
+          let lower = core.toLowerCase();
+          
+          // A. Dictionary lookup
+          if (typoDict[lower]) {
+            let fixed = typoDict[lower];
+            if (core[0] === core[0].toUpperCase()) fixed = fixed.charAt(0).toUpperCase() + fixed.slice(1);
+            words[i] = prePunct + fixed + postPunct;
+            continue;
+          }
+          
+          // B. Remove start stutters (wwhat -> what)
+          let startFixed = core.replace(/^([a-zA-Z])\1+/g, '$1');
+          if (startFixed !== core) {
+             words[i] = prePunct + startFixed + postPunct;
+             core = startFixed;
+             lower = core.toLowerCase();
+          }
+
+          // C. Remove gibberish (no vowels, length > 2) e.g. dkj, ddll
+          if (!/[aeiouyAEIOUY]/.test(core) && !validVowelLess.includes(lower)) {
+            words[i] = ''; 
+            continue;
+          }
+
+          // D. Remove single repeated letters (wwww -> w)
+          if (core.length === 1 && !['a', 'i', 'A', 'I'].includes(core)) {
+            words[i] = '';
+          }
+        }
+        text = words.join('');
+      }
+
+      // Stutter fix for words > 3 letters (sooo -> so)
+      if (document.getElementById('optFixStutter').checked) {
+        text = text.replace(/\b(\w)\1{2,}/gi, '$1');
+      }
+
+      // Fix Excessive Punctuation
+      if (document.getElementById('optFixPunct').checked) {
+        text = text.replace(/([,!?])\1+/g, '$1'); // Reduces ,,, to , and !!! to !
+        text = text.replace(/\.{4,}/g, '...'); // Reduces .... to ...
+      }
+
+      // Fix Punctuation Spacing
+      if (document.getElementById('optFixPunctSpace').checked) {
+        // Removes spaces BEFORE punctuation: "word ," -> "word,"
+        text = text.replace(/\s+([.,!?])/g, '$1');
+        // Adds space AFTER punctuation if missing: "word.Another" -> "word. Another"
+        text = text.replace(/([.,!?])(?=[^\s\d])/g, '$1 ');
       }
 
       // --- 3. LINKS & EMAILS ---
