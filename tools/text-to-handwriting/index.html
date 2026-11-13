@@ -65,7 +65,7 @@
     .input-box:focus, .textarea-box:focus { background: #fff; border-color: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,0.15); }
     .textarea-box { min-height: 100px; resize: vertical; line-height: 1.5; }
 
-    /* Font & Paper Grids */
+    /* Font Grid */
     .font-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-height: 250px; overflow-y: auto; padding-right: 4px; }
     .font-grid::-webkit-scrollbar { width: 4px; }
     .font-grid::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -79,33 +79,17 @@
     .font-preview { font-size: 18px; color: #0f172a; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .font-name { font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .paper-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-    .paper-btn {
-      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;
-      padding: 6px 2px; display: flex; flex-direction: column; align-items: center; gap: 4px;
-      cursor: pointer; font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;
-    }
-    .paper-btn:hover { background: #fff; border-color: #10b981; }
-    .paper-btn.on { background: #ecfdf5; border-color: #10b981; color: #059669; }
-    .paper-icon { width: 100%; height: 36px; border: 1px solid #cbd5e1; border-radius: 3px; }
-    
-    /* Paper Patterns */
-    .p-ruled { background: linear-gradient(90deg, transparent 8px, rgba(239,68,68,.4) 8px, rgba(239,68,68,.4) 9px, transparent 9px), repeating-linear-gradient(180deg, #fff 0, #fff 6px, rgba(59,130,246,.4) 6px, rgba(59,130,246,.4) 7px); }
-    .p-plain { background: #fff; }
-    .p-grid { background: repeating-linear-gradient(90deg, transparent 0, transparent 5px, rgba(59,130,246,.3) 5px, rgba(59,130,246,.3) 6px), repeating-linear-gradient(180deg, #fff 0, #fff 5px, rgba(59,130,246,.3) 5px, rgba(59,130,246,.3) 6px); }
-    .p-legal { background: linear-gradient(90deg, transparent 6px, rgba(239,68,68,.4) 6px, rgba(239,68,68,.4) 7px, transparent 7px), repeating-linear-gradient(180deg, #fef08a 0, #fef08a 6px, rgba(59,130,246,.4) 6px, rgba(59,130,246,.4) 7px); }
-    .p-dotted { background: radial-gradient(circle, rgba(59,130,246,.5) 1px, transparent 1.2px) 0 0/6px 6px, #fff; }
-    .p-music { background: repeating-linear-gradient(180deg, #fff 0, #fff 4px, rgba(0,0,0,.3) 4px, rgba(0,0,0,.3) 5px); background-size: 100% 20px; background-repeat: repeat-y; }
-    .p-vintage { background: linear-gradient(90deg, transparent 6px, rgba(139,69,19,.4) 6px, rgba(139,69,19,.4) 7px, transparent 7px), repeating-linear-gradient(180deg, #fdf6e3 0, #fdf6e3 6px, rgba(139,69,19,.3) 6px, rgba(139,69,19,.3) 7px); }
-    .p-dark { background: #1e293b; }
-
-    /* Inks */
-    .ink-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    /* Paper & Ink Settings */
+    .ink-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
     .ink-btn { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #cbd5e1; cursor: pointer; padding: 0; transition: transform 0.2s; }
     .ink-btn:hover { transform: scale(1.15); }
     .ink-btn.on { box-shadow: 0 0 0 2px #10b981; transform: scale(1.15); }
     .custom-ink { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #64748b; cursor: pointer; }
     .custom-ink input[type="color"] { width: 28px; height: 28px; border: none; border-radius: 50%; cursor: pointer; padding: 0; background: none; }
+
+    .dropdown-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .dropdown-grid .field { margin: 0; }
+    .dropdown-grid select { width: 100%; font-size: 13px; padding: 8px; text-overflow: ellipsis; }
 
     /* Sliders */
     .slider-group { display: flex; flex-direction: column; gap: 14px; }
@@ -216,29 +200,49 @@
         <!-- Paper & Ink -->
         <div class="control-group">
           <div class="control-title">Paper & Ink</div>
-          <div class="paper-grid" id="paperGrid">
-            <!-- JS Injects Papers -->
-          </div>
-          <div class="ink-row" id="inkRow" style="margin-top:8px;">
+          
+          <!-- Ink Colors -->
+          <div class="ink-row" id="inkRow">
             <!-- JS Injects Inks -->
             <label class="custom-ink" title="Custom Color">
               <input type="color" id="customInk" value="#1E1E26"> Custom
             </label>
           </div>
-          <div style="display:flex; gap:12px; margin-top:8px;">
-            <div class="field" style="flex:1; margin:0;">
-              <label>Size</label>
-              <select id="pageSize" class="input-box">
-                <option value="a4">A4</option>
-                <option value="letter">US Letter</option>
+
+          <!-- Dropdowns -->
+          <div class="dropdown-grid">
+            <div class="field">
+              <label>Style</label>
+              <select id="paperStyle" class="input-box">
+                <option value="ruled">Ruled</option>
+                <option value="plain">Plain</option>
+                <option value="grid">Grid</option>
+                <option value="legal">Legal</option>
+                <option value="dotted">Dotted</option>
+                <option value="music">Music</option>
+                <option value="vintage">Vintage</option>
+                <option value="dark">Dark</option>
               </select>
             </div>
-            <div class="field" style="flex:1; margin:0;">
+            <div class="field">
+              <label>Size</label>
+              <select id="pageSize" class="input-box">
+                <option value="a3">A3</option>
+                <option value="a4" selected>A4</option>
+                <option value="a5">A5</option>
+                <option value="letter">US Letter</option>
+                <option value="legal">US Legal</option>
+              </select>
+            </div>
+            <div class="field">
               <label>Effect</label>
               <select id="pageEffect" class="input-box">
                 <option value="clean">Clean</option>
                 <option value="scan">Scanned</option>
                 <option value="photo">Photo</option>
+                <option value="sepia">Sepia</option>
+                <option value="bw">Black & White</option>
+                <option value="vintage">Vintage</option>
               </select>
             </div>
           </div>
@@ -325,7 +329,6 @@
       seed: 1
     };
 
-    // 50+ Handwriting Fonts
     const FONTS = [
       'Alex Brush', 'Allura', 'Amatic SC', 'Architects Daughter', 'Birthstone', 'Caveat', 
       'Cedarville Cursive', 'Coming Soon', 'Cookie', 'Courgette', 'Covered By Your Grace', 
@@ -340,29 +343,22 @@
       'Yellowtail', 'Zeyada'
     ];
 
-    const PAPERS = [
-      { id: 'ruled', name: 'Ruled' },
-      { id: 'plain', name: 'Plain' },
-      { id: 'grid', name: 'Grid' },
-      { id: 'legal', name: 'Legal' },
-      { id: 'dotted', name: 'Dotted' },
-      { id: 'music', name: 'Music' },
-      { id: 'vintage', name: 'Vintage' },
-      { id: 'dark', name: 'Dark' }
-    ];
-
     const INKS = [
       { id: 'blue', c: '#1C3F94' },
       { id: 'black', c: '#1E1E26' },
       { id: 'red', c: '#C3262F' },
       { id: 'green', c: '#1D7A43' },
       { id: 'pencil', c: '#404046' },
-      { id: 'white', c: '#FFFFFF' } // Good for dark paper
+      { id: 'white', c: '#FFFFFF' }
     ];
 
+    // Expanded Paper Sizes (Points for PDF, Pixels for Canvas)
     const SIZES = {
+      a3: { w: 1754, h: 2480, pw: 841.89, ph: 1190.55, label: 'A3' },
       a4: { w: 1240, h: 1754, pw: 595.28, ph: 841.89, label: 'A4' },
-      letter: { w: 1275, h: 1650, pw: 612, ph: 792, label: 'US Letter' }
+      a5: { w: 874, h: 1240, pw: 419.53, ph: 595.28, label: 'A5' },
+      letter: { w: 1275, h: 1650, pw: 612, ph: 792, label: 'US Letter' },
+      legal: { w: 1275, h: 2100, pw: 612, ph: 1008, label: 'US Legal' }
     };
 
     let customFamily = '';
@@ -375,10 +371,13 @@
     const inputTitle = document.getElementById('inputTitle');
     const inputText = document.getElementById('inputText');
     const fontGrid = document.getElementById('fontGrid');
-    const paperGrid = document.getElementById('paperGrid');
     const inkRow = document.getElementById('inkRow');
     const customInk = document.getElementById('customInk');
     const canvasWrapper = document.getElementById('canvasWrapper');
+    
+    const paperStyleEl = document.getElementById('paperStyle');
+    const pageSizeEl = document.getElementById('pageSize');
+    const pageEffectEl = document.getElementById('pageEffect');
 
     // === Helpers ===
     function toggleSidebar() {
@@ -408,7 +407,7 @@
       inputText.value = state.text;
       customInk.value = state.custom;
       
-      // Build Fonts (50+)
+      // Build Fonts
       FONTS.forEach(f => {
         let b = document.createElement('button');
         b.className = 'font-btn' + (state.font === f ? ' on' : '');
@@ -416,16 +415,6 @@
         b.innerHTML = `<span class="font-preview" style="font-family:'${f}', cursive;">Hello</span><span class="font-name">${f}</span>`;
         b.onclick = () => { state.font = f; syncUI(); render(); };
         fontGrid.appendChild(b);
-      });
-
-      // Build Papers (8 types)
-      PAPERS.forEach(p => {
-        let b = document.createElement('button');
-        b.className = 'paper-btn' + (state.paper === p.id ? ' on' : '');
-        b.dataset.id = p.id;
-        b.innerHTML = `<div class="paper-icon p-${p.id}"></div>${p.name}`;
-        b.onclick = () => { state.paper = p.id; syncUI(); render(); };
-        paperGrid.appendChild(b);
       });
 
       // Build Inks
@@ -443,11 +432,11 @@
       // Event Listeners
       inputTitle.addEventListener('input', (e) => { state.title = e.target.value; render(); });
       inputText.addEventListener('input', (e) => { state.text = e.target.value; render(); });
-      
       customInk.addEventListener('input', (e) => { state.ink = e.target.value; syncUI(); render(); });
       
-      document.getElementById('pageSize').addEventListener('change', (e) => { state.page = e.target.value; render(); });
-      document.getElementById('pageEffect').addEventListener('change', (e) => { state.effect = e.target.value; render(); });
+      paperStyleEl.addEventListener('change', (e) => { state.paper = e.target.value; render(); });
+      pageSizeEl.addEventListener('change', (e) => { state.page = e.target.value; render(); });
+      pageEffectEl.addEventListener('change', (e) => { state.effect = e.target.value; render(); });
       
       const setupSlider = (id, stateKey, unit) => {
         const el = document.getElementById('range' + id);
@@ -497,12 +486,15 @@
 
     function syncUI() {
       document.querySelectorAll('.font-btn').forEach(el => el.classList.toggle('on', el.dataset.id === state.font));
-      document.querySelectorAll('.paper-btn').forEach(el => el.classList.toggle('on', el.dataset.id === state.paper));
       document.querySelectorAll('.ink-btn').forEach(el => {
         el.classList.toggle('on', el.dataset.c === state.ink);
         el.style.borderColor = el.dataset.id === 'white' ? '#cbd5e1' : '#fff';
       });
       customInk.parentElement.classList.toggle('on', !INKS.some(k => k.c === state.ink));
+      
+      paperStyleEl.value = state.paper;
+      pageSizeEl.value = state.page;
+      pageEffectEl.value = state.effect;
     }
 
     function useSampleText() {
@@ -640,12 +632,12 @@
         cell = L.gap / 2;
         let sy = (L.top + L.rule) % cell, sx = L.mx % cell;
         if (p === 'grid') {
-          ctx.strokeStyle = p === 'dark' ? 'rgba(255,255,255,.1)' : 'rgba(80,140,210,.26)'; 
+          ctx.strokeStyle = 'rgba(80,140,210,.26)'; 
           ctx.lineWidth = 1.3;
           for (y = sy; y <= H; y += cell) line(0, y, W, y);
           for (x = sx; x <= W; x += cell) line(x, 0, x, H);
         } else {
-          ctx.fillStyle = p === 'dark' ? 'rgba(255,255,255,.2)' : 'rgba(70,80,110,.4)';
+          ctx.fillStyle = 'rgba(70,80,110,.4)';
           for (y = sy; y <= H; y += cell) {
             for (x = sx; x <= W; x += cell) {
               ctx.beginPath(); ctx.arc(x, y, 1.9, 0, 6.2832); ctx.fill();
@@ -657,6 +649,7 @@
 
     function applyEffect(c, n) {
       let e = state.effect, W = c.width, H = c.height, ctx = c.getContext('2d');
+      
       if (e === 'scan') {
         ctx.globalAlpha = 0.1; ctx.fillStyle = 'rgba(40,40,40,.035)'; ctx.fillRect(0, 0, W, H);
         let o = document.createElement('canvas'); o.width = W; o.height = H;
@@ -675,6 +668,24 @@
         r.addColorStop(0, 'rgba(0,0,0,0)'); r.addColorStop(1, 'rgba(0,0,0,.17)');
         ctx.fillStyle = r; ctx.fillRect(0, 0, W, H);
       }
+      if (e === 'sepia' || e === 'bw' || e === 'vintage') {
+        let o = document.createElement('canvas'); o.width = W; o.height = H;
+        let x = o.getContext('2d');
+        
+        if (e === 'sepia') x.filter = 'sepia(0.8)';
+        if (e === 'bw') x.filter = 'grayscale(1) contrast(1.2)';
+        if (e === 'vintage') x.filter = 'sepia(0.5) contrast(0.9) brightness(1.1)';
+        
+        x.drawImage(c, 0, 0);
+        
+        if (e === 'vintage') {
+          let r = x.createRadialGradient(W * 0.42, H * 0.38, Math.min(W, H) * 0.3, W / 2, H / 2, Math.max(W, H) * 0.78);
+          r.addColorStop(0, 'rgba(0,0,0,0)'); r.addColorStop(1, 'rgba(50,20,0,.3)');
+          x.fillStyle = r; x.fillRect(0, 0, W, H);
+        }
+        return o;
+      }
+      
       return c;
     }
 
@@ -732,6 +743,7 @@
       ctx.drawImage(tl, 0, 0);
       ctx.globalCompositeOperation = 'source-over';
       ctx.globalAlpha = 1;
+      
       return applyEffect(c, n);
     }
 
