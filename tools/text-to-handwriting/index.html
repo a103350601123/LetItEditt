@@ -4,12 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Text to Handwriting Converter | LetitEdit</title>
-  <meta name="description" content="Convert typed text into realistic handwritten pages. Choose fonts, paper styles, and download as PNG or PDF.">
+  <meta name="description" content="Convert typed text into realistic handwritten pages. Choose from 50+ fonts, paper styles, and download as PNG, JPG, WEBP, or PDF.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✍️</text></svg>">
   <link rel="stylesheet" href="../../assets/css/style.css">
   
-  <!-- Google Fonts for Handwriting -->
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Homemade+Apple&family=Indie+Flower&family=Kalam:wght@300;400;700&family=Patrick+Hand&family=Shadows+Into+Light&family=Reenie+Beanie&family=Nothing+You+Could+Do&family=Cedarville+Cursive&family=Dawning+of+a+New+Day&family=Zeyada&family=Gloria+Hallelujah&display=swap" rel="stylesheet">
+  <!-- Massive Google Fonts List (50+ Handwriting/Cursive Fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Allura&family=Amatic+SC:wght@400;700&family=Architects+Daughter&family=Birthstone&family=Caveat:wght@400;700&family=Cedarville+Cursive&family=Coming+Soon&family=Cookie&family=Courgette&family=Covered+By+Your+Grace&family=Crafty+Girls&family=Cute+Font&family=Dancing+Script:wght@400;700&family=Dawning+of+a+New+Day&family=Delius&family=Give+You+Glory&family=Gloria+Hallelujah&family=Gochi+Hand&family=Great+Vibes&family=Handlee&family=Herr+Von+Muellerhoff&family=Homemade+Apple&family=Indie+Flower&family=Just+Another+Hand&family=Kalam:wght@300;400;700&family=Kaushan+Script&family=Kristi&family=La+Belle+Aurore&family=Marck+Script&family=Mountains+of+Christmas&family=Mr+Dafoe&family=Nanum+Pen+Script&family=Neucha&family=Nothing+You+Could+Do&family=Pacifico&family=Pangolin&family=Parisienne&family=Patrick+Hand&family=Permanent+Marker&family=Pinyon+Script&family=Qwigley&family=Reenie+Beanie&family=Rock+Salt&family=Sacramento&family=Satisfy&family=Shadows+Into+Light&family=Short+Stack&family=Sriracha&family=Style+Script&family=Tangerine:wght@400;700&family=Walter+Turncoat&family=WindSong:wght@400;500&family=Yellowtail&family=Zeyada&display=swap" rel="stylesheet">
   
   <!-- jsPDF for PDF Generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -19,76 +21,37 @@
        LetitEdit App Layout
        ========================================= */
     html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      overflow: hidden; /* Prevent body scroll */
-      background: #f1f5f9;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      height: 100%; margin: 0; padding: 0; overflow: hidden;
+      background: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
-    .app-container {
-      display: flex;
-      height: 100vh;
-      width: 100vw;
-      position: relative;
-    }
+    .app-container { display: flex; height: 100vh; width: 100vw; position: relative; }
 
     /* --- Left Sidebar (Editing Panel) --- */
     .sidebar {
-      width: 380px;
-      height: 100%;
-      background: #ffffff;
-      border-right: 1px solid #e2e8f0;
-      display: flex;
-      flex-direction: column;
-      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 100;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.03);
+      width: 400px; height: 100%; background: #ffffff; border-right: 1px solid #e2e8f0;
+      display: flex; flex-direction: column; transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100; box-shadow: 2px 0 10px rgba(0,0,0,0.03);
     }
-
-    .app-container.hide-sidebar .sidebar {
-      margin-left: -380px;
-    }
+    .app-container.hide-sidebar .sidebar { margin-left: -400px; }
 
     .sidebar-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid #e2e8f0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #ffffff;
+      padding: 16px 20px; border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: center; justify-content: space-between; background: #ffffff;
     }
-    .sidebar-header h2 {
-      font-size: 18px;
-      font-weight: 800;
-      color: #0f172a;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .sidebar-header h2 { font-size: 18px; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px; }
 
     .sidebar-scroll {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      scrollbar-width: thin;
+      flex: 1; overflow-y: auto; padding: 20px;
+      display: flex; flex-direction: column; gap: 24px; scrollbar-width: thin;
     }
-
-    /* Custom Scrollbar */
     .sidebar-scroll::-webkit-scrollbar { width: 6px; }
-    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
     .sidebar-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
     /* Sections */
     .control-group { display: flex; flex-direction: column; gap: 12px; }
     .control-title {
-      font-size: 12px; font-weight: 800; color: #64748b; 
-      text-transform: uppercase; letter-spacing: 0.5px;
+      font-size: 12px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;
       display: flex; align-items: center; gap: 6px; margin: 0;
     }
 
@@ -103,17 +66,20 @@
     .textarea-box { min-height: 100px; resize: vertical; line-height: 1.5; }
 
     /* Font & Paper Grids */
-    .font-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .font-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-height: 250px; overflow-y: auto; padding-right: 4px; }
+    .font-grid::-webkit-scrollbar { width: 4px; }
+    .font-grid::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    
     .font-btn {
       background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
-      padding: 8px; text-align: left; cursor: pointer; transition: all 0.2s;
+      padding: 8px; text-align: left; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column;
     }
     .font-btn:hover { background: #fff; border-color: #10b981; }
     .font-btn.on { background: #ecfdf5; border-color: #10b981; box-shadow: 0 0 0 1px #10b981; }
-    .font-preview { display: block; font-size: 18px; color: #0f172a; margin-bottom: 2px; }
-    .font-name { display: block; font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; }
+    .font-preview { font-size: 18px; color: #0f172a; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .font-name { font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .paper-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .paper-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .paper-btn {
       background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;
       padding: 6px 2px; display: flex; flex-direction: column; align-items: center; gap: 4px;
@@ -129,6 +95,9 @@
     .p-grid { background: repeating-linear-gradient(90deg, transparent 0, transparent 5px, rgba(59,130,246,.3) 5px, rgba(59,130,246,.3) 6px), repeating-linear-gradient(180deg, #fff 0, #fff 5px, rgba(59,130,246,.3) 5px, rgba(59,130,246,.3) 6px); }
     .p-legal { background: linear-gradient(90deg, transparent 6px, rgba(239,68,68,.4) 6px, rgba(239,68,68,.4) 7px, transparent 7px), repeating-linear-gradient(180deg, #fef08a 0, #fef08a 6px, rgba(59,130,246,.4) 6px, rgba(59,130,246,.4) 7px); }
     .p-dotted { background: radial-gradient(circle, rgba(59,130,246,.5) 1px, transparent 1.2px) 0 0/6px 6px, #fff; }
+    .p-music { background: repeating-linear-gradient(180deg, #fff 0, #fff 4px, rgba(0,0,0,.3) 4px, rgba(0,0,0,.3) 5px); background-size: 100% 20px; background-repeat: repeat-y; }
+    .p-vintage { background: linear-gradient(90deg, transparent 6px, rgba(139,69,19,.4) 6px, rgba(139,69,19,.4) 7px, transparent 7px), repeating-linear-gradient(180deg, #fdf6e3 0, #fdf6e3 6px, rgba(139,69,19,.3) 6px, rgba(139,69,19,.3) 7px); }
+    .p-dark { background: #1e293b; }
 
     /* Inks */
     .ink-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -144,17 +113,10 @@
     .slider-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: #334155; }
     .slider-header output { color: #10b981; background: #ecfdf5; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: 800; }
     
-    input[type="range"] {
-      -webkit-appearance: none; width: 100%; height: 6px; background: #e2e8f0; border-radius: 4px; outline: none; margin: 4px 0;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
-      background: #10b981; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(16,185,129,0.4); transition: transform 0.1s;
-    }
+    input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; background: #e2e8f0; border-radius: 4px; outline: none; margin: 4px 0; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #10b981; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(16,185,129,0.4); transition: transform 0.1s; }
     input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
-    input[type="range"]::-moz-range-thumb {
-      width: 18px; height: 18px; border-radius: 50%; background: #10b981; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(16,185,129,0.4);
-    }
+    input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: #10b981; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(16,185,129,0.4); }
 
     .checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #334155; cursor: pointer; margin-top: 4px; }
     .checkbox-row input { width: 16px; height: 16px; accent-color: #10b981; }
@@ -168,67 +130,43 @@
     .action-row { display: flex; gap: 8px; margin-top: 8px; }
 
     /* --- Right Sidebar (Preview) --- */
-    .main-preview {
-      flex: 1; display: flex; flex-direction: column; background: #e2e8f0; position: relative; overflow: hidden;
-    }
+    .main-preview { flex: 1; display: flex; flex-direction: column; background: #e2e8f0; position: relative; overflow: hidden; }
 
     .preview-header {
-      height: 60px; background: #fff; border-bottom: 1px solid #e2e8f0;
-      display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 10;
+      min-height: 60px; background: #fff; border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 10; flex-wrap: wrap; gap: 10px;
     }
     
-    /* Toggle Button */
-    .toggle-btn {
-      background: #f1f5f9; border: 1px solid #e2e8f0; padding: 8px 16px; border-radius: 8px;
-      display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: #334155;
-      cursor: pointer; transition: all 0.2s;
-    }
+    .toggle-btn { background: #f1f5f9; border: 1px solid #e2e8f0; padding: 8px 16px; border-radius: 8px; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: #334155; cursor: pointer; transition: all 0.2s; }
     .toggle-btn:hover { background: #e2e8f0; }
 
-    .download-actions { display: flex; gap: 8px; }
-    .btn-png { background: #fff; border: 1px solid #e2e8f0; color: #0f172a; padding: 8px 16px; font-size: 14px; }
-    .btn-png:hover { background: #f8fafc; }
+    .download-actions { display: flex; gap: 8px; align-items: center; }
+    .select-format { padding: 8px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 600; color: #334155; outline: none; background: #fff; cursor: pointer; }
+    
+    .btn-save { background: #fff; border: 1px solid #e2e8f0; color: #0f172a; padding: 8px 16px; font-size: 14px; }
+    .btn-save:hover { background: #f8fafc; }
     .btn-pdf { background: #10b981; color: #fff; padding: 8px 16px; font-size: 14px; box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
     .btn-pdf:hover { background: #059669; transform: translateY(-1px); }
 
-    /* Canvas Area */
-    .canvas-container {
-      flex: 1; overflow: auto; padding: 30px;
-      display: flex; align-items: center; justify-content: center; /* Centers the canvas perfectly */
-    }
-    
-    .canvas-wrapper {
-      width: 100%; max-width: 700px;
-      filter: drop-shadow(0 15px 25px rgba(0,0,0,0.1));
-    }
-    .canvas-wrapper canvas { display: block; width: 100%; height: auto; background: #fff; border-radius: 4px; }
+    .canvas-container { flex: 1; overflow: auto; padding: 30px; display: flex; align-items: center; justify-content: center; }
+    .canvas-wrapper { width: 100%; max-width: 700px; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.1)); }
+    .canvas-wrapper canvas { display: block; width: 100%; height: auto; border-radius: 4px; }
 
-    /* Info Text */
     .preview-info { font-size: 13px; color: #64748b; font-weight: 600; display: flex; gap: 12px; }
     .preview-info span { background: #f1f5f9; padding: 2px 8px; border-radius: 6px; }
 
-    /* Mobile Overlay */
-    .mobile-overlay {
-      position: absolute; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px);
-      z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.3s;
-    }
+    .mobile-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
 
-    /* Responsive */
     @media (max-width: 900px) {
-      .sidebar {
-        position: absolute; left: 0; top: 0; height: 100%;
-        box-shadow: 5px 0 25px rgba(0,0,0,0.1);
-      }
-      .app-container.hide-sidebar .sidebar { margin-left: -380px; }
-      
+      .sidebar { position: absolute; left: 0; top: 0; height: 100%; box-shadow: 5px 0 25px rgba(0,0,0,0.1); }
+      .app-container.hide-sidebar .sidebar { margin-left: -400px; }
       .mobile-overlay.show { opacity: 1; pointer-events: auto; }
-      
-      .preview-header { padding: 0 12px; }
+      .preview-header { padding: 10px; justify-content: center; }
       .preview-info { display: none; }
       .toggle-btn span { display: none; }
       .toggle-btn { padding: 8px 10px; }
-      
       .canvas-container { padding: 12px; }
+      .download-actions { width: 100%; justify-content: space-between; }
     }
   </style>
 </head>
@@ -236,7 +174,6 @@
 
   <div class="app-container hide-sidebar" id="appLayout">
     
-    <!-- Mobile Overlay to close sidebar -->
     <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
 
     <!-- LEFT: Editing Panel -->
@@ -267,12 +204,12 @@
 
         <!-- Handwriting Font -->
         <div class="control-group">
-          <div class="control-title">Handwriting Style</div>
+          <div class="control-title">Handwriting Style (50+)</div>
           <div class="font-grid" id="fontGrid">
             <!-- JS Injects Fonts -->
           </div>
           <label class="btn btn-outline" style="margin-top:4px; width:100%;">
-            ⬆ Upload Font (.ttf) <input type="file" id="fontUpload" accept=".ttf,.otf,.woff" hidden>
+            ⬆ Write in your own font <input type="file" id="fontUpload" accept=".ttf,.otf,.woff" hidden>
           </label>
         </div>
 
@@ -282,10 +219,10 @@
           <div class="paper-grid" id="paperGrid">
             <!-- JS Injects Papers -->
           </div>
-          <div class="ink-row" id="inkRow">
+          <div class="ink-row" id="inkRow" style="margin-top:8px;">
             <!-- JS Injects Inks -->
             <label class="custom-ink" title="Custom Color">
-              <input type="color" id="customInk" value="#5B2A86"> Custom
+              <input type="color" id="customInk" value="#1E1E26"> Custom
             </label>
           </div>
           <div style="display:flex; gap:12px; margin-top:8px;">
@@ -351,7 +288,12 @@
         </div>
         
         <div class="download-actions">
-          <button class="btn btn-png" onclick="downloadPNG()">⬇ PNG</button>
+          <select id="imageFormat" class="select-format">
+            <option value="png">PNG</option>
+            <option value="jpeg">JPG</option>
+            <option value="webp">WEBP</option>
+          </select>
+          <button class="btn btn-save" onclick="downloadImage()">⬇ Save</button>
           <button class="btn btn-pdf" onclick="downloadPDF()">⬇ PDF</button>
         </div>
       </header>
@@ -370,10 +312,10 @@
     const state = {
       title: "The Water Cycle",
       text: "Water is always on the move. The sun heats oceans, lakes and rivers, and some of that water turns into vapor that rises into the air. This step is called evaporation.\n\nAs the vapor rises, it cools and turns back into tiny droplets that form clouds. This is called condensation. When the droplets join together and get too heavy, they fall back to the ground as rain, snow, sleet or hail. We call this precipitation.",
-      font: 'caveat',
+      font: 'Caveat',
       paper: 'ruled',
-      ink: 'blue',
-      custom: '#5B2A86',
+      ink: '#1C3F94',
+      custom: '#1E1E26',
       page: 'a4',
       effect: 'clean',
       size: 34,
@@ -383,13 +325,19 @@
       seed: 1
     };
 
+    // 50+ Handwriting Fonts
     const FONTS = [
-      { id: 'caveat', name: 'Caveat' },
-      { id: 'homemade', name: 'Homemade' },
-      { id: 'kalam', name: 'Kalam' },
-      { id: 'indie', name: 'Indie Flower' },
-      { id: 'shadows', name: 'Shadows' },
-      { id: 'patrick', name: 'Patrick' }
+      'Alex Brush', 'Allura', 'Amatic SC', 'Architects Daughter', 'Birthstone', 'Caveat', 
+      'Cedarville Cursive', 'Coming Soon', 'Cookie', 'Courgette', 'Covered By Your Grace', 
+      'Crafty Girls', 'Cute Font', 'Dancing Script', 'Dawning of a New Day', 'Delius', 
+      'Give You Glory', 'Gloria Hallelujah', 'Gochi Hand', 'Great Vibes', 'Handlee', 
+      'Herr Von Muellerhoff', 'Homemade Apple', 'Indie Flower', 'Just Another Hand', 'Kalam', 
+      'Kaushan Script', 'Kristi', 'La Belle Aurore', 'Marck Script', 'Mountains of Christmas', 
+      'Mr Dafoe', 'Nanum Pen Script', 'Neucha', 'Nothing You Could Do', 'Pacifico', 'Pangolin', 
+      'Parisienne', 'Patrick Hand', 'Permanent Marker', 'Pinyon Script', 'Qwigley', 
+      'Reenie Beanie', 'Rock Salt', 'Sacramento', 'Satisfy', 'Shadows Into Light', 
+      'Short Stack', 'Sriracha', 'Style Script', 'Tangerine', 'Walter Turncoat', 'WindSong', 
+      'Yellowtail', 'Zeyada'
     ];
 
     const PAPERS = [
@@ -397,7 +345,10 @@
       { id: 'plain', name: 'Plain' },
       { id: 'grid', name: 'Grid' },
       { id: 'legal', name: 'Legal' },
-      { id: 'dotted', name: 'Dotted' }
+      { id: 'dotted', name: 'Dotted' },
+      { id: 'music', name: 'Music' },
+      { id: 'vintage', name: 'Vintage' },
+      { id: 'dark', name: 'Dark' }
     ];
 
     const INKS = [
@@ -405,7 +356,8 @@
       { id: 'black', c: '#1E1E26' },
       { id: 'red', c: '#C3262F' },
       { id: 'green', c: '#1D7A43' },
-      { id: 'pencil', c: '#404046' }
+      { id: 'pencil', c: '#404046' },
+      { id: 'white', c: '#FFFFFF' } // Good for dark paper
     ];
 
     const SIZES = {
@@ -431,9 +383,7 @@
     // === Helpers ===
     function toggleSidebar() {
       appLayout.classList.toggle('hide-sidebar');
-      if (window.innerWidth <= 900) {
-        mobileOverlay.classList.toggle('show');
-      }
+      if (window.innerWidth <= 900) mobileOverlay.classList.toggle('show');
     }
 
     function mulberry32(a) {
@@ -452,29 +402,23 @@
       return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')';
     }
 
-    function inkColor() {
-      if (state.ink === 'custom') return state.custom;
-      return (INKS.find(i => i.id === state.ink) || INKS[0]).c;
-    }
-
     // === UI Initialization ===
     function initUI() {
-      // Setup default state in inputs
       inputTitle.value = state.title;
       inputText.value = state.text;
       customInk.value = state.custom;
       
-      // Build Fonts
+      // Build Fonts (50+)
       FONTS.forEach(f => {
         let b = document.createElement('button');
-        b.className = 'font-btn' + (state.font === f.id ? ' on' : '');
-        b.dataset.id = f.id;
-        b.innerHTML = `<span class="font-preview" style="font-family:'${f.name}', cursive;">Hello</span><span class="font-name">${f.name}</span>`;
-        b.onclick = () => { state.font = f.id; syncUI(); render(); };
+        b.className = 'font-btn' + (state.font === f ? ' on' : '');
+        b.dataset.id = f;
+        b.innerHTML = `<span class="font-preview" style="font-family:'${f}', cursive;">Hello</span><span class="font-name">${f}</span>`;
+        b.onclick = () => { state.font = f; syncUI(); render(); };
         fontGrid.appendChild(b);
       });
 
-      // Build Papers
+      // Build Papers (8 types)
       PAPERS.forEach(p => {
         let b = document.createElement('button');
         b.className = 'paper-btn' + (state.paper === p.id ? ' on' : '');
@@ -487,10 +431,12 @@
       // Build Inks
       INKS.forEach(k => {
         let b = document.createElement('button');
-        b.className = 'ink-btn' + (state.ink === k.id ? ' on' : '');
+        b.className = 'ink-btn' + (state.ink === k.c ? ' on' : '');
         b.dataset.id = k.id;
+        b.dataset.c = k.c;
         b.style.background = k.c;
-        b.onclick = () => { state.ink = k.id; syncUI(); render(); };
+        b.style.borderColor = k.id === 'white' ? '#cbd5e1' : '#fff';
+        b.onclick = () => { state.ink = k.c; syncUI(); render(); };
         inkRow.insertBefore(b, customInk.parentElement);
       });
 
@@ -498,12 +444,11 @@
       inputTitle.addEventListener('input', (e) => { state.title = e.target.value; render(); });
       inputText.addEventListener('input', (e) => { state.text = e.target.value; render(); });
       
-      customInk.addEventListener('input', (e) => { state.ink = 'custom'; state.custom = e.target.value; syncUI(); render(); });
+      customInk.addEventListener('input', (e) => { state.ink = e.target.value; syncUI(); render(); });
       
       document.getElementById('pageSize').addEventListener('change', (e) => { state.page = e.target.value; render(); });
       document.getElementById('pageEffect').addEventListener('change', (e) => { state.effect = e.target.value; render(); });
       
-      // Sliders
       const setupSlider = (id, stateKey, unit) => {
         const el = document.getElementById('range' + id);
         const out = document.getElementById('val' + id);
@@ -532,14 +477,14 @@
             customFamily = fam;
             
             let b = document.createElement('button');
-            b.className = 'font-btn' + (state.font === 'custom' ? ' on' : '');
+            b.className = 'font-btn on';
             b.dataset.id = 'custom';
-            b.innerHTML = `<span class="font-preview" style="font-family:'${fam}', cursive;">Hello</span><span class="font-name">Uploaded</span>`;
+            b.innerHTML = `<span class="font-preview" style="font-family:'${fam}', cursive;">Hello</span><span class="font-name">Your Font</span>`;
             b.onclick = () => { state.font = 'custom'; syncUI(); render(); };
             
             let old = fontGrid.querySelector('[data-id="custom"]');
             if (old) fontGrid.replaceChild(b, old);
-            else fontGrid.appendChild(b);
+            else fontGrid.insertBefore(b, fontGrid.firstChild);
             
             state.font = 'custom';
             syncUI(); render();
@@ -547,31 +492,28 @@
         }).catch(() => alert('Could not read font file.'));
       });
 
-      // Initial Render
       render();
     }
 
     function syncUI() {
       document.querySelectorAll('.font-btn').forEach(el => el.classList.toggle('on', el.dataset.id === state.font));
       document.querySelectorAll('.paper-btn').forEach(el => el.classList.toggle('on', el.dataset.id === state.paper));
-      document.querySelectorAll('.ink-btn').forEach(el => el.classList.toggle('on', el.dataset.id === state.ink));
-      customInk.parentElement.classList.toggle('on', state.ink === 'custom');
+      document.querySelectorAll('.ink-btn').forEach(el => {
+        el.classList.toggle('on', el.dataset.c === state.ink);
+        el.style.borderColor = el.dataset.id === 'white' ? '#cbd5e1' : '#fff';
+      });
+      customInk.parentElement.classList.toggle('on', !INKS.some(k => k.c === state.ink));
     }
 
     function useSampleText() {
       inputTitle.value = "The Water Cycle";
       inputText.value = "Water is always on the move. The sun heats oceans, lakes and rivers, and some of that water turns into vapor that rises into the air. This step is called evaporation.\n\nAs the vapor rises, it cools and turns back into tiny droplets that form clouds. This is called condensation. When the droplets join together and get too heavy, they fall back to the ground as rain, snow, sleet or hail. We call this precipitation.";
-      state.title = inputTitle.value;
-      state.text = inputText.value;
-      render();
+      state.title = inputTitle.value; state.text = inputText.value; render();
     }
 
     function clearText() {
-      inputTitle.value = "";
-      inputText.value = "";
-      state.title = "";
-      state.text = "";
-      render();
+      inputTitle.value = ""; inputText.value = "";
+      state.title = ""; state.text = ""; render();
     }
 
     function shuffleDesign() {
@@ -593,16 +535,13 @@
       render();
     }
 
-    // === Core Engine (Untouched logic) ===
+    // === Core Engine ===
     function layout(fam) {
       const P = SIZES[state.page] || SIZES.a4;
-      const lined = state.paper === 'ruled' || state.paper === 'legal';
+      const lined = ['ruled', 'legal', 'vintage', 'music'].includes(state.paper);
       let L = { W: P.w, H: P.h, gap: state.gap, rule: 3 };
-      L.top = lined ? 196 : 170;
-      L.mx = lined ? 168 : 120;
-      L.tx = lined ? L.mx + 24 : L.mx;
-      L.rx = P.w - 96;
-      L.maxW = L.rx - L.tx;
+      L.top = lined ? 196 : 170; L.mx = lined ? 168 : 120; L.tx = lined ? L.mx + 24 : L.mx;
+      L.rx = P.w - 96; L.maxW = L.rx - L.tx;
       L.perPage = Math.max(1, Math.floor((P.h - 104 - L.top) / L.gap) + 1);
 
       let m = document.createElement('canvas').getContext('2d');
@@ -612,42 +551,26 @@
       
       L.fs = Math.round(state.size * norm * 10) / 10;
       m.font = L.fs + 'px "' + fam + '"';
-      L.space = Math.max(L.fs * 0.14, m.measureText(' ').width + state.word);
+      L.space = Math.max(L.fs * 0.14, m.measureText(' ').width);
       
       let v = state.mess;
       let rnd = mulberry32(state.seed * 7919 + 13);
 
-      function wWidth(t) {
-        let w = m.measureText(t).width;
-        if (state.letter) w += state.letter * Array.from(t).length;
-        return w;
-      }
+      function wWidth(t) { return m.measureText(t).width; }
 
       let lines = [];
       let title = state.title.trim();
-      if (title) {
-        lines.push({ words: [{ t: title, w: wWidth(title), sc: 1 }], center: true, underline: true });
-      }
+      if (title) lines.push({ words: [{ t: title, w: wWidth(title), sc: 1 }], center: true, underline: true });
 
       let cur = null, curW = 0;
-
-      function newLine(indent) {
-        cur = { words: [], indent: indent || 0 };
-        curW = cur.indent;
-      }
-
+      function newLine(indent) { cur = { words: [], indent: indent || 0 }; curW = cur.indent; }
       function add(t) {
         let sc = 1 + (rnd() * 2 - 1) * v * 0.004;
         let w = wWidth(t) * sc;
-        let room = L.maxW - cur.indent;
-        
-        if (w > room) {
+        if (w > L.maxW - cur.indent) {
           let g = Array.from(t), chunk = '';
           for (let i = 0; i < g.length; i++) {
-            if (chunk && wWidth(chunk + g[i]) * sc > L.maxW) {
-              add2(chunk, sc);
-              chunk = '';
-            }
+            if (chunk && wWidth(chunk + g[i]) * sc > L.maxW) { add2(chunk, sc); chunk = ''; }
             chunk += g[i];
           }
           if (chunk) add2(chunk, sc);
@@ -655,65 +578,74 @@
         }
         add2(t, sc, w);
       }
-
       function add2(t, sc, w) {
         if (w === undefined) w = wWidth(t) * sc;
         let need = (cur.words.length ? L.space : 0) + w;
-        if (cur.words.length && curW + need > L.maxW) {
-          lines.push(cur);
-          newLine(0);
-          need = w;
-        }
-        cur.words.push({ t, w, sc });
-        curW += need;
+        if (cur.words.length && curW + need > L.maxW) { lines.push(cur); newLine(0); need = w; }
+        cur.words.push({ t, w, sc }); curW += need;
       }
 
-      let paras = state.text.replace(/\r\n?/g, '\n').split('\n');
-      paras.forEach(p => {
+      state.text.replace(/\r\n?/g, '\n').split('\n').forEach(p => {
         let words = p.split(/[ \t]+/).filter(Boolean);
         if (!words.length) { lines.push({ words: [] }); return; }
         newLine(state.indent ? L.fs * 1.6 : 0);
-        words.forEach(add);
-        lines.push(cur);
+        words.forEach(add); lines.push(cur);
       });
       
       while (lines.length && !lines[lines.length - 1].words.length) lines.pop();
 
       let pages = [];
-      for (let i = 0; i < lines.length; i += L.perPage) {
-        pages.push(lines.slice(i, i + L.perPage));
-      }
+      for (let i = 0; i < lines.length; i += L.perPage) pages.push(lines.slice(i, i + L.perPage));
       if (!pages.length) pages.push([]);
       
-      L.pages = pages;
-      L.rnd = rnd;
+      L.pages = pages; L.rnd = rnd;
       return L;
     }
 
     function drawPaper(ctx, W, H, L) {
       let p = state.paper, y, x, cell;
-      ctx.fillStyle = p === 'legal' ? '#FCF3A5' : '#FFFFFF';
+      
+      if (p === 'dark') ctx.fillStyle = '#1e293b';
+      else if (p === 'legal') ctx.fillStyle = '#FCF3A5';
+      else if (p === 'vintage') ctx.fillStyle = '#fdf6e3';
+      else ctx.fillStyle = '#FFFFFF';
       ctx.fillRect(0, 0, W, H);
+
       function line(x1, y1, x2, y2) { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); }
 
-      if (p === 'ruled' || p === 'legal') {
-        ctx.strokeStyle = p === 'legal' ? 'rgba(84,118,168,.45)' : 'rgba(76,138,206,.45)';
+      if (['ruled', 'legal', 'vintage'].includes(p)) {
+        if (p === 'vintage') ctx.strokeStyle = 'rgba(139,69,19,.3)';
+        else if (p === 'legal') ctx.strokeStyle = 'rgba(84,118,168,.45)';
+        else ctx.strokeStyle = 'rgba(76,138,206,.45)';
+        
         ctx.lineWidth = 2;
         let y0 = L.top + L.rule - L.gap;
         if (y0 < 70) y0 = L.top + L.rule;
         for (y = y0; y <= H - 56; y += L.gap) line(0, y, W, y);
-        ctx.strokeStyle = 'rgba(222,70,80,.55)';
+        
+        ctx.strokeStyle = p === 'vintage' ? 'rgba(139,69,19,.5)' : 'rgba(222,70,80,.55)';
         line(L.mx, 0, L.mx, H);
         if (p === 'legal') line(L.mx - 9, 0, L.mx - 9, H);
-      } else if (p === 'grid' || p === 'dotted') {
+      } 
+      else if (p === 'music') {
+        ctx.strokeStyle = 'rgba(0,0,0,.25)';
+        ctx.lineWidth = 1;
+        let y0 = 100;
+        while(y0 < H - 100) {
+          for(let i=0; i<5; i++) line(0, y0 + i*10, W, y0 + i*10);
+          y0 += 60;
+        }
+      }
+      else if (p === 'grid' || p === 'dotted') {
         cell = L.gap / 2;
         let sy = (L.top + L.rule) % cell, sx = L.mx % cell;
         if (p === 'grid') {
-          ctx.strokeStyle = 'rgba(80,140,210,.26)'; ctx.lineWidth = 1.3;
+          ctx.strokeStyle = p === 'dark' ? 'rgba(255,255,255,.1)' : 'rgba(80,140,210,.26)'; 
+          ctx.lineWidth = 1.3;
           for (y = sy; y <= H; y += cell) line(0, y, W, y);
           for (x = sx; x <= W; x += cell) line(x, 0, x, H);
         } else {
-          ctx.fillStyle = 'rgba(70,80,110,.4)';
+          ctx.fillStyle = p === 'dark' ? 'rgba(255,255,255,.2)' : 'rgba(70,80,110,.4)';
           for (y = sy; y <= H; y += cell) {
             for (x = sx; x <= W; x += cell) {
               ctx.beginPath(); ctx.arc(x, y, 1.9, 0, 6.2832); ctx.fill();
@@ -754,7 +686,7 @@
 
       let tl = document.createElement('canvas'); tl.width = W; tl.height = H;
       let t = tl.getContext('2d');
-      let ink = inkColor(), pencil = state.ink === 'pencil';
+      let ink = state.ink, pencil = state.ink === '#404046';
       
       t.font = L.fs + 'px "' + fam + '"';
       t.textBaseline = 'alphabetic';
@@ -782,16 +714,7 @@
           t.rotate(rot);
           if (o.sc !== 1) t.scale(o.sc, o.sc);
           t.globalAlpha = Math.max(0.74, 1 - rnd() * v * 0.022);
-          
-          if (state.letter) {
-            let gx = 0, g = Array.from(o.t);
-            for (let j = 0; j < g.length; j++) {
-              t.fillText(g[j], gx, (rnd() * 2 - 1) * v * 0.12);
-              gx += document.createElement('canvas').getContext('2d').measureText(g[j]).width + state.letter;
-            }
-          } else {
-            t.fillText(o.t, 0, 0);
-          }
+          t.fillText(o.t, 0, 0);
           t.restore();
           x += o.w + L.space + (rnd() * 2 - 1) * v * 0.5;
         }
@@ -813,7 +736,7 @@
     }
 
     function render() {
-      let fam = (state.font === 'custom' && customFamily) ? customFamily : (FONTS.find(f => f.id === state.font) || FONTS[0]).name;
+      let fam = state.font === 'custom' && customFamily ? customFamily : state.font;
       if (window.document.fonts && window.document.fonts.load) {
         document.fonts.load('40px "' + fam + '"', state.text.slice(0, 50) || 'Hello').then(() => {
           try {
@@ -830,20 +753,19 @@
     function showPages() {
       let n = pageCanvases.length;
       canvasWrapper.innerHTML = '';
-      pageCanvases.forEach(cv => {
-        canvasWrapper.appendChild(cv);
-      });
+      pageCanvases.forEach(cv => canvasWrapper.appendChild(cv));
       let P = SIZES[state.page] || SIZES.a4;
       document.getElementById('infoPages').textContent = n + (n === 1 ? ' page' : ' pages');
       document.getElementById('infoSize').textContent = P.label;
     }
 
-    function downloadPNG() {
+    function downloadImage() {
+      const format = document.getElementById('imageFormat').value;
       pageCanvases.forEach((cv, i) => {
         setTimeout(() => {
           let a = document.createElement('a');
-          a.download = 'handwriting' + (pageCanvases.length > 1 ? '-page-' + (i + 1) : '') + '.png';
-          a.href = cv.toDataURL('image/png');
+          a.download = 'handwriting' + (pageCanvases.length > 1 ? '-page-' + (i + 1) : '') + '.' + format;
+          a.href = cv.toDataURL('image/' + format, 0.92);
           a.click();
         }, i * 450);
       });
