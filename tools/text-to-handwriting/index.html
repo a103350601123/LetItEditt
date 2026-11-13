@@ -156,7 +156,8 @@
 </head>
 <body>
 
-  <div class="app-container hide-sidebar" id="appLayout">
+  <!-- REMOVED 'hide-sidebar' class so it is visible by default -->
+  <div class="app-container" id="appLayout">
     
     <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
 
@@ -352,7 +353,6 @@
       { id: 'white', c: '#FFFFFF' }
     ];
 
-    // Expanded Paper Sizes (Points for PDF, Pixels for Canvas)
     const SIZES = {
       a3: { w: 1754, h: 2480, pw: 841.89, ph: 1190.55, label: 'A3' },
       a4: { w: 1240, h: 1754, pw: 595.28, ph: 841.89, label: 'A4' },
