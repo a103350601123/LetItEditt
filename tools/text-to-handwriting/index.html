@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Text to Handwriting Converter | LetitEdit</title>
   <meta name="description" content="Convert typed text into realistic handwritten pages. Choose fonts, paper styles, and download as PNG or PDF.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✍️</text></svg>">
@@ -15,392 +15,381 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
-    /* Scoped styles for LetitEdit Handwriting Tool */
-    .wth-app {
-      --brand: #6366f1;
-      --brand-hover: #4f46e5;
-      --brand-light: #e0e7ff;
-      --bg-color: #f8fafc;
-      --card-bg: #ffffff;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
-      --border-light: #e2e8f0;
-      --border-focus: #cbd5e1;
-      
+    /* =========================================
+       LetitEdit App Layout
+       ========================================= */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* Prevent body scroll */
+      background: #f1f5f9;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      color: var(--text-main);
-      background: var(--bg-color);
-      padding-bottom: 40px;
-    }
-    
-    .wth-app * { box-sizing: border-box; }
-    .wth-app h2, .wth-app h3 { color: var(--text-main); margin: 0 0 10px; text-align: left; font-family: inherit; }
-    .wth-app p { margin: 0 0 10px; }
-
-    /* Modern Header/Hero */
-    .wth-hero {
-      position: relative; text-align: center; padding: 50px 20px 80px; color: #fff;
-      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-      border-bottom-left-radius: 40px; border-bottom-right-radius: 40px;
-    }
-    .wth-hero h2 { color: #fff; font-size: 40px; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; }
-    .wth-hero p { color: #e0e7ff; max-width: 650px; margin: 0 auto; font-size: 17px; line-height: 1.6; }
-    .wth-badge { 
-      display: inline-block; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.3); font-size: 13px; font-weight: 600; 
-      padding: 6px 16px; border-radius: 999px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px;
     }
 
-    /* Layout Grid */
-    .wth-shell {
-      max-width: 1300px; margin: -40px auto 0; padding: 0 20px; position: relative; z-index: 2;
-      display: grid; grid-template-columns: 400px 1fr; gap: 24px; align-items: start;
-    }
-    
-    /* Modern Cards */
-    .wth-card { 
-      background: var(--card-bg); border: 1px solid var(--border-light); 
-      border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.05); 
-      padding: 24px; 
-    }
-    .wth-preview { 
-      padding: 0; overflow: hidden; position: sticky; top: 24px; 
-      display: flex; flex-direction: column; height: calc(100vh - 60px); /* Full height preview */
-    }
-    
-    /* Section Headers */
-    .wth-sec + .wth-sec { border-top: 1px solid var(--border-light); margin-top: 24px; padding-top: 24px; }
-    .wth-sec-h { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-    .wth-num { 
-      flex: none; width: 32px; height: 32px; border-radius: 10px; 
-      background: var(--brand-light); color: var(--brand); font-weight: 800; font-size: 15px; 
-      display: flex; align-items: center; justify-content: center; 
-    }
-    .wth-app .wth-sec-h h3 { font-size: 18px; font-weight: 700; margin: 0; }
-    .wth-count { margin-left: auto; font-size: 12px; font-weight: 700; color: var(--brand); background: var(--brand-light); padding: 4px 10px; border-radius: 8px; }
-    
-    /* Inputs */
-    .wth-field { margin-bottom: 16px; }
-    .wth-field label { display: block; font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 6px; }
-    .wth-app .wth-input, .wth-app .wth-select, .wth-app .wth-textarea {
-      width: 100%; font: inherit; font-size: 15px; color: var(--text-main);
-      background: #f1f5f9; border: 1px solid transparent; border-radius: 10px; padding: 12px 14px; outline: none; transition: all 0.2s;
-    }
-    .wth-app .wth-input:focus, .wth-app .wth-select:focus, .wth-app .wth-textarea:focus { background: #fff; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-light); }
-    .wth-app .wth-textarea { min-height: 140px; resize: vertical; line-height: 1.5; }
-    .wth-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-
-    /* Font Picker Buttons */
-    .wth-fonts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .wth-app .wth-font {
-      display: flex; flex-direction: column; padding: 10px; background: #fff; 
-      border: 1px solid var(--border-light); border-radius: 12px; cursor: pointer; text-align: left; transition: all 0.2s;
-    }
-    .wth-app .wth-font:hover { border-color: var(--brand); background: #f8fafc; }
-    .wth-app .wth-font.on { border-color: var(--brand); background: var(--brand-light); box-shadow: 0 0 0 2px var(--brand); }
-    .wth-font-s { font-size: 22px; color: #1e293b; margin-bottom: 2px; }
-    .wth-font-n { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-
-    /* Paper Picker Buttons */
-    .wth-papers { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-    .wth-app .wth-paper { 
-      display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 4px; 
-      background: #fff; border: 1px solid var(--border-light); border-radius: 10px; cursor: pointer; 
-      font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted);
-    }
-    .wth-app .wth-paper:hover { background: #f8fafc; border-color: var(--border-focus); }
-    .wth-app .wth-paper.on { border-color: var(--brand); background: var(--brand-light); color: var(--brand); }
-    .wth-pp { display: block; width: 100%; height: 46px; border: 1px solid var(--border-light); border-radius: 4px; background: #fff; }
-    .wth-pp-ruled { background: linear-gradient(90deg, transparent 8px, rgba(222,70,80,.6) 8px, rgba(222,70,80,.6) 9px, transparent 9px), repeating-linear-gradient(180deg, #fff 0, #fff 7px, rgba(76,138,206,.6) 7px, rgba(76,138,206,.6) 8px); }
-    .wth-pp-grid { background: repeating-linear-gradient(90deg, transparent 0, transparent 6px, rgba(80,140,210,.45) 6px, rgba(80,140,210,.45) 7px), repeating-linear-gradient(180deg, #fff 0, #fff 6px, rgba(80,140,210,.45) 6px, rgba(80,140,210,.45) 7px); }
-    .wth-pp-legal { background: linear-gradient(90deg, transparent 7px, rgba(222,70,80,.6) 7px, rgba(222,70,80,.6) 8px, transparent 8px, transparent 10px, rgba(222,70,80,.6) 10px, rgba(222,70,80,.6) 11px, transparent 11px), repeating-linear-gradient(180deg, #FCF3A5 0, #FCF3A5 7px, rgba(84,118,168,.55) 7px, rgba(84,118,168,.55) 8px); }
-    .wth-pp-dotted { background: radial-gradient(circle, rgba(70,80,110,.55) 1px, transparent 1.2px) 0 0/8px 8px, #fff; }
-
-    /* Ink Picker Buttons */
-    .wth-inks { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
-    .wth-app .wth-ink { 
-      width: 36px; height: 36px; border-radius: 50%; cursor: pointer; 
-      border: 3px solid #fff; box-shadow: 0 0 0 1px var(--border-focus); transition: all 0.2s; padding: 0; 
-    }
-    .wth-app .wth-ink:hover { transform: scale(1.1); }
-    .wth-app .wth-ink.on { box-shadow: 0 0 0 3px var(--brand); transform: scale(1.1); }
-    .wth-custom { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--text-muted); cursor: pointer; text-transform: uppercase; }
-    .wth-app .wth-custom input[type="color"] { width: 36px; height: 36px; border: 1px solid var(--border-focus); border-radius: 50%; padding: 0; cursor: pointer; background: none; }
-    .wth-app .wth-custom.on input[type="color"] { box-shadow: 0 0 0 3px var(--brand); border-color: transparent; }
-
-    /* =========================================
-       NEW: Fine-Tune Sliders & Buttons
-       ========================================= */
-    .wth-ranges { display: flex; flex-direction: column; gap: 12px; }
-    
-    .wth-range-card {
-      background: #f8fafc;
-      border: 1px solid var(--border-light);
-      border-radius: 12px;
-      padding: 12px 16px;
-      transition: all 0.2s;
-    }
-    .wth-range-card:hover { border-color: var(--brand); box-shadow: 0 2px 8px rgba(99,102,241,0.08); }
-    
-    .wth-range-header {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
-    }
-    .wth-range-header label { font-size: 13px; font-weight: 700; color: var(--text-main); margin: 0; }
-    .wth-range-header output { 
-      font-size: 13px; font-weight: 800; color: var(--brand); 
-      background: #fff; border: 1px solid var(--border-light); 
-      padding: 2px 8px; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    }
-
-    /* Custom Range Input styling */
-    .wth-app input[type="range"] {
-      -webkit-appearance: none; width: 100%; height: 6px; 
-      background: #e2e8f0; border-radius: 4px; outline: none; margin: 8px 0;
-    }
-    .wth-app input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
-      background: var(--brand); cursor: pointer; border: 3px solid #fff;
-      box-shadow: 0 2px 6px rgba(99, 102, 241, 0.4); transition: transform 0.1s;
-    }
-    .wth-app input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
-    .wth-app input[type="range"]::-moz-range-thumb {
-      width: 20px; height: 20px; border-radius: 50%; background: var(--brand); 
-      cursor: pointer; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(99, 102, 241, 0.4);
-    }
-
-    .wth-check { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: var(--text-main); margin: 16px 0; cursor: pointer; }
-    .wth-check input { width: 20px; height: 20px; accent-color: var(--brand); border-radius: 4px; cursor: pointer; }
-
-    /* Custom Action Buttons */
-    .wth-actions-row { display: flex; gap: 12px; margin-top: 20px; }
-    .wth-app .wth-btn-soft {
-      flex: 1; background: var(--brand-light); color: var(--brand); 
-      border: 1px solid transparent; padding: 12px; border-radius: 10px; font-weight: 700; font-size: 14px;
-      display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;
-    }
-    .wth-app .wth-btn-soft:hover { background: #d0d9ff; border-color: #c7d2fe; }
-    .wth-app .wth-btn-outline {
-      background: transparent; color: var(--text-muted); 
-      border: 1px solid var(--border-focus); padding: 12px 20px; border-radius: 10px; font-weight: 700; font-size: 14px;
-      cursor: pointer; transition: all 0.2s;
-    }
-    .wth-app .wth-btn-outline:hover { background: #fff; color: var(--text-main); border-color: var(--text-muted); }
-
-    /* =========================================
-       NEW: Preview Area Centering
-       ========================================= */
-    .wth-pv-bar { 
-      display: flex; align-items: center; justify-content: space-between; 
-      padding: 16px 24px; border-bottom: 1px solid var(--border-light); background: #fff; 
-    }
-    .wth-pv-title { display: flex; align-items: baseline; gap: 8px; }
-    .wth-pv-title b { font-size: 16px; color: var(--text-main); }
-    .wth-pv-title span { font-size: 13px; color: var(--text-muted); font-weight: 500; }
-    
-    .wth-pv-actions { display: flex; gap: 10px; background: #f1f5f9; padding: 4px; border-radius: 12px; }
-    .wth-pv-actions .wth-btn { padding: 8px 16px; font-size: 14px; border-radius: 8px; display: flex; align-items: center; gap: 6px; font-weight: 700; border: none; cursor: pointer; transition: all 0.2s; }
-    .wth-pv-actions .wth-btn-ghost { background: transparent; color: var(--text-main); }
-    .wth-pv-actions .wth-btn-ghost:hover { background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .wth-pv-actions .wth-btn-solid { background: var(--brand); color: #fff; }
-    .wth-pv-actions .wth-btn-solid:hover { background: var(--brand-hover); }
-
-    /* Centering the Canvas */
-    .wth-pages { 
-      flex: 1; overflow-y: auto; background: #e2e8f0; padding: 40px 20px; 
-      display: flex; flex-direction: column; align-items: center; justify-content: center; 
+    .app-container {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
       position: relative;
     }
-    .wth-page { 
-      width: 100%; max-width: 650px; /* Slightly smaller for better framing */
-      display: flex; justify-content: center;
+
+    /* --- Left Sidebar (Editing Panel) --- */
+    .sidebar {
+      width: 380px;
+      height: 100%;
+      background: #ffffff;
+      border-right: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.03);
     }
-    .wth-page canvas { 
-      display: block; width: 100%; height: auto; background: #fff; 
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15), 0 8px 10px -6px rgba(0,0,0,0.1); 
-      border-radius: 4px; 
+
+    .app-container.hide-sidebar .sidebar {
+      margin-left: -380px;
+    }
+
+    .sidebar-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+    }
+    .sidebar-header h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sidebar-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      scrollbar-width: thin;
+    }
+
+    /* Custom Scrollbar */
+    .sidebar-scroll::-webkit-scrollbar { width: 6px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+    /* Sections */
+    .control-group { display: flex; flex-direction: column; gap: 12px; }
+    .control-title {
+      font-size: 12px; font-weight: 800; color: #64748b; 
+      text-transform: uppercase; letter-spacing: 0.5px;
+      display: flex; align-items: center; gap: 6px; margin: 0;
+    }
+
+    /* Inputs */
+    .field label { display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; }
+    .input-box, .textarea-box {
+      width: 100%; font-family: inherit; font-size: 14px; color: #0f172a;
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; 
+      padding: 10px 12px; outline: none; transition: all 0.2s;
+    }
+    .input-box:focus, .textarea-box:focus { background: #fff; border-color: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,0.15); }
+    .textarea-box { min-height: 100px; resize: vertical; line-height: 1.5; }
+
+    /* Font & Paper Grids */
+    .font-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .font-btn {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+      padding: 8px; text-align: left; cursor: pointer; transition: all 0.2s;
+    }
+    .font-btn:hover { background: #fff; border-color: #10b981; }
+    .font-btn.on { background: #ecfdf5; border-color: #10b981; box-shadow: 0 0 0 1px #10b981; }
+    .font-preview { display: block; font-size: 18px; color: #0f172a; margin-bottom: 2px; }
+    .font-name { display: block; font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; }
+
+    .paper-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .paper-btn {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;
+      padding: 6px 2px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+      cursor: pointer; font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;
+    }
+    .paper-btn:hover { background: #fff; border-color: #10b981; }
+    .paper-btn.on { background: #ecfdf5; border-color: #10b981; color: #059669; }
+    .paper-icon { width: 100%; height: 36px; border: 1px solid #cbd5e1; border-radius: 3px; }
+    
+    /* Paper Patterns */
+    .p-ruled { background: linear-gradient(90deg, transparent 8px, rgba(239,68,68,.4) 8px, rgba(239,68,68,.4) 9px, transparent 9px), repeating-linear-gradient(180deg, #fff 0, #fff 6px, rgba(59,130,246,.4) 6px, rgba(59,130,246,.4) 7px); }
+    .p-plain { background: #fff; }
+    .p-grid { background: repeating-linear-gradient(90deg, transparent 0, transparent 5px, rgba(59,130,246,.3) 5px, rgba(59,130,246,.3) 6px), repeating-linear-gradient(180deg, #fff 0, #fff 5px, rgba(59,130,246,.3) 5px, rgba(59,130,246,.3) 6px); }
+    .p-legal { background: linear-gradient(90deg, transparent 6px, rgba(239,68,68,.4) 6px, rgba(239,68,68,.4) 7px, transparent 7px), repeating-linear-gradient(180deg, #fef08a 0, #fef08a 6px, rgba(59,130,246,.4) 6px, rgba(59,130,246,.4) 7px); }
+    .p-dotted { background: radial-gradient(circle, rgba(59,130,246,.5) 1px, transparent 1.2px) 0 0/6px 6px, #fff; }
+
+    /* Inks */
+    .ink-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .ink-btn { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #cbd5e1; cursor: pointer; padding: 0; transition: transform 0.2s; }
+    .ink-btn:hover { transform: scale(1.15); }
+    .ink-btn.on { box-shadow: 0 0 0 2px #10b981; transform: scale(1.15); }
+    .custom-ink { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #64748b; cursor: pointer; }
+    .custom-ink input[type="color"] { width: 28px; height: 28px; border: none; border-radius: 50%; cursor: pointer; padding: 0; background: none; }
+
+    /* Sliders */
+    .slider-group { display: flex; flex-direction: column; gap: 14px; }
+    .slider-item { display: flex; flex-direction: column; gap: 6px; }
+    .slider-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: #334155; }
+    .slider-header output { color: #10b981; background: #ecfdf5; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: 800; }
+    
+    input[type="range"] {
+      -webkit-appearance: none; width: 100%; height: 6px; background: #e2e8f0; border-radius: 4px; outline: none; margin: 4px 0;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+      background: #10b981; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(16,185,129,0.4); transition: transform 0.1s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+    input[type="range"]::-moz-range-thumb {
+      width: 18px; height: 18px; border-radius: 50%; background: #10b981; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(16,185,129,0.4);
+    }
+
+    .checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #334155; cursor: pointer; margin-top: 4px; }
+    .checkbox-row input { width: 16px; height: 16px; accent-color: #10b981; }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; font-weight: 700; cursor: pointer; transition: all 0.2s; border-radius: 8px; border: none; }
+    .btn-outline { background: #fff; border: 1px solid #e2e8f0; color: #334155; padding: 8px 12px; font-size: 13px; }
+    .btn-outline:hover { background: #f8fafc; border-color: #cbd5e1; }
+    .btn-soft { background: #ecfdf5; color: #059669; padding: 8px 12px; font-size: 13px; border: 1px solid transparent; }
+    .btn-soft:hover { background: #d1fae5; }
+    .action-row { display: flex; gap: 8px; margin-top: 8px; }
+
+    /* --- Right Sidebar (Preview) --- */
+    .main-preview {
+      flex: 1; display: flex; flex-direction: column; background: #e2e8f0; position: relative; overflow: hidden;
+    }
+
+    .preview-header {
+      height: 60px; background: #fff; border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 10;
     }
     
-    /* Responsive */
-    @media (max-width: 1024px) {
-      .wth-shell { grid-template-columns: 1fr; }
-      .wth-preview { position: relative; top: auto; height: 600px; }
+    /* Toggle Button */
+    .toggle-btn {
+      background: #f1f5f9; border: 1px solid #e2e8f0; padding: 8px 16px; border-radius: 8px;
+      display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: #334155;
+      cursor: pointer; transition: all 0.2s;
     }
-    @media (max-width: 640px) {
-      .wth-hero { border-radius: 0; padding: 40px 16px 60px; }
-      .wth-hero h2 { font-size: 28px; }
-      .wth-shell { padding: 0 12px; gap: 16px; }
-      .wth-papers { grid-template-columns: repeat(3, 1fr); }
-      .wth-pv-actions { flex-direction: column; width: 100%; }
-      .wth-pv-bar { flex-direction: column; gap: 12px; align-items: flex-start; }
+    .toggle-btn:hover { background: #e2e8f0; }
+
+    .download-actions { display: flex; gap: 8px; }
+    .btn-png { background: #fff; border: 1px solid #e2e8f0; color: #0f172a; padding: 8px 16px; font-size: 14px; }
+    .btn-png:hover { background: #f8fafc; }
+    .btn-pdf { background: #10b981; color: #fff; padding: 8px 16px; font-size: 14px; box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+    .btn-pdf:hover { background: #059669; transform: translateY(-1px); }
+
+    /* Canvas Area */
+    .canvas-container {
+      flex: 1; overflow: auto; padding: 30px;
+      display: flex; align-items: center; justify-content: center; /* Centers the canvas perfectly */
+    }
+    
+    .canvas-wrapper {
+      width: 100%; max-width: 700px;
+      filter: drop-shadow(0 15px 25px rgba(0,0,0,0.1));
+    }
+    .canvas-wrapper canvas { display: block; width: 100%; height: auto; background: #fff; border-radius: 4px; }
+
+    /* Info Text */
+    .preview-info { font-size: 13px; color: #64748b; font-weight: 600; display: flex; gap: 12px; }
+    .preview-info span { background: #f1f5f9; padding: 2px 8px; border-radius: 6px; }
+
+    /* Mobile Overlay */
+    .mobile-overlay {
+      position: absolute; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px);
+      z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .sidebar {
+        position: absolute; left: 0; top: 0; height: 100%;
+        box-shadow: 5px 0 25px rgba(0,0,0,0.1);
+      }
+      .app-container.hide-sidebar .sidebar { margin-left: -380px; }
+      
+      .mobile-overlay.show { opacity: 1; pointer-events: auto; }
+      
+      .preview-header { padding: 0 12px; }
+      .preview-info { display: none; }
+      .toggle-btn span { display: none; }
+      .toggle-btn { padding: 8px 10px; }
+      
+      .canvas-container { padding: 12px; }
     }
   </style>
 </head>
-<body class="wth-app">
-  
-  <header class="header" style="background: #fff; position: relative; z-index: 10;">
-    <a href="../../index.html" class="logo" style="color: var(--brand); font-weight: 800;">LetitEdit</a>
-    <button id="themeToggle" class="btn btn-outline btn-sm" aria-label="Toggle Dark Mode">🌙</button>
-  </header>
+<body>
 
-  <!-- Modern Hero Section -->
-  <section class="wth-hero">
-    <div class="wth-badge">Free Tool by LetitEdit</div>
-    <h2>Text to Handwriting</h2>
-    <p>Type or paste your text and turn it into realistic handwriting on notebook paper. Pick a handwriting font, ink color and paper, then download it as a PNG image or PDF.</p>
-  </section>
+  <div class="app-container hide-sidebar" id="appLayout">
+    
+    <!-- Mobile Overlay to close sidebar -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
 
-  <div class="wth-shell">
-    <!-- Left Column: Controls -->
-    <div class="wth-card wth-text-card">
-      <div class="wth-sec-h">
-        <span class="wth-num">1</span><h3>Your text</h3>
-        <span class="wth-count" id="wth-count">0 words</span>
+    <!-- LEFT: Editing Panel -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>LetitEdit <span style="font-size:12px; color:#10b981; background:#ecfdf5; padding:2px 8px; border-radius:4px; margin-left:8px;">Pro</span></h2>
+        <button class="btn btn-outline" onclick="toggleSidebar()" style="padding:6px 8px;">✕</button>
       </div>
-      <div class="wth-field">
-        <label for="wth-title">Title <span style="font-weight:400;color:var(--text-muted);">(optional)</span></label>
-        <input class="wth-input" id="wth-title" type="text" placeholder="e.g. The Water Cycle" autocomplete="off">
-      </div>
-      <div class="wth-field">
-        <label for="wth-text">Text</label>
-        <textarea class="wth-textarea" id="wth-text" placeholder="Type or paste the text you want to turn into handwriting…"></textarea>
-      </div>
-      <div style="display:flex; gap:16px; margin-top:8px;">
-        <button type="button" class="wth-link" id="wth-sample" style="background:none; border:none; color:var(--brand); font-weight:700; cursor:pointer; font-size:14px;">Use sample text</button>
-        <button type="button" class="wth-link" id="wth-clear" style="background:none; border:none; color:var(--brand); font-weight:700; cursor:pointer; font-size:14px;">Clear text</button>
-      </div>
-    </div>
-
-    <div class="wth-card wth-style-card">
-      <!-- Font Picker -->
-      <div class="wth-sec">
-        <div class="wth-sec-h"><span class="wth-num">2</span><h3>Handwriting</h3></div>
-        <div class="wth-fonts" id="wth-fonts"></div>
-        <label class="wth-btn wth-btn-outline" for="wth-font-file" style="margin-top:16px; width:100%; display:flex; justify-content:center;">⬆ Upload Custom Font</label>
-        <input type="file" id="wth-font-file" accept=".ttf,.otf,.woff,.woff2" hidden>
-      </div>
-
-      <!-- Paper & Ink -->
-      <div class="wth-sec">
-        <div class="wth-sec-h"><span class="wth-num">3</span><h3>Paper & ink</h3></div>
-        <div style="font-size:12px; font-weight:700; margin-bottom:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Paper</div>
-        <div class="wth-papers" id="wth-papers"></div>
+      
+      <div class="sidebar-scroll">
         
-        <div style="font-size:12px; font-weight:700; margin:20px 0 10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Ink color</div>
-        <div class="wth-inks" id="wth-inks">
-          <label class="wth-custom" id="wth-custom-wrap" title="Pick any ink color">
-            <input type="color" id="wth-custom" value="#5B2A86"> Custom
+        <!-- Text Input -->
+        <div class="control-group">
+          <div class="control-title">Text Input</div>
+          <div class="field">
+            <label>Title (Optional)</label>
+            <input type="text" id="inputTitle" class="input-box" placeholder="e.g. Chapter 1">
+          </div>
+          <div class="field">
+            <label>Your Text</label>
+            <textarea id="inputText" class="textarea-box" placeholder="Type or paste your text here..."></textarea>
+          </div>
+          <div class="action-row">
+            <button class="btn btn-outline" style="flex:1;" onclick="useSampleText()">Sample</button>
+            <button class="btn btn-outline" style="flex:1;" onclick="clearText()">Clear</button>
+          </div>
+        </div>
+
+        <!-- Handwriting Font -->
+        <div class="control-group">
+          <div class="control-title">Handwriting Style</div>
+          <div class="font-grid" id="fontGrid">
+            <!-- JS Injects Fonts -->
+          </div>
+          <label class="btn btn-outline" style="margin-top:4px; width:100%;">
+            ⬆ Upload Font (.ttf) <input type="file" id="fontUpload" accept=".ttf,.otf,.woff" hidden>
           </label>
         </div>
 
-        <div class="wth-grid2" style="margin-top:20px">
-          <div class="wth-field">
-            <label for="wth-page">Page size</label>
-            <select class="wth-select" id="wth-page">
-              <option value="a4">A4</option>
-              <option value="letter">US Letter</option>
-            </select>
+        <!-- Paper & Ink -->
+        <div class="control-group">
+          <div class="control-title">Paper & Ink</div>
+          <div class="paper-grid" id="paperGrid">
+            <!-- JS Injects Papers -->
           </div>
-          <div class="wth-field">
-            <label for="wth-effect">Look</label>
-            <select class="wth-select" id="wth-effect">
-              <option value="clean">Clean</option>
-              <option value="scan">Scanned</option>
-              <option value="photo">Photo (soft shadow)</option>
-            </select>
+          <div class="ink-row" id="inkRow">
+            <!-- JS Injects Inks -->
+            <label class="custom-ink" title="Custom Color">
+              <input type="color" id="customInk" value="#5B2A86"> Custom
+            </label>
+          </div>
+          <div style="display:flex; gap:12px; margin-top:8px;">
+            <div class="field" style="flex:1; margin:0;">
+              <label>Size</label>
+              <select id="pageSize" class="input-box">
+                <option value="a4">A4</option>
+                <option value="letter">US Letter</option>
+              </select>
+            </div>
+            <div class="field" style="flex:1; margin:0;">
+              <label>Effect</label>
+              <select id="pageEffect" class="input-box">
+                <option value="clean">Clean</option>
+                <option value="scan">Scanned</option>
+                <option value="photo">Photo</option>
+              </select>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- NEW Fine-tune Section -->
-      <div class="wth-sec">
-        <div class="wth-sec-h"><span class="wth-num">4</span><h3>Fine-tune</h3></div>
+        <!-- Fine-Tune -->
+        <div class="control-group">
+          <div class="control-title">Fine-Tune</div>
+          <div class="slider-group">
+            <div class="slider-item">
+              <div class="slider-header"><label>Font Size</label><output id="valSize">34px</output></div>
+              <input type="range" id="rangeSize" min="18" max="64" value="34">
+            </div>
+            <div class="slider-item">
+              <div class="slider-header"><label>Line Spacing</label><output id="valGap">56px</output></div>
+              <input type="range" id="rangeGap" min="36" max="96" value="56">
+            </div>
+            <div class="slider-item">
+              <div class="slider-header"><label>Natural Variation</label><output id="valMess">4/10</output></div>
+              <input type="range" id="rangeMess" min="0" max="10" value="4">
+            </div>
+          </div>
+          <label class="checkbox-row">
+            <input type="checkbox" id="chkIndent"> Indent paragraphs
+          </label>
+          <div class="action-row" style="margin-top:12px;">
+            <button class="btn btn-soft" style="flex:1;" onclick="shuffleDesign()">🎲 Shuffle</button>
+            <button class="btn btn-outline" style="flex:1;" onclick="resetDesign()">↺ Reset</button>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- RIGHT: Preview Area -->
+    <main class="main-preview">
+      <header class="preview-header">
+        <div style="display:flex; align-items:center; gap:16px;">
+          <button class="toggle-btn" onclick="toggleSidebar()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            <span>Controls</span>
+          </button>
+          <div class="preview-info">
+            <span id="infoPages">1 page</span>
+            <span id="infoSize">A4</span>
+          </div>
+        </div>
         
-        <div class="wth-ranges">
-          <div class="wth-range-card">
-            <div class="wth-range-header">
-              <label for="wth-size">Font size</label>
-              <output id="wth-size-v">34px</output>
-            </div>
-            <input type="range" id="wth-size" min="18" max="64" step="1" value="34">
-          </div>
-          
-          <div class="wth-range-card">
-            <div class="wth-range-header">
-              <label for="wth-gap">Line spacing</label>
-              <output id="wth-gap-v">56px</output>
-            </div>
-            <input type="range" id="wth-gap" min="36" max="96" step="1" value="56">
-          </div>
-
-          <div class="wth-range-card">
-            <div class="wth-range-header">
-              <label for="wth-letter">Letter spacing</label>
-              <output id="wth-letter-v">0px</output>
-            </div>
-            <input type="range" id="wth-letter" min="-2" max="12" step="0.5" value="0">
-          </div>
-
-          <div class="wth-range-card">
-            <div class="wth-range-header">
-              <label for="wth-word">Word spacing</label>
-              <output id="wth-word-v">0px</output>
-            </div>
-            <input type="range" id="wth-word" min="-8" max="40" step="1" value="0">
-          </div>
-
-          <div class="wth-range-card">
-            <div class="wth-range-header">
-              <label for="wth-mess">Natural variation</label>
-              <output id="wth-mess-v">4/10</output>
-            </div>
-            <input type="range" id="wth-mess" min="0" max="10" step="1" value="4">
-          </div>
+        <div class="download-actions">
+          <button class="btn btn-png" onclick="downloadPNG()">⬇ PNG</button>
+          <button class="btn btn-pdf" onclick="downloadPDF()">⬇ PDF</button>
         </div>
+      </header>
 
-        <label class="wth-check">
-          <input type="checkbox" id="wth-indent"> Indent the first line of each paragraph
-        </label>
-        
-        <div class="wth-actions-row">
-          <button type="button" class="wth-btn-soft" id="wth-shuffle">🎲 Shuffle Design</button>
-          <button type="button" class="wth-btn-outline" id="wth-reset">↺ Reset</button>
+      <div class="canvas-container">
+        <div class="canvas-wrapper" id="canvasWrapper">
+          <!-- Canvases inject here -->
         </div>
       </div>
-    </div>
+    </main>
 
-    <!-- Right Column: Preview (Centered) -->
-    <div class="wth-card wth-preview">
-      <div class="wth-pv-bar">
-        <div class="wth-pv-title">
-          <b>Preview</b><span id="wth-info">1 page · A4</span>
-        </div>
-        <div class="wth-pv-actions">
-          <button type="button" class="wth-btn wth-btn-ghost" id="wth-png">⬇ PNG</button>
-          <button type="button" class="wth-btn wth-btn-solid" id="wth-pdf">⬇ PDF</button>
-        </div>
-      </div>
-      
-      <!-- Canvas injects here -->
-      <div class="wth-pages" id="wth-pages"></div>
-    </div>
   </div>
 
-  <script src="../../assets/js/common.js"></script>
   <script>
-    // === Configuration Data ===
+    // === State ===
+    const state = {
+      title: "The Water Cycle",
+      text: "Water is always on the move. The sun heats oceans, lakes and rivers, and some of that water turns into vapor that rises into the air. This step is called evaporation.\n\nAs the vapor rises, it cools and turns back into tiny droplets that form clouds. This is called condensation. When the droplets join together and get too heavy, they fall back to the ground as rain, snow, sleet or hail. We call this precipitation.",
+      font: 'caveat',
+      paper: 'ruled',
+      ink: 'blue',
+      custom: '#5B2A86',
+      page: 'a4',
+      effect: 'clean',
+      size: 34,
+      gap: 56,
+      mess: 4,
+      indent: false,
+      seed: 1
+    };
+
     const FONTS = [
-      { id: 'caveat', name: 'Caveat', tag: 'Neat' },
-      { id: 'homemade', name: 'Homemade Apple', tag: 'Joined-up' },
-      { id: 'kalam', name: 'Kalam', tag: 'Hindi + English' },
-      { id: 'indie', name: 'Indie Flower', tag: 'Rounded' },
-      { id: 'shadows', name: 'Shadows Into Light', tag: 'Light' },
-      { id: 'patrick', name: 'Patrick Hand', tag: 'Print' },
-      { id: 'reenie', name: 'Reenie Beanie', tag: 'Quick notes' },
-      { id: 'nothing', name: 'Nothing You Could Do', tag: 'Slanted' },
-      { id: 'cedarville', name: 'Cedarville Cursive', tag: 'Cursive' },
-      { id: 'dawning', name: 'Dawning of a New Day', tag: 'Loose' },
-      { id: 'zeyada', name: 'Zeyada', tag: 'Messy' },
-      { id: 'gloria', name: 'Gloria Hallelujah', tag: 'Playful' }
+      { id: 'caveat', name: 'Caveat' },
+      { id: 'homemade', name: 'Homemade' },
+      { id: 'kalam', name: 'Kalam' },
+      { id: 'indie', name: 'Indie Flower' },
+      { id: 'shadows', name: 'Shadows' },
+      { id: 'patrick', name: 'Patrick' }
     ];
 
     const PAPERS = [
@@ -412,11 +401,11 @@
     ];
 
     const INKS = [
-      { id: 'blue', name: 'Blue pen', c: '#1C3F94' },
-      { id: 'black', name: 'Black pen', c: '#1E1E26' },
-      { id: 'red', name: 'Red pen', c: '#C3262F' },
-      { id: 'green', name: 'Green pen', c: '#1D7A43' },
-      { id: 'pencil', name: 'Pencil', c: '#404046' }
+      { id: 'blue', c: '#1C3F94' },
+      { id: 'black', c: '#1E1E26' },
+      { id: 'red', c: '#C3262F' },
+      { id: 'green', c: '#1D7A43' },
+      { id: 'pencil', c: '#404046' }
     ];
 
     const SIZES = {
@@ -424,45 +413,29 @@
       letter: { w: 1275, h: 1650, pw: 612, ph: 792, label: 'US Letter' }
     };
 
-    const SAMPLE_TITLE = "The Water Cycle";
-    const SAMPLE_TEXT = `Water is always on the move. The sun heats oceans, lakes and rivers, and some of that water turns into vapor that rises into the air. This step is called evaporation.\n\nAs the vapor rises, it cools and turns back into tiny droplets that form clouds. This is called condensation. When the droplets join together and get too heavy, they fall back to the ground as rain, snow, sleet or hail. We call this precipitation.\n\nThe water then collects in oceans, lakes, rivers and under the ground, and the whole cycle starts again. Without the water cycle, plants, animals and people would not have the fresh water they need to live.`;
-
-    // === State ===
-    let state = {
-      title: SAMPLE_TITLE,
-      text: SAMPLE_TEXT,
-      font: 'caveat',
-      paper: 'ruled',
-      ink: 'blue',
-      custom: '#5B2A86',
-      page: 'a4',
-      effect: 'clean',
-      size: 34,
-      gap: 56,
-      letter: 0,
-      word: 0,
-      mess: 4,
-      indent: false,
-      seed: 1
-    };
-
     let customFamily = '';
     let customCount = 0;
-    let lastGoogleFont = state.font;
     let pageCanvases = [];
 
     // === DOM Elements ===
-    const titleEl = document.getElementById('wth-title');
-    const textEl = document.getElementById('wth-text');
-    const fontsEl = document.getElementById('wth-fonts');
-    const papersEl = document.getElementById('wth-papers');
-    const inksEl = document.getElementById('wth-inks');
-    const customWrap = document.getElementById('wth-custom-wrap');
-    const customEl = document.getElementById('wth-custom');
+    const appLayout = document.getElementById('appLayout');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+    const inputTitle = document.getElementById('inputTitle');
+    const inputText = document.getElementById('inputText');
+    const fontGrid = document.getElementById('fontGrid');
+    const paperGrid = document.getElementById('paperGrid');
+    const inkRow = document.getElementById('inkRow');
+    const customInk = document.getElementById('customInk');
+    const canvasWrapper = document.getElementById('canvasWrapper');
 
     // === Helpers ===
-    function $(id) { return document.getElementById(id); }
-    
+    function toggleSidebar() {
+      appLayout.classList.toggle('hide-sidebar');
+      if (window.innerWidth <= 900) {
+        mobileOverlay.classList.toggle('show');
+      }
+    }
+
     function mulberry32(a) {
       return function() {
         a |= 0; a = a + 0x6D2B79F5 | 0;
@@ -486,167 +459,144 @@
 
     // === UI Initialization ===
     function initUI() {
-      // Fonts
+      // Setup default state in inputs
+      inputTitle.value = state.title;
+      inputText.value = state.text;
+      customInk.value = state.custom;
+      
+      // Build Fonts
       FONTS.forEach(f => {
         let b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'wth-font';
+        b.className = 'font-btn' + (state.font === f.id ? ' on' : '');
         b.dataset.id = f.id;
-        b.innerHTML = `<span class="wth-font-s" style="font-family:'${f.name}', cursive;">Hello there</span><span class="wth-font-n">${f.name} · ${f.tag}</span>`;
-        b.onclick = () => { state.font = f.id; lastGoogleFont = f.id; syncUI(); render(); };
-        fontsEl.appendChild(b);
+        b.innerHTML = `<span class="font-preview" style="font-family:'${f.name}', cursive;">Hello</span><span class="font-name">${f.name}</span>`;
+        b.onclick = () => { state.font = f.id; syncUI(); render(); };
+        fontGrid.appendChild(b);
       });
 
-      // Papers
+      // Build Papers
       PAPERS.forEach(p => {
         let b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'wth-paper';
+        b.className = 'paper-btn' + (state.paper === p.id ? ' on' : '');
         b.dataset.id = p.id;
-        b.innerHTML = `<span class="wth-pp wth-pp-${p.id}"></span>${p.name}`;
+        b.innerHTML = `<div class="paper-icon p-${p.id}"></div>${p.name}`;
         b.onclick = () => { state.paper = p.id; syncUI(); render(); };
-        papersEl.appendChild(b);
+        paperGrid.appendChild(b);
       });
 
-      // Inks
+      // Build Inks
       INKS.forEach(k => {
         let b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'wth-ink';
+        b.className = 'ink-btn' + (state.ink === k.id ? ' on' : '');
         b.dataset.id = k.id;
         b.style.background = k.c;
-        b.title = k.name;
         b.onclick = () => { state.ink = k.id; syncUI(); render(); };
-        inksEl.insertBefore(b, customWrap);
+        inkRow.insertBefore(b, customInk.parentElement);
       });
 
-      // Inputs
-      titleEl.value = state.title;
-      textEl.value = state.text;
-      updateWordCount();
-
-      titleEl.addEventListener('input', () => { state.title = titleEl.value; render(); });
-      textEl.addEventListener('input', () => { state.text = textEl.value; updateWordCount(); render(); });
+      // Event Listeners
+      inputTitle.addEventListener('input', (e) => { state.title = e.target.value; render(); });
+      inputText.addEventListener('input', (e) => { state.text = e.target.value; render(); });
       
-      $('wth-sample').onclick = () => { state.title = SAMPLE_TITLE; state.text = SAMPLE_TEXT; titleEl.value = state.title; textEl.value = state.text; updateWordCount(); render(); };
-      $('wth-clear').onclick = () => { state.title = ''; state.text = ''; titleEl.value = ''; textEl.value = ''; updateWordCount(); render(); };
-
-      $('wth-page').value = state.page;
-      $('wth-page').onchange = (e) => { state.page = e.target.value; render(); };
+      customInk.addEventListener('input', (e) => { state.ink = 'custom'; state.custom = e.target.value; syncUI(); render(); });
       
-      $('wth-effect').value = state.effect;
-      $('wth-effect').onchange = (e) => { state.effect = e.target.value; render(); };
-
+      document.getElementById('pageSize').addEventListener('change', (e) => { state.page = e.target.value; render(); });
+      document.getElementById('pageEffect').addEventListener('change', (e) => { state.effect = e.target.value; render(); });
+      
       // Sliders
-      const sliders = [
-        { id: 'size', unit: 'px' }, { id: 'gap', unit: 'px' }, 
-        { id: 'letter', unit: 'px' }, { id: 'word', unit: 'px' }, 
-        { id: 'mess', unit: '/10', zero: 'Off' }
-      ];
-
-      sliders.forEach(s => {
-        const el = $('wth-' + s.id);
-        const out = $('wth-' + s.id + '-v');
-        el.value = state[s.id];
-        out.textContent = s.id === 'mess' && state[s.id] === 0 ? 'Off' : state[s.id] + s.unit;
-        
-        el.addEventListener('input', () => {
-          state[s.id] = parseFloat(el.value) || 0;
-          out.textContent = s.id === 'mess' && state[s.id] === 0 ? 'Off' : state[s.id] + s.unit;
+      const setupSlider = (id, stateKey, unit) => {
+        const el = document.getElementById('range' + id);
+        const out = document.getElementById('val' + id);
+        el.addEventListener('input', (e) => {
+          state[stateKey] = parseFloat(e.target.value);
+          out.textContent = state[stateKey] + unit;
           render();
         });
-      });
-
-      // Checkbox
-      $('wth-indent').checked = state.indent;
-      $('wth-indent').onchange = (e) => { state.indent = e.target.checked; render(); };
-
-      // Custom Ink
-      customEl.value = state.custom;
-      customEl.addEventListener('input', () => { state.ink = 'custom'; state.custom = customEl.value; syncUI(); render(); });
-      customEl.addEventListener('click', () => { if(state.ink !== 'custom') { state.ink = 'custom'; syncUI(); render(); }});
-
-      // Shuffle & Reset
-      $('wth-shuffle').onclick = () => {
-        state.seed = 1 + Math.floor(Math.random() * 99999);
-        if (state.mess === 0) { state.mess = 4; syncUI(); }
-        render();
       };
-      $('wth-reset').onclick = () => {
-        state.size = 34; state.gap = 56; state.letter = 0; state.word = 0; state.mess = 4; state.indent = false;
-        syncUI(); render();
-      };
+      setupSlider('Size', 'size', 'px');
+      setupSlider('Gap', 'gap', 'px');
+      setupSlider('Mess', 'mess', '/10');
 
-      // Download buttons
-      $('wth-png').onclick = downloadPNG;
-      $('wth-pdf').onclick = downloadPDF;
+      document.getElementById('chkIndent').addEventListener('change', (e) => { state.indent = e.target.checked; render(); });
 
-      // Custom Font Upload
-      const fileEl = $('wth-font-file');
-      fileEl.addEventListener('change', () => {
-        const f = fileEl.files && fileEl.files[0];
-        fileEl.value = '';
+      // Font Upload
+      document.getElementById('fontUpload').addEventListener('change', function() {
+        const f = this.files[0];
         if (!f) return;
-        if (f.size > 15 * 1024 * 1024) { alert('Font file is too big (15 MB max).'); return; }
+        this.value = '';
         
         f.arrayBuffer().then(buf => {
-          const fam = 'WTH Custom Font ' + (++customCount);
+          const fam = 'CustomFont' + (++customCount);
           return new FontFace(fam, buf).load().then(face => {
             document.fonts.add(face);
             customFamily = fam;
-            const label = f.name.replace(/\.[^.]+$/, '').slice(0, 40) || 'Your font';
             
-            let old = fontsEl.querySelector('[data-id="custom"]');
             let b = document.createElement('button');
-            b.type = 'button'; b.className = 'wth-font'; b.dataset.id = 'custom';
-            b.innerHTML = `<span class="wth-font-s" style="font-family:'${fam}', cursive;">Hello there</span><span class="wth-font-n">${label}</span>`;
+            b.className = 'font-btn' + (state.font === 'custom' ? ' on' : '');
+            b.dataset.id = 'custom';
+            b.innerHTML = `<span class="font-preview" style="font-family:'${fam}', cursive;">Hello</span><span class="font-name">Uploaded</span>`;
             b.onclick = () => { state.font = 'custom'; syncUI(); render(); };
             
-            if (old) fontsEl.replaceChild(b, old);
-            else fontsEl.insertBefore(b, fontsEl.firstChild);
+            let old = fontGrid.querySelector('[data-id="custom"]');
+            if (old) fontGrid.replaceChild(b, old);
+            else fontGrid.appendChild(b);
             
             state.font = 'custom';
             syncUI(); render();
           });
-        }).catch(() => alert('Could not read the font file.'));
+        }).catch(() => alert('Could not read font file.'));
       });
+
+      // Initial Render
+      render();
     }
 
     function syncUI() {
-      Array.from(fontsEl.children).forEach(el => {
-        el.classList.toggle('on', el.dataset.id === state.font);
-      });
-      Array.from(papersEl.children).forEach(el => {
-        el.classList.toggle('on', el.dataset.id === state.paper);
-      });
-      Array.from(inksEl.children).forEach(el => {
-        if (el.classList.contains('wth-custom')) return;
-        el.classList.toggle('on', el.dataset.id === state.ink);
-      });
-      customWrap.classList.toggle('on', state.ink === 'custom');
-
-      $('wth-page').value = state.page;
-      $('wth-effect').value = state.effect;
-      $('wth-indent').checked = state.indent;
-
-      ['size','gap','letter','word','mess'].forEach(id => {
-        $('wth-' + id).value = state[id];
-        const unit = id === 'mess' ? '/10' : 'px';
-        $('wth-' + id + '-v').textContent = (id === 'mess' && state[id] === 0) ? 'Off' : state[id] + unit;
-      });
+      document.querySelectorAll('.font-btn').forEach(el => el.classList.toggle('on', el.dataset.id === state.font));
+      document.querySelectorAll('.paper-btn').forEach(el => el.classList.toggle('on', el.dataset.id === state.paper));
+      document.querySelectorAll('.ink-btn').forEach(el => el.classList.toggle('on', el.dataset.id === state.ink));
+      customInk.parentElement.classList.toggle('on', state.ink === 'custom');
     }
 
-    function updateWordCount() {
-      const text = textEl.value.trim();
-      const count = text ? text.split(/\s+/).length : 0;
-      $('wth-count').textContent = count + (count === 1 ? ' word' : ' words');
+    function useSampleText() {
+      inputTitle.value = "The Water Cycle";
+      inputText.value = "Water is always on the move. The sun heats oceans, lakes and rivers, and some of that water turns into vapor that rises into the air. This step is called evaporation.\n\nAs the vapor rises, it cools and turns back into tiny droplets that form clouds. This is called condensation. When the droplets join together and get too heavy, they fall back to the ground as rain, snow, sleet or hail. We call this precipitation.";
+      state.title = inputTitle.value;
+      state.text = inputText.value;
+      render();
     }
 
-    // === Rendering Engine ===
+    function clearText() {
+      inputTitle.value = "";
+      inputText.value = "";
+      state.title = "";
+      state.text = "";
+      render();
+    }
+
+    function shuffleDesign() {
+      state.seed = Math.floor(Math.random() * 9999);
+      if (state.mess === 0) {
+        state.mess = 4;
+        document.getElementById('rangeMess').value = 4;
+        document.getElementById('valMess').textContent = '4/10';
+      }
+      render();
+    }
+
+    function resetDesign() {
+      state.size = 34; state.gap = 56; state.mess = 4; state.indent = false;
+      document.getElementById('rangeSize').value = 34; document.getElementById('valSize').textContent = '34px';
+      document.getElementById('rangeGap').value = 56; document.getElementById('valGap').textContent = '56px';
+      document.getElementById('rangeMess').value = 4; document.getElementById('valMess').textContent = '4/10';
+      document.getElementById('chkIndent').checked = false;
+      render();
+    }
+
+    // === Core Engine (Untouched logic) ===
     function layout(fam) {
       const P = SIZES[state.page] || SIZES.a4;
       const lined = state.paper === 'ruled' || state.paper === 'legal';
-      
       let L = { W: P.w, H: P.h, gap: state.gap, rule: 3 };
       L.top = lined ? 196 : 170;
       L.mx = lined ? 168 : 120;
@@ -744,10 +694,7 @@
       let p = state.paper, y, x, cell;
       ctx.fillStyle = p === 'legal' ? '#FCF3A5' : '#FFFFFF';
       ctx.fillRect(0, 0, W, H);
-
-      function line(x1, y1, x2, y2) {
-        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
-      }
+      function line(x1, y1, x2, y2) { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); }
 
       if (p === 'ruled' || p === 'legal') {
         ctx.strokeStyle = p === 'legal' ? 'rgba(84,118,168,.45)' : 'rgba(76,138,206,.45)';
@@ -755,14 +702,12 @@
         let y0 = L.top + L.rule - L.gap;
         if (y0 < 70) y0 = L.top + L.rule;
         for (y = y0; y <= H - 56; y += L.gap) line(0, y, W, y);
-        
         ctx.strokeStyle = 'rgba(222,70,80,.55)';
         line(L.mx, 0, L.mx, H);
         if (p === 'legal') line(L.mx - 9, 0, L.mx - 9, H);
       } else if (p === 'grid' || p === 'dotted') {
         cell = L.gap / 2;
         let sy = (L.top + L.rule) % cell, sx = L.mx % cell;
-        
         if (p === 'grid') {
           ctx.strokeStyle = 'rgba(80,140,210,.26)'; ctx.lineWidth = 1.3;
           for (y = sy; y <= H; y += cell) line(0, y, W, y);
@@ -819,12 +764,10 @@
       for (let k = 0; k < lines.length; k++) {
         let ln = lines[k];
         if (!ln.words.length) continue;
-        
         let base = L.top + k * L.gap - 2;
         let drift = (rnd() * 2 - 1) * v * 0.5;
         let lineW = 0;
         ln.words.forEach((o, i) => { lineW += o.w + (i ? L.space : 0); });
-        
         let x = L.tx + (ln.indent || 0) + (rnd() * 2 - 1) * v * 0.6;
         if (ln.center) x = L.tx + Math.max(0, (L.maxW - lineW) / 2);
         let x0 = x;
@@ -834,7 +777,6 @@
           let prog = (x - L.tx) / L.maxW;
           let dy = drift * prog * 2 + (rnd() * 2 - 1) * v * 0.28;
           let rot = (rnd() * 2 - 1) * v * 0.0022;
-          
           t.save();
           t.translate(x, base + dy);
           t.rotate(rot);
@@ -867,60 +809,36 @@
       ctx.drawImage(tl, 0, 0);
       ctx.globalCompositeOperation = 'source-over';
       ctx.globalAlpha = 1;
-      
       return applyEffect(c, n);
     }
 
     function render() {
       let fam = (state.font === 'custom' && customFamily) ? customFamily : (FONTS.find(f => f.id === state.font) || FONTS[0]).name;
-      
       if (window.document.fonts && window.document.fonts.load) {
         document.fonts.load('40px "' + fam + '"', state.text.slice(0, 50) || 'Hello').then(() => {
           try {
             let L = layout(fam);
             let list = [];
-            for (let i = 0; i < L.pages.length; i++) {
-              list.push(drawPage(L, L.pages[i], i, fam));
-            }
+            for (let i = 0; i < L.pages.length; i++) list.push(drawPage(L, L.pages[i], i, fam));
             pageCanvases = list;
             showPages();
           } catch (e) { console.error(e); }
-        }).catch(() => {
-           let L = layout(fam);
-           let list = [];
-           for (let i = 0; i < L.pages.length; i++) list.push(drawPage(L, L.pages[i], i, fam));
-           pageCanvases = list;
-           showPages();
         });
       }
     }
 
     function showPages() {
-      let box = $('wth-pages');
       let n = pageCanvases.length;
-      let wraps = box.querySelectorAll('.wth-page');
-      
-      for (let i = 0; i < n; i++) {
-        let w = wraps[i];
-        if (!w) {
-          w = document.createElement('div');
-          w.className = 'wth-page';
-          box.appendChild(w);
-        }
-        let cv = pageCanvases[i];
-        let old = w.querySelector('canvas');
-        if (old) w.replaceChild(cv, old);
-        else w.appendChild(cv);
-      }
-      
-      for (let j = wraps.length - 1; j >= n; j--) box.removeChild(wraps[j]);
-      
+      canvasWrapper.innerHTML = '';
+      pageCanvases.forEach(cv => {
+        canvasWrapper.appendChild(cv);
+      });
       let P = SIZES[state.page] || SIZES.a4;
-      $('wth-info').textContent = n + (n === 1 ? ' page' : ' pages') + ' · ' + P.label;
+      document.getElementById('infoPages').textContent = n + (n === 1 ? ' page' : ' pages');
+      document.getElementById('infoSize').textContent = P.label;
     }
 
     function downloadPNG() {
-      if (!pageCanvases.length) return;
       pageCanvases.forEach((cv, i) => {
         setTimeout(() => {
           let a = document.createElement('a');
@@ -932,25 +850,17 @@
     }
 
     function downloadPDF() {
-      if (!pageCanvases.length) return;
       const { jsPDF } = window.jspdf;
       let P = SIZES[state.page] || SIZES.a4;
       let pdf = new jsPDF('p', 'pt', [P.pw, P.ph]);
-      
       pageCanvases.forEach((cv, i) => {
         if (i > 0) pdf.addPage([P.pw, P.ph]);
-        let imgData = cv.toDataURL('image/jpeg', 0.92);
-        pdf.addImage(imgData, 'JPEG', 0, 0, P.pw, P.ph);
+        pdf.addImage(cv.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, P.pw, P.ph);
       });
-      
       pdf.save('handwriting.pdf');
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      initUI();
-      render();
-    });
-
+    window.addEventListener('DOMContentLoaded', initUI);
   </script>
 </body>
 </html>
