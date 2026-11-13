@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>List Forge Pro | Text to List Converter</title>
+  <meta name="description" content="Convert text into perfectly formatted lists instantly. Split by lines, commas, or custom delimiters with advanced sorting and deduplication.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📋</text></svg>">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+
+  <style>
+    /* =========================================
+       LetitEdit - List Forge Pro Custom Design
+       ========================================= */
+    :root {
+      --brand: #6366f1;
+      --brand-hover: #4f46e5;
+      --brand-light: #e0e7ff;
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    html, body {
+      height: 100%; margin: 0; padding: 0; overflow: hidden;
+      background: var(--bg-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .app-container { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
+
+    /* --- Top Header --- */
+    .top-nav {
+      height: 64px; background: #ffffff; border-bottom: 1px solid var(--border-color);
+      display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 10;
+    }
+    .logo { font-size: 20px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+    .badge { font-size: 11px; background: var(--brand-light); color: var(--brand); padding: 3px 10px; border-radius: 20px; font-weight: 700; }
+    
+    .nav-actions { display: flex; gap: 10px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; border: none; transition: all 0.2s; font-family: inherit; }
+    .btn-primary { background: var(--brand); color: white; box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+    .btn-primary:hover { background: var(--brand-hover); transform: translateY(-1px); }
+    .btn-outline { background: #fff; border: 1px solid var(--border-color); color: var(--text-main); }
+    .btn-outline:hover { background: #f8fafc; border-color: #cbd5e1; }
+    .btn-danger { background: #fee2e2; color: #ef4444; border: 1px solid transparent; }
+    .btn-danger:hover { background: #fecaca; }
+
+    /* --- Control Bar --- */
+    .control-bar {
+      background: #ffffff; border-bottom: 1px solid var(--border-color);
+      padding: 16px 24px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+    }
+
+    .control-group { display: flex; flex-direction: column; gap: 6px; }
+    .control-group label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    
+    select, input[type="text"] {
+      padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color);
+      font-family: inherit; font-size: 14px; color: var(--text-main); outline: none; background: #fff;
+      transition: border-color 0.2s; min-width: 160px;
+    }
+    select:focus, input[type="text"]:focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-light); }
+
+    .checkbox-group { display: flex; align-items: center; gap: 16px; }
+    .checkbox-row { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text-main); }
+    .checkbox-row input { accent-color: var(--brand); width: 16px; height: 16px; cursor: pointer; }
+
+    /* --- Main Editor Area --- */
+    .editor-area {
+      flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; overflow: hidden;
+    }
+    
+    .pane {
+      background: #ffffff; border-radius: 12px; border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-md); display: flex; flex-direction: column; overflow: hidden; transition: border-color 0.2s;
+    }
+    .pane:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-light); }
+    
+    .pane-header {
+      padding: 12px 20px; border-bottom: 1px solid var(--border-color); background: #f8fafc;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .pane-header span { font-weight: 700; font-size: 14px; color: var(--text-main); }
+    .pane-stats { font-size: 12px; color: var(--brand); font-weight: 700; background: var(--brand-light); padding: 2px 10px; border-radius: 6px; }
+
+    textarea {
+      flex: 1; width: 100%; padding: 20px; border: none; outline: none; resize: none;
+      font-family: inherit; font-size: 15px; line-height: 1.6; color: var(--text-main); background: transparent;
+    }
+    .output-pane textarea { background: #fafafa; color: #334155; }
+
+    /* --- Responsive --- */
+    @media (max-width: 900px) {
+      .editor-area { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; padding: 12px; gap: 12px; }
+      .nav-actions .btn span { display: none; }
+      .nav-actions .btn { padding: 8px 12px; }
+      .control-bar { padding: 12px; gap: 12px; }
+      .control-group { width: 100%; }
+      select, input[type="text"] { width: 100%; }
+      .checkbox-group { width: 100%; justify-content: space-between; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Top Header -->
+    <header class="top-nav">
+      <div class="logo">📋 List Forge <span class="badge">PRO</span></div>
+      <div class="nav-actions">
+        <button class="btn btn-danger" onclick="clearAll()">🗑️ <span>Clear</span></button>
+        <button class="btn btn-primary" onclick="copyOutput()">📋 <span>Copy Result</span></button>
+      </div>
+    </header>
+
+    <!-- Control Bar -->
+    <div class="control-bar">
+      <div class="control-group">
+        <label>Split By</label>
+        <select id="splitDelimiter">
+          <option value="\n">Lines / Paragraphs</option>
+          <option value=",">Commas (,)</option>
+          <option value=";">Semicolons (;)</option>
+          <option value=" ">Spaces</option>
+          <option value="custom">Custom Delimiter...</option>
+        </select>
+      </div>
+      
+      <div class="control-group" id="customSplitWrapper" style="display: none;">
+        <label>Custom Separator</label>
+        <input type="text" id="customSplitInput" placeholder="e.g. | or ||">
+      </div>
+
+      <div class="control-group">
+        <label>Format Style</label>
+        <select id="formatStyle">
+          <option value="bullet">Bullet Points (•)</option>
+          <option value="numbered">Numbered (1. 2. 3.)</option>
+          <option value="dash">Dashes (-)</option>
+          <option value="comma">Comma Separated</option>
+          <option value="json">JSON Array</option>
+          <option value="custom">Custom Prefix...</option>
+          <option value="none">No Prefix (Raw)</option>
+        </select>
+      </div>
+
+      <div class="control-group" id="customPrefixWrapper" style="display: none;">
+        <label>Custom Prefix</label>
+        <input type="text" id="customPrefixInput" placeholder="e.g. * ">
+      </div>
+
+      <div class="control-group" style="flex: 1;">
+        <label>Advanced Processing</label>
+        <div class="checkbox-group">
+          <label class="checkbox-row"><input type="checkbox" id="optTrim" checked> Trim Whitespace</label>
+          <label class="checkbox-row"><input type="checkbox" id="optRemoveEmpty" checked> Remove Empty</label>
+          <label class="checkbox-row"><input type="checkbox" id="optDedupe"> Remove Duplicates</label>
+          <label class="checkbox-row"><input type="checkbox" id="optSort"> Sort A-Z</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Editor Area -->
+    <main class="editor-area">
+      
+      <!-- Input Pane -->
+      <div class="pane">
+        <div class="pane-header">
+          <span>Raw Input</span>
+          <span class="pane-stats" id="inputStats">0 chars</span>
+        </div>
+        <textarea id="textInput" placeholder="Paste your text here. Choose your split options above, and the list will generate automatically..."></textarea>
+      </div>
+
+      <!-- Output Pane -->
+      <div class="pane output-pane">
+        <div class="pane-header">
+          <span>Formatted List</span>
+          <span class="pane-stats" id="outputStats">0 items</span>
+        </div>
+        <textarea id="textOutput" readonly placeholder="Your formatted list will appear here..."></textarea>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // === DOM Elements ===
+    const textInput = document.getElementById('textInput');
+    const textOutput = document.getElementById('textOutput');
+    
+    const splitDelimiter = document.getElementById('splitDelimiter');
+    const customSplitWrapper = document.getElementById('customSplitWrapper');
+    const customSplitInput = document.getElementById('customSplitInput');
+    
+    const formatStyle = document.getElementById('formatStyle');
+    const customPrefixWrapper = document.getElementById('customPrefixWrapper');
+    const customPrefixInput = document.getElementById('customPrefixInput');
+
+    const optTrim = document.getElementById('optTrim');
+    const optRemoveEmpty = document.getElementById('optRemoveEmpty');
+    const optDedupe = document.getElementById('optDedupe');
+    const optSort = document.getElementById('optSort');
+
+    // === UI Toggles ===
+    splitDelimiter.addEventListener('change', (e) => {
+      customSplitWrapper.style.display = e.target.value === 'custom' ? 'flex' : 'none';
+      processText();
+    });
+
+    formatStyle.addEventListener('change', (e) => {
+      customPrefixWrapper.style.display = e.target.value === 'custom' ? 'flex' : 'none';
+      processText();
+    });
+
+    // === Core Engine ===
+    function processText() {
+      let text = textInput.value;
+      
+      // 1. Determine Delimiter
+      let delimiter = splitDelimiter.value;
+      if (delimiter === 'custom') {
+        delimiter = customSplitInput.value || ',';
+      } else if (delimiter === '\\n') {
+        delimiter = '\n';
+      }
+
+      // 2. Split Text
+      // Note: For lines, we split by \n. For spaces, we split by space.
+      let items = [];
+      if (delimiter === '\n') {
+        items = text.split(/\r?\n/);
+      } else {
+        items = text.split(delimiter);
+      }
+
+      // 3. Processing Array
+      if (optTrim.checked) items = items.map(item => item.trim());
+      if (optRemoveEmpty.checked) items = items.filter(item => item !== '');
+      if (optDedupe.checked) items = [...new Set(items)];
+      if (optSort.checked) items.sort((a, b) => a.localeCompare(b));
+
+      // 4. Format Output
+      let result = '';
+      const style = formatStyle.value;
+
+      if (items.length === 0) {
+        textOutput.value = '';
+        updateStats(0);
+        return;
+      }
+
+      switch (style) {
+        case 'bullet':
+          result = items.map(item => `• ${item}`).join('\n');
+          break;
+        case 'numbered':
+          result = items.map((item, i) => `${i + 1}. ${item}`).join('\n');
+          break;
+        case 'dash':
+          result = items.map(item => `- ${item}`).join('\n');
+          break;
+        case 'comma':
+          result = items.join(', ');
+          break;
+        case 'json':
+          result = JSON.stringify(items, null, 2);
+          break;
+        case 'custom':
+          const prefix = customPrefixInput.value || '';
+          result = items.map(item => `${prefix}${item}`).join('\n');
+          break;
+        case 'none':
+        default:
+          result = items.join('\n');
+          break;
+      }
+
+      textOutput.value = result;
+      updateStats(items.length);
+    }
+
+    function updateStats(itemCount) {
+      const inLength = textInput.value.length;
+      document.getElementById('inputStats').textContent = inLength + (inLength === 1 ? ' char' : ' chars');
+      document.getElementById('outputStats').textContent = itemCount + (itemCount === 1 ? ' item' : ' items');
+    }
+
+    // === Utilities ===
+    function clearAll() {
+      textInput.value = '';
+      textOutput.value = '';
+      updateStats(0);
+      textInput.focus();
+    }
+
+    function copyOutput() {
+      if (!textOutput.value) return;
+      
+      navigator.clipboard.writeText(textOutput.value).then(() => {
+        const btn = document.querySelector('.btn-primary');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = "✅ Copied!";
+        btn.style.background = "#10b981"; 
+        
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.style.background = "";
+        }, 2000);
+      }).catch(err => {
+        alert("Failed to copy text.");
+      });
+    }
+
+    // === Event Listeners ===
+    textInput.addEventListener('input', processText);
+    customSplitInput.addEventListener('input', processText);
+    customPrefixInput.addEventListener('input', processText);
+    
+    [optTrim, optRemoveEmpty, optDedupe, optSort].forEach(el => {
+      el.addEventListener('change', processText);
+    });
+
+    // Initial setup
+    window.addEventListener('DOMContentLoaded', () => {
+      processText();
+      textInput.focus();
+    });
+  </script>
+</body>
+</html>
