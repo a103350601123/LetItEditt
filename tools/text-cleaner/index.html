@@ -3,152 +3,133 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Advanced Text Sanitizer | LetitEdit</title>
-  <meta name="description" content="Professionally sanitize and format your text. Fix typos, remove gibberish, optimize spacing, and format instantly.">
+  <title>Text Sanitizer & Formatter | LetitEdit</title>
+  <meta name="description" content="Professionally sanitize your text. Fix typos, remove gibberish, optimize spacing, and format text instantly.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
   <link rel="stylesheet" href="../../assets/css/style.css">
 
   <style>
     /* =========================================
-       LetitEdit Premium Dark UI
+       LetitEdit Layout (Based on your provided source)
        ========================================= */
-    :root {
-      --brand: #7c3aed; /* Deep Violet */
-      --brand-hover: #6d28d9;
-      --brand-glow: rgba(124, 58, 237, 0.4);
-      
-      --bg-main: #f8fafc;
-      --sidebar-bg: #0f172a; /* Dark Slate */
-      --sidebar-border: #1e293b;
-      --sidebar-text: #e2e8f0;
-      --sidebar-muted: #94a3b8;
-      
-      --editor-bg: #ffffff;
-      --editor-border: #e2e8f0;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-    }
-
     html, body {
       height: 100%; margin: 0; padding: 0; overflow: hidden;
-      background: var(--bg-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     .app-container { display: flex; height: 100vh; width: 100vw; position: relative; }
 
-    /* --- Left Sidebar (Dark) --- */
+    /* --- Left Sidebar (Settings Panel) --- */
     .sidebar {
-      width: 380px; height: 100%; background: var(--sidebar-bg); border-right: 1px solid var(--sidebar-border);
+      width: 380px; height: 100%; background: #ffffff; border-right: 1px solid #e2e8f0;
       display: flex; flex-direction: column; transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 100; box-shadow: 4px 0 24px rgba(0,0,0,0.1);
+      z-index: 100; box-shadow: 2px 0 10px rgba(0,0,0,0.03);
     }
     .app-container.hide-sidebar .sidebar { margin-left: -380px; }
 
     .sidebar-header {
-      padding: 20px; border-bottom: 1px solid var(--sidebar-border);
-      display: flex; align-items: center; justify-content: space-between; background: var(--sidebar-bg);
+      padding: 16px 20px; border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: center; justify-content: space-between; background: #ffffff;
     }
-    .sidebar-header h2 { font-size: 18px; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px; }
-    .badge { font-size: 11px; color: #fff; background: var(--brand); padding: 3px 8px; border-radius: 6px; font-weight: 800; }
+    .sidebar-header h2 { font-size: 18px; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px; }
+    .pro-badge { font-size: 11px; color: #6366f1; background: #e0e7ff; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.5px; font-weight: 800; }
 
     .sidebar-scroll {
       flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px;
     }
     .sidebar-scroll::-webkit-scrollbar { width: 6px; }
-    .sidebar-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
-    /* Custom Accordion (Dark) */
+    /* Accordion Sections */
     details {
-      background: #1e293b; border: 1px solid #334155; border-radius: 10px; overflow: hidden;
-      transition: all 0.2s;
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden;
     }
-    details[open] { border-color: var(--brand); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    details[open] { background: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
     summary {
-      padding: 14px 16px; font-size: 14px; font-weight: 700; color: var(--sidebar-text); cursor: pointer;
+      padding: 14px 16px; font-size: 14px; font-weight: 700; color: #1e293b; cursor: pointer;
       list-style: none; display: flex; align-items: center; gap: 10px;
       user-select: none; transition: background 0.2s;
     }
-    summary:hover { background: #334155; }
-    summary::after { content: '▼'; font-size: 10px; color: var(--sidebar-muted); margin-left: auto; transition: transform 0.3s; }
-    details[open] summary::after { transform: rotate(180deg); color: var(--brand); }
+    summary:hover { background: #f1f5f9; }
+    summary::after { content: '▼'; font-size: 10px; color: #94a3b8; margin-left: auto; transition: transform 0.3s; }
+    details[open] summary::after { transform: rotate(180deg); }
     
-    .summary-icon { width: 18px; height: 18px; color: var(--sidebar-muted); transition: color 0.2s; }
-    details[open] .summary-icon { color: var(--brand); }
+    .summary-icon { width: 18px; height: 18px; color: #6366f1; }
 
-    .options-list { padding: 0 16px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+    .options-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 12px; border-top: 1px solid #e2e8f0; }
 
-    /* Custom Toggle Switch (Dark) */
-    .toggle-row { display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 6px 0; }
-    .toggle-row span { font-size: 13px; font-weight: 500; color: var(--sidebar-text); padding-right: 12px; }
-    
+    /* Custom Toggle Switch */
+    .toggle-row { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+    .toggle-row span { font-size: 13px; font-weight: 500; color: #475569; padding-right: 10px; }
     .switch { position: relative; display: inline-block; width: 38px; height: 22px; flex-shrink: 0; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider {
       position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #475569; transition: .3s; border-radius: 20px;
+      background-color: #cbd5e1; transition: .3s; border-radius: 20px;
     }
     .slider:before {
       position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px;
-      background-color: #fff; transition: .3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
-    input:checked + .slider { background-color: var(--brand); box-shadow: 0 0 10px var(--brand-glow); }
+    input:checked + .slider { background-color: #6366f1; }
     input:checked + .slider:before { transform: translateX(16px); }
 
-    /* Radio Buttons (Dark) */
-    .radio-group { display: flex; flex-direction: column; gap: 10px; padding-top: 4px; }
-    .radio-row { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: var(--sidebar-text); font-weight: 500; }
-    .radio-row input { accent-color: var(--brand); width: 16px; height: 16px; cursor: pointer; }
+    /* Radio Buttons for Case */
+    .radio-group { display: flex; flex-direction: column; gap: 8px; }
+    .radio-row { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: #475569; font-weight: 500; }
+    .radio-row input { accent-color: #6366f1; width: 16px; height: 16px; cursor: pointer; }
 
-    /* --- Right Editor Area (Light) --- */
-    .main-editor { flex: 1; display: flex; flex-direction: column; background: var(--bg-main); position: relative; }
+    /* --- Right Sidebar (Editor Area) --- */
+    .main-editor { flex: 1; display: flex; flex-direction: column; background: #e2e8f0; position: relative; }
 
     .editor-header {
-      min-height: 64px; background: #ffffff; border-bottom: 1px solid var(--editor-border);
-      display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 10; flex-wrap: wrap; gap: 12px;
+      min-height: 60px; background: #fff; border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 10; flex-wrap: wrap; gap: 10px;
     }
     
-    .toggle-btn { background: #ffffff; border: 1px solid var(--editor-border); padding: 8px 16px; border-radius: 8px; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: var(--text-main); cursor: pointer; transition: all 0.2s; }
-    .toggle-btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
+    .toggle-btn { background: #f1f5f9; border: 1px solid #e2e8f0; padding: 8px 16px; border-radius: 8px; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: #334155; cursor: pointer; transition: all 0.2s; }
+    .toggle-btn:hover { background: #e2e8f0; }
 
-    .action-buttons { display: flex; gap: 10px; align-items: center; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; font-weight: 700; cursor: pointer; transition: all 0.2s; border-radius: 8px; border: none; padding: 10px 20px; font-size: 14px; }
-    .btn-primary { background: var(--brand); color: #fff; box-shadow: 0 4px 12px var(--brand-glow); }
-    .btn-primary:hover { background: var(--brand-hover); transform: translateY(-1px); }
-    .btn-outline { background: #fff; border: 1px solid var(--editor-border); color: var(--text-main); }
+    .action-buttons { display: flex; gap: 8px; align-items: center; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; font-weight: 700; cursor: pointer; transition: all 0.2s; border-radius: 8px; border: none; padding: 8px 16px; font-size: 14px; }
+    .btn-primary { background: #6366f1; color: #fff; box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+    .btn-primary:hover { background: #4f46e5; transform: translateY(-1px); }
+    .btn-outline { background: #fff; border: 1px solid #e2e8f0; color: #334155; }
     .btn-outline:hover { background: #f8fafc; border-color: #cbd5e1; }
+    .btn-danger { background: #fee2e2; color: #ef4444; border: 1px solid transparent; }
+    .btn-danger:hover { background: #fecaca; }
 
-    /* Split View */
-    .split-view { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 24px; overflow: hidden; }
+    /* Split View Text Areas */
+    .split-view { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; overflow: hidden; }
     
     .textarea-wrapper {
-      display: flex; flex-direction: column; background: #ffffff; border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid var(--editor-border); overflow: hidden;
-      transition: border-color 0.2s;
+      display: flex; flex-direction: column; background: #fff; border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; overflow: hidden;
     }
-    .textarea-wrapper:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-glow); }
     
     .textarea-header {
-      padding: 14px 20px; border-bottom: 1px solid var(--editor-border); display: flex; justify-content: space-between; align-items: center; background: #f8fafc;
+      padding: 12px 16px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc;
     }
-    .textarea-header span { font-weight: 700; font-size: 14px; color: var(--text-main); }
-    .textarea-header small { font-size: 12px; color: var(--text-muted); font-weight: 600; background: #e2e8f0; padding: 2px 8px; border-radius: 6px; }
+    .textarea-header span { font-weight: 700; font-size: 14px; color: #1e293b; }
+    .textarea-header small { font-size: 12px; color: #64748b; font-weight: 600; }
 
     textarea {
-      flex: 1; width: 100%; padding: 20px; border: none; outline: none; resize: none;
-      font-family: inherit; font-size: 15px; line-height: 1.6; color: var(--text-main); background: #ffffff;
+      flex: 1; width: 100%; padding: 16px; border: none; outline: none; resize: none;
+      font-family: inherit; font-size: 15px; line-height: 1.6; color: #0f172a; background: #fff;
     }
-    .output-area { background: #fafafa; color: #334155; }
+    
+    .output-area { background: #f8fafc; }
 
-    .mobile-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+    .mobile-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
 
     @media (max-width: 900px) {
-      .sidebar { position: absolute; left: 0; top: 0; height: 100%; }
+      .sidebar { position: absolute; left: 0; top: 0; height: 100%; box-shadow: 5px 0 25px rgba(0,0,0,0.1); }
       .app-container.hide-sidebar .sidebar { margin-left: -380px; }
       .mobile-overlay.show { opacity: 1; pointer-events: auto; }
-      .editor-header { padding: 12px; justify-content: center; }
+      .editor-header { padding: 10px; justify-content: center; }
       .toggle-btn span { display: none; }
-      .toggle-btn { padding: 10px; }
-      .split-view { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; padding: 12px; gap: 16px; }
+      .toggle-btn { padding: 8px 10px; }
+      .split-view { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; padding: 12px; gap: 12px; }
       .action-buttons { width: 100%; justify-content: space-between; }
     }
   </style>
@@ -162,18 +143,18 @@
     <!-- LEFT: Settings Panel -->
     <aside class="sidebar">
       <div class="sidebar-header">
-        <h2>LetitEdit <span class="badge">Pro</span></h2>
-        <button class="btn" onclick="toggleSidebar()" style="padding:6px 10px; background:#1e293b; color:#94a3b8;">✕</button>
+        <h2>LetitEdit <span class="pro-badge">PRO</span></h2>
+        <button class="btn btn-outline" onclick="toggleSidebar()" style="padding:6px 8px;">✕</button>
       </div>
       
       <div class="sidebar-scroll">
         
-        <!-- Section 1: Text Sanitizer -->
+        <!-- Auto-Correction & Fixes -->
         <details open>
-          <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Text Sanitizer</summary>
+          <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Intelligent Refinement</summary>
           <div class="options-list">
             <label class="toggle-row">
-              <span>Intelligent Typo Correction</span>
+              <span>Smart Spellcheck & Gibberish Removal</span>
               <div class="switch"><input type="checkbox" id="optFixSpelling" checked><span class="slider"></span></div>
             </label>
             <label class="toggle-row">
@@ -191,7 +172,7 @@
           </div>
         </details>
 
-        <!-- Section 2: Spatial Formatting -->
+        <!-- Whitespace -->
         <details>
           <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg> Spatial Formatting</summary>
           <div class="options-list">
@@ -205,7 +186,7 @@
           </div>
         </details>
 
-        <!-- Section 3: Symbol Purge -->
+        <!-- Characters -->
         <details>
           <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg> Symbol Purge</summary>
           <div class="options-list">
@@ -218,7 +199,7 @@
           </div>
         </details>
 
-        <!-- Section 4: Markup Stripper -->
+        <!-- Web & Code -->
         <details>
           <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg> Markup Stripper</summary>
           <div class="options-list">
@@ -229,7 +210,7 @@
           </div>
         </details>
 
-        <!-- Section 5: Data Redaction -->
+        <!-- Privacy -->
         <details>
           <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg> Data Redaction</summary>
           <div class="options-list">
@@ -238,7 +219,7 @@
           </div>
         </details>
 
-        <!-- Section 6: Case Engineering -->
+        <!-- Formatting -->
         <details>
           <summary><svg class="summary-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg> Case Engineering</summary>
           <div class="options-list">
@@ -301,29 +282,32 @@
     const mobileOverlay = document.getElementById('mobileOverlay');
     const textInput = document.getElementById('textInput');
     const textOutput = document.getElementById('textOutput');
+    
     const inputs = document.querySelectorAll('.switch input, input[name="case"]');
 
-    // === Robust Local Dictionary (Offline, Instant) ===
+    // === Enhanced Offline Dictionary ===
+    // Includes specific fixes for stutters mapped to full words
     const typoDict = {
-      "namne": "name", "wwhat": "what", "whhat": "what", "wass": "was", "iss": "is",
-      "cantt": "can't", "thiss": "this", "thatt": "that", "annd": "and", "arr": "are",
-      "nott": "not", "yoou": "you", "wherre": "where", "witth": "with", "bee": "be",
-      "itss": "its", "alot": "a lot", "definately": "definitely", "recieve": "receive",
-      "seperate": "separate", "occured": "occurred", "untill": "until", "aple": "apple",
-      "bannana": "banana", "tomatoe": "tomato", "teh": "the", "adn": "and", "hte": "the",
-      "taht": "that", "thier": "their", "wat": "what", "whta": "what", "waht": "what",
-      "wicth": "which", "becuase": "because", "beacuse": "because", "dont": "don't",
-      "wont": "won't", "im": "I'm", "ive": "I've", "youre": "you're", "theyre": "they're",
-      "yo": "you", "u": "you", "r": "are", "ur": "your", "pls": "please", "plz": "please"
+      "nam": "name", "righ": "right", "wwhat": "what", "whhat": "what", 
+      "wass": "was", "iss": "is", "cantt": "can't", "thiss": "this", 
+      "thatt": "that", "annd": "and", "arr": "are", "nott": "not", 
+      "yoou": "you", "wherre": "where", "witth": "with", "bee": "be",
+      "itss": "its", "alot": "a lot", "definately": "definitely", 
+      "recieve": "receive", "seperate": "separate", "occured": "occurred", 
+      "untill": "until", "aple": "apple", "bannana": "banana", 
+      "tomatoe": "tomato", "teh": "the", "adn": "and", "hte": "the",
+      "taht": "that", "thier": "their", "wat": "what", "whta": "what", 
+      "waht": "what", "wicth": "which", "becuase": "because", "beacuse": "because", 
+      "dont": "don't", "cant": "can't", "wont": "won't", "im": "I'm", 
+      "ive": "I've", "youre": "you're", "theyre": "they're", "yo": "you", 
+      "u": "you", "r": "are", "ur": "your", "pls": "please", "plz": "please"
     };
 
-    // === Sidebar Toggle ===
     function toggleSidebar() {
       appLayout.classList.toggle('hide-sidebar');
       if (window.innerWidth <= 900) mobileOverlay.classList.toggle('show');
     }
 
-    // Debounce to prevent lag while typing
     let debounceTimer;
     function triggerProcess() {
       clearTimeout(debounceTimer);
@@ -349,15 +333,19 @@
         text = text.replace(/\[[^\]]+\]/g, '');
       }
 
-      // --- 2. INTELLIGENT TYPO CORRECTION & GIBBERISH REMOVAL ---
+      // --- 2. INTELLIGENT SPELLCHECK & GIBBERISH REMOVAL ---
+      // Step A: Fix repeated words (e.g., "is is" -> "is")
       if (document.getElementById('optFixSpelling').checked) {
+        text = text.replace(/\b(\w+)\s+\1\b/gi, '$1');
+
+        // Step B: Process word by word
         let words = text.split(/(\s+)/);
         
         for (let i = 0; i < words.length; i++) {
           let word = words[i];
           if (!word.trim()) continue;
           
-          // Separate punctuation from the core word (e.g., "kkk," -> "kkk", ",")
+          // Extract punctuation around the word (e.g., "nam," -> "nam", ",")
           let match = word.match(/^([^a-zA-Z]*)([a-zA-Z]+)([^a-zA-Z]*)$/);
           if (!match) continue;
           
@@ -365,54 +353,57 @@
           let core = match[2];
           let postPunct = match[3];
           let lower = core.toLowerCase();
+
+          // Step C: Normalize ANY repeating characters (e.g., "naaaaaaam" -> "nam")
+          // This explicitly catches middle repeats like "naaaaaaam" -> "nam"
+          let reduced = lower.replace(/([a-zA-Z])\1{2,}/g, '$1'); 
           
-          // A. Dictionary Check
-          if (typoDict[lower]) {
-            let fixed = typoDict[lower];
+          // Step D: Dictionary Check
+          if (typoDict[reduced]) {
+            let fixed = typoDict[reduced];
             if (core[0] === core[0].toUpperCase()) fixed = fixed.charAt(0).toUpperCase() + fixed.slice(1);
             words[i] = prePunct + fixed + postPunct;
             continue;
           }
 
-          // B. Remove pure gibberish (no vowels, length > 2) e.g., "dkj", "ddll"
-          if (core.length > 2 && !/[aeiouy]/i.test(core)) {
+          // Step E: Remove pure gibberish (no vowels, length > 2) e.g., "dkj", "ddll"
+          if (reduced.length > 2 && !/[aeiouy]/i.test(reduced)) {
               words[i] = '';
               continue;
           }
 
-          // C. Remove pure stutters (e.g., "kkk", "wwww")
+          // Step F: Remove pure stutters (e.g., "kkk", "wwww")
           if (/^([a-zA-Z])\1+$/.test(core)) {
               words[i] = '';
               continue;
           }
 
-          // D. Fix start stutters (e.g., "wwwhat" -> "what")
-          let startFixed = core.replace(/^([a-zA-Z])\1+/gi, '$1');
-          if (startFixed !== core) {
-             words[i] = prePunct + startFixed + postPunct;
+          // Step G: Fallback - if the word was reduced but not in dictionary, use reduced version
+          if (reduced !== lower) {
+              if (core[0] === core[0].toUpperCase()) reduced = reduced.charAt(0).toUpperCase() + reduced.slice(1);
+              words[i] = prePunct + reduced + postPunct;
           }
         }
         text = words.join('');
       }
 
-      // Normalize Repeating Characters (sooo -> so)
+      // Global Stutter Fix (redundant but safe)
       if (document.getElementById('optFixStutter').checked) {
         text = text.replace(/\b(\w)\1{2,}/gi, '$1');
       }
 
       // --- 3. PUNCTUATION FIXES ---
       if (document.getElementById('optFixPunct').checked) {
-        text = text.replace(/([,!?])\1+/g, '$1'); // Reduces ,,, to ,
-        text = text.replace(/\.{4,}/g, '...'); // Reduces .... to ...
+        text = text.replace(/([,!?])\1+/g, '$1'); 
+        text = text.replace(/\.{4,}/g, '...'); 
       }
 
       if (document.getElementById('optFixPunctSpace').checked) {
-        // Fixes "word ." -> "word." and "word.Another" -> "word. Another"
         text = text.replace(/\s+([.,!?])/g, '$1'); 
         text = text.replace(/([.,!?])(?=[^\s\d])/g, '$1 '); 
       }
 
-      // --- 4. DATA REDACTION ---
+      // --- 4. LINKS & EMAILS ---
       if (document.getElementById('optStripEmails').checked) {
         text = text.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '');
       }
@@ -420,7 +411,7 @@
         text = text.replace(/https?:\/\/[^\s]+/g, '');
       }
 
-      // --- 5. SYMBOL PURGE ---
+      // --- 5. CHARACTERS ---
       if (document.getElementById('optStripEmoji').checked) {
         text = text.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '');
       }
@@ -496,12 +487,8 @@
       navigator.clipboard.writeText(textOutput.value).then(() => {
         const btn = event.target;
         const originalText = btn.innerHTML;
-        btn.innerHTML = "✅ Extracted!";
-        btn.style.background = "#10b981"; // Green success
-        setTimeout(() => {
-          btn.innerHTML = originalText;
-          btn.style.background = "";
-        }, 2000);
+        btn.innerHTML = "✅ Copied!";
+        setTimeout(() => btn.innerHTML = originalText, 2000);
       }).catch(err => {
         alert("Failed to copy text.");
       });
