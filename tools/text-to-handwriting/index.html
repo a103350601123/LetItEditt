@@ -17,7 +17,7 @@
   <style>
     /* Scoped styles for LetitEdit Handwriting Tool */
     .wth-app {
-      --brand: #6366f1; /* Modern Indigo */
+      --brand: #6366f1;
       --brand-hover: #4f46e5;
       --brand-light: #e0e7ff;
       --bg-color: #f8fafc;
@@ -39,13 +39,9 @@
 
     /* Modern Header/Hero */
     .wth-hero {
-      position: relative; 
-      text-align: center;
-      padding: 50px 20px 80px; 
-      color: #fff;
+      position: relative; text-align: center; padding: 50px 20px 80px; color: #fff;
       background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-      border-bottom-left-radius: 40px;
-      border-bottom-right-radius: 40px;
+      border-bottom-left-radius: 40px; border-bottom-right-radius: 40px;
     }
     .wth-hero h2 { color: #fff; font-size: 40px; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; }
     .wth-hero p { color: #e0e7ff; max-width: 650px; margin: 0 auto; font-size: 17px; line-height: 1.6; }
@@ -58,8 +54,7 @@
     /* Layout Grid */
     .wth-shell {
       max-width: 1300px; margin: -40px auto 0; padding: 0 20px; position: relative; z-index: 2;
-      display: grid; grid-template-columns: 400px 1fr;
-      gap: 24px; align-items: start;
+      display: grid; grid-template-columns: 400px 1fr; gap: 24px; align-items: start;
     }
     
     /* Modern Cards */
@@ -68,7 +63,10 @@
       border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.05); 
       padding: 24px; 
     }
-    .wth-preview { padding: 0; overflow: hidden; position: sticky; top: 24px; display: flex; flex-direction: column; max-height: calc(100vh - 60px); }
+    .wth-preview { 
+      padding: 0; overflow: hidden; position: sticky; top: 24px; 
+      display: flex; flex-direction: column; height: calc(100vh - 60px); /* Full height preview */
+    }
     
     /* Section Headers */
     .wth-sec + .wth-sec { border-top: 1px solid var(--border-light); margin-top: 24px; padding-top: 24px; }
@@ -89,28 +87,13 @@
       background: #f1f5f9; border: 1px solid transparent; border-radius: 10px; padding: 12px 14px; outline: none; transition: all 0.2s;
     }
     .wth-app .wth-input:focus, .wth-app .wth-select:focus, .wth-app .wth-textarea:focus { background: #fff; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-light); }
-    .wth-app .wth-textarea { min-height: 160px; resize: vertical; line-height: 1.5; }
+    .wth-app .wth-textarea { min-height: 140px; resize: vertical; line-height: 1.5; }
     .wth-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-
-    /* Modern Buttons */
-    .wth-app .wth-btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 10px 18px; font: inherit; font-size: 14px; font-weight: 700;
-      border-radius: 10px; border: none; cursor: pointer; transition: all 0.2s;
-    }
-    .wth-app .wth-btn-primary { background: var(--brand); color: #fff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
-    .wth-app .wth-btn-primary:hover { background: var(--brand-hover); transform: translateY(-1px); }
-    .wth-app .wth-btn-secondary { background: #fff; color: var(--text-main); border: 1px solid var(--border-light); }
-    .wth-app .wth-btn-secondary:hover { background: #f8fafc; border-color: var(--border-focus); }
-    
-    .wth-links { display: flex; gap: 16px; margin-top: 8px; }
-    .wth-app .wth-link { background: none; border: 0; padding: 0; color: var(--brand); font-size: 14px; font-weight: 600; cursor: pointer; }
-    .wth-app .wth-link:hover { text-decoration: underline; }
 
     /* Font Picker Buttons */
     .wth-fonts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .wth-app .wth-font {
-      position: relative; display: flex; flex-direction: column; padding: 10px; background: #fff; 
+      display: flex; flex-direction: column; padding: 10px; background: #fff; 
       border: 1px solid var(--border-light); border-radius: 12px; cursor: pointer; text-align: left; transition: all 0.2s;
     }
     .wth-app .wth-font:hover { border-color: var(--brand); background: #f8fafc; }
@@ -145,16 +128,67 @@
     .wth-app .wth-custom input[type="color"] { width: 36px; height: 36px; border: 1px solid var(--border-focus); border-radius: 50%; padding: 0; cursor: pointer; background: none; }
     .wth-app .wth-custom.on input[type="color"] { box-shadow: 0 0 0 3px var(--brand); border-color: transparent; }
 
-    /* Sliders */
-    .wth-ranges { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .wth-range { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0 8px; }
-    .wth-range label { margin: 0; font-size: 12px; text-transform: uppercase; color: var(--text-muted); }
-    .wth-range output { font-size: 13px; font-weight: 700; color: var(--brand); background: var(--brand-light); padding: 2px 6px; border-radius: 4px; }
-    .wth-app .wth-range input[type="range"] { grid-column: 1 / -1; width: 100%; accent-color: var(--brand); cursor: pointer; margin-top: 4px; }
-    .wth-check { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text-main); margin: 16px 0 0; cursor: pointer; }
-    .wth-check input { width: 18px; height: 18px; accent-color: var(--brand); }
+    /* =========================================
+       NEW: Fine-Tune Sliders & Buttons
+       ========================================= */
+    .wth-ranges { display: flex; flex-direction: column; gap: 12px; }
+    
+    .wth-range-card {
+      background: #f8fafc;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 12px 16px;
+      transition: all 0.2s;
+    }
+    .wth-range-card:hover { border-color: var(--brand); box-shadow: 0 2px 8px rgba(99,102,241,0.08); }
+    
+    .wth-range-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+    }
+    .wth-range-header label { font-size: 13px; font-weight: 700; color: var(--text-main); margin: 0; }
+    .wth-range-header output { 
+      font-size: 13px; font-weight: 800; color: var(--brand); 
+      background: #fff; border: 1px solid var(--border-light); 
+      padding: 2px 8px; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
 
-    /* Preview Area */
+    /* Custom Range Input styling */
+    .wth-app input[type="range"] {
+      -webkit-appearance: none; width: 100%; height: 6px; 
+      background: #e2e8f0; border-radius: 4px; outline: none; margin: 8px 0;
+    }
+    .wth-app input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+      background: var(--brand); cursor: pointer; border: 3px solid #fff;
+      box-shadow: 0 2px 6px rgba(99, 102, 241, 0.4); transition: transform 0.1s;
+    }
+    .wth-app input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+    .wth-app input[type="range"]::-moz-range-thumb {
+      width: 20px; height: 20px; border-radius: 50%; background: var(--brand); 
+      cursor: pointer; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(99, 102, 241, 0.4);
+    }
+
+    .wth-check { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: var(--text-main); margin: 16px 0; cursor: pointer; }
+    .wth-check input { width: 20px; height: 20px; accent-color: var(--brand); border-radius: 4px; cursor: pointer; }
+
+    /* Custom Action Buttons */
+    .wth-actions-row { display: flex; gap: 12px; margin-top: 20px; }
+    .wth-app .wth-btn-soft {
+      flex: 1; background: var(--brand-light); color: var(--brand); 
+      border: 1px solid transparent; padding: 12px; border-radius: 10px; font-weight: 700; font-size: 14px;
+      display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;
+    }
+    .wth-app .wth-btn-soft:hover { background: #d0d9ff; border-color: #c7d2fe; }
+    .wth-app .wth-btn-outline {
+      background: transparent; color: var(--text-muted); 
+      border: 1px solid var(--border-focus); padding: 12px 20px; border-radius: 10px; font-weight: 700; font-size: 14px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .wth-app .wth-btn-outline:hover { background: #fff; color: var(--text-main); border-color: var(--text-muted); }
+
+    /* =========================================
+       NEW: Preview Area Centering
+       ========================================= */
     .wth-pv-bar { 
       display: flex; align-items: center; justify-content: space-between; 
       padding: 16px 24px; border-bottom: 1px solid var(--border-light); background: #fff; 
@@ -163,36 +197,39 @@
     .wth-pv-title b { font-size: 16px; color: var(--text-main); }
     .wth-pv-title span { font-size: 13px; color: var(--text-muted); font-weight: 500; }
     
-    /* Action Buttons (Download) */
     .wth-pv-actions { display: flex; gap: 10px; background: #f1f5f9; padding: 4px; border-radius: 12px; }
-    .wth-pv-actions .wth-btn { padding: 8px 16px; font-size: 14px; border-radius: 8px; }
-    .wth-pv-actions .wth-btn-ghost { background: transparent; color: var(--text-main); border: none; }
+    .wth-pv-actions .wth-btn { padding: 8px 16px; font-size: 14px; border-radius: 8px; display: flex; align-items: center; gap: 6px; font-weight: 700; border: none; cursor: pointer; transition: all 0.2s; }
+    .wth-pv-actions .wth-btn-ghost { background: transparent; color: var(--text-main); }
     .wth-pv-actions .wth-btn-ghost:hover { background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .wth-pv-actions .wth-btn-solid { background: var(--brand); color: #fff; border: none; }
+    .wth-pv-actions .wth-btn-solid { background: var(--brand); color: #fff; }
     .wth-pv-actions .wth-btn-solid:hover { background: var(--brand-hover); }
 
+    /* Centering the Canvas */
     .wth-pages { 
-      flex: 1; overflow: auto; background: #e2e8f0; padding: 30px; 
-      display: flex; flex-direction: column; align-items: center; gap: 30px; min-height: 400px; 
+      flex: 1; overflow-y: auto; background: #e2e8f0; padding: 40px 20px; 
+      display: flex; flex-direction: column; align-items: center; justify-content: center; 
+      position: relative;
     }
-    .wth-page { width: 100%; max-width: 760px; }
+    .wth-page { 
+      width: 100%; max-width: 650px; /* Slightly smaller for better framing */
+      display: flex; justify-content: center;
+    }
     .wth-page canvas { 
       display: block; width: 100%; height: auto; background: #fff; 
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); 
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15), 0 8px 10px -6px rgba(0,0,0,0.1); 
       border-radius: 4px; 
     }
     
     /* Responsive */
     @media (max-width: 1024px) {
       .wth-shell { grid-template-columns: 1fr; }
-      .wth-preview { position: relative; top: auto; max-height: none; }
+      .wth-preview { position: relative; top: auto; height: 600px; }
     }
     @media (max-width: 640px) {
       .wth-hero { border-radius: 0; padding: 40px 16px 60px; }
       .wth-hero h2 { font-size: 28px; }
       .wth-shell { padding: 0 12px; gap: 16px; }
       .wth-papers { grid-template-columns: repeat(3, 1fr); }
-      .wth-ranges { grid-template-columns: 1fr; }
       .wth-pv-actions { flex-direction: column; width: 100%; }
       .wth-pv-bar { flex-direction: column; gap: 12px; align-items: flex-start; }
     }
@@ -227,9 +264,9 @@
         <label for="wth-text">Text</label>
         <textarea class="wth-textarea" id="wth-text" placeholder="Type or paste the text you want to turn into handwriting…"></textarea>
       </div>
-      <div class="wth-links">
-        <button type="button" class="wth-link" id="wth-sample">Use sample text</button>
-        <button type="button" class="wth-link" id="wth-clear">Clear text</button>
+      <div style="display:flex; gap:16px; margin-top:8px;">
+        <button type="button" class="wth-link" id="wth-sample" style="background:none; border:none; color:var(--brand); font-weight:700; cursor:pointer; font-size:14px;">Use sample text</button>
+        <button type="button" class="wth-link" id="wth-clear" style="background:none; border:none; color:var(--brand); font-weight:700; cursor:pointer; font-size:14px;">Clear text</button>
       </div>
     </div>
 
@@ -238,7 +275,7 @@
       <div class="wth-sec">
         <div class="wth-sec-h"><span class="wth-num">2</span><h3>Handwriting</h3></div>
         <div class="wth-fonts" id="wth-fonts"></div>
-        <label class="wth-btn wth-btn-secondary" for="wth-font-file" style="margin-top:16px; width:100%;">⬆ Use your own font file</label>
+        <label class="wth-btn wth-btn-outline" for="wth-font-file" style="margin-top:16px; width:100%; display:flex; justify-content:center;">⬆ Upload Custom Font</label>
         <input type="file" id="wth-font-file" accept=".ttf,.otf,.woff,.woff2" hidden>
       </div>
 
@@ -274,54 +311,77 @@
         </div>
       </div>
 
-      <!-- Fine-tune -->
+      <!-- NEW Fine-tune Section -->
       <div class="wth-sec">
         <div class="wth-sec-h"><span class="wth-num">4</span><h3>Fine-tune</h3></div>
+        
         <div class="wth-ranges">
-          <div class="wth-range">
-            <label for="wth-size">Font size</label><output id="wth-size-v">34px</output>
+          <div class="wth-range-card">
+            <div class="wth-range-header">
+              <label for="wth-size">Font size</label>
+              <output id="wth-size-v">34px</output>
+            </div>
             <input type="range" id="wth-size" min="18" max="64" step="1" value="34">
           </div>
-          <div class="wth-range">
-            <label for="wth-gap">Line spacing</label><output id="wth-gap-v">56px</output>
+          
+          <div class="wth-range-card">
+            <div class="wth-range-header">
+              <label for="wth-gap">Line spacing</label>
+              <output id="wth-gap-v">56px</output>
+            </div>
             <input type="range" id="wth-gap" min="36" max="96" step="1" value="56">
           </div>
-          <div class="wth-range">
-            <label for="wth-letter">Letter spacing</label><output id="wth-letter-v">0px</output>
+
+          <div class="wth-range-card">
+            <div class="wth-range-header">
+              <label for="wth-letter">Letter spacing</label>
+              <output id="wth-letter-v">0px</output>
+            </div>
             <input type="range" id="wth-letter" min="-2" max="12" step="0.5" value="0">
           </div>
-          <div class="wth-range">
-            <label for="wth-word">Word spacing</label><output id="wth-word-v">0px</output>
+
+          <div class="wth-range-card">
+            <div class="wth-range-header">
+              <label for="wth-word">Word spacing</label>
+              <output id="wth-word-v">0px</output>
+            </div>
             <input type="range" id="wth-word" min="-8" max="40" step="1" value="0">
           </div>
-          <div class="wth-range" style="grid-column: 1 / -1;">
-            <label for="wth-mess">Natural variation</label><output id="wth-mess-v">4/10</output>
+
+          <div class="wth-range-card">
+            <div class="wth-range-header">
+              <label for="wth-mess">Natural variation</label>
+              <output id="wth-mess-v">4/10</output>
+            </div>
             <input type="range" id="wth-mess" min="0" max="10" step="1" value="4">
           </div>
         </div>
-        <label class="wth-check"><input type="checkbox" id="wth-indent"> Indent the first line of each paragraph</label>
+
+        <label class="wth-check">
+          <input type="checkbox" id="wth-indent"> Indent the first line of each paragraph
+        </label>
         
-        <div style="display:flex; gap:12px; align-items:center; margin-top:20px;">
-          <button type="button" class="wth-btn wth-btn-secondary" id="wth-shuffle">🔀 Shuffle handwriting</button>
-          <button type="button" class="wth-link" id="wth-reset">Reset style</button>
+        <div class="wth-actions-row">
+          <button type="button" class="wth-btn-soft" id="wth-shuffle">🎲 Shuffle Design</button>
+          <button type="button" class="wth-btn-outline" id="wth-reset">↺ Reset</button>
         </div>
       </div>
     </div>
 
-    <!-- Right Column: Preview -->
+    <!-- Right Column: Preview (Centered) -->
     <div class="wth-card wth-preview">
       <div class="wth-pv-bar">
         <div class="wth-pv-title">
-          <b>Preview</b><span id="wth-info">1 page</span>
+          <b>Preview</b><span id="wth-info">1 page · A4</span>
         </div>
         <div class="wth-pv-actions">
           <button type="button" class="wth-btn wth-btn-ghost" id="wth-png">⬇ PNG</button>
           <button type="button" class="wth-btn wth-btn-solid" id="wth-pdf">⬇ PDF</button>
         </div>
       </div>
-      <div class="wth-pages" id="wth-pages">
-        <!-- Canvases will be injected here -->
-      </div>
+      
+      <!-- Canvas injects here -->
+      <div class="wth-pages" id="wth-pages"></div>
     </div>
   </div>
 
@@ -582,7 +642,7 @@
       $('wth-count').textContent = count + (count === 1 ? ' word' : ' words');
     }
 
-    // === Rendering Engine (No logic changed) ===
+    // === Rendering Engine ===
     function layout(fam) {
       const P = SIZES[state.page] || SIZES.a4;
       const lined = state.paper === 'ruled' || state.paper === 'legal';
