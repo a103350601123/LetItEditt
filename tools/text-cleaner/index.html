@@ -57,7 +57,7 @@
 
     /* Custom Toggle Switch */
     .toggle-row { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-    .toggle-row span { font-size: 13px; font-weight: 500; color: #475569; }
+    .toggle-row span { font-size: 13px; font-weight: 500; color: #475569; padding-right: 10px; }
     .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider {
@@ -146,13 +146,26 @@
       
       <div class="sidebar-scroll">
         
-        <!-- Typo & Grammar Fixers (NEW) -->
+        <!-- Auto-Correction & Fixes (NEW) -->
         <details open>
           <summary>Auto-Correction & Fixes</summary>
           <div class="options-list">
-            <label class="toggle-row"><span>Fix repeated letters (WWwhat)</span><div class="switch"><input type="checkbox" id="optFixStutter" checked><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Reduce excessive punctuation (,,,!!!)</span><div class="switch"><input type="checkbox" id="optFixPunct" checked><span class="slider"></span></div></label>
-            <label class="toggle-row"><span>Fix spacing around punctuation</span><div class="switch"><input type="checkbox" id="optFixPunctSpace" checked><span class="slider"></span></div></label>
+            <label class="toggle-row">
+              <span>Fix common typos (iss → is)</span>
+              <div class="switch"><input type="checkbox" id="optFixTypos" checked><span class="slider"></span></div>
+            </label>
+            <label class="toggle-row">
+              <span>Remove 3+ letter stutters (wwwhat)</span>
+              <div class="switch"><input type="checkbox" id="optFixStutter" checked><span class="slider"></span></div>
+            </label>
+            <label class="toggle-row">
+              <span>Reduce excess punctuation (,!!!)</span>
+              <div class="switch"><input type="checkbox" id="optFixPunct" checked><span class="slider"></span></div>
+            </label>
+            <label class="toggle-row">
+              <span>Fix spacing around punctuation</span>
+              <div class="switch"><input type="checkbox" id="optFixPunctSpace" checked><span class="slider"></span></div>
+            </label>
           </div>
         </details>
 
@@ -268,6 +281,16 @@
     // All checkboxes and radios
     const inputs = document.querySelectorAll('.switch input, input[name="case"]');
 
+    // Dictionary of common typos (Safe to use without breaking real words)
+    const typoDict = {
+      "iss": "is", "wass": "was", "whhat": "what", "wwhat": "what", "thee": "the",
+      "thiss": "this", "thatt": "that", "annd": "and", "arr": "are", "nott": "not",
+      "yoou": "you", "wherre": "where", "witth": "with", "bee": "be", "itss": "its",
+      "alot": "a lot", "definately": "definitely", "recieve": "receive",
+      "seperate": "separate", "occured": "occurred", "untill": "until",
+      "aple": "apple", "bannana": "banana", "carrot": "carrot", "tomatoe": "tomato"
+    };
+
     // === Sidebar Toggle ===
     function toggleSidebar() {
       appLayout.classList.toggle('hide-sidebar');
@@ -279,20 +302,38 @@
       let text = textInput.value;
       
       // --- 1. AUTO-CORRECTION & FIXES ---
+      
+      // Fix Dictionary Typos
+      if (document.getElementById('optFixTypos').checked) {
+        text = text.replace(/\b[a-zA-Z]+\b/g, function(w) {
+          let lower = w.toLowerCase();
+          if (typoDict[lower]) {
+            // Preserve capitalization if original word was capitalized
+            if (w[0] === w[0].toUpperCase()) {
+              return typoDict[lower].charAt(0).toUpperCase() + typoDict[lower].slice(1);
+            }
+            return typoDict[lower];
+          }
+          return w;
+        });
+      }
+
+      // Fix Stutters (Only removes if a letter repeats 3 or more times, e.g. "sooo" -> "so", "wwwhat" -> "what")
       if (document.getElementById('optFixStutter').checked) {
-        // Fixes "WWwhat" -> "What", "ddll" -> "dl", "cantt" -> "cant"
-        text = text.replace(/\b(\w)\1{1,}/gi, '$1');
+        text = text.replace(/\b(\w)\1{2,}/gi, '$1');
       }
+
+      // Fix Excessive Punctuation
       if (document.getElementById('optFixPunct').checked) {
-        // Reduces "..." to "." (or keeps "..."), "!!!" to "!"
-        text = text.replace(/\.{2,}/g, '.');
-        text = text.replace(/\,{2,}/g, ',');
-        text = text.replace(/\!{2,}/g, '!');
-        text = text.replace(/\?{2,}/g, '?');
+        text = text.replace(/([,!?])\1+/g, '$1'); // Reduces ,,, to , and !!! to !
       }
+
+      // Fix Punctuation Spacing
       if (document.getElementById('optFixPunctSpace').checked) {
-        // Fixes "word ," -> "word," and "word." -> "word."
+        // Removes spaces BEFORE punctuation: "word ," -> "word,"
         text = text.replace(/\s+([.,!?])/g, '$1');
+        // Adds space AFTER punctuation if missing: "word.Another" -> "word. Another"
+        text = text.replace(/([.,!?])(?=[^\s\d])/g, '$1 ');
       }
 
       // --- 2. HTML & CODE ---
@@ -332,7 +373,6 @@
         text = text.replace(/[^a-zA-Z0-9\s]/g, '');
       }
       if (document.getElementById('optRemoveSpecial').checked) {
-        // Removes stuff like @#$%^&*()
         text = text.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '');
       }
       if (document.getElementById('optRemoveNumbers').checked) {
