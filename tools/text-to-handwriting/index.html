@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text to Handwriting Converter | MyUtility</title>
+  <meta name="description" content="Convert typed text into realistic handwritten pages. Choose fonts, paper styles, and download as PNG or PDF.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛠️</text></svg>">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <!-- Google Fonts for Handwriting -->
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Homemade+Apple&family=Indie+Flower&family=Kalam:wght@300;400;700&family=Patrick+Hand&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+  <!-- jsPDF for PDF Generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
+  <style>
+    .preview-container { background: #fff; padding: 1rem; border-radius: var(--radius); box-shadow: var(--shadow); text-align: center; overflow: auto; }
+    #handwritingCanvas { max-width: 100%; height: auto; border: 1px solid var(--border-color); }
+    .font-options { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .font-btn { padding: 0.8rem; border: 2px solid var(--border-color); border-radius: var(--radius); cursor: pointer; text-align: left; background: var(--card-bg); color: var(--text-color); transition: all 0.2s; }
+    .font-btn:hover { border-color: var(--primary-color); }
+    .font-btn.active { border-color: var(--primary-color); background: var(--input-bg); }
+    .font-btn span { font-size: 1.2rem; display: block; margin-bottom: 0.2rem; }
+    .font-btn small { color: #64748b; font-size: 0.75rem; }
+    .download-actions { display: flex; gap: 1rem; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <a href="../../index.html" class="logo">MyUtility</a>
+    <button id="themeToggle" class="btn btn-outline btn-sm" aria-label="Toggle Dark Mode">🌙</button>
+  </header>
+
+  <main class="container">
+    <div style="margin-bottom: 2rem;">
+      <h1 style="font-size: 1.8rem;">Text to Handwriting</h1>
+      <p style="color: #64748b;">Convert typed text into realistic handwritten pages.</p>
+    </div>
+
+    <div class="tool-layout">
+      <div>
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <h3>1. Your Text</h3>
+          <div class="form-group">
+            <label>Title (optional, centered and underlined)</label>
+            <input type="text" id="titleInput" placeholder="The Water Cycle">
+          </div>
+          <div class="form-group">
+            <label>Text</label>
+            <textarea id="textInput" rows="10" placeholder="Water is always on the move..."></textarea>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <small style="color: #64748b;"><span id="wordCount">0</span> words</small>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn btn-outline btn-sm" onclick="useSampleText()">Use sample text</button>
+              <button class="btn btn-outline btn-sm" onclick="clearText()">Clear text</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <h3>2. Handwriting</h3>
+          <div class="font-options">
+            <button class="font-btn active" data-font="'Caveat', cursive" style="font-family: 'Caveat', cursive;">
+              <span>Hello there</span><small>Caveat · Neat</small>
+            </button>
+            <button class="font-btn" data-font="'Homemade Apple', cursive" style="font-family: 'Homemade Apple', cursive;">
+              <span>Hello there</span><small>Homemade Apple · Joined</small>
+            </button>
+            <button class="font-btn" data-font="'Kalam', cursive" style="font-family: 'Kalam', cursive;">
+              <span>Hello there</span><small>Kalam · Hindi + English</small>
+            </button>
+            <button class="font-btn" data-font="'Indie Flower', cursive" style="font-family: 'Indie Flower', cursive;">
+              <span>Hello there</span><small>Indie Flower · Rounded</small>
+            </button>
+            <button class="font-btn" data-font="'Shadows Into Light', cursive" style="font-family: 'Shadows Into Light', cursive;">
+              <span>Hello there</span><small>Shadows Into Light · Light</small>
+            </button>
+            <button class="font-btn" data-font="'Patrick Hand', cursive" style="font-family: 'Patrick Hand', cursive;">
+              <span>Hello there</span><small>Patrick Hand · Print</small>
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>3. Paper & Ink</h3>
+          <div class="form-group">
+            <label>Paper Style</label>
+            <select id="paperStyle">
+              <option value="ruled">Ruled (Notebook)</option>
+              <option value="grid">Grid</option>
+              <option value="plain">Plain</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Ink Color</label>
+            <select id="inkColor">
+              <option value="#1e3a8a">Dark Blue</option>
+              <option value="#000000">Black</option>
+              <option value="#1d4ed8">Blue</option>
+              <option value="#b91c1c">Red</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="preview-container">
+        <h3 style="text-align: left; margin-bottom: 1rem;">Preview <span style="font-size: 0.8rem; font-weight: normal; color: #64748b;">1 page · A4</span></h3>
+        <canvas id="handwritingCanvas"></canvas>
+        
+        <div class="download-actions">
+          <button class="btn btn-primary" onclick="downloadPNG()" style="flex: 1;">📥 PNG</button>
+          <button class="btn btn-primary" onclick="downloadPDF()" style="flex: 1;">📄 PDF</button>
+        </div>
+        <p style="font-size: 0.75rem; color: #64748b; margin-top: 0.5rem;">Nothing is uploaded. Your text stays in your browser.</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/common.js"></script>
+  <script>
+    const canvas = document.getElementById('handwritingCanvas');
+    const ctx = canvas.getContext('2d');
+    const textInput = document.getElementById('textInput');
+    const titleInput = document.getElementById('titleInput');
+    const wordCountEl = document.getElementById('wordCount');
+
+    const PAGE_WIDTH = 794; // A4 at 96 DPI
+    const PAGE_HEIGHT = 1123;
+    
+    let currentFont = "'Caveat', cursive";
+    let currentInk = '#1e3a8a';
+    let currentPaper = 'ruled';
+
+    function updateWordCount() {
+      const text = textInput.value.trim();
+      wordCountEl.textContent = text ? text.split(/\s+/).length : 0;
+    }
+
+    function useSampleText() {
+      titleInput.value = "The Water Cycle";
+      textInput.value = `Water is always on the move. The sun heats oceans, lakes and rivers, and some of that water turns into vapor that rises into the air. This step is called evaporation.\n\nAs the vapor rises, it cools and turns back into tiny droplets that form clouds. This is called condensation. When the droplets join together and get too heavy, they fall back to the ground as rain, snow, sleet or hail. We call this precipitation.`;
+      updateWordCount();
+      renderCanvas();
+    }
+
+    function clearText() {
+      titleInput.value = "";
+      textInput.value = "";
+      updateWordCount();
+      renderCanvas();
+    }
+
+    document.querySelectorAll('.font-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFont = btn.getAttribute('data-font');
+        renderCanvas();
+      });
+    });
+
+    document.getElementById('paperStyle').addEventListener('change', (e) => { currentPaper = e.target.value; renderCanvas(); });
+    document.getElementById('inkColor').addEventListener('change', (e) => { currentInk = e.target.value; renderCanvas(); });
+
+    function renderCanvas() {
+      canvas.width = PAGE_WIDTH;
+      canvas.height = PAGE_HEIGHT;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, PAGE_WIDTH, PAGE_HEIGHT);
+      drawPaper();
+
+      ctx.fillStyle = currentInk;
+      ctx.font = `28px ${currentFont}`;
+      ctx.textBaseline = 'top';
+
+      let y = 80;
+      const marginX = 50;
+      const lineHeight = 36;
+
+      if (titleInput.value.trim()) {
+        ctx.font = `bold 32px ${currentFont}`;
+        ctx.textAlign = 'center';
+        ctx.fillText(titleInput.value.trim(), PAGE_WIDTH / 2, y);
+        const textWidth = ctx.measureText(titleInput.value.trim()).width;
+        ctx.beginPath();
+        ctx.moveTo((PAGE_WIDTH / 2) - (textWidth / 2), y + 34);
+        ctx.lineTo((PAGE_WIDTH / 2) + (textWidth / 2), y + 34);
+        ctx.strokeStyle = currentInk;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        y += 60;
+        ctx.font = `28px ${currentFont}`;
+        ctx.textAlign = 'left';
+      }
+
+      const text = textInput.value;
+      const paragraphs = text.split('\n');
+
+      paragraphs.forEach(para => {
+        if (para.trim() === '') { y += lineHeight; return; }
+        const words = para.split(' ');
+        let line = '';
+
+        words.forEach(word => {
+          const testLine = line + word + ' ';
+          if (ctx.measureText(testLine).width > (PAGE_WIDTH - marginX * 2) && line !== '') {
+            ctx.fillText(line.trim(), marginX, y);
+            y += lineHeight;
+            line = word + ' ';
+          } else {
+            line = testLine;
+          }
+        });
+        ctx.fillText(line.trim(), marginX, y);
+        y += lineHeight + 10; 
+      });
+    }
+
+    function drawPaper() {
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1;
+      const lineSpacing = 36;
+      const startY = 80;
+      const marginX = 50;
+
+      if (currentPaper === 'ruled') {
+        for (let y = startY + lineSpacing; y < PAGE_HEIGHT; y += lineSpacing) {
+          ctx.beginPath(); ctx.moveTo(marginX, y); ctx.lineTo(PAGE_WIDTH - marginX, y); ctx.stroke();
+        }
+        ctx.strokeStyle = '#fca5a5';
+        ctx.beginPath(); ctx.moveTo(marginX - 10, 0); ctx.lineTo(marginX - 10, PAGE_HEIGHT); ctx.stroke();
+      } else if (currentPaper === 'grid') {
+        for (let x = marginX; x < PAGE_WIDTH - marginX; x += lineSpacing) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, PAGE_HEIGHT); ctx.stroke();
+        }
+        for (let y = startY; y < PAGE_HEIGHT; y += lineSpacing) {
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(PAGE_WIDTH, y); ctx.stroke();
+        }
+      }
+    }
+
+    function downloadPNG() {
+      const link = document.createElement('a');
+      link.download = 'handwriting.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'px', 'a4');
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save('handwriting.pdf');
+    }
+
+    textInput.addEventListener('input', () => { updateWordCount(); renderCanvas(); });
+    titleInput.addEventListener('input', renderCanvas);
+    useSampleText();
+  </script>
+</body>
+</html>
