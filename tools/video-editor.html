@@ -54,7 +54,7 @@
   .accordion-content.active { display: flex; flex-direction: column; }
   
   .category-title { font-size: 11px; color: var(--accent); margin: 8px 0 4px; font-weight: 600; }
-  .effect-btn { background: var(--bg-hover); border: 1px solid transparent; color: var(--text-muted); padding: 6px 10px; border-radius: 4px; text-align: left; cursor: pointer; font-size: 12px; transition: 0.1s; }
+  .effect-btn { background: var(--bg-hover); border: 1px solid transparent; color: var(--text-muted); padding: 6px 10px; border-radius: 4px; text-align: left; cursor: pointer; font-size: 12px; transition: 0.1s; width: 100%; }
   .effect-btn:hover { border-color: var(--border); color: var(--text-main); }
   .effect-btn.selected { border-color: var(--accent); color: var(--accent); background: rgba(0, 210, 255, 0.1); }
 
@@ -63,7 +63,7 @@
   .canvas-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 10px; overflow: hidden; }
   #preview { max-width: 100%; max-height: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.5); background: #000; }
   
-  /* PLAYER CONTROLS (FIXED) */
+  /* PLAYER CONTROLS */
   .player-controls { height: 50px; background: var(--bg-panel); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; flex-shrink: 0; }
   .time-display { font-family: monospace; color: var(--accent); font-size: 12px; min-width: 80px; }
   
@@ -75,12 +75,8 @@
   /* Right Sidebar (Properties) */
   .sidebar-right { width: 300px; background: var(--bg-panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
   @media (max-width: 768px) {
-    .sidebar-right { width: 100%; height: 220px; border-left: none; border-top: 1px solid var(--border); }
+    .sidebar-right { width: 100%; height: 200px; border-left: none; border-top: 1px solid var(--border); }
   }
-  
-  .prop-tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 10px; gap: 15px; overflow-x: auto; scrollbar-width: none; }
-  .prop-tab { padding: 10px 0; color: var(--text-muted); cursor: pointer; font-weight: 500; font-size: 12px; border-bottom: 2px solid transparent; white-space: nowrap; }
-  .prop-tab.active { color: var(--text-main); border-bottom-color: var(--text-main); }
   
   .prop-section { border-bottom: 1px solid var(--border); padding: 12px; }
   .prop-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
@@ -88,9 +84,7 @@
   
   input[type="range"] { flex: 1; height: 4px; border-radius: 2px; background: #3f3f46; outline: none; -webkit-appearance: none; }
   input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--text-main); cursor: pointer; }
-  input[type="number"], input[type="color"] { background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-main); padding: 4px 6px; border-radius: 4px; font-size: 12px; outline: none; }
-  input[type="color"] { padding: 0; width: 30px; height: 26px; cursor: pointer; }
-  .btn-sm { background: var(--bg-hover); border: none; color: var(--text-main); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; }
+  input[type="color"] { padding: 0; width: 30px; height: 26px; cursor: pointer; border: none; background: transparent; }
 
   /* ── TIMELINE ── */
   .timeline-area { height: 220px; background: var(--bg-panel); border-top: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
@@ -133,9 +127,11 @@
   </div>
 
   <div class="main">
-    <!-- LEFT SIDEBAR (Tools) -->
+    <!-- LEFT SIDEBAR (All Effects & Tools) -->
     <div class="sidebar-left">
       <div class="panel-content">
+        
+        <!-- MEDIA -->
         <div class="accordion-item">
           <div class="accordion-header active" onclick="toggleAccordion(this)">▶ Media</div>
           <div class="accordion-content active" id="mediaContent">
@@ -144,50 +140,99 @@
           </div>
         </div>
 
+        <!-- ADD TEXT (Full Templates) -->
         <div class="accordion-item">
           <div class="accordion-header" onclick="toggleAccordion(this)">▶ Add Text</div>
           <div class="accordion-content">
-            <button class="effect-btn" onclick="addTextClip('Double-click to edit', 'basic')">Basic Text</button>
-            <div class="category-title">Templates</div>
+            <div class="category-title">Text template</div>
+            <button class="effect-btn" onclick="addTextClip('Trending', 'title')">Trending</button>
+            <button class="effect-btn" onclick="addTextClip('Basic', 'basic')">Basic</button>
             <button class="effect-btn" onclick="addTextClip('Title', 'title')">Title</button>
+            <button class="effect-btn" onclick="addTextClip('Social media', 'caption')">Social media</button>
+            <button class="effect-btn" onclick="addTextClip('Vlog', 'title')">Vlog</button>
+            <button class="effect-btn" onclick="addTextClip('Halloween', 'title')">Halloween</button>
+            <button class="effect-btn" onclick="addTextClip('Makeup', 'caption')">Makeup</button>
+            <button class="effect-btn" onclick="addTextClip('Technology', 'title')">Technology</button>
+            <button class="effect-btn" onclick="addTextClip('Time', 'caption')">Time</button>
             <button class="effect-btn" onclick="addTextClip('Caption', 'caption')">Caption</button>
           </div>
         </div>
 
+        <!-- STICKERS (Full List) -->
         <div class="accordion-item">
           <div class="accordion-header" onclick="toggleAccordion(this)">▶ Stickers</div>
           <div class="accordion-content">
-            <button class="effect-btn" onclick="document.getElementById('stickerInput').click()">+ Upload Sticker</button>
+            <button class="effect-btn" onclick="document.getElementById('stickerInput').click()">+ Upload Custom Sticker</button>
             <div class="category-title">Trending</div>
-            <button class="effect-btn" onclick="alert('Emoji sticker applied!')">🔥 Fire Emoji</button>
+            <button class="effect-btn" onclick="addEmojiSticker('🔥')">🔥 Fire</button>
+            <button class="effect-btn" onclick="addEmojiSticker('💖')">💖 Heart</button>
+            <button class="effect-btn" onclick="addEmojiSticker('✨')">✨ Sparkles</button>
+            <div class="category-title">Pro & Emoji</div>
+            <button class="effect-btn" onclick="addEmojiSticker('👑')">👑 Crown</button>
+            <button class="effect-btn" onclick="addEmojiSticker('😂')">😂 Laugh</button>
+            <button class="effect-btn" onclick="addEmojiSticker('💯')">💯 100</button>
+            <div class="category-title">Vibes & Mood</div>
+            <button class="effect-btn" onclick="addEmojiSticker('🎵')">🎵 Music</button>
+            <button class="effect-btn" onclick="addEmojiSticker('☀️')">☀️ Summer</button>
+            <button class="effect-btn" onclick="addEmojiSticker('🌙')">🌙 Night</button>
+            <button class="effect-btn" onclick="addEmojiSticker('🛸')">🛸 Cyber</button>
+            <button class="effect-btn" onclick="addEmojiSticker('💼')">💼 Details</button>
+            <div class="category-title">Travel & Plog</div>
+            <button class="effect-btn" onclick="addEmojiSticker('✈️')">✈️ Travel</button>
+            <button class="effect-btn" onclick="addEmojiSticker('📸')">📸 Camera</button>
+            <button class="effect-btn" onclick="addEmojiSticker('🏖️')">🏖️ Beach</button>
           </div>
         </div>
 
+        <!-- EFFECTS (Video & Body) -->
         <div class="accordion-item">
           <div class="accordion-header" onclick="toggleAccordion(this)">▶ Effects</div>
           <div class="accordion-content">
             <div class="category-title">Video effects</div>
-            <button class="effect-btn" onclick="applyVideoEffect('glitch')">Glitch</button>
-            <button class="effect-btn" onclick="applyVideoEffect('retro')">Retro</button>
-            <button class="effect-btn" onclick="applyVideoEffect('lens')">Lens</button>
+            <button class="effect-btn" onclick="applyEffect('glitch')">Glitch</button>
+            <button class="effect-btn" onclick="applyEffect('retro')">Retro</button>
+            <button class="effect-btn" onclick="applyEffect('lens')">Lens</button>
+            <button class="effect-btn" onclick="applyEffect('light')">Light Effects</button>
+            <button class="effect-btn" onclick="applyEffect('distortion')">Distortion</button>
+            <button class="effect-btn" onclick="applyEffect('decor')">Decor</button>
+            <button class="effect-btn" onclick="applyEffect('star')">Star</button>
+            <button class="effect-btn" onclick="applyEffect('texture')">Texture</button>
+            <button class="effect-btn" onclick="applyEffect('cartoon')">Cartoon</button>
+            <button class="effect-btn" onclick="applyEffect('nightclub')">Nightclub</button>
             
             <div class="category-title">Body effects</div>
-            <button class="effect-btn" onclick="applyBodyEffect('stroke')">Stroke</button>
-            <button class="effect-btn" onclick="applyBodyEffect('hallucination')">Hallucination</button>
-            <button class="effect-btn" onclick="applyBodyEffect('mask')">Mask</button>
+            <button class="effect-btn" onclick="applyEffect('stroke')">Stroke</button>
+            <button class="effect-btn" onclick="applyEffect('hallucination')">Hallucination</button>
+            <button class="effect-btn" onclick="applyEffect('superpowers')">Superpowers</button>
+            <button class="effect-btn" onclick="applyEffect('mask')">Mask</button>
+            <button class="effect-btn" onclick="applyEffect('glowing')">Glowing lines</button>
+            <button class="effect-btn" onclick="applyEffect('clone')">Clone</button>
+            <button class="effect-btn" onclick="applyEffect('mood')">Mood</button>
+            <button class="effect-btn" onclick="applyEffect('selfie')">Selfie</button>
+            <button class="effect-btn" onclick="applyEffect('funny')">Funny faces</button>
           </div>
         </div>
 
+        <!-- TRANSITIONS -->
         <div class="accordion-item">
           <div class="accordion-header" onclick="toggleAccordion(this)">▶ Transitions</div>
           <div class="accordion-content">
             <div class="category-title">Basic</div>
             <button class="effect-btn" onclick="applyTransition('fade')">Fade</button>
             <button class="effect-btn" onclick="applyTransition('slide')">Slide</button>
+            <button class="effect-btn" onclick="applyTransition('overlay')">Overlay</button>
+            
             <div class="category-title">Light Effects</div>
             <button class="effect-btn" onclick="applyTransition('flash')">Flash</button>
+            <button class="effect-btn" onclick="applyTransition('blur')">Blur</button>
+            
+            <div class="category-title">Camera & Glitch</div>
+            <button class="effect-btn" onclick="applyTransition('camera')">Camera</button>
+            <button class="effect-btn" onclick="applyTransition('glitch')">Glitch</button>
+            <button class="effect-btn" onclick="applyTransition('distortion')">Distortion</button>
           </div>
         </div>
+
       </div>
     </div>
 
@@ -198,7 +243,7 @@
       </div>
       <div class="player-controls">
         <div class="time-display" id="timeDisplay">00:00:00</div>
-        <!-- FIXED PLAY BUTTON -->
+        <!-- PLAY BUTTON -->
         <button id="btnPlay">
           <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         </button>
@@ -208,22 +253,16 @@
 
     <!-- RIGHT SIDEBAR (Properties) -->
     <div class="sidebar-right">
-      <div class="prop-tabs">
-        <div class="prop-tab active">Video</div>
-        <div class="prop-tab">Speed</div>
-      </div>
-      <div class="panel-content" id="propContent">
-        <div class="prop-section">
-          <div class="prop-row"><span class="prop-label">Scale</span>
-            <input type="range" id="propScale" min="10" max="300" value="100">
-          </div>
-          <div class="prop-row"><span class="prop-label">Opacity</span>
-            <input type="range" id="propOpacity" min="0" max="100" value="100">
-          </div>
-          <div class="prop-row"><span class="prop-label">Color Key</span>
-            <input type="checkbox" id="propCutoutEnable">
-            <input type="color" id="propCutoutColor" value="#00ff00">
-          </div>
+      <div class="prop-section">
+        <div class="prop-row"><span class="prop-label">Scale</span>
+          <input type="range" id="propScale" min="10" max="300" value="100">
+        </div>
+        <div class="prop-row"><span class="prop-label">Opacity</span>
+          <input type="range" id="propOpacity" min="0" max="100" value="100">
+        </div>
+        <div class="prop-row"><span class="prop-label">Color Key</span>
+          <input type="checkbox" id="propCutoutEnable">
+          <input type="color" id="propCutoutColor" value="#00ff00">
         </div>
       </div>
     </div>
@@ -232,8 +271,8 @@
   <!-- TIMELINE -->
   <div class="timeline-area">
     <div class="timeline-toolbar">
-      <button class="btn-sm" onclick="splitClip()">Split</button>
-      <button class="btn-sm" onclick="deleteClip()">Delete</button>
+      <button class="effect-btn" style="width:auto;" onclick="splitClip()">Split</button>
+      <button class="effect-btn" style="width:auto;" onclick="deleteClip()">Delete</button>
     </div>
     <div class="timeline-scroll">
       <div class="track-headers">
@@ -246,7 +285,7 @@
       <div class="timeline-tracks" id="timelineTracks">
         <div class="ruler" id="ruler"></div>
         <div class="track" data-track="0"></div> <!-- Text -->
-        <div class="track" data-track="1"></div> <!-- Overlay/Stickers -->
+        <div class="track" data-track="1"></div> <!-- Overlay -->
         <div class="track" data-track="2"></div> <!-- Video -->
         <div class="track" data-track="3"></div> <!-- Audio -->
         <div class="playhead" id="playhead"></div>
@@ -268,7 +307,6 @@
 
 <script>
 'use strict';
-// ─── CONSTANTS & STATE ──────────────────────────────────────────────────
 const TRACKS = { text: 0, overlay: 1, video: 2, audio: 3 };
 const state = { media: [], clips: [], selectedId: null, currentTime: 0, playing: false, zoom: 50 };
 let audioCtx = null, audioDest = null;
@@ -288,12 +326,12 @@ const getTotalDuration = () => Math.max(10, ...state.clips.map(c => c.start + c.
 
 // ─── UI ACCORDION ───────────────────────────────────────────────────────
 function toggleAccordion(el) {
-  const content = el.nextElementSibling;
+  document.querySelectorAll('.accordion-header').forEach(h => { if(h!==el) { h.classList.remove('active'); h.nextElementSibling.classList.remove('active'); }});
   el.classList.toggle('active');
-  content.classList.toggle('active');
+  el.nextElementSibling.classList.toggle('active');
 }
 
-// ─── MEDIA IMPORT ───────────────────────────────────────────────────────
+// ─── MEDIA & STICKERS IMPORT ────────────────────────────────────────────
 document.getElementById('fileInput').addEventListener('change', async (e) => {
   for (const f of Array.from(e.target.files)) {
     const url = URL.createObjectURL(f);
@@ -302,22 +340,30 @@ document.getElementById('fileInput').addEventListener('change', async (e) => {
     
     if (type === 'video') {
       const v = document.createElement('video'); v.src = url; v.muted = true;
-      await new Promise(r => v.onloadedmetadata = r);
-      m.duration = v.duration;
-      v.currentTime = Math.min(1, v.duration / 2);
-      await new Promise(r => v.onseeked = r);
+      await new Promise(r => v.onloadedmetadata = r); m.duration = v.duration;
+      v.currentTime = Math.min(1, v.duration / 2); await new Promise(r => v.onseeked = r);
       const c = document.createElement('canvas'); c.width = 100; c.height = 56;
-      c.getContext('2d').drawImage(v, 0, 0, 100, 56);
-      m.thumb = c.toDataURL();
+      c.getContext('2d').drawImage(v, 0, 0, 100, 56); m.thumb = c.toDataURL();
     } else if (type === 'audio') {
       const a = document.createElement('audio'); a.src = url;
       await new Promise(r => a.onloadedmetadata = r); m.duration = a.duration;
-    } else {
-      m.thumb = url;
-    }
+    } else { m.thumb = url; }
     state.media.push(m);
   }
-  renderMediaLibrary();
+  renderMediaLibrary(); e.target.value = '';
+});
+
+document.getElementById('stickerInput').addEventListener('change', async (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const url = URL.createObjectURL(f);
+  const img = new Image(); img.src = url;
+  await new Promise(r => img.onload = r);
+  addClip({
+    type: 'sticker', mediaId: uid(), name: 'Sticker', thumb: url, _el: img,
+    track: TRACKS.overlay, start: state.currentTime, duration: 3,
+    transform: { scale: 30, x: 0, y: 0, opacity: 100 }, effect: '', filter: ''
+  });
   e.target.value = '';
 });
 
@@ -330,7 +376,7 @@ function renderMediaLibrary() {
   `).join('');
 }
 
-// ─── TIMELINE & CLIPS ───────────────────────────────────────────────────
+// ─── ADD CLIPS ──────────────────────────────────────────────────────────
 function addMediaToTimeline(mediaId) {
   const m = state.media.find(x => x.id === mediaId);
   if (!m) return;
@@ -339,67 +385,60 @@ function addMediaToTimeline(mediaId) {
     type: m.type, mediaId: m.id, name: m.name, thumb: m.thumb,
     track, start: state.currentTime, duration: m.duration, offset: 0, speed: 1,
     transform: { scale: 100, x: 0, y: 0, opacity: 100 },
-    cutout: { enabled: false, color: '#00ff00', threshold: 40 },
-    filter: '', effect: ''
+    cutout: { enabled: false, color: '#00ff00' }, filter: '', effect: ''
+  });
+}
+
+function addEmojiSticker(emoji) {
+  addClip({
+    type: 'text', name: `Sticker ${emoji}`, track: TRACKS.overlay, start: state.currentTime, duration: 3,
+    transform: { scale: 100, x: 0, y: 0, opacity: 100 },
+    textStyle: { text: emoji, fontSize: 150, color: '#fff', stroke: '', shadow: true }, effect: '', filter: ''
   });
 }
 
 function addTextClip(text, template) {
   let fontSize = 80, color = '#ffffff', stroke = '#000000', shadow = true;
-  if (template === 'title') { fontSize = 120; color = '#00d2ff'; shadow = false; }
+  if (template === 'title') { fontSize = 140; color = '#00d2ff'; stroke = ''; }
   if (template === 'caption') { fontSize = 60; stroke = '#000000'; }
   
   addClip({
-    type: 'text', name: text, track: TRACKS.text, start: state.currentTime, duration: 4, offset: 0, speed: 1,
+    type: 'text', name: text, track: TRACKS.text, start: state.currentTime, duration: 4,
     transform: { scale: 100, x: 0, y: 0, opacity: 100 },
-    textStyle: { text, fontSize, color, stroke, shadow }
+    textStyle: { text, fontSize, color, stroke, shadow }, effect: '', filter: ''
   });
 }
 
 function addClip(data) {
-  const c = { id: uid(), ...data, _el: null, _audioNode: null };
-  ensureElement(c);
-  state.clips.push(c);
-  state.selectedId = c.id;
-  renderTimeline(); drawFrame();
-}
-
-function ensureElement(c) {
-  if (c._el || c.type === 'text') return;
-  const m = state.media.find(x => x.id === c.mediaId);
-  if (!m) return;
-  
-  if (c.type === 'video') { c._el = document.createElement('video'); c._el.src = m.url; c._el.playsInline = true; c._el.preload = 'auto'; }
-  else if (c.type === 'audio') { c._el = document.createElement('audio'); c._el.src = m.url; c._el.preload = 'auto'; }
-  else { c._el = new Image(); c._el.src = m.url; }
-  
-  if (c.type === 'video' || c.type === 'audio') {
-    try {
-      if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); audioDest = audioCtx.createMediaStreamDestination(); }
-      const src = audioCtx.createMediaElementSource(c._el), gain = audioCtx.createGain();
-      src.connect(gain); gain.connect(audioCtx.destination); gain.connect(audioDest);
-      c._audioNode = { source: src, gain };
-    } catch(e) {}
+  const c = { id: uid(), ...data, _audioNode: null };
+  if (c.type !== 'text' && !c._el) {
+    if (c.type === 'video') { c._el = document.createElement('video'); c._el.src = state.media.find(m=>m.id===c.mediaId).url; c._el.playsInline = true; }
+    else if (c.type === 'audio') { c._el = document.createElement('audio'); c._el.src = state.media.find(m=>m.id===c.mediaId).url; }
+    else if (c.type === 'image') { c._el = new Image(); c._el.src = state.media.find(m=>m.id===c.mediaId).url; }
+    
+    if (c.type === 'video' || c.type === 'audio') {
+      try {
+        if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); audioDest = audioCtx.createMediaStreamDestination(); }
+        const src = audioCtx.createMediaElementSource(c._el), gain = audioCtx.createGain();
+        src.connect(gain); gain.connect(audioCtx.destination); gain.connect(audioDest);
+        c._audioNode = { source: src, gain };
+      } catch(e) {}
+    }
   }
+  state.clips.push(c); selectClip(c.id); renderTimeline();
 }
 
 // ─── RENDER TIMELINE ────────────────────────────────────────────────────
 function renderTimeline() {
   const total = getTotalDuration(), width = total * state.zoom + 200;
-  const tracksEl = document.getElementById('timelineTracks');
-  const ruler = document.getElementById('ruler');
-  
-  tracksEl.style.width = width + 'px';
-  ruler.innerHTML = '';
-  
+  document.getElementById('timelineTracks').style.width = width + 'px';
+  const ruler = document.getElementById('ruler'); ruler.innerHTML = '';
   for (let t = 0; t <= total + 5; t += 2) {
     const d = document.createElement('div'); d.className = 'ruler-tick';
     d.style.left = (t * state.zoom) + 'px'; d.textContent = fmtTime(t).substring(0, 5);
     ruler.appendChild(d);
   }
-  
   document.querySelectorAll('.track').forEach(t => t.innerHTML = '');
-  
   state.clips.forEach(c => {
     const trackEl = document.querySelector(`.track[data-track="${c.track}"]`);
     if (!trackEl) return;
@@ -409,11 +448,6 @@ function renderTimeline() {
     el.style.width = Math.max(c.duration * state.zoom, 20) + 'px';
     el.innerHTML = `<div class="clip-label">${c.name}</div><div class="clip-strip" style="${c.thumb ? `background-image:url(${c.thumb});background-size:cover;` : ''}"></div>`;
     el.onclick = (e) => { e.stopPropagation(); selectClip(c.id); };
-    
-    const hL = document.createElement('div'); hL.className = 'clip-handle left';
-    const hR = document.createElement('div'); hR.className = 'clip-handle right';
-    el.appendChild(hL); el.appendChild(hR);
-    
     trackEl.appendChild(el);
   });
   updatePlayhead();
@@ -421,7 +455,43 @@ function renderTimeline() {
 
 function selectClip(id) { state.selectedId = id; renderTimeline(); renderProps(); drawFrame(); }
 
-// ─── CANVAS DRAWING & EFFECTS ───────────────────────────────────────────
+// ─── EFFECTS ENGINE ─────────────────────────────────────────────────────
+function applyEffect(type) {
+  const c = getClip(state.selectedId);
+  if (!c) return alert("Select a clip in the timeline first.");
+  c.effect = type;
+  // Map complex effects to canvas filters
+  const effectMap = {
+    'glitch': 'hue-rotate(90deg) contrast(200%) saturate(200%)',
+    'retro': 'sepia(0.8) contrast(1.2) brightness(0.9)',
+    'lens': 'blur(3px) contrast(1.5)',
+    'light': 'brightness(1.5) drop-shadow(0 0 20px #fff)',
+    'distortion': 'contrast(200%) invert(100%)',
+    'decor': 'sepia(0.5) saturate(150%)',
+    'star': 'brightness(1.2) drop-shadow(0 0 10px #00d2ff)',
+    'texture': 'contrast(150%) brightness(0.8)',
+    'cartoon': 'contrast(200%) saturate(300%)',
+    'nightclub': 'hue-rotate(270deg) brightness(1.3)',
+    'stroke': 'drop-shadow(0 0 8px #ff0055)',
+    'hallucination': 'hue-rotate(180deg) blur(5px) invert(50%)',
+    'superpowers': 'drop-shadow(0 0 15px #00ff00) brightness(1.2)',
+    'mask': 'grayscale(100%) contrast(150%)',
+    'glowing': 'drop-shadow(0 0 20px #00d2ff) brightness(1.5)',
+    'clone': 'blur(2px) opacity(80%)',
+    'mood': 'sepia(0.4) brightness(0.8)',
+    'selfie': 'brightness(1.2) contrast(110%) blur(1px)',
+    'funny': 'hue-rotate(45deg) saturate(300%)'
+  };
+  c.filter = effectMap[type] || '';
+  drawFrame();
+  alert(`${type} effect applied.`);
+}
+
+function applyTransition(type) {
+  alert(`${type} transition queued (applies on render).`);
+}
+
+// ─── CANVAS DRAWING ─────────────────────────────────────────────────────
 function drawFrame() {
   ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
   const t = state.currentTime;
@@ -430,9 +500,9 @@ function drawFrame() {
     const localT = t - c.start;
     
     if (c._el && (c.type === 'video' || c.type === 'audio')) {
-      const expected = c.offset + (localT * c.speed);
+      const expected = localT * c.speed;
       if (state.playing) {
-        if (c._el.paused) { c._el.currentTime = expected; c._el.playbackRate = c.speed; c._el.play().catch(()=>{}); }
+        if (c._el.paused) { c._el.currentTime = expected; c._el.play().catch(()=>{}); }
         if (c._audioNode) c._audioNode.gain.gain.value = 1;
       } else {
         if (!c._el.paused) c._el.pause();
@@ -447,21 +517,10 @@ function drawFrame() {
     
     if (c.filter) ctx.filter = c.filter;
     
-    // Specific Effects Logic
-    if (c.effect === 'glitch') {
-      ctx.filter = 'hue-rotate(90deg) contrast(200%)';
-      ctx.drawImage(c._el || hiddenCanvas, -50, -50); // Offset for glitch feel
-    } else if (c.effect === 'retro') {
-      ctx.filter = 'sepia(0.8) contrast(1.2)';
-    } else if (c.effect === 'hallucination') {
-      ctx.filter = 'hue-rotate(180deg) saturate(300%) blur(2px)';
-    }
-    
-    if (c.type === 'video' || c.type === 'image') {
-      if (c._el && (c.type === 'image' || c._el.readyState >= 2)) {
+    if (c.type === 'video' || c.type === 'image' || c.type === 'sticker') {
+      if (c._el && (c.type === 'image' || c.type === 'sticker' || c._el.readyState >= 2)) {
         
-        // Cutout
-        if (c.cutout.enabled) {
+        if (c.cutout && c.cutout.enabled) {
           const vw = c._el.videoWidth || c._el.naturalWidth, vh = c._el.videoHeight || c._el.naturalHeight;
           hiddenCanvas.width = vw; hiddenCanvas.height = vh; hiddenCtx.drawImage(c._el, 0, 0);
           try {
@@ -495,57 +554,38 @@ function drawFrame() {
   });
 }
 
-// ─── EFFECTS APPLY ──────────────────────────────────────────────────────
-function applyVideoEffect(type) {
-  const c = getClip(state.selectedId);
-  if (c) { c.effect = type; drawFrame(); }
-}
-function applyBodyEffect(type) {
-  const c = getClip(state.selectedId);
-  if (c) { 
-    c.effect = type; 
-    if (type === 'stroke') c.filter = 'drop-shadow(0 0 10px #00d2ff)'; 
-    drawFrame(); 
-  }
-}
-function applyTransition(type) { alert(`${type} transition queued for next cut.`); }
-
-// ─── PROPERTIES BINDING ─────────────────────────────────────────────────
+// ─── PROPERTIES & PLAYBACK ──────────────────────────────────────────────
 function renderProps() {
   const c = getClip(state.selectedId);
   document.getElementById('propScale').value = c?.transform.scale || 100;
   document.getElementById('propOpacity').value = c?.transform.opacity || 100;
-  document.getElementById('propCutoutEnable').checked = c?.cutout.enabled || false;
+  document.getElementById('propCutoutEnable').checked = c?.cutout?.enabled || false;
 }
 
 document.getElementById('propScale').addEventListener('input', e => { const c = getClip(state.selectedId); if(c) { c.transform.scale = parseInt(e.target.value); drawFrame(); } });
 document.getElementById('propOpacity').addEventListener('input', e => { const c = getClip(state.selectedId); if(c) { c.transform.opacity = parseInt(e.target.value); drawFrame(); } });
-document.getElementById('propCutoutEnable').addEventListener('change', e => { const c = getClip(state.selectedId); if(c) { c.cutout.enabled = e.target.checked; drawFrame(); } });
+document.getElementById('propCutoutEnable').addEventListener('change', e => { const c = getClip(state.selectedId); if(c) { if(!c.cutout) c.cutout = {color:'#00ff00'}; c.cutout.enabled = e.target.checked; drawFrame(); } });
 
-// ─── PLAYBACK & TIMELINE SCRUB ──────────────────────────────────────────
 const playBtn = document.getElementById('btnPlay'), playIcon = document.getElementById('playIcon');
 function play() {
   if (state.playing) return;
   state.playing = true;
-  playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; // Pause icon
+  playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
   if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
   lastTime = performance.now();
   rafId = requestAnimationFrame(tick);
 }
 function pause() {
   state.playing = false;
-  playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>'; // Play icon
+  playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
   cancelAnimationFrame(rafId);
   state.clips.forEach(c => { if(c._el && c._el.pause) c._el.pause(); });
 }
 function tick() {
   if (!state.playing) return;
-  const now = performance.now();
-  state.currentTime += (now - lastTime) / 1000;
-  lastTime = now;
+  const now = performance.now(); state.currentTime += (now - lastTime) / 1000; lastTime = now;
   if (state.currentTime > getTotalDuration()) { state.currentTime = getTotalDuration(); pause(); }
-  updatePlayhead(); drawFrame();
-  rafId = requestAnimationFrame(tick);
+  updatePlayhead(); drawFrame(); rafId = requestAnimationFrame(tick);
 }
 playBtn.addEventListener('click', () => state.playing ? pause() : play());
 
@@ -560,6 +600,23 @@ document.getElementById('ruler').addEventListener('pointerdown', e => {
   state.currentTime = Math.max(0, (e.clientX - rect.left) / state.zoom);
   updatePlayhead(); drawFrame();
 });
+
+// ─── TOOLS ──────────────────────────────────────────────────────────────
+function splitClip() {
+  const c = getClip(state.selectedId);
+  if (!c) return;
+  const localT = state.currentTime - c.start;
+  if (localT <= 0 || localT >= c.duration) return;
+  const second = JSON.parse(JSON.stringify(c));
+  second.id = uid(); second.start = state.currentTime; second.duration = c.duration - localT;
+  c.duration = localT;
+  state.clips.push(second); selectClip(second.id); renderTimeline();
+}
+function deleteClip() {
+  if (!state.selectedId) return;
+  state.clips = state.clips.filter(x => x.id !== state.selectedId);
+  state.selectedId = null; renderTimeline(); renderProps(); drawFrame();
+}
 
 // ─── EXPORT ─────────────────────────────────────────────────────────────
 document.getElementById('btnExport').addEventListener('click', async () => {
@@ -593,7 +650,6 @@ document.getElementById('btnExport').addEventListener('click', async () => {
   finally { document.getElementById('exportModal').classList.remove('on'); }
 });
 
-// Init
 renderTimeline(); drawFrame();
 </script>
 </body>
