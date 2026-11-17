@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Text to Handwriting — convert text into handwritten pages</title>
+<meta name="description" content="Turn typed text into realistic handwriting on paper. Choose the title, one of 22 handwriting fonts, ruled, grid, legal pad or dotted paper, set margins and ink, then export as PNG or multi-page PDF. Nothing is uploaded.">
+<meta name="theme-color" content="#080a0f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%237c5cff'/%3E%3Cpath d='M4 16l4-5 3 3 4-6 5 8z' fill='white'/%3E%3Ccircle cx='8' cy='7' r='2' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Architects+Daughter&family=Caveat:wght@400;700&family=Coming+Soon&family=Covered+By+Your+Grace&family=Dancing+Script:wght@400;700&family=Gochi+Hand&family=Great+Vibes&family=Homemade+Apple&family=Indie+Flower&family=Inter:wght@400;500;600;700&family=Just+Another+Hand&family=Kalam:wght@400;700&family=La+Belle+Aurore&family=Patrick+Hand&family=Permanent+Marker&family=Reenie+Beanie&family=Rock+Salt&family=Sacramento&family=Satisfy&family=Shadows+Into+Light&family=Sriracha&family=Zeyada&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="../../index.html" title="Back to Toolbox">
+      <span class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor" stroke="none"/><path d="m5 17 4.5-5.5 3.5 3.5 3-4 3 6"/></svg>
+      </span>
+      <span class="brand-text">
+        <strong>Text to Handwriting</strong>
+        <span>Runs in your browser</span>
+      </span>
+    </a>
+
+    <div class="topbar-info">
+      <span class="status-chip"><i aria-hidden="true"></i><span id="summary">A4 · 1 page</span></span>
+    </div>
+
+    <div class="topbar-actions">
+      <button class="btn ghost" id="btnPng" data-export="png" title="Download the page you are viewing as a PNG">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor" stroke="none"/><path d="m5 17 4.5-5.5 3.5 3.5 3-4 3 6"/></svg>
+        <span class="btn-label long">Download PNG</span>
+        <span class="btn-label short">PNG</span>
+      </button>
+      <button class="btn primary" id="btnPdf" data-export="pdf" title="Download every page as a PDF">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6"/><path d="M9 18h4"/></svg>
+        <span class="btn-label long">Download PDF</span>
+        <span class="btn-label short">PDF</span>
+      </button>
+    </div>
+  </header>
+  <main class="workspace">
+    <aside class="sidebar" aria-label="Handwriting settings">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Your text</h2>
+          <span class="counter" id="textStats">0 words</span>
+        </div>
+        <label class="field title-field" for="titleInput">
+          <span class="field-top"><span>Title <em>centred &amp; underlined on the page</em></span></span>
+          <input id="titleInput" class="text-input" type="text" maxlength="90" spellcheck="false" placeholder="A handwritten note" aria-label="Page title">
+        </label>
+        <label class="field body-field" for="textInput">
+          <span class="field-top"><span>Body text</span></span>
+          <textarea id="textInput" maxlength="12000" spellcheck="false" placeholder="Type or paste your text here…" aria-label="Text to convert">Dear friend,
+
+This page was written with a little help from a browser and a lot of imagination. Type or paste anything into the panel and watch it appear on the page — in your choice of handwriting.
+
+Change the ink, pick a paper size, then download the finished page as a PNG or a PDF. Everything stays on your device.
+
+Warmly,
+Your handwriting tool</textarea>
+        </label>
+        <div class="text-foot">
+          <span>Line breaks are kept</span>
+          <span class="text-actions">
+            <button type="button" class="mini-btn" id="btnSample">Sample Text</button>
+            <button type="button" class="mini-btn muted" id="btnClear">Clear</button>
+          </span>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Handwriting</h2>
+
+        <label class="field">
+          <span class="field-top"><span>Font</span><b id="fontCount">22 styles</b></span>
+          <select id="fontSelect" class="select" aria-label="Handwriting font"></select>
+        </label>
+        <div class="font-preview" id="fontPreview" aria-hidden="true">The quick brown fox jumps over the lazy dog</div>
+
+        <label class="field">
+          <span class="field-top"><span>Font size</span><b id="fontSizeVal">24 px</b></span>
+          <input type="range" id="fontSize" min="12" max="48" step="1" value="24">
+        </label>
+
+        <label class="field">
+          <span class="field-top"><span>Line height</span><b id="lineHeightVal">1.80×</b></span>
+          <input type="range" id="lineHeight" min="1" max="2.8" step="0.05" value="1.8">
+        </label>
+
+        <label class="field">
+          <span class="field-top"><span>Handwriting wobble</span><b id="wobbleVal">60%</b></span>
+          <input type="range" id="wobble" min="0" max="100" step="1" value="60">
+        </label>
+
+        <div class="field">
+          <span class="field-top"><span>Ink colour</span><b id="inkName">Blue</b></span>
+          <div class="swatches" role="radiogroup" aria-label="Ink colour">
+            <label class="swatch"><input type="radio" name="ink" value="blue" checked><i class="dot" style="--c:#1f3f94" aria-hidden="true"></i>Blue</label>
+            <label class="swatch"><input type="radio" name="ink" value="black"><i class="dot" style="--c:#191b21" aria-hidden="true"></i>Black</label>
+            <label class="swatch"><input type="radio" name="ink" value="red"><i class="dot" style="--c:#9c1f26" aria-hidden="true"></i>Red</label>
+            <label class="swatch"><input type="radio" name="ink" value="green"><i class="dot" style="--c:#1d6b3a" aria-hidden="true"></i>Green</label>
+          </div>
+          <label class="custom-ink" id="customInkWrap" for="inkCustom">
+            <span class="custom-ink-label">Custom</span>
+            <input type="color" id="inkCustom" value="#7c5cff" aria-label="Pick a custom ink colour">
+            <b id="customInkVal">#7C5CFF</b>
+          </label>
+        </div>
+      </section>
+      <section class="panel">
+        <h2>Paper</h2>
+
+        <label class="field">
+          <span class="field-top"><span>Page size</span><b id="pageDim">210 × 297 mm</b></span>
+          <select id="pageSize" class="select" aria-label="Page size">
+            <option value="a4" selected>A4 — 210 × 297 mm</option>
+            <option value="letter">Letter — 8.5 × 11 in</option>
+            <option value="legal">Legal — 8.5 × 14 in</option>
+          </select>
+        </label>
+
+        <div class="field">
+          <span class="field-top"><span>Margins</span><b>millimetres</b></span>
+          <div class="margins">
+            <label class="margin-field"><span>Top</span><span class="num-wrap"><input id="marginTop" data-margin="top" type="number" min="0" max="60" step="1" value="18" inputmode="numeric"><i>mm</i></span></label>
+            <label class="margin-field"><span>Bottom</span><span class="num-wrap"><input id="marginBottom" data-margin="bottom" type="number" min="0" max="60" step="1" value="18" inputmode="numeric"><i>mm</i></span></label>
+            <label class="margin-field"><span>Left</span><span class="num-wrap"><input id="marginLeft" data-margin="left" type="number" min="0" max="60" step="1" value="20" inputmode="numeric"><i>mm</i></span></label>
+            <label class="margin-field"><span>Right</span><span class="num-wrap"><input id="marginRight" data-margin="right" type="number" min="0" max="60" step="1" value="20" inputmode="numeric"><i>mm</i></span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="field-top"><span>Paper style</span><b id="paperName">Ruled</b></span>
+          <div class="paper-grid" id="paperStyle" role="group" aria-label="Paper style">
+            <button type="button" class="paper-btn" data-paper="ruled" aria-pressed="true">
+              <span class="paper-thumb thumb-ruled" aria-hidden="true"></span>
+              <span class="paper-name">Ruled</span>
+            </button>
+            <button type="button" class="paper-btn" data-paper="grid" aria-pressed="false">
+              <span class="paper-thumb thumb-grid" aria-hidden="true"></span>
+              <span class="paper-name">Grid</span>
+            </button>
+            <button type="button" class="paper-btn" data-paper="legal" aria-pressed="false">
+              <span class="paper-thumb thumb-legal" aria-hidden="true"></span>
+              <span class="paper-name">Legal Pad</span>
+            </button>
+            <button type="button" class="paper-btn" data-paper="dotted" aria-pressed="false">
+              <span class="paper-thumb thumb-dotted" aria-hidden="true"></span>
+              <span class="paper-name">Dotted</span>
+            </button>
+            <button type="button" class="paper-btn" data-paper="plain" aria-pressed="false">
+              <span class="paper-thumb thumb-plain" aria-hidden="true"></span>
+              <span class="paper-name">Plain</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel export-panel">
+        <div class="panel-head">
+          <h2>Export</h2>
+          <span class="badge">PNG · PDF</span>
+        </div>
+        <div class="export-buttons">
+          <button class="btn soft block" id="btnPng2" data-export="png">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor" stroke="none"/><path d="m5 17 4.5-5.5 3.5 3.5 3-4 3 6"/></svg>
+            <span>Download PNG</span>
+          </button>
+          <button class="btn primary block" id="btnPdf2" data-export="pdf">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6"/><path d="M9 18h4"/></svg>
+            <span>Download PDF</span>
+          </button>
+        </div>
+        <p class="export-note" id="exportNote">PNG and PDF both save this page.</p>
+      </section>
+
+      <p class="privacy"><span aria-hidden="true">🔒</span> Nothing is uploaded. Every page is drawn and exported on your device.</p>
+    </aside>
+    <section class="stage" aria-label="Page preview">
+      <div class="stage-bar">
+        <div class="stage-title"><span class="live-dot" aria-hidden="true"></span>Live preview</div>
+        <div class="page-nav">
+          <button class="icon-btn" id="prevPage" aria-label="Previous page" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <span class="page-indicator"><b id="pageNow">1</b> / <span id="pageTotal">1</span></span>
+          <button class="icon-btn" id="nextPage" aria-label="Next page" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="canvas-area">
+        <canvas id="pageCanvas" width="1191" height="1684" aria-label="Handwriting page preview"></canvas>
+      </div>
+      <div class="stage-foot">
+        <span id="pageMeta">A4 · 210 × 297 mm · Caveat</span>
+        <span id="renderDpi">Rendered at 216 DPI</span>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
