@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rich Text / HTML to Markdown Converter</title>
+<meta name="description" content="Convert pasted HTML or rich text into clean Markdown with headings, links, lists, bold and italic preserved.">
+<meta name="theme-color" content="#2563eb">
+<link rel="canonical" href="https://letitedit.com/tools/writing-text/html-to-markdown/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Rich Text / HTML to Markdown Converter">
+<meta property="og:description" content="Convert pasted HTML or rich text into clean Markdown with headings, links, lists, bold and italic preserved.">
+<meta property="og:url" content="https://letitedit.com/tools/writing-text/html-to-markdown/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../../css/site.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","name":"Rich Text / HTML to Markdown","mainEntity":[{"@type":"Question","name":"Which elements are supported?","acceptedAnswer":{"@type":"Answer","text":"Headings, paragraphs, links, bold, italic, inline code, lists, blockquotes, line breaks and preformatted blocks."}},{"@type":"Question","name":"Do I need to upload a .docx file?","acceptedAnswer":{"@type":"Answer","text":"No. This version accepts pasted HTML or rich text. Complex Word files should be saved as HTML first."}}]}</script>
+</head>
+<body>
+<header class="topbar">
+  <nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+    <button class="menu-button" type="button" aria-controls="primary-links">Menu</button>
+    <div class="nav-links" id="primary-links">
+      <a href="/">Home</a>
+      <a href="/tools/writing-text/">Writing &amp; Text</a>
+      <a href="/tools/coding-developer/">Developer Tools</a>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+    </div>
+  </nav>
+</header>
+<div class="site-search-strip">
+  <div class="container">
+    <div class="search-wrap">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input class="search-input" id="site-search" type="search" placeholder="Search 34 free tools…" aria-label="Search tools" autocomplete="off">
+      <div class="search-results" id="search-results" role="listbox" hidden></div>
+    </div>
+  </div>
+</div>
+<nav class="container breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../index.html">Home</a><span>/</span>
+  <a href="../../../tools/writing-text/index.html">Writing &amp; Text Tools</a>
+  <span>/</span><span aria-current="page">Rich Text / HTML to Markdown</span>
+</nav>
+<section class="container page-head">
+  <span class="eyebrow">Writing &amp; Text Tools</span>
+  <h1>Rich Text / HTML to Markdown</h1>
+  <p>Paste markup from a webpage or rich-text editor. Common inline and block formatting is converted to standard Markdown.</p>
+</section>
+<section class="container workspace">
+  <div class="workspace-head">
+    <h2>Interactive tool</h2>
+    <span class="card-tag">Runs in your browser</span>
+  </div>
+  <div class="panel-grid">
+    <div><div class="field"><label for="tool-input">Input text</label><textarea id="tool-input" placeholder="Paste or type your text here…"></textarea></div>
+         <div id="controls"></div>
+         <div class="output-actions"><button class="btn btn-secondary btn-small" id="clear-input" type="button">Clear input</button></div></div>
+    <div>
+      <div class="workspace-head">
+        <h2>Output</h2>
+        <div class="output-actions">
+          <button class="btn btn-secondary btn-small" id="copy-output" type="button">Copy output</button>
+          <button class="btn btn-secondary btn-small" id="download-output" type="button">Download</button>
+          <button class="btn btn-secondary btn-small" id="restore-output" type="button" hidden>Restore original values</button>
+        </div>
+      </div>
+      <div class="output-box" id="tool-output"></div>
+      <div class="status" id="tool-status" role="status" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+<section class="section section-soft">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>How to use Rich Text / HTML to Markdown</h2>
+      <ol><li>Paste HTML into the input box.</li><li>Markdown is generated automatically.</li><li>Copy the Markdown output.</li></ol>
+    </div>
+    <div class="info-card">
+      <h2>Example</h2>
+      
+      <div class="example-row"><span class="example-label">Input</span><div class="example-box">&lt;h2&gt;Hello&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;World&lt;/strong&gt;&lt;/p&gt;</div></div>
+      <div class="example-row"><span class="example-label">Output</span><div class="example-box">## Hello
+
+**World**</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>Frequently asked questions</h2>
+      <div class="faq-item"><h3>Which elements are supported?</h3><p>Headings, paragraphs, links, bold, italic, inline code, lists, blockquotes, line breaks and preformatted blocks.</p></div><div class="faq-item"><h3>Do I need to upload a .docx file?</h3><p>No. This version accepts pasted HTML or rich text. Complex Word files should be saved as HTML first.</p></div>
+    </div>
+    <div class="info-card">
+      <h2>Related tools</h2>
+      <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
+        <a class="card" href="../../../tools/writing-text/bionic-reading/index.html"><h3>Bionic Reading Converter</h3><p>Convert text to bionic reading format by boldening the first letters of each word. Adjustable strength.</p></a><a class="card" href="../../../tools/writing-text/text-cleaner/index.html"><h3>Text Cleaner &amp; Formatter</h3><p>Clean messy text in one pass: normalize Unicode, remove zero-width characters, strip selected character classes and fix line endings.</p></a><a class="card" href="../../../tools/writing-text/text-to-slug/index.html"><h3>Text to Slug Converter</h3><p>Turn headlines into clean URL slugs. Unicode-aware, lowercase and hyphen-separated, with a length limit.</p></a><a class="card" href="../../../tools/writing-text/smart-quotes/index.html"><h3>Straight Quotes to Curly Quotes</h3><p>Convert straight quotes and apostrophes into proper typographic curly quotes for articles, books and polished copy.</p></a>
+      </div>
+    </div>
+  </div>
+</section>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h3>LetitEdit</h3>
+        <p>Free, focused online tools that run in your browser. No accounts, no uploads, no deceptive downloads.</p>
+      </div>
+      <div>
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/tools/writing-text/">Writing &amp; Text Tools</a></li>
+          <li><a href="/tools/coding-developer/">Coding &amp; Developer Tools</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/contact/">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Policies</h3>
+        <ul>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="/terms-of-service/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> LetitEdit.com</span>
+      <span>Built for privacy, accuracy and plain-English tooling.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../../js/search-index.js"></script>
+<script src="../../../js/site.js"></script>
+<script src="../../../js/text-core.js"></script>
+<script src="../../../js/tool-runtime.js"></script>
+<script id="tool-config" type="application/json">{"slug":"html-to-markdown","layout":"single","outputType":"text","controls":[],"example":{"input":"\u003ch2\u003eHello\u003c/h2\u003e\u003cp\u003e\u003cstrong\u003eWorld\u003c/strong\u003e\u003c/p\u003e","output":"## Hello\n\n**World**"}}</script>
+</body>
+</html>

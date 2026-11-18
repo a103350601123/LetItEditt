@@ -1,0 +1,17 @@
+{
+  "name": "letitedit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LetitEdit — free browser-side online tools.",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:all": "npm run build && npm test && npm run test:e2e"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "vitest": "^3.2.4"
+  }
+}

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JSON Formatter &amp; Validator — Free Online Beautifier</title>
+<meta name="description" content="Format, minify, validate and sort JSON in your browser. See clear parse errors, choose indentation and copy the result instantly.">
+<meta name="theme-color" content="#2563eb">
+<link rel="canonical" href="https://letitedit.com/tools/coding-developer/json-formatter/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="JSON Formatter &amp; Validator — Free Online Beautifier">
+<meta property="og:description" content="Format, minify, validate and sort JSON in your browser. See clear parse errors, choose indentation and copy the result instantly.">
+<meta property="og:url" content="https://letitedit.com/tools/coding-developer/json-formatter/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../../css/site.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","name":"JSON Formatter \u0026 Validator","mainEntity":[{"@type":"Question","name":"Is my JSON uploaded to a server?","acceptedAnswer":{"@type":"Answer","text":"No. The JSON is parsed and printed by JavaScript running in your browser. This page does not send your input to LetitEdit or to a third-party formatting service."}},{"@type":"Question","name":"Does formatting change the data?","acceptedAnswer":{"@type":"Answer","text":"Formatting and minifying only change whitespace outside string values, so numbers, booleans and text stay the same. Enabling key sorting does change the order of object properties, but not their values or array order."}},{"@type":"Question","name":"Why does the validator reject comments or trailing commas?","acceptedAnswer":{"@type":"Answer","text":"Standard JSON does not allow comments or a comma after the final item. The browser parser enforces the JSON specification. JSON5 and JSONC extensions are not accepted unless you remove those features first."}},{"@type":"Question","name":"Can it validate against my API schema?","acceptedAnswer":{"@type":"Answer","text":"No. This tool checks JSON syntax only. A document can be valid JSON while still having the wrong field names or types. Use a JSON Schema validator when you need to enforce an API contract."}},{"@type":"Question","name":"Does key sorting reorder arrays?","acceptedAnswer":{"@type":"Answer","text":"No. Arrays keep their original order because position can be meaningful. Sorting is applied recursively to object keys only."}}]}</script>
+</head>
+<body>
+<header class="topbar">
+  <nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+    <button class="menu-button" type="button" aria-controls="primary-links">Menu</button>
+    <div class="nav-links" id="primary-links">
+      <a href="/">Home</a>
+      <a href="/tools/writing-text/">Writing &amp; Text</a>
+      <a href="/tools/coding-developer/">Developer Tools</a>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+    </div>
+  </nav>
+</header>
+<div class="site-search-strip">
+  <div class="container">
+    <div class="search-wrap">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input class="search-input" id="site-search" type="search" placeholder="Search 34 free tools…" aria-label="Search tools" autocomplete="off">
+      <div class="search-results" id="search-results" role="listbox" hidden></div>
+    </div>
+  </div>
+</div>
+<nav class="container breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../index.html">Home</a><span>/</span>
+  <a href="../../../tools/coding-developer/index.html">Coding &amp; Developer Tools</a>
+  <span>/</span><span aria-current="page">JSON Formatter &amp; Validator</span>
+</nav>
+<section class="container page-head">
+  <span class="eyebrow">Coding &amp; Developer Tools</span>
+  <h1>JSON Formatter &amp; Validator</h1>
+  <p>Turn dense JSON into readable, consistently indented output, minify it for transport, or check it for syntax errors — all locally in your browser.</p>
+</section>
+<section class="container workspace">
+  <div class="workspace-head">
+    <h2>Interactive tool</h2>
+    <span class="card-tag">Runs in your browser</span>
+  </div>
+  <div class="panel-grid">
+    <div><div class="field"><label for="tool-input" id="tool-input-label">JSON input</label><textarea id="tool-input" placeholder="Paste JSON here, for example {&quot;name&quot;:&quot;Ada&quot;,&quot;active&quot;:true}…"></textarea></div><div id="controls"></div><div class="output-actions">
+          <button class="btn btn-secondary btn-small" id="clear-input" type="button">Clear input</button>
+          <button class="btn btn-secondary btn-small" id="load-example" type="button">Load example</button>
+          <button class="btn btn-secondary btn-small" id="swap-output" type="button" hidden>Use output as input</button>
+        </div></div>
+    <div>
+      <div class="workspace-head">
+        <h2>Output</h2>
+        <div class="output-actions">
+          <button class="btn btn-secondary btn-small" id="copy-output" type="button">Copy output</button>
+          <button class="btn btn-secondary btn-small" id="download-output" type="button">Download</button>
+        </div>
+      </div>
+      <pre class="output-box" id="tool-output"></pre>
+      <div class="status" id="tool-status" role="status" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+<section class="section section-soft">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>How to use JSON Formatter &amp; Validator</h2>
+      <ol><li>Paste or type a JSON document into the input box.</li><li>Choose Format to beautify it or Minify to remove optional whitespace.</li><li>Adjust indentation or enable alphabetical key sorting when needed.</li><li>Review the status line, then copy or download the result.</li></ol>
+    </div>
+    <div class="info-card">
+      <h2>Example</h2>
+      
+      <div class="example-row"><span class="example-label">Input</span><div class="example-box">{&quot;project&quot;:&quot;LetitEdit&quot;,&quot;tools&quot;:[&quot;JSON&quot;,&quot;Base64&quot;],&quot;active&quot;:true}</div></div>
+      <div class="example-row"><span class="example-label">Output</span><div class="example-box">{
+  &quot;project&quot;: &quot;LetitEdit&quot;,
+  &quot;tools&quot;: [
+    &quot;JSON&quot;,
+    &quot;Base64&quot;
+  ],
+  &quot;active&quot;: true
+}</div></div>
+    </div>
+  </div>
+</section>
+<section class="section section-soft">
+  <div class="container">
+    <article class="article-card">
+      <span class="eyebrow">In-depth guide</span>
+      <h2>Why formatting JSON makes debugging easier</h2>
+      <p>JSON is deliberately compact. A single API response, configuration export or log entry can arrive as one very long line, which is efficient for machines and miserable for people. A formatter parses that line and prints it again with consistent indentation, line breaks and spacing, so nested objects and arrays become visible at a glance. The data does not change; only its presentation does. That small change makes it much easier to spot a missing field, compare two responses, review a pull request or explain a payload to a colleague. Because the work happens in your browser, you can paste a response while debugging without sending it to a third-party formatting service.</p>
+      <h2>What validation checks and what it does not</h2>
+      <p>The formatter validates syntax with the browser&#39;s built-in JSON parser. That means it enforces the rules of the JSON specification: keys and strings must use double quotes, commas cannot trail the last item, comments are not allowed, and values must be strings, numbers, true, false, null, objects or arrays. When parsing fails, the page shows the parser&#39;s error message so you can find the problem instead of guessing. Validation is not a schema check. A document can be valid JSON while containing the wrong field names, missing required values or an unexpected type. Use a schema validator when you need to enforce a contract, and use this formatter to confirm that the document is syntactically sound.</p>
+      <h2>Pretty printing versus minifying</h2>
+      <p>Pretty printing adds whitespace so humans can read the structure. Minifying removes every optional space, tab and newline so the payload is as small as possible. Both modes produce the same data, and switching between them is a useful way to confirm that formatting has not changed the meaning. Minified JSON is common in API requests, configuration bundles and storage where bytes matter. Formatted JSON is better for documentation, reviews and troubleshooting. Whitespace inside string values is always preserved, so minifying will not alter a message, URL or description. If a value contains meaningful leading or trailing spaces, they remain part of the string after either operation.</p>
+      <h2>Choosing indentation and sorting keys</h2>
+      <p>You can indent with two spaces, four spaces or a tab. Two spaces are a good default because they keep deeply nested documents narrow enough to read on a laptop. Four spaces are easier to scan when the structure is shallow, while tabs let each editor display the depth it prefers. The optional key-sort control reorders object properties alphabetically and applies the same rule to nested objects. Array order is never changed because arrays often represent sequences where position matters. Sorting is handy for comparing two versions of a configuration file, but avoid it when a downstream system depends on property order. JSON technically treats objects as unordered, yet real code sometimes observes insertion order.</p>
+      <h2>A safe everyday workflow</h2>
+      <p>Paste the document into the input box and choose Format. If the output is empty and the status turns red, read the parser message and correct the syntax before continuing. Once the structure looks right, use Minify when you need a compact payload, or keep the formatted version for documentation. Copy or download the result only after reviewing it. Remove passwords, tokens, personal data and internal hostnames before sharing a payload, even when processing is local, because the output may still end up in a ticket or chat message. Very large documents can be slow in any browser, so split enormous exports where possible. For a quick conversion of escaped or encoded content, pair this tool with the Base64 encoder or the regex tester.</p>
+    </article>
+  </div>
+</section>
+<section class="section">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>Frequently asked questions</h2>
+      <div class="faq-item"><h3>Is my JSON uploaded to a server?</h3><p>No. The JSON is parsed and printed by JavaScript running in your browser. This page does not send your input to LetitEdit or to a third-party formatting service.</p></div><div class="faq-item"><h3>Does formatting change the data?</h3><p>Formatting and minifying only change whitespace outside string values, so numbers, booleans and text stay the same. Enabling key sorting does change the order of object properties, but not their values or array order.</p></div><div class="faq-item"><h3>Why does the validator reject comments or trailing commas?</h3><p>Standard JSON does not allow comments or a comma after the final item. The browser parser enforces the JSON specification. JSON5 and JSONC extensions are not accepted unless you remove those features first.</p></div><div class="faq-item"><h3>Can it validate against my API schema?</h3><p>No. This tool checks JSON syntax only. A document can be valid JSON while still having the wrong field names or types. Use a JSON Schema validator when you need to enforce an API contract.</p></div><div class="faq-item"><h3>Does key sorting reorder arrays?</h3><p>No. Arrays keep their original order because position can be meaningful. Sorting is applied recursively to object keys only.</p></div>
+    </div>
+    <div class="info-card">
+      <h2>Related tools</h2>
+      <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
+        <a class="card" href="../../../tools/coding-developer/base64-encoder-decoder/index.html"><h3>Base64 Encoder &amp; Decoder</h3><p>Encode text to Base64 or decode Base64 to UTF-8 text. Supports accents, emoji, URL-safe characters and optional padding, entirely in your browser.</p></a><a class="card" href="../../../tools/coding-developer/regex-tester/index.html"><h3>Regex Tester &amp; Match Highlighter</h3><p>Test JavaScript regular expressions against sample text. See highlighted matches, capture groups, flags and replacement output instantly in your browser.</p></a><a class="card" href="../../../tools/writing-text/html-to-markdown/index.html"><h3>Rich Text / HTML to Markdown</h3><p>Convert pasted HTML or rich text into clean Markdown with headings, links, lists, bold and italic preserved.</p></a><a class="card" href="../../../tools/writing-text/text-to-slug/index.html"><h3>Text to Slug Converter</h3><p>Turn headlines into clean URL slugs. Unicode-aware, lowercase and hyphen-separated, with a length limit.</p></a>
+      </div>
+    </div>
+  </div>
+</section>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h3>LetitEdit</h3>
+        <p>Free, focused online tools that run in your browser. No accounts, no uploads, no deceptive downloads.</p>
+      </div>
+      <div>
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/tools/writing-text/">Writing &amp; Text Tools</a></li>
+          <li><a href="/tools/coding-developer/">Coding &amp; Developer Tools</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/contact/">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Policies</h3>
+        <ul>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="/terms-of-service/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> LetitEdit.com</span>
+      <span>Built for privacy, accuracy and plain-English tooling.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../../js/search-index.js"></script>
+<script src="../../../js/site.js"></script>
+<script src="../../../js/dev-core.js"></script>
+<script src="../../../js/dev-runtime.js"></script>
+<script id="tool-config" type="application/json">{"slug":"json-formatter","outputType":"text","controls":[{"type":"select","key":"mode","label":"Output mode","options":[["format","Format (pretty print)"],["minify","Minify"]],"default":"format"},{"type":"select","key":"indent","label":"Indentation","options":[["2","2 spaces"],["4","4 spaces"],["tab","Tab"]],"default":"2"},{"type":"checkbox","key":"sortKeys","label":"Sort object keys alphabetically","default":false}],"example":{"input":"{\"project\":\"LetitEdit\",\"tools\":[\"JSON\",\"Base64\"],\"active\":true}","output":"{\n  \"project\": \"LetitEdit\",\n  \"tools\": [\n    \"JSON\",\n    \"Base64\"\n  ],\n  \"active\": true\n}"},"kind":"json","inputLabel":"JSON input","placeholder":"Paste JSON here, for example {\"name\":\"Ada\",\"active\":true}…"}</script>
+</body>
+</html>

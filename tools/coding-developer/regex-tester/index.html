@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Regex Tester — Test JavaScript Regular Expressions</title>
+<meta name="description" content="Test JavaScript regular expressions against sample text. See highlighted matches, capture groups, flags and replacement output instantly in your browser.">
+<meta name="theme-color" content="#2563eb">
+<link rel="canonical" href="https://letitedit.com/tools/coding-developer/regex-tester/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Regex Tester — Test JavaScript Regular Expressions">
+<meta property="og:description" content="Test JavaScript regular expressions against sample text. See highlighted matches, capture groups, flags and replacement output instantly in your browser.">
+<meta property="og:url" content="https://letitedit.com/tools/coding-developer/regex-tester/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../../css/site.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","name":"Regex Tester \u0026 Match Highlighter","mainEntity":[{"@type":"Question","name":"Which regular expression flavour does this tool use?","acceptedAnswer":{"@type":"Answer","text":"It uses the JavaScript engine in your browser, the same one used by new RegExp() and String.replace(). Patterns written for PCRE, Python or Java may need changes, especially around named groups, inline flags and some escape sequences."}},{"@type":"Question","name":"What does the global flag change?","acceptedAnswer":{"@type":"Answer","text":"Without the global flag the tester stops after the first match. With it enabled, every match is highlighted and listed, up to a safety limit of 1,000 results."}},{"@type":"Question","name":"Are capture groups shown?","acceptedAnswer":{"@type":"Answer","text":"Yes. Numbered and named groups appear in the match table. Optional groups that did not participate are shown as empty, and each match includes its starting index in the original test string."}},{"@type":"Question","name":"Does the replacement preview modify my text?","acceptedAnswer":{"@type":"Answer","text":"No. The replacement is calculated for preview only. Nothing is changed until you copy the output or apply the pattern in your own code."}},{"@type":"Question","name":"Can I use lookbehind or Unicode property escapes?","acceptedAnswer":{"@type":"Answer","text":"Lookbehind and property escapes such as \\p{Letter} are supported in current browsers but may be unavailable in older ones. Enable the Unicode flag for property escapes. The tester reports an error if the engine cannot compile the pattern."}}]}</script>
+</head>
+<body>
+<header class="topbar">
+  <nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+    <button class="menu-button" type="button" aria-controls="primary-links">Menu</button>
+    <div class="nav-links" id="primary-links">
+      <a href="/">Home</a>
+      <a href="/tools/writing-text/">Writing &amp; Text</a>
+      <a href="/tools/coding-developer/">Developer Tools</a>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+    </div>
+  </nav>
+</header>
+<div class="site-search-strip">
+  <div class="container">
+    <div class="search-wrap">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input class="search-input" id="site-search" type="search" placeholder="Search 34 free tools…" aria-label="Search tools" autocomplete="off">
+      <div class="search-results" id="search-results" role="listbox" hidden></div>
+    </div>
+  </div>
+</div>
+<nav class="container breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../index.html">Home</a><span>/</span>
+  <a href="../../../tools/coding-developer/index.html">Coding &amp; Developer Tools</a>
+  <span>/</span><span aria-current="page">Regex Tester &amp; Match Highlighter</span>
+</nav>
+<section class="container page-head">
+  <span class="eyebrow">Coding &amp; Developer Tools</span>
+  <h1>Regex Tester &amp; Match Highlighter</h1>
+  <p>Write a JavaScript regular expression, choose flags and see every match highlighted, with capture groups and an optional replacement preview.</p>
+</section>
+<section class="container workspace">
+  <div class="workspace-head">
+    <h2>Interactive tool</h2>
+    <span class="card-tag">Runs in your browser</span>
+  </div>
+  <div class="panel-grid">
+    <div><div id="controls"></div><div class="field"><label for="tool-input" id="tool-input-label">Test string</label><textarea id="tool-input" placeholder="Paste the text you want to test…"></textarea></div><div class="output-actions">
+          <button class="btn btn-secondary btn-small" id="clear-input" type="button">Clear input</button>
+          <button class="btn btn-secondary btn-small" id="load-example" type="button">Load example</button>
+          <button class="btn btn-secondary btn-small" id="swap-output" type="button" hidden>Use output as input</button>
+        </div></div>
+    <div>
+      <div class="workspace-head">
+        <h2>Output</h2>
+        <div class="output-actions">
+          <button class="btn btn-secondary btn-small" id="copy-output" type="button">Copy output</button>
+          <button class="btn btn-secondary btn-small" id="download-output" type="button">Download</button>
+        </div>
+      </div>
+      <div class="output-box" id="tool-output"></div>
+      <div class="status" id="tool-status" role="status" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+<section class="section section-soft">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>How to use Regex Tester &amp; Match Highlighter</h2>
+      <ol><li>Enter a regular expression and choose the flags you need.</li><li>Paste a representative test string into the input box.</li><li>Review the highlighted matches and the table of groups and indexes.</li><li>Add replacement text to preview the result, then copy what you need.</li></ol>
+    </div>
+    <div class="info-card">
+      <h2>Example</h2>
+      <div class="example-row"><span class="example-label">Pattern</span><div class="example-box">[\w.+-]+@[\w-]+\.[\w.]+</div></div>
+      <div class="example-row"><span class="example-label">Input</span><div class="example-box">Contact jane@example.com or sam@site.org</div></div>
+      <div class="example-row"><span class="example-label">Output</span><div class="example-box">jane@example.com
+sam@site.org</div></div>
+    </div>
+  </div>
+</section>
+<section class="section section-soft">
+  <div class="container">
+    <article class="article-card">
+      <span class="eyebrow">In-depth guide</span>
+      <h2>What a JavaScript regex tester does</h2>
+      <p>A regular expression is a compact pattern language for finding, validating and replacing text. This tester runs patterns with the JavaScript regular-expression engine in your browser, so the behaviour you see matches what new RegExp() and String.replace() do in web code. That distinction matters: JavaScript regex is not identical to PCRE, Python&#39;s re module or Java&#39;s Pattern class. Some constructs behave differently and some advanced features are unavailable. Testing here helps you confirm flags, escaping and capture groups before shipping a pattern to production. Paste a representative sample, adjust the pattern, and watch the highlighted matches and match table update. No text or pattern is sent to a server.</p>
+      <h2>How flags change the result</h2>
+      <p>Flags modify how the engine interprets a pattern. Global searches every match instead of stopping at the first one. Ignore case makes letters match regardless of case. Multiline changes the meaning of the start and end anchors so they apply to each line. Dot-all lets a period match line breaks. Unicode enables code-point-aware behaviour and is required for property escapes such as \p{Letter}. The tester shows the effective flags next to the match count, so you can see exactly what is active. If a pattern works in one language but not another, compare the flags first; a missing global flag or an unexpected multiline anchor is a common reason for different results.</p>
+      <h2>Capture groups, indexes and named groups</h2>
+      <p>Parentheses create capture groups. The match table lists each group&#39;s value alongside the overall match and its starting index, which makes it easier to debug extraction patterns. Named groups, written as (?&lt;name&gt;...), appear by name instead of by number and are usually easier to maintain. Numbering follows the order of opening parentheses, including nested groups. Non-capturing groups (?:...) group without adding an entry. If a group is optional and did not participate in the match, it is shown as empty rather than as the text undefined. Start indexes refer to the original test string, not to the highlighted preview. Zero-length matches are marked with a symbol because they select a position rather than a span of characters.</p>
+      <h2>Testing replacements before you apply them</h2>
+      <p>When you enter replacement text, the tester runs the same flags through JavaScript&#39;s replace operation and shows the result below the match list. Replacement syntax supports $1, $2 and so on for numbered groups, $&lt;name&gt; for named groups, $&amp; for the whole match and $$ for a literal dollar sign. The preview is useful for tasks such as reformatting dates, swapping name order or wrapping values in quotes. It also exposes mistakes quickly: a reference to a group that does not exist stays literal, and an unexpected global flag may replace more text than intended. Review the replacement preview and the match table before copying the output into source code or a data migration script.</p>
+      <h2>Writing patterns that stay readable and safe</h2>
+      <p>Start with the smallest pattern that matches your sample, then add one constraint at a time. Use anchors when the whole string must match, character classes for allowed characters, and explicit escaping for punctuation such as dots and question marks. Test empty input, punctuation, Unicode text and very long strings. Avoid nested quantifiers that can cause catastrophic backtracking on hostile input. In JavaScript, prefer simple string checks when a regex is not necessary, and cap the amount of text you process. Keep patterns in named constants with a comment explaining the intent. This tester highlights matches and caps results at one thousand, but it does not make an unsafe pattern safe in production.</p>
+    </article>
+  </div>
+</section>
+<section class="section">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>Frequently asked questions</h2>
+      <div class="faq-item"><h3>Which regular expression flavour does this tool use?</h3><p>It uses the JavaScript engine in your browser, the same one used by new RegExp() and String.replace(). Patterns written for PCRE, Python or Java may need changes, especially around named groups, inline flags and some escape sequences.</p></div><div class="faq-item"><h3>What does the global flag change?</h3><p>Without the global flag the tester stops after the first match. With it enabled, every match is highlighted and listed, up to a safety limit of 1,000 results.</p></div><div class="faq-item"><h3>Are capture groups shown?</h3><p>Yes. Numbered and named groups appear in the match table. Optional groups that did not participate are shown as empty, and each match includes its starting index in the original test string.</p></div><div class="faq-item"><h3>Does the replacement preview modify my text?</h3><p>No. The replacement is calculated for preview only. Nothing is changed until you copy the output or apply the pattern in your own code.</p></div><div class="faq-item"><h3>Can I use lookbehind or Unicode property escapes?</h3><p>Lookbehind and property escapes such as \p{Letter} are supported in current browsers but may be unavailable in older ones. Enable the Unicode flag for property escapes. The tester reports an error if the engine cannot compile the pattern.</p></div>
+    </div>
+    <div class="info-card">
+      <h2>Related tools</h2>
+      <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
+        <a class="card" href="../../../tools/coding-developer/json-formatter/index.html"><h3>JSON Formatter &amp; Validator</h3><p>Format, minify, validate and sort JSON in your browser. See clear parse errors, choose indentation and copy the result instantly.</p></a><a class="card" href="../../../tools/coding-developer/base64-encoder-decoder/index.html"><h3>Base64 Encoder &amp; Decoder</h3><p>Encode text to Base64 or decode Base64 to UTF-8 text. Supports accents, emoji, URL-safe characters and optional padding, entirely in your browser.</p></a><a class="card" href="../../../tools/writing-text/find-and-replace/index.html"><h3>Find and Replace</h3><p>Find and replace text with literal or regular expression matching, case sensitivity and whole-word control.</p></a><a class="card" href="../../../tools/writing-text/text-filter/index.html"><h3>Text Filter</h3><p>Filter text lines by keyword or regular expression. Keep matches, remove matches or highlight them.</p></a>
+      </div>
+    </div>
+  </div>
+</section>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h3>LetitEdit</h3>
+        <p>Free, focused online tools that run in your browser. No accounts, no uploads, no deceptive downloads.</p>
+      </div>
+      <div>
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/tools/writing-text/">Writing &amp; Text Tools</a></li>
+          <li><a href="/tools/coding-developer/">Coding &amp; Developer Tools</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/contact/">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Policies</h3>
+        <ul>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="/terms-of-service/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> LetitEdit.com</span>
+      <span>Built for privacy, accuracy and plain-English tooling.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../../js/search-index.js"></script>
+<script src="../../../js/site.js"></script>
+<script src="../../../js/dev-core.js"></script>
+<script src="../../../js/dev-runtime.js"></script>
+<script id="tool-config" type="application/json">{"slug":"regex-tester","outputType":"text","controls":[{"type":"text","key":"pattern","label":"Regular expression","placeholder":"For example: \\b\\w+@\\w+\\.\\w+\\b","default":""},{"type":"text","key":"replacement","label":"Replacement text (optional)","placeholder":"Use $1, $\u0026 or $\u003cname\u003e in the replacement","default":""},{"type":"checkbox","key":"global","label":"Global — find every match","default":true},{"type":"checkbox","key":"ignoreCase","label":"Ignore case (i)","default":false},{"type":"checkbox","key":"multiline","label":"Multiline anchors (m)","default":false},{"type":"checkbox","key":"dotAll","label":"Dot matches newlines (s)","default":false},{"type":"checkbox","key":"unicode","label":"Unicode mode (u)","default":false}],"example":{"input":"Contact jane@example.com or sam@site.org","pattern":"[\\w.+-]+@[\\w-]+\\.[\\w.]+","replacement":"","output":"jane@example.com\nsam@site.org"},"kind":"regex","inputLabel":"Test string","placeholder":"Paste the text you want to test…"}</script>
+</body>
+</html>
