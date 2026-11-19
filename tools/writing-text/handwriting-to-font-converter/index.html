@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Handwriting to Font Converter — Draw and Preview Glyphs</title>
+<meta name="description" content="Draw handwriting glyphs on a canvas, preview them in a sentence and export a picture of the result. This scoped browser tool does not generate an installable OpenType font.">
+<meta name="theme-color" content="#2563eb">
+<link rel="canonical" href="https://letitedit.com/tools/writing-text/handwriting-to-font-converter/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Handwriting to Font Converter — Draw and Preview Glyphs">
+<meta property="og:description" content="Draw handwriting glyphs on a canvas, preview them in a sentence and export a picture of the result. This scoped browser tool does not generate an installable OpenType font.">
+<meta property="og:url" content="https://letitedit.com/tools/writing-text/handwriting-to-font-converter/">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../../css/site.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","name":"Handwriting to Font Converter","mainEntity":[{"@type":"Question","name":"Can I download a .otf font?","acceptedAnswer":{"@type":"Answer","text":"No. Producing an installable OpenType font needs a contour tracer and CFF/OTF writer and is outside this build. This tool exports a PNG picture of your glyphs instead."}},{"@type":"Question","name":"Is this the same as Text to Handwriting?","acceptedAnswer":{"@type":"Answer","text":"No. Text to Handwriting places typed text on notebook paper and exports PNG or PDF pages. This tool focuses on drawing individual letter shapes and previewing them as a sample."}},{"@type":"Question","name":"Is my handwriting uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. Drawing, preview and export all happen in your browser."}}]}
+</script>
+</head>
+<body>
+<header class="topbar">
+  <nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+    <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
+    <div class="nav-links" id="primary-links">
+      <a href="/categories/">Categories</a>
+      <a href="/new-tools/">New Tools</a>
+      <a href="/news/">News</a>
+      <a href="/blog/">Blog</a>
+      <a href="/tools/">All Tools</a>
+      <a href="/faq/">FAQ</a>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+    </div>
+  </nav>
+</header>
+<div class="site-search-strip" id="search-strip">
+  <div class="container">
+    <div class="search-wrap">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input class="search-input" id="site-search" type="search" placeholder="Search 51 free tools…" aria-label="Search all tools" autocomplete="off">
+      <div class="search-results" id="search-results" role="listbox" hidden></div>
+    </div>
+  </div>
+</div>
+<nav class="container breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../">Home</a><span>/</span>
+  <a href="../../../tools/writing-text/">Writing &amp; Text Tools</a><span>/</span>
+  <span aria-current="page">Handwriting to Font Converter</span>
+</nav>
+<section class="container page-head">
+  <span class="eyebrow">Writing &amp; Text Tools</span>
+  <h1>Handwriting to Font Converter</h1>
+  <p>Choose a character group, draw each glyph on the pad and build a preview from the shapes you have drawn. The download is a PNG picture, not a font file.</p>
+</section>
+<section class="container workspace engine-workspace" data-engine="handwriting-to-font">
+<div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>
+<div class="engine-grid engine-handwriting">
+  <div class="engine-controls">
+    <div class="opt-group"><span class="opt-title">Character group</span><label class="opt"><input type="radio" name="hf-group" value="upper" checked> <span>ABC</span></label><label class="opt"><input type="radio" name="hf-group" value="lower"> <span>abc</span></label><label class="opt"><input type="radio" name="hf-group" value="num"> <span>123</span></label><label class="opt"><input type="radio" name="hf-group" value="sym"> <span>?!&</span></label></div>
+    <div class="opt-group"><span class="opt-title">Character</span><div class="chip-row" id="hf-chars"></div></div>
+    <div class="workspace-head"><h3>Drawing pad</h3><div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="hf-pen">Pen</button><button type="button" class="btn btn-secondary btn-small" id="hf-eraser">Eraser</button><button type="button" class="btn btn-secondary btn-small" id="hf-undo">Undo</button><button type="button" class="btn btn-secondary btn-small" id="hf-clear">Clear</button></div></div>
+    <canvas id="hf-pad" width="520" height="360" aria-label="Drawing area" class="draw-pad"></canvas>
+    <div class="opt-group"><span class="opt-title">Pen size <small id="hf-pen-size-label">14px</small></span><input type="range" id="hf-pen-size" min="14" max="160" step="1" value="14"></div>
+    <p class="hint">Tip: use ← and → to move between characters. Draw one glyph per character; keep it inside the guide box and sit letters on the baseline.</p>
+  </div>
+  <div class="engine-output">
+    <div class="workspace-head"><h2>Preview</h2></div>
+    <div class="field"><label>Text to preview</label><textarea id="hf-text" rows="3" placeholder="Type something to see your glyphs…">Hello</textarea></div>
+    <div class="chip-row"><button type="button" class="chip" data-hf-phrase="The quick brown fox jumps over the lazy dog.">Pangram</button><button type="button" class="chip" data-hf-phrase="ABCDEFGHIJKLM NOPQRSTUVWXYZ 0123456789">Alphabet</button></div>
+    <div class="two-cols"><div class="field"><label>Preview size</label><input type="range" id="hf-size" min="18" max="110" step="1" value="44"></div><div class="field"><label>Letter gap</label><input type="range" id="hf-gap" min="0" max="60" step="1" value="10"></div></div>
+    <div class="output-actions"><button type="button" class="btn" id="hf-build">Build preview</button><button type="button" class="btn btn-secondary btn-small" id="hf-download">Download PNG</button></div>
+    <canvas id="hf-preview" width="760" height="240" class="preview-pad"></canvas>
+    <div class="status" id="hf-status" role="status" aria-live="polite"></div>
+    <p class="hint warning">Scope: this build lets you draw glyphs and export a <strong>picture preview</strong>. It does not generate an installable OpenType (.otf) font. For handwritten pages and PDF/PNG export, use the separate <a href="/tools/text-to-handwriting/index.html">Text to Handwriting</a> tool.</p>
+  </div>
+</div>
+</section>
+
+<section class="section section-soft">
+  <div class="container"><article class="article-card">
+      <span class="eyebrow">In-depth guide</span>
+      <h2>What this scoped tool does</h2>
+      <p>The pad stores one drawing per character. The preview takes each drawn glyph, scales it to the chosen size and tiles the glyphs into a sample image. Undo and clear apply to the selected character only.</p>
+      <p>A PNG download is genuinely useful for mock-ups and for checking how a set of letters looks together, but it is not a font that an operating system can install.</p>
+      <h2>What the reference tool does</h2>
+      <p>The supplied reference application includes a canvas editor, printable corner-marker templates, photo import with perspective correction, ink thresholding, contour tracing, per-character spacing controls and an embedded OpenType writer. Reproducing that stack faithfully would require a large, separately audited font pipeline.</p>
+      <p>This page keeps its own URL and states the difference plainly rather than implying that a font file is produced. For handwritten pages, use the preserved Text to Handwriting tool linked from the workspace.</p>
+  </article></div>
+</section>
+<section class="section">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>Frequently asked questions</h2>
+      <details class="faq-item">
+  <summary>Can I download a .otf font?</summary>
+  <p>No. Producing an installable OpenType font needs a contour tracer and CFF/OTF writer and is outside this build. This tool exports a PNG picture of your glyphs instead.</p>
+</details><details class="faq-item">
+  <summary>Is this the same as Text to Handwriting?</summary>
+  <p>No. Text to Handwriting places typed text on notebook paper and exports PNG or PDF pages. This tool focuses on drawing individual letter shapes and previewing them as a sample.</p>
+</details><details class="faq-item">
+  <summary>Is my handwriting uploaded?</summary>
+  <p>No. Drawing, preview and export all happen in your browser.</p>
+</details>
+    </div>
+    <div class="info-card">
+      <h2>Related tools</h2>
+      <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
+        <a class="card" href="../../../tools/text-to-handwriting/index.html"><h3>Text to Handwriting</h3><p>Turn typed text into realistic handwriting on notebook paper and export as PNG or multi-page PDF. Already built and preserved.</p></a><a class="card" href="../../../tools/writing-text/bionic-reading/"><h3>Bionic Reading Converter</h3><p>Bold the first part of each word with adjustable fixation strength and saccade skipping. Preview the result, copy formatted text, HTML or Markdown, download an HTML file and open a distraction-free reading view.</p></a><a class="card" href="../../../tools/writing-text/text-cleaner/"><h3>Text Cleaner</h3><p>Clean messy text in one ordered pass: trim whitespace, strip HTML tags and emoji, remove accents, unify quotes, fix punctuation and expand shorthand. Everything runs in your browser.</p></a><a class="card" href="../../../tools/writing-text/word-counter/"><h3>Word Counter &amp; Text Statistics</h3><p>Count words, grapheme-based characters, sentences and paragraphs. See reading and speaking time, keyword density for one-to-three-word phrases and an optional progress goal.</p></a>
+      </div>
+    </div>
+  </div>
+</section>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h3>LetitEdit</h3>
+        <p>Free, focused online tools that run in your browser. No accounts, no uploads, no deceptive downloads.</p>
+      </div>
+      <div>
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="/categories/">Categories</a></li>
+          <li><a href="/new-tools/">New Tools</a></li>
+          <li><a href="/tools/">All Tools</a></li>
+          <li><a href="/news/">News</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Policies</h3>
+        <ul>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="/terms-of-service/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> LetitEdit.com</span>
+      <span>Built for privacy, accuracy and plain-English tooling.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../../js/search-index.js"></script>
+<script src="../../../js/sidebar-data.js"></script>
+<script src="../../../js/site.js"></script>
+<script src="../../../js/category-sidebar.js"></script>
+<script src="../../../js/reference-core.js"></script>
+<script src="../../../js/reference-runtime.js"></script>
+<script id="tool-config" type="application/json">{"slug":"handwriting-to-font-converter","engine":"handwriting-to-font","layout":"single","outputType":"image"}</script>
+</body>
+</html>

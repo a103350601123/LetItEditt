@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Photo Merger — Combine Images Horizontally or Vertically</title>
+<meta name="description" content="Join up to six images into one picture, side by side or stacked, with adjustable spacing and a single PNG download. The merge happens locally in your browser.">
+<meta name="theme-color" content="#2563eb">
+<link rel="canonical" href="https://letitedit.com/photo-merger/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Photo Merger — Combine Images Horizontally or Vertically">
+<meta property="og:description" content="Join up to six images into one picture, side by side or stacked, with adjustable spacing and a single PNG download. The merge happens locally in your browser.">
+<meta property="og:url" content="https://letitedit.com/photo-merger/">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/css/site.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","name":"Photo Merger","mainEntity":[{"@type":"Question","name":"Are the uploaded photos stored or sent anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. Images are read and drawn in your browser. They are not uploaded to LetitEdit or a third party, and closing the page discards the working copies."}},{"@type":"Question","name":"How many images can I combine?","acceptedAnswer":{"@type":"Answer","text":"Up to six. The limit keeps the preview responsive and the resulting canvas manageable. For longer sequences, merge smaller groups and combine those results in a second pass."}},{"@type":"Question","name":"What if my photos have different sizes?","acceptedAnswer":{"@type":"Answer","text":"The merger places images on a shared canvas without resizing them, so mismatched heights in a row or widths in a stack will be visible. Resize the files first if you need a uniform grid."}},{"@type":"Question","name":"What does the spacing control do?","acceptedAnswer":{"@type":"Answer","text":"It sets the gap between neighbouring images on the final canvas. The background of that gap is transparent in the PNG, so placing the result on a coloured page will show the page colour between photos."}},{"@type":"Question","name":"The download looks blank or incomplete. What went wrong?","acceptedAnswer":{"@type":"Answer","text":"Very large inputs can exceed what the browser can draw comfortably. Try fewer images, smaller source files or a smaller spacing value, wait for the preview to finish, then download again."}}]}
+</script>
+</head>
+<body>
+<header class="topbar">
+  <nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+    <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
+    <div class="nav-links" id="primary-links">
+      <a href="/categories/">Categories</a>
+      <a href="/new-tools/">New Tools</a>
+      <a href="/news/">News</a>
+      <a href="/blog/">Blog</a>
+      <a href="/tools/">All Tools</a>
+      <a href="/faq/">FAQ</a>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+    </div>
+  </nav>
+</header>
+<div class="site-search-strip" id="search-strip">
+  <div class="container">
+    <div class="search-wrap">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input class="search-input" id="site-search" type="search" placeholder="Search 51 free tools…" aria-label="Search all tools" autocomplete="off">
+      <div class="search-results" id="search-results" role="listbox" hidden></div>
+    </div>
+  </div>
+</div>
+<nav class="container breadcrumbs" aria-label="Breadcrumb">
+  <a href="/">Home</a><span>/</span>
+  <a href="/tools/image-photo/">Image &amp; Photo Tools</a><span>/</span>
+  <span aria-current="page">Photo Merger</span>
+</nav>
+<section class="container page-head">
+  <span class="eyebrow">Image &amp; Photo Tools</span>
+  <h1>Photo Merger</h1>
+  <p>Combine several photos into a single image without a layout program. Choose a horizontal row or a vertical stack, add up to six files, set the gap between them and download one PNG. Everything runs in your browser.</p>
+</section>
+<section class="container workspace image-workspace" data-image-engine="photo-merger">
+<div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>
+<div class="image-grid"><div class="image-controls"><div class="opt-group"><span class="opt-title">Source image</span><label class="image-drop" for="image-file"><span class="image-drop-icon" aria-hidden="true">📁</span><strong>Choose an image or drop it here</strong><span>You can select several files at once.</span></label><input type="file" id="image-file" accept="image/png,image/jpeg,image/webp" multiple><div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="image-change">Change image</button><button type="button" class="btn btn-secondary btn-small" id="image-reset">Reset</button></div><p class="hint">Up to six files are accepted. Order matters: the first image appears first.</p></div><div class="opt-group"><span class="opt-title">Layout</span><div class="opt-row"><label class="opt"><input type="radio" name="pm-direction" value="horizontal" checked> <span>Horizontal row</span></label><label class="opt"><input type="radio" name="pm-direction" value="vertical"> <span>Vertical stack</span></label></div></div><div class="opt-group"><span class="opt-title">Spacing and background</span><div class="field range-field"><label for="pm-spacing">Gap between images <output id="pm-spacing-value">12px</output></label><input type="range" id="pm-spacing" min="0" max="100" step="1" value="12"></div><div class="field color-field"><label for="pm-bg">Canvas colour</label><input type="color" id="pm-bg" value="#ffffff"></div></div><div class="opt-group"><span class="opt-title">Image order</span><div class="pm-order" id="pm-order"><p class="hint">Add images to see their order here.</p></div></div><div class="opt-group"><span class="opt-title">Merge</span><div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="pm-merge">Merge images</button></div></div></div><div class="image-output"><div class="workspace-head"><h2>Preview</h2><span class="pill" id="image-meta">No image loaded</span></div><div class="image-preview-frame"><canvas id="image-preview" width="800" height="480" aria-label="Image preview"></canvas></div><div class="status" id="image-status" role="status" aria-live="polite"></div><div class="output-actions"><button type="button" class="btn" id="image-download" disabled>Download image</button></div><div class="image-output-note">Merged canvas</div></div></div>
+</section>
+<section class="section section-soft">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>How to use Photo Merger</h2>
+      <ol><li>Upload up to six images you want to combine.</li><li>Choose Horizontal or Vertical for the layout.</li><li>Set the spacing between neighbouring images.</li><li>Reorder files if needed so the result reads in the right sequence.</li><li>Preview the combined canvas, then download the PNG.</li></ol>
+    </div>
+    <div class="info-card">
+      <h2>Example</h2>
+      
+      <div class="example-row"><span class="example-label">Input</span><div class="example-box">Three 600×400 JPEGs of the same subject</div></div>
+      <div class="example-row"><span class="example-label">Output</span><div class="example-box">One 1840×400 PNG triptych with 20-pixel gaps</div></div>
+    </div>
+  </div>
+</section>
+<section class="section section-soft">
+  <div class="container"><article class="article-card">
+      <span class="eyebrow">In-depth guide</span>
+      <h2>When a single canvas is easier</h2>
+      <p>Sometimes the clearest way to show several photos is to place them together on one canvas. A before-and-after pair, a three-step tutorial or a set of product angles all read better as a single image than as separate attachments. This tool does that one job: it takes up to six pictures and arranges them in a horizontal row or a vertical stack, with a gap you control. You do not need to learn layers or alignment guides. The preview shows the finished arrangement before you download anything, and the export is a PNG containing all the images on one transparent-backed canvas. Because the work happens in your browser, the photos never travel to a remote service. You can experiment with layouts freely, because nothing is saved until you download.</p>
+      <h2>Building a merged image</h2>
+      <p>Start by uploading the images in the order you want them to appear. Most browsers let you select several files at once, but you can also check the order in the preview and rearrange if the tool offers that control. Next choose the layout. Horizontal places images left to right and is natural for comparisons and panoramas; vertical stacks them top to bottom and suits instructions or long screenshots. Then set the spacing. A small gap keeps the group tight, while a larger one gives each photo room to breathe. Watch the preview as you adjust — the canvas grows to fit the arrangement. When the sequence looks right, download the PNG. If something is wrong, change the layout or order and export again rather than trying to patch the file elsewhere.</p>
+      <h2>Spacing, sizes and alignment</h2>
+      <p>The spacing value controls the gap between neighbouring images, not the margin around the outside of the canvas. That gap is transparent in the downloaded PNG, so its appearance depends on the background where you place the result. On a white page it will look white; on a dark page it will look dark. The merger does not rescale your files. If you combine a tall portrait with a wide landscape in a row, their heights will differ and the shorter one will sit against empty space. That is fine for some layouts and distracting for others. When you need an even grid, resize the source images to matching dimensions first, then merge them. A little preparation produces a much tidier result than trying to correct alignment after the fact.</p>
+      <h2>Formats and practical uses</h2>
+      <p>PNG is the export format because it preserves the combined pixels exactly and supports transparency in the gaps. That makes the result easy to drop into a document, a slide or a webpage without a white box appearing around it. The input files can be common web formats such as JPG, PNG and WebP, provided your browser can decode them. Typical uses include side-by-side comparisons, multi-angle product shots, comic-style sequences and concatenated screenshots. For a very long vertical stack, consider whether the result will be viewed on a small screen; an extremely tall image can be awkward to scroll. Splitting it into shorter sections is often more readable than producing one giant file. Keep the source files together in a named folder so you can rebuild the arrangement later.</p>
+      <h2>Privacy, limits and troubleshooting</h2>
+      <p>Merging runs locally in your browser, so your images are not uploaded and no account is needed. The practical limit is six files, which keeps rendering predictable. Large, high-resolution photos can still make the canvas heavy, so if the preview is slow or the download looks incomplete, reduce the number of images or resize them before merging. Check that every file actually decoded — a corrupt source can leave a blank area in the arrangement. If the gap looks wrong, remember it is transparent and check the page behind it. When the sequence appears in the wrong order, adjust the upload order and export again. Reloading the page clears the current set and gives you a clean start. If a particular file consistently fails to appear, replace that copy with a fresh export from its source.</p>
+  </article></div>
+</section>
+<section class="section">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>Frequently asked questions</h2>
+      <details class="faq-item">
+  <summary>Are the uploaded photos stored or sent anywhere?</summary>
+  <p>No. Images are read and drawn in your browser. They are not uploaded to LetitEdit or a third party, and closing the page discards the working copies.</p>
+</details><details class="faq-item">
+  <summary>How many images can I combine?</summary>
+  <p>Up to six. The limit keeps the preview responsive and the resulting canvas manageable. For longer sequences, merge smaller groups and combine those results in a second pass.</p>
+</details><details class="faq-item">
+  <summary>What if my photos have different sizes?</summary>
+  <p>The merger places images on a shared canvas without resizing them, so mismatched heights in a row or widths in a stack will be visible. Resize the files first if you need a uniform grid.</p>
+</details><details class="faq-item">
+  <summary>What does the spacing control do?</summary>
+  <p>It sets the gap between neighbouring images on the final canvas. The background of that gap is transparent in the PNG, so placing the result on a coloured page will show the page colour between photos.</p>
+</details><details class="faq-item">
+  <summary>The download looks blank or incomplete. What went wrong?</summary>
+  <p>Very large inputs can exceed what the browser can draw comfortably. Try fewer images, smaller source files or a smaller spacing value, wait for the preview to finish, then download again.</p>
+</details>
+    </div>
+    <div class="info-card">
+      <h2>Related tools</h2>
+      <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
+        <a class="card" href="/image-editor/index.html"><h3>Image Editor</h3><p>Crop, rotate and flip photos, adjust brightness, contrast and colour, add a text overlay, then export PNG, JPG or WebP — all locally in your browser.</p></a><a class="card" href="/add-border-to-image/index.html"><h3>Add Border to Image</h3><p>Wrap a photo in a solid colour border of any width and colour. Preview the frame live, keep the original image intact and download the bordered result as a PNG.</p></a><a class="card" href="/image-resizer/index.html"><h3>Image Resizer</h3><p>Resize photos to exact pixel dimensions. Lock aspect ratio, use fit or stretch modes within a documented pixel cap, and export PNG, JPG or WebP.</p></a><a class="card" href="/image-compressor/index.html"><h3>Image Compressor</h3><p>Re-encode images through a canvas with selectable JPEG or WebP quality and an optional maximum dimension, comparing original and resulting byte sizes before download.</p></a>
+      </div>
+    </div>
+  </div>
+</section>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h3>LetitEdit</h3>
+        <p>Free, focused online tools that run in your browser. No accounts, no uploads, no deceptive downloads.</p>
+      </div>
+      <div>
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="/categories/">Categories</a></li>
+          <li><a href="/new-tools/">New Tools</a></li>
+          <li><a href="/tools/">All Tools</a></li>
+          <li><a href="/news/">News</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Policies</h3>
+        <ul>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="/terms-of-service/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> LetitEdit.com</span>
+      <span>Built for privacy, accuracy and plain-English tooling.</span>
+    </div>
+  </div>
+</footer>
+<script src="/js/search-index.js"></script>
+<script src="/js/sidebar-data.js"></script>
+<script src="/js/site.js"></script>
+<script src="/js/category-sidebar.js"></script>
+<script src="/js/image-core.js"></script>
+<script src="/js/image-runtime.js"></script>
+<script id="tool-config" type="application/json">{"slug":"photo-merger","engine":"photo-merger","layout":"engine","outputType":"image","example":{"input":"Three 600×400 JPEGs of the same subject","output":"One 1840×400 PNG triptych with 20-pixel gaps"}}</script>
+</body>
+</html>
