@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HEIC Viewer &amp; Converter — Open and Convert HEIF Images</title>
+<meta name="description" content="Open .heic and .heif photos in your browser, preview one or many files and download PNG or JPG copies. Decoding uses a local library; no files are uploaded.">
+<meta name="theme-color" content="#2563eb">
+<link rel="canonical" href="https://letitedit.com/heic-viewer/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="HEIC Viewer &amp; Converter — Open and Convert HEIF Images">
+<meta property="og:description" content="Open .heic and .heif photos in your browser, preview one or many files and download PNG or JPG copies. Decoding uses a local library; no files are uploaded.">
+<meta property="og:url" content="https://letitedit.com/heic-viewer/">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/css/site.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","name":"HEIC Viewer \u0026 Converter","mainEntity":[{"@type":"Question","name":"Are my HEIC photos uploaded to a server?","acceptedAnswer":{"@type":"Answer","text":"No. The viewer loads a libheif decoder library locally and decodes files in your browser. Your photos are not sent to LetitEdit or to any conversion service."}},{"@type":"Question","name":"Why won't my file open?","acceptedAnswer":{"@type":"Answer","text":"HEIC files can use different codecs and some variants are not supported by the current browser decoder. If decoding fails, the tool reports the failure rather than showing a blank or fake preview. Try exporting the photo as JPEG from the source device."}},{"@type":"Question","name":"Can I convert many files at once?","acceptedAnswer":{"@type":"Answer","text":"Yes. Batch mode accepts multiple .heic and .heif files, shows a thumbnail for each decoded image and lets you download PNG or JPG copies. Files the decoder cannot read are listed as failures instead of being silently skipped."}},{"@type":"Question","name":"Which output format should I choose?","acceptedAnswer":{"@type":"Answer","text":"PNG is lossless and keeps the decoded pixels exactly, which suits screenshots and graphics. JPG is smaller and is usually better for photographs. Neither adds information that was not in the original HEIC file."}},{"@type":"Question","name":"Why does conversion take a while?","acceptedAnswer":{"@type":"Answer","text":"HEIC uses efficient compression, so decoding is more work than opening a JPEG. A batch of high-resolution photos can take noticeable time even on a fast machine. Keep the tab active and wait for the status message before downloading."}}]}
+</script>
+</head>
+<body>
+<header class="topbar">
+  <nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+    <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
+    <div class="nav-links" id="primary-links">
+      <a href="/categories/">Categories</a>
+      <a href="/new-tools/">New Tools</a>
+      <a href="/news/">News</a>
+      <a href="/blog/">Blog</a>
+      <a href="/tools/">All Tools</a>
+      <a href="/faq/">FAQ</a>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+    </div>
+  </nav>
+</header>
+<div class="site-search-strip" id="search-strip">
+  <div class="container">
+    <div class="search-wrap">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input class="search-input" id="site-search" type="search" placeholder="Search 51 free tools…" aria-label="Search all tools" autocomplete="off">
+      <div class="search-results" id="search-results" role="listbox" hidden></div>
+    </div>
+  </div>
+</div>
+<nav class="container breadcrumbs" aria-label="Breadcrumb">
+  <a href="/">Home</a><span>/</span>
+  <a href="/tools/image-photo/">Image &amp; Photo Tools</a><span>/</span>
+  <span aria-current="page">HEIC Viewer &amp; Converter</span>
+</nav>
+<section class="container page-head">
+  <span class="eyebrow">Image &amp; Photo Tools</span>
+  <h1>HEIC Viewer &amp; Converter</h1>
+  <p>View Apple-style HEIC and HEIF photos without installing a desktop converter. Load a single image or a whole batch, inspect real previews and download PNG or JPG copies. Files are decoded in your browser with a locally loaded libheif library.</p>
+</section>
+<section class="container workspace image-workspace" data-image-engine="heic-viewer">
+<div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>
+<div class="image-grid"><div class="image-controls"><div class="opt-group"><span class="opt-title">Source image</span><label class="image-drop" for="image-file"><span class="image-drop-icon" aria-hidden="true">📁</span><strong>Choose an image or drop it here</strong><span>You can select several files at once.</span></label><input type="file" id="image-file" accept=".heic,.heif,image/heic,image/heif" multiple><div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="image-change">Change image</button><button type="button" class="btn btn-secondary btn-small" id="image-reset">Reset</button></div><p class="hint">HEIC and HEIF files are decoded locally with a bundled libheif build. Unsupported files are reported, never faked.</p></div><div class="opt-group"><span class="opt-title">Download format</span><div class="field"><label for="heic-format">Format for previews and downloads</label><select id="heic-format"><option value="png">PNG</option><option value="jpeg">JPG</option></select></div><div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="heic-download-all">Download all decoded images</button></div></div><div class="opt-group"><span class="opt-title">How it works</span><p class="hint">Each file is decoded with the local library. Collapsed or unsupported variants appear in the failure list. Choose a thumbnail to inspect a larger preview.</p></div></div><div class="image-output"><div class="workspace-head"><h2>Decoded images</h2><span class="pill" id="image-meta">0 decoded</span></div><div class="image-preview-frame"><canvas id="image-preview" width="800" height="480" aria-label="Selected HEIC preview"></canvas></div><div class="status" id="image-status" role="status" aria-live="polite"></div><div class="heic-gallery" id="heic-gallery" aria-label="Decoded image thumbnails"></div><div class="output-actions"><button type="button" class="btn" id="image-download" disabled>Download selected</button></div><div class="image-output-note">Files are decoded in your browser; no upload is involved.</div></div></div>
+</section>
+<section class="section section-soft">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>How to use HEIC Viewer &amp; Converter</h2>
+      <ol><li>Choose one or more .heic or .heif files from your device.</li><li>Wait while the local decoder generates previews; large batches take longer.</li><li>Click a thumbnail to inspect the decoded image at a larger size.</li><li>Pick PNG or JPG as the download format for each image or the batch.</li><li>Review any failure messages and skip files the decoder cannot read.</li></ol>
+    </div>
+    <div class="info-card">
+      <h2>Example</h2>
+      
+      <div class="example-row"><span class="example-label">Input</span><div class="example-box">IMG_0042.HEIC from a phone, 4032×3024</div></div>
+      <div class="example-row"><span class="example-label">Output</span><div class="example-box">IMG_0042.png preview plus a 4032×3024 PNG download</div></div>
+    </div>
+  </div>
+</section>
+<section class="section section-soft">
+  <div class="container"><article class="article-card">
+      <span class="eyebrow">In-depth guide</span>
+      <h2>Why HEIC needs a real decoder</h2>
+      <p>Photos from many modern phones are saved in HEIC or HEIF format, which uses more efficient compression than JPEG. That efficiency is useful on a device with limited storage, but it also means a browser cannot simply display the file the way it displays a JPEG. This viewer loads a libheif decoder library locally and uses it to turn each file into pixels the page can show. The result is a genuine preview generated from your photo, not a placeholder or an icon. If decoding fails, the tool says so plainly instead of inventing a successful result. You can then decide whether to retry, convert the file on the source device or use the successfully decoded images in the batch. If you depend on these pictures regularly, keeping the original files alongside converted copies saves you repeating the step later.</p>
+      <h2>Viewing a single photo</h2>
+      <p>For one image, choose the .heic or .heif file and wait for the decoder to finish. A thumbnail appears once the file is read, and selecting it opens a larger preview. This preview is useful for checking orientation, colour and whether the photo you picked is the one you wanted before you spend time downloading a converted copy. HEIC stores more than just pixels — some files carry depth maps, live-photo pairs or multiple representations — and the viewer shows the primary still image. Extra payloads are not exposed as separate downloads. If the preview looks empty or the status area shows an error, the decoder could not interpret that particular file; the page will not quietly present a blank image as a success. Try another file to confirm the viewer itself is working before you investigate the source.</p>
+      <h2>Converting a batch</h2>
+      <p>Batch mode is the practical choice when you have moved a folder of photos off a phone. Select several files at once and the viewer decodes them one by one, listing a thumbnail for each success and an error for each failure. Choose PNG or JPG for the downloads. PNG keeps the decoded pixels without further loss and is a good fit for graphics or images with sharp edges, while JPG produces smaller files that are easier to email or upload. Mixed results are normal: a folder can contain both standard HEIC files and variants that the current decoder cannot handle. Failed items are reported by name so you can deal with them separately instead of wondering which conversions quietly disappeared. Work through the failures after the successful files are downloaded.</p>
+      <h2>Formats, quality and file size</h2>
+      <p>Converting HEIC to PNG or JPG is a change of container and compression, not an enhancement. The decoder reconstructs the pixels that were stored in the HEIC file; the encoder then writes them into the format you chose. PNG preserves those pixels exactly and can produce a large file, especially for a high-resolution phone photo. JPG compresses again, which reduces size but can introduce slight softness around fine detail. Neither format restores motion in a live-photo pair or reveals detail that was never captured. If you need a smaller result for a website, convert first and then resize or compress with a dedicated tool. Keep the original HEIC file as your master copy so you can re-convert later with different settings.</p>
+      <h2>Privacy and troubleshooting</h2>
+      <p>All decoding and encoding happens in your browser. The viewer uses a locally loaded libheif library, and your photos are not uploaded to LetitEdit or to a third-party conversion service. That is reassuring for personal pictures, but it also means the page depends on your browser&#39;s capabilities. Very large batches can be slow, so keep the tab active and wait for each status message before leaving. If a file fails, check that the extension really is .heic or .heif, then try re-exporting it from the source device as JPEG and see whether that copy opens. Older browsers may lack features the decoder needs; updating the browser often fixes unexplained failures. Should the page become unresponsive, reload it and process the photos in smaller groups.</p>
+  </article></div>
+</section>
+<section class="section">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>Frequently asked questions</h2>
+      <details class="faq-item">
+  <summary>Are my HEIC photos uploaded to a server?</summary>
+  <p>No. The viewer loads a libheif decoder library locally and decodes files in your browser. Your photos are not sent to LetitEdit or to any conversion service.</p>
+</details><details class="faq-item">
+  <summary>Why won&#39;t my file open?</summary>
+  <p>HEIC files can use different codecs and some variants are not supported by the current browser decoder. If decoding fails, the tool reports the failure rather than showing a blank or fake preview. Try exporting the photo as JPEG from the source device.</p>
+</details><details class="faq-item">
+  <summary>Can I convert many files at once?</summary>
+  <p>Yes. Batch mode accepts multiple .heic and .heif files, shows a thumbnail for each decoded image and lets you download PNG or JPG copies. Files the decoder cannot read are listed as failures instead of being silently skipped.</p>
+</details><details class="faq-item">
+  <summary>Which output format should I choose?</summary>
+  <p>PNG is lossless and keeps the decoded pixels exactly, which suits screenshots and graphics. JPG is smaller and is usually better for photographs. Neither adds information that was not in the original HEIC file.</p>
+</details><details class="faq-item">
+  <summary>Why does conversion take a while?</summary>
+  <p>HEIC uses efficient compression, so decoding is more work than opening a JPEG. A batch of high-resolution photos can take noticeable time even on a fast machine. Keep the tab active and wait for the status message before downloading.</p>
+</details>
+    </div>
+    <div class="info-card">
+      <h2>Related tools</h2>
+      <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
+        <a class="card" href="/image-editor/index.html"><h3>Image Editor</h3><p>Crop, rotate and flip photos, adjust brightness, contrast and colour, add a text overlay, then export PNG, JPG or WebP — all locally in your browser.</p></a><a class="card" href="/image-resizer/index.html"><h3>Image Resizer</h3><p>Resize photos to exact pixel dimensions. Lock aspect ratio, use fit or stretch modes within a documented pixel cap, and export PNG, JPG or WebP.</p></a><a class="card" href="/image-compressor/index.html"><h3>Image Compressor</h3><p>Re-encode images through a canvas with selectable JPEG or WebP quality and an optional maximum dimension, comparing original and resulting byte sizes before download.</p></a><a class="card" href="/add-border-to-image/index.html"><h3>Add Border to Image</h3><p>Wrap a photo in a solid colour border of any width and colour. Preview the frame live, keep the original image intact and download the bordered result as a PNG.</p></a>
+      </div>
+    </div>
+  </div>
+</section>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h3>LetitEdit</h3>
+        <p>Free, focused online tools that run in your browser. No accounts, no uploads, no deceptive downloads.</p>
+      </div>
+      <div>
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="/categories/">Categories</a></li>
+          <li><a href="/new-tools/">New Tools</a></li>
+          <li><a href="/tools/">All Tools</a></li>
+          <li><a href="/news/">News</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Policies</h3>
+        <ul>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="/terms-of-service/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> LetitEdit.com</span>
+      <span>Built for privacy, accuracy and plain-English tooling.</span>
+    </div>
+  </div>
+</footer>
+<script src="/js/search-index.js"></script>
+<script src="/js/sidebar-data.js"></script>
+<script src="/js/site.js"></script>
+<script src="/js/category-sidebar.js"></script>
+<script src="/js/image-core.js"></script>
+<script src="/js/vendor/libheif-bundle.js"></script>
+<script src="/js/image-runtime.js"></script>
+<script id="tool-config" type="application/json">{"slug":"heic-viewer","engine":"heic-viewer","layout":"engine","outputType":"image","example":{"input":"IMG_0042.HEIC from a phone, 4032×3024","output":"IMG_0042.png preview plus a 4032×3024 PNG download"}}</script>
+</body>
+</html>
