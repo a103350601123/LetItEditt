@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Image to Text (OCR) — English Extraction in Your Browser</title>
+<meta name="description" content="Extract English text from images with a locally loaded Tesseract.js OCR engine and language data; nothing is uploaded, and you can copy or download the result.">
+<meta name="theme-color" content="#2563eb">
+<link rel="canonical" href="https://letitedit.com/image-to-text/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Image to Text (OCR) — English Extraction in Your Browser">
+<meta property="og:description" content="Extract English text from images with a locally loaded Tesseract.js OCR engine and language data; nothing is uploaded, and you can copy or download the result.">
+<meta property="og:url" content="https://letitedit.com/image-to-text/">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/css/site.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","name":"Image to Text (OCR)","mainEntity":[{"@type":"Question","name":"Does my image get uploaded for recognition?","acceptedAnswer":{"@type":"Answer","text":"No. The image is decoded in your browser and passed to a locally loaded Tesseract.js worker. The page must download the worker and WASM files with its other assets, but your image bytes are not sent to LetitEdit or an outside OCR service."}},{"@type":"Question","name":"Why is this build English only?","acceptedAnswer":{"@type":"Answer","text":"It loads English language data, so it recognises printed English characters and words. Other scripts and languages are outside this build and may produce poor or empty results even when the image itself is clear."}},{"@type":"Question","name":"What affects recognition accuracy?","acceptedAnswer":{"@type":"Answer","text":"Font, size, contrast and language all matter. Sharp, evenly lit images with generous spacing usually work best, while blur, glare, low contrast, decorative fonts and angled text increase mistakes. Handwriting is unreliable."}},{"@type":"Question","name":"Why did the worker fail to start?","acceptedAnswer":{"@type":"Answer","text":"The OCR engine needs its worker and WASM download with the page. If those files are blocked, cached incorrectly or unavailable offline, recognition cannot begin. Reload the page, allow the files to load, then try again."}},{"@type":"Question","name":"Can I trust the text without checking it?","acceptedAnswer":{"@type":"Answer","text":"Always review it. The output shown is genuinely extracted text with copy and .txt download controls, but OCR can confuse similar characters, spacing and punctuation. Compare important names, numbers and links with the original image before using them."}}]}
+</script>
+</head>
+<body class="tool-page tool-page-image">
+<header class="topbar">
+  <nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+    <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
+    <div class="nav-links" id="primary-links">
+      <a href="/categories/">Categories</a>
+      <a href="/new-tools/">New Tools</a>
+      <a href="/news/">News</a>
+      <a href="/blog/">Blog</a>
+      <a href="/tools/">All Tools</a>
+      <a href="/faq/">FAQ</a>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+    </div>
+  </nav>
+</header>
+<div class="site-search-strip" id="search-strip">
+  <div class="container">
+    <div class="search-wrap">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
+      <div class="search-results" id="search-results" role="listbox" hidden></div>
+    </div>
+  </div>
+</div>
+<nav class="container breadcrumbs" aria-label="Breadcrumb">
+  <a href="/">Home</a><span>/</span>
+  <a href="/tools/image-photo/">Image &amp; Photo Tools</a><span>/</span>
+  <span aria-current="page">Image to Text (OCR)</span>
+</nav>
+<section class="container page-head tool-head">
+  <div class="tool-head-copy">
+    <span class="eyebrow">Image &amp; Photo Tools</span>
+    <h1>Image to Text (OCR)</h1>
+    <p>This tool loads a Tesseract.js worker and English language data with the page, then decodes your image in the browser and runs recognition locally. A progress indicator shows loading and recognition, and the output is the real extracted text rather than a demonstration string. Copy it or download a .txt file when the result looks right.</p>
+  </div>
+  <div class="tool-trust" aria-label="How this tool handles your files">
+    <span class="trust-pill"><span aria-hidden="true">✓</span> Local processing</span>
+    <span class="trust-pill"><span aria-hidden="true">✓</span> No upload</span>
+  </div>
+</section>
+<section class="container workspace image-workspace" data-image-engine="image-to-text">
+<div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>
+<div class="image-grid"><div class="image-controls"><div class="opt-group"><span class="opt-title">OCR engine</span><p class="hint" id="ocr-worker-status">Loading local OCR engine…</p><p class="hint">The Tesseract.js worker and English data load with this page. Your image is recognised in the browser.</p></div><div class="opt-group"><span class="opt-title">Source image</span><label class="image-drop" for="image-file"><span class="image-drop-icon" aria-hidden="true">📁</span><strong>Choose an image or drop it here</strong><span>One file at a time.</span></label><input type="file" id="image-file" accept="image/png,image/jpeg,image/webp"><div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="image-change">Change image</button><button type="button" class="btn btn-secondary btn-small" id="image-reset">Reset</button></div><p class="hint">Printed English text works best: large, high-contrast characters on a plain background.</p></div><div class="opt-group"><span class="opt-title">Recognition</span><div class="output-actions"><button type="button" class="btn" id="ocr-extract">Extract text</button></div></div><div class="opt-group"><span class="opt-title">Result</span><textarea id="ocr-output" class="output-box" rows="9" readonly placeholder="Extracted text appears here after recognition."></textarea><div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="ocr-copy">Copy text</button><button type="button" class="btn btn-secondary btn-small" id="ocr-download">Download .txt</button></div></div></div><div class="image-output"><div class="workspace-head"><h2>Source preview</h2><span class="pill" id="image-meta">No image loaded</span></div><div class="image-preview-frame"><canvas id="image-preview" width="800" height="480" aria-label="Image being recognised"></canvas></div><div class="status" id="image-status" role="status" aria-live="polite"></div><p class="hint">Recognition is never perfect. Compare the result with the source, especially punctuation and similar characters.</p></div></div>
+</section>
+<section class="container tool-principles" aria-label="How this tool works">
+  <div class="principle"><span class="principle-icon" aria-hidden="true">⚙️</span><div><strong>Real processing</strong><p>Every result is produced from your own input in this browser, not from a simulated preview.</p></div></div>
+  <div class="principle"><span class="principle-icon" aria-hidden="true">🔒</span><div><strong>Private by default</strong><p>Files stay in browser memory and object URLs are released when you reset, cancel or leave.</p></div></div>
+  <div class="principle"><span class="principle-icon" aria-hidden="true">⬇️</span><div><strong>Clear export</strong><p>Download your result when processing finishes. Optional model downloads are disclosed on the page.</p></div></div>
+</section>
+<section class="section section-soft">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>How to use Image to Text (OCR)</h2>
+      <ol><li>Wait for the OCR worker and English data to finish loading.</li><li>Choose a clear PNG, JPG or WebP image containing printed English text.</li><li>Start recognition and watch the progress indicator.</li><li>Review the extracted text for spacing and punctuation errors.</li><li>Copy the text or download it as a .txt file.</li></ol>
+    </div>
+    <div class="info-card">
+      <h2>Example</h2>
+      
+      <div class="example-row"><span class="example-label">Input</span><div class="example-box">A sharp photo of a printed sign that says OPEN TODAY.</div></div>
+      <div class="example-row"><span class="example-label">Output</span><div class="example-box">Recognised text: OPEN TODAY, ready to copy or save as .txt.</div></div>
+    </div>
+  </div>
+</section>
+<section class="section section-soft">
+  <div class="container"><article class="article-card">
+      <span class="eyebrow">In-depth guide</span>
+      <h2>What the OCR engine does</h2>
+      <p>Optical character recognition looks for shapes in an image that match letters, numbers and punctuation, then assembles them into words. This tool uses a Tesseract.js engine loaded locally alongside the page, together with English language data that helps the recogniser choose between similar possibilities. The image is decoded into pixels in your browser before recognition starts. A progress indicator reports the loading and recognition stages, so you can see whether the engine is preparing, working or finished. When it stops, the panel contains the real text that the engine found, ready for review rather than a prewritten placeholder. The recogniser returns a plain text block rather than a formatted document, so line breaks, columns and table structure may need cleanup in your own editor afterwards.</p>
+      <h2>Where your image goes</h2>
+      <p>Privacy is straightforward here: the picture stays in your browser. Recognition runs in a worker, which is a separate script thread that keeps the page responsive while it processes pixels. The worker and its WASM support files have to be downloaded with the page, just as any other engine asset would be. That download is not an upload of your document. No photo, screenshot or scan is posted to a server by this tool. Once you close or refresh the page, the in-memory image is gone. You still control what happens next, because the extracted text is only copied or downloaded when you choose to do so. If you close the tab during a run, the session ends and you will need to choose the image and start again.</p>
+      <h2>What changes accuracy</h2>
+      <p>Recognition quality depends heavily on the source image. A large, sharp picture with dark printed letters on a plain light background usually gives clean results. Small fonts, fuzzy focus, glare, shadows, low contrast and decorative typefaces can turn one character into another or split words incorrectly. Angled pages are harder than flat ones, and dense tables may be read in the wrong order. Language is a hard limit as well: this build loads English data only, so other scripts are not reliably supported. Handwriting and stylised lettering remain difficult for OCR generally. A few minutes spent preparing a clearer image often improves the result more than repeated recognition attempts. Cropping tightly around the text and resizing a small scan to a clearer size are simple ways to reduce those errors before another attempt.</p>
+      <h2>Reading the result critically</h2>
+      <p>OCR produces text, not a guarantee. The panel may include every word correctly, or it may swap similar letters, add stray spaces, miss punctuation or join two lines together. Treat the result as a draft that you inspect against the original picture. Pay particular attention to proper names, numbers, dates, amounts and links, since a single mistaken character can change their meaning. When the text looks right, use the copy button to paste it elsewhere or download it as a plain .txt file. That file contains only the extracted text, which makes it convenient for notes, spreadsheets, accessibility checks and search indexes after you have made any needed corrections. The download keeps the spelling exactly as recognised, so make corrections in your own document if you plan to publish or share the content widely.</p>
+      <h2>Troubleshooting common failures</h2>
+      <p>If the engine never reaches recognition, check that the worker and WASM files loaded with the page. Network filtering, an interrupted refresh or offline use can prevent them from arriving, and reloading usually fixes the problem. If recognition runs but returns little or nothing, inspect the image: crop away clutter, straighten the page, increase contrast or use a sharper source. Very large images can be slow to decode, so a moderate resized copy may work better. Remember that English-only language data cannot solve a page written in another language. After any retry, compare the new output with the original instead of assuming that a longer result is automatically a more accurate one. A second try with a better crop is usually faster than manually fixing dozens of uncertain characters in the output.</p>
+  </article></div>
+</section>
+<section class="section">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>Frequently asked questions</h2>
+      <details class="faq-item">
+  <summary>Does my image get uploaded for recognition?</summary>
+  <p>No. The image is decoded in your browser and passed to a locally loaded Tesseract.js worker. The page must download the worker and WASM files with its other assets, but your image bytes are not sent to LetitEdit or an outside OCR service.</p>
+</details><details class="faq-item">
+  <summary>Why is this build English only?</summary>
+  <p>It loads English language data, so it recognises printed English characters and words. Other scripts and languages are outside this build and may produce poor or empty results even when the image itself is clear.</p>
+</details><details class="faq-item">
+  <summary>What affects recognition accuracy?</summary>
+  <p>Font, size, contrast and language all matter. Sharp, evenly lit images with generous spacing usually work best, while blur, glare, low contrast, decorative fonts and angled text increase mistakes. Handwriting is unreliable.</p>
+</details><details class="faq-item">
+  <summary>Why did the worker fail to start?</summary>
+  <p>The OCR engine needs its worker and WASM download with the page. If those files are blocked, cached incorrectly or unavailable offline, recognition cannot begin. Reload the page, allow the files to load, then try again.</p>
+</details><details class="faq-item">
+  <summary>Can I trust the text without checking it?</summary>
+  <p>Always review it. The output shown is genuinely extracted text with copy and .txt download controls, but OCR can confuse similar characters, spacing and punctuation. Compare important names, numbers and links with the original image before using them.</p>
+</details>
+    </div>
+    <div class="info-card">
+      <h2>Related tools</h2>
+      <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
+        <a class="card tool-card" href="/image-editor/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🖼️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Editor</h3><p>Crop, rotate and flip photos, adjust brightness, contrast and colour, add a text overlay, then export PNG, JPG or WebP — all locally in your browser.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-resizer/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📐</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Resizer</h3><p>Resize photos to exact pixel dimensions. Lock aspect ratio, use fit or stretch modes within a documented pixel cap, and export PNG, JPG or WebP.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/black-and-white-image-converter/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">⚫</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Black &amp; White Image Converter</h3><p>Convert photos to black and white in your browser. Pick smooth grayscale or an adjustable threshold for line art, keep transparency, and export PNG, JPG or WebP.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/screenshot-beautifier/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">✨</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Screenshot Beautifier</h3><p>Dress up a screenshot with gradient, solid, transparent or patterned backgrounds, padding, rounded corners, shadow, filters and title bars. Export a polished PNG.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a>
+      </div>
+    </div>
+  </div>
+</section>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="footer-logo" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+        <p>Free, focused tools that run in your browser. Your files stay on your device, every result is real, and there are no accounts or deceptive downloads.</p>
+        <a class="footer-contact" href="mailto:info@letitedit.com">info@letitedit.com</a>
+      </div>
+      <div class="footer-column">
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="/tools/">All Tools</a></li>
+          <li><a href="/categories/">Categories</a></li>
+          <li><a href="/new-tools/">New Tools</a></li>
+          <li><a href="/news/">News</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Popular categories</h3>
+        <ul>
+          <li><a href="/tools/writing-text/">Text &amp; Writing</a></li>
+          <li><a href="/tools/coding-developer/">Developer Tools</a></li>
+          <li><a href="/tools/image-photo/">Image &amp; Photo</a></li>
+          <li><a href="/tools/video-audio/">Video &amp; Audio</a></li>
+          <li><a href="/tools/social-media/">Social Media</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Trust &amp; policies</h3>
+        <ul>
+          <li><a href="/about/">About LetitEdit</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="/terms-of-service/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-promise">
+      <span aria-hidden="true">🔒</span>
+      <p><strong>Privacy by design.</strong> Files are processed in your browser. Optional AI models download only after you opt in, and are never sent your media.</p>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> LetitEdit.com</span>
+      <span>Built for privacy, accuracy and plain-English tooling.</span>
+    </div>
+  </div>
+</footer>
+<script src="/js/search-index.js"></script>
+<script src="/js/sidebar-data.js"></script>
+<script src="/js/site.js"></script>
+<script src="/js/category-sidebar.js"></script>
+<script src="/js/image-core.js"></script>
+<script src="/js/vendor/tesseract.min.js"></script>
+<script src="/js/image-runtime.js"></script>
+<script id="tool-config" type="application/json">{"slug":"image-to-text","engine":"image-to-text","layout":"engine","outputType":"text","example":{"input":"A sharp photo of a printed sign that says OPEN TODAY.","output":"Recognised text: OPEN TODAY, ready to copy or save as .txt."}}</script>
+</body>
+</html>
