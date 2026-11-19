@@ -1,0 +1,181 @@
+/* Shared LetitEdit shell for preserved tools with isolated legacy CSS. */
+body.site-compat-body {
+  --bg: #ffffff;
+  --bg-soft: #f8fbff;
+  --panel: #ffffff;
+  --panel-2: #eff6ff;
+  --panel-3: #f8fbff;
+  --line: #e2e8f0;
+  --line-soft: #e2e8f0;
+  --text: #0f172a;
+  --muted: #475569;
+  --muted-2: #64748b;
+  --accent: #2563eb;
+  --accent-2: #60a5fa;
+  --accent-soft: rgba(37, 99, 235, .12);
+  --good: #15803d;
+  --danger: #b91c1c;
+  color-scheme: light;
+  overflow: auto !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+.site-compat-body .app {
+  height: calc(100vh - 108px);
+  height: calc(100dvh - 108px);
+}
+
+.site-compat-header-wrap,
+.site-compat-search-wrap,
+.site-compat-breadcrumbs,
+.site-compat-seo,
+.site-compat-footer {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  color: #0f172a;
+}
+
+.site-compat-header-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  background: rgba(255, 255, 255, .96);
+  border-bottom: 1px solid #e2e8f0;
+}
+.site-compat-header-wrap .site-compat-nav {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 52px;
+}
+.site-compat-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #0f172a;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  text-decoration: none;
+}
+.site-compat-mark {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  color: #fff;
+  background: linear-gradient(135deg, #2563eb, #60a5fa);
+  font-size: .85rem;
+}
+.site-compat-header-wrap .menu-button {
+  display: none;
+  margin-left: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+  background: #fff;
+  color: #2563eb;
+  padding: 6px 11px;
+  font-weight: 700;
+}
+.site-compat-header-wrap .nav-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
+.site-compat-header-wrap .nav-links a { color: #475569; font-size: .88rem; font-weight: 600; text-decoration: none; }
+.site-compat-header-wrap .nav-links a:hover { color: #2563eb; }
+
+.site-compat-search-wrap { background: #eff6ff; border-bottom: 1px solid #e2e8f0; }
+.site-compat-search-wrap .site-compat-search-inner { max-width: 1180px; margin: 0 auto; padding: 10px 20px; }
+.site-compat-search-wrap .search-wrap { position: relative; max-width: 640px; }
+.site-compat-search-wrap .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #2563eb; }
+.site-compat-search-wrap .search-input {
+  width: 100%;
+  padding: 9px 12px 9px 40px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  color: #0f172a;
+  font-size: .9rem;
+}
+.site-compat-search-wrap .search-input:focus { outline: 3px solid rgba(37, 99, 235, .15); border-color: #2563eb; }
+.site-compat-search-wrap .search-results {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  max-height: 320px;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(37, 99, 235, .12);
+  padding: 7px;
+}
+.site-compat-search-wrap .search-results[hidden] { display: none; }
+.site-compat-search-wrap .search-result { display: block; padding: 8px 11px; border-radius: 8px; color: #0f172a; text-decoration: none; }
+.site-compat-search-wrap .search-result:hover { background: #eff6ff; text-decoration: none; }
+.site-compat-search-wrap .search-result small { display: block; color: #475569; font-size: .75rem; }
+.site-compat-search-wrap .search-empty { padding: 10px; color: #475569; }
+
+.site-compat-breadcrumbs { max-width: 1180px; margin: 0 auto; padding: 12px 20px; font-size: .84rem; color: #475569; }
+.site-compat-breadcrumbs a { color: #2563eb; text-decoration: none; }
+.site-compat-breadcrumbs span { margin: 0 7px; color: #94a3b8; }
+
+.site-compat-seo { background: #fff; border-top: 1px solid #e2e8f0; padding: 32px 20px 8px; }
+.site-compat-seo-inner { max-width: 1180px; margin: 0 auto; }
+.site-compat-seo h2 { margin: 0 0 10px; font-size: 1.4rem; letter-spacing: -.02em; }
+.site-compat-seo p { color: #475569; }
+.site-compat-seo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.site-compat-card { border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px; background: #fff; }
+.site-compat-card ol, .site-compat-card ul { margin: 0; padding-left: 20px; color: #475569; }
+.site-compat-card li + li { margin-top: 6px; }
+.site-compat-faq { border-bottom: 1px solid #e2e8f0; padding: 10px 0; }
+.site-compat-faq:last-child { border-bottom: 0; }
+.site-compat-faq h3 { margin: 0 0 4px; font-size: .98rem; }
+.site-compat-faq p { margin: 0; font-size: .9rem; }
+.site-compat-related { display: flex; flex-wrap: wrap; gap: 8px; }
+.site-compat-related a {
+  display: inline-block;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  padding: 6px 11px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: .85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.site-compat-footer { border-top: 1px solid #e2e8f0; background: #f8fbff; padding: 26px 20px 20px; }
+.site-compat-footer-inner { max-width: 1180px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; }
+.site-compat-footer p { margin: 0; color: #475569; font-size: .86rem; }
+.site-compat-footer a { color: #2563eb; text-decoration: none; }
+
+@media (max-width: 680px) {
+  .site-compat-header-wrap .menu-button { display: inline-flex; }
+  .site-compat-header-wrap .nav-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 10px 16px;
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+  }
+  .site-compat-header-wrap .nav-links.is-open { display: flex; }
+  .site-compat-header-wrap .nav-links a { padding: 7px 0; }
+  .site-compat-seo-grid { grid-template-columns: 1fr; }
+  .site-compat-body .app { height: calc(100dvh - 104px); }
+}

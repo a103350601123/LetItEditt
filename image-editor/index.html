@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Image Editor — Crop, Adjust and Annotate Locally</title>
+<meta name="description" content="Crop, rotate and flip photos, adjust brightness, contrast and colour, add a text overlay, then export PNG, JPG or WebP — all locally in your browser.">
+<meta name="theme-color" content="#2563eb">
+<link rel="canonical" href="https://letitedit.com/image-editor/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Image Editor — Crop, Adjust and Annotate Locally">
+<meta property="og:description" content="Crop, rotate and flip photos, adjust brightness, contrast and colour, add a text overlay, then export PNG, JPG or WebP — all locally in your browser.">
+<meta property="og:url" content="https://letitedit.com/image-editor/">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/css/site.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","name":"Image Editor","mainEntity":[{"@type":"Question","name":"Is my photo uploaded anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. The image is decoded and edited by JavaScript running in your browser. Nothing is sent to LetitEdit or to a third-party image service, and closing the page clears the working copy."}},{"@type":"Question","name":"What can I actually change here?","acceptedAnswer":{"@type":"Answer","text":"You can crop with a slider, rotate and flip, adjust brightness, contrast, saturation and blur, apply grayscale or sepia, and add a text overlay. It is meant for quick corrections rather than layered design work."}},{"@type":"Question","name":"Which formats can I export?","acceptedAnswer":{"@type":"Answer","text":"PNG, JPG and WebP. PNG keeps sharp text and flat colour, JPG produces smaller photo files, and WebP offers a good size and quality balance where it is supported."}},{"@type":"Question","name":"Why does my export look different from the preview?","acceptedAnswer":{"@type":"Answer","text":"JPG and WebP are lossy, so fine gradients or small text can soften slightly after saving. Choose PNG when you need pixel-exact output, and re-check the preview after changing format."}},{"@type":"Question","name":"This tool feels slow with a large photo. What can I do?","acceptedAnswer":{"@type":"Answer","text":"Very high-resolution files can take a moment to process in any browser. Crop first to reduce the working area, close other heavy tabs, and try a smaller source image if the page becomes unresponsive."}}]}
+</script>
+</head>
+<body class="tool-page tool-page-image">
+<header class="topbar">
+  <nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+    <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
+    <div class="nav-links" id="primary-links">
+      <a href="/categories/">Categories</a>
+      <a href="/new-tools/">New Tools</a>
+      <a href="/news/">News</a>
+      <a href="/blog/">Blog</a>
+      <a href="/tools/">All Tools</a>
+      <a href="/faq/">FAQ</a>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+    </div>
+  </nav>
+</header>
+<div class="site-search-strip" id="search-strip">
+  <div class="container">
+    <div class="search-wrap">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
+      <div class="search-results" id="search-results" role="listbox" hidden></div>
+    </div>
+  </div>
+</div>
+<nav class="container breadcrumbs" aria-label="Breadcrumb">
+  <a href="/">Home</a><span>/</span>
+  <a href="/tools/image-photo/">Image &amp; Photo Tools</a><span>/</span>
+  <span aria-current="page">Image Editor</span>
+</nav>
+<section class="container page-head tool-head">
+  <div class="tool-head-copy">
+    <span class="eyebrow">Image &amp; Photo Tools</span>
+    <h1>Image Editor</h1>
+    <p>A compact photo editor for the tweaks you need most: straighten a crop, correct exposure, add a caption and save in a web-friendly format. Everything happens in your browser, so your original file never leaves the device. There is no account, upload queue or waiting step.</p>
+  </div>
+  <div class="tool-trust" aria-label="How this tool handles your files">
+    <span class="trust-pill"><span aria-hidden="true">✓</span> Local processing</span>
+    <span class="trust-pill"><span aria-hidden="true">✓</span> No upload</span>
+  </div>
+</section>
+<section class="container workspace image-workspace" data-image-engine="image-editor">
+<div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>
+<div class="image-grid"><div class="image-controls"><div class="opt-group"><span class="opt-title">Source image</span><label class="image-drop" for="image-file"><span class="image-drop-icon" aria-hidden="true">📁</span><strong>Choose an image or drop it here</strong><span>One file at a time.</span></label><input type="file" id="image-file" accept="image/png,image/jpeg,image/webp"><div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="image-change">Change image</button><button type="button" class="btn btn-secondary btn-small" id="image-reset">Reset</button></div><p class="hint">JPG, PNG and WebP are supported. Very large files are rejected with a clear message.</p></div><div class="opt-group"><span class="opt-title">Crop</span><div class="field range-field"><label for="ie-crop-x">Left <output id="ie-crop-x-value">0px</output></label><input type="range" id="ie-crop-x" min="0" max="100" step="1" value="0"></div><div class="field range-field"><label for="ie-crop-y">Top <output id="ie-crop-y-value">0px</output></label><input type="range" id="ie-crop-y" min="0" max="100" step="1" value="0"></div><div class="field range-field"><label for="ie-crop-w">Width <output id="ie-crop-w-value">100px</output></label><input type="range" id="ie-crop-w" min="1" max="100" step="1" value="100"></div><div class="field range-field"><label for="ie-crop-h">Height <output id="ie-crop-h-value">100px</output></label><input type="range" id="ie-crop-h" min="1" max="100" step="1" value="100"></div><div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="ie-crop-apply">Apply crop</button></div></div><div class="opt-group"><span class="opt-title">Orientation</span><div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="ie-rot-left">↶ Left</button><button type="button" class="btn btn-secondary btn-small" id="ie-rot-right">↷ Right</button><button type="button" class="btn btn-secondary btn-small" id="ie-flip-h">⇄ Flip H</button><button type="button" class="btn btn-secondary btn-small" id="ie-flip-v">⇅ Flip V</button></div></div><div class="opt-group"><span class="opt-title">Adjustments</span><div class="field range-field"><label for="ie-brightness">Brightness <output id="ie-brightness-value">100%</output></label><input type="range" id="ie-brightness" min="0" max="200" step="1" value="100"></div><div class="field range-field"><label for="ie-contrast">Contrast <output id="ie-contrast-value">100%</output></label><input type="range" id="ie-contrast" min="0" max="200" step="1" value="100"></div><div class="field range-field"><label for="ie-saturation">Saturation <output id="ie-saturation-value">100%</output></label><input type="range" id="ie-saturation" min="0" max="200" step="1" value="100"></div><div class="field range-field"><label for="ie-blur">Blur <output id="ie-blur-value">0px</output></label><input type="range" id="ie-blur" min="0" max="20" step="0.5" value="0"></div><div class="field range-field"><label for="ie-grayscale">Grayscale <output id="ie-grayscale-value">0%</output></label><input type="range" id="ie-grayscale" min="0" max="100" step="1" value="0"></div><div class="field range-field"><label for="ie-sepia">Sepia <output id="ie-sepia-value">0%</output></label><input type="range" id="ie-sepia" min="0" max="100" step="1" value="0"></div><div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="ie-adjust-reset">Reset adjustments</button></div></div><div class="opt-group"><span class="opt-title">Text overlay</span><div class="field"><label>Caption</label><textarea id="ie-text" rows="2" placeholder="Optional caption. Press Enter for a new line."></textarea></div><div class="field range-field"><label for="ie-text-size">Text size <output id="ie-text-size-value">5%</output></label><input type="range" id="ie-text-size" min="1" max="20" step="1" value="5"></div><div class="field color-field"><label for="ie-text-color">Text colour</label><input type="color" id="ie-text-color" value="#ffffff"></div><label class="opt"><input type="checkbox" id="ie-text-bg" checked> <span>Readable backing</span></label><div class="field range-field"><label for="ie-text-x">Text position X <output id="ie-text-x-value">50%</output></label><input type="range" id="ie-text-x" min="0" max="100" step="1" value="50"></div><div class="field range-field"><label for="ie-text-y">Text position Y <output id="ie-text-y-value">85%</output></label><input type="range" id="ie-text-y" min="0" max="100" step="1" value="85"></div></div><div class="opt-group"><span class="opt-title">Export</span><div class="field"><label for="ie-format">Format</label><select id="ie-format"><option value="png">PNG</option><option value="jpeg">JPG</option><option value="webp">WebP</option></select></div><div class="field range-field"><label for="ie-quality">Quality (JPG/WebP) <output id="ie-quality-value">0.92</output></label><input type="range" id="ie-quality" min="0.1" max="1" step="0.01" value="0.92"></div></div></div><div class="image-output"><div class="workspace-head"><h2>Preview</h2><span class="pill" id="image-meta">No image loaded</span></div><div class="image-preview-frame"><canvas id="image-preview" width="800" height="480" aria-label="Image preview"></canvas></div><div class="status" id="image-status" role="status" aria-live="polite"></div><div class="output-actions"><button type="button" class="btn" id="image-download" disabled>Download image</button></div><div class="image-output-note">Crop, adjust and annotate locally</div></div></div>
+</section>
+<section class="container tool-principles" aria-label="How this tool works">
+  <div class="principle"><span class="principle-icon" aria-hidden="true">⚙️</span><div><strong>Real processing</strong><p>Every result is produced from your own input in this browser, not from a simulated preview.</p></div></div>
+  <div class="principle"><span class="principle-icon" aria-hidden="true">🔒</span><div><strong>Private by default</strong><p>Files stay in browser memory and object URLs are released when you reset, cancel or leave.</p></div></div>
+  <div class="principle"><span class="principle-icon" aria-hidden="true">⬇️</span><div><strong>Clear export</strong><p>Download your image file when processing finishes. Optional model downloads are disclosed on the page.</p></div></div>
+</section>
+<section class="section section-soft">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>How to use Image Editor</h2>
+      <ol><li>Upload a JPG, PNG or WebP image from your device.</li><li>Drag the crop slider to trim edges and set the frame you want.</li><li>Use rotate and flip controls to get the orientation right.</li><li>Apply brightness, contrast, saturation, blur, grayscale or sepia adjustments.</li><li>Add and position a text overlay, then preview the result.</li><li>Choose PNG, JPG or WebP and download the finished image.</li></ol>
+    </div>
+    <div class="info-card">
+      <h2>Example</h2>
+      
+      <div class="example-row"><span class="example-label">Input</span><div class="example-box">2400×1600 JPEG with a skewed horizon and no caption</div></div>
+      <div class="example-row"><span class="example-label">Output</span><div class="example-box">1600×1200 PNG with a straightened crop and caption text</div></div>
+    </div>
+  </div>
+</section>
+<section class="section section-soft">
+  <div class="container"><article class="article-card">
+      <span class="eyebrow">In-depth guide</span>
+      <h2>A lightweight editor for everyday photos</h2>
+      <p>Most photo jobs are small: a crooked horizon, a dim exposure, a caption that needs to sit in the corner. This editor collects those everyday corrections in one place so you can finish them without installing software or handing a file to a remote service. You load an image, trim it with a crop slider, fix the orientation with rotate and flip, then tune brightness, contrast and saturation until the picture looks right. Blur, grayscale and sepia are available for stylistic changes, and a text overlay lets you label a screenshot or mark up a shared photo. The preview updates as you work, so each adjustment is easy to judge before you commit. When you are satisfied, you download the result in PNG, JPG or WebP. The original file on your device is never modified.</p>
+      <h2>The workflow from upload to export</h2>
+      <p>Start by uploading a JPG, PNG or WebP image from your device. The editor decodes it locally and places it in the preview area. Next, drag the crop slider to choose how much of the frame to keep; cropping early reduces the area that later filters have to process. If the picture is sideways or mirrored, apply rotate or flip before anything else, because text and colour decisions are easier once the orientation is correct. Then work through the adjustments in small steps rather than pushing a single slider to its limit. Add a text overlay last, position it over a clear part of the image, and check that it remains readable. Finally, pick an export format and download. If a result disappoints you, reset the adjustments and try again.</p>
+      <h2>Understanding the adjustments</h2>
+      <p>Brightness lifts or lowers the overall lightness of every pixel, which helps with an underexposed shot but can wash out highlights if pushed too far. Contrast widens or narrows the gap between light and dark tones, making a flat image look punchier. Saturation controls the intensity of colour; reducing it moves a photo toward grayscale, while increasing it can make skies and clothing look unnaturally vivid. Blur softens detail and is useful for de-emphasising a busy background, though it cannot recover information that is out of focus. Grayscale removes colour entirely, and sepia applies a warm brown tint for an older look. These controls are deliberately simple, so combine them gently and compare against the original preview rather than trusting a single number.</p>
+      <h2>Choosing the right export format</h2>
+      <p>PNG is lossless, which means it preserves the exact pixels you see in the preview. Choose it when your overlay contains small text, sharp lines or flat colour, because compression artefacts are most visible around lettering. JPG is lossy and produces much smaller files for photographs with smooth gradients and natural texture; it is a good default for sharing a photo where a few extra kilobytes matter. WebP sits between the two in many cases, offering efficient compression and support for transparency in current browsers. If a downloaded file looks softer than the preview, switch to PNG and compare again. Remember that re-saving a JPG a second time adds another generation of loss, so keep an original copy and export from that rather than from a previous download.</p>
+      <h2>Privacy, limits and troubleshooting</h2>
+      <p>Editing happens in your browser, so your photo is not uploaded to a server and no account is required. That also means the page cannot reach files stored elsewhere in your cloud drive unless you download them first. This is a single-image editor for quick corrections, not a layer-based design application: there are no masks, brush tools or undo history beyond what the preview offers. Very large files may take longer to decode and render, especially on older devices. If the page becomes sluggish, crop the image first, close other tabs and retry with a smaller file. If an overlay disappears or a slider seems to have no effect, reset the tool and reload the image, then apply changes one at a time so you can see which step causes the problem.</p>
+  </article></div>
+</section>
+<section class="section">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>Frequently asked questions</h2>
+      <details class="faq-item">
+  <summary>Is my photo uploaded anywhere?</summary>
+  <p>No. The image is decoded and edited by JavaScript running in your browser. Nothing is sent to LetitEdit or to a third-party image service, and closing the page clears the working copy.</p>
+</details><details class="faq-item">
+  <summary>What can I actually change here?</summary>
+  <p>You can crop with a slider, rotate and flip, adjust brightness, contrast, saturation and blur, apply grayscale or sepia, and add a text overlay. It is meant for quick corrections rather than layered design work.</p>
+</details><details class="faq-item">
+  <summary>Which formats can I export?</summary>
+  <p>PNG, JPG and WebP. PNG keeps sharp text and flat colour, JPG produces smaller photo files, and WebP offers a good size and quality balance where it is supported.</p>
+</details><details class="faq-item">
+  <summary>Why does my export look different from the preview?</summary>
+  <p>JPG and WebP are lossy, so fine gradients or small text can soften slightly after saving. Choose PNG when you need pixel-exact output, and re-check the preview after changing format.</p>
+</details><details class="faq-item">
+  <summary>This tool feels slow with a large photo. What can I do?</summary>
+  <p>Very high-resolution files can take a moment to process in any browser. Crop first to reduce the working area, close other heavy tabs, and try a smaller source image if the page becomes unresponsive.</p>
+</details>
+    </div>
+    <div class="info-card">
+      <h2>Related tools</h2>
+      <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
+        <a class="card tool-card" href="/image-resizer/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📐</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Resizer</h3><p>Resize photos to exact pixel dimensions. Lock aspect ratio, use fit or stretch modes within a documented pixel cap, and export PNG, JPG or WebP.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-flip-rotate/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔄</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Flip &amp; Rotate</h3><p>Flip or rotate images in your browser. Mirror horizontally or vertically, turn in 90-degree steps, combine operations, and export PNG, JPG or WebP without upload.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/black-and-white-image-converter/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">⚫</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Black &amp; White Image Converter</h3><p>Convert photos to black and white in your browser. Pick smooth grayscale or an adjustable threshold for line art, keep transparency, and export PNG, JPG or WebP.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-compressor/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🗜️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Compressor</h3><p>Re-encode images through a canvas with selectable JPEG or WebP quality and an optional maximum dimension, comparing original and resulting byte sizes before download.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a>
+      </div>
+    </div>
+  </div>
+</section>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="footer-logo" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+        <p>Free, focused tools that run in your browser. Your files stay on your device, every result is real, and there are no accounts or deceptive downloads.</p>
+        <a class="footer-contact" href="mailto:info@letitedit.com">info@letitedit.com</a>
+      </div>
+      <div class="footer-column">
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="/tools/">All Tools</a></li>
+          <li><a href="/categories/">Categories</a></li>
+          <li><a href="/new-tools/">New Tools</a></li>
+          <li><a href="/news/">News</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Popular categories</h3>
+        <ul>
+          <li><a href="/tools/writing-text/">Text &amp; Writing</a></li>
+          <li><a href="/tools/coding-developer/">Developer Tools</a></li>
+          <li><a href="/tools/image-photo/">Image &amp; Photo</a></li>
+          <li><a href="/tools/video-audio/">Video &amp; Audio</a></li>
+          <li><a href="/tools/social-media/">Social Media</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Trust &amp; policies</h3>
+        <ul>
+          <li><a href="/about/">About LetitEdit</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="/terms-of-service/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-promise">
+      <span aria-hidden="true">🔒</span>
+      <p><strong>Privacy by design.</strong> Files are processed in your browser. Optional AI models download only after you opt in, and are never sent your media.</p>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> LetitEdit.com</span>
+      <span>Built for privacy, accuracy and plain-English tooling.</span>
+    </div>
+  </div>
+</footer>
+<script src="/js/search-index.js"></script>
+<script src="/js/sidebar-data.js"></script>
+<script src="/js/site.js"></script>
+<script src="/js/category-sidebar.js"></script>
+<script src="/js/image-core.js"></script>
+<script src="/js/image-runtime.js"></script>
+<script id="tool-config" type="application/json">{"slug":"image-editor","engine":"image-editor","layout":"engine","outputType":"image","example":{"input":"2400×1600 JPEG with a skewed horizon and no caption","output":"1600×1200 PNG with a straightened crop and caption text"}}</script>
+</body>
+</html>
