@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Text Cleaner — Remove Unwanted Characters, Spaces and HTML</title>
+<meta name="description" content="Clean messy text in one ordered pass: trim whitespace, strip HTML tags and emoji, remove accents, unify quotes, fix punctuation and expand shorthand. Everything runs in your browser.">
+<meta name="theme-color" content="#2563eb">
+<link rel="canonical" href="https://letitedit.com/tools/writing-text/text-cleaner/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Text Cleaner — Remove Unwanted Characters, Spaces and HTML">
+<meta property="og:description" content="Clean messy text in one ordered pass: trim whitespace, strip HTML tags and emoji, remove accents, unify quotes, fix punctuation and expand shorthand. Everything runs in your browser.">
+<meta property="og:url" content="https://letitedit.com/tools/writing-text/text-cleaner/">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../../css/site.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","name":"Text Cleaner","mainEntity":[{"@type":"Question","name":"Does this upload my text?","acceptedAnswer":{"@type":"Answer","text":"No. Cleaning happens entirely in your browser. Nothing is sent to a server."}},{"@type":"Question","name":"Does Strip emoji remove every emoji?","acceptedAnswer":{"@type":"Answer","text":"No. It targets the common pictograph ranges used by the reference tool, so some modern emoji, flags and joined sequences can remain. Use the Remove Emojis tool for the broader Unicode-range filter."}},{"@type":"Question","name":"What does the Default preset select?","acceptedAnswer":{"@type":"Answer","text":"It selects trim, remove leading and trailing spaces, strip HTML tags, strip emoji, collapse multiple spaces and reduce multiple blank lines. It leaves letter case unchanged."}},{"@type":"Question","name":"Can I undo a cleanup?","acceptedAnswer":{"@type":"Answer","text":"Yes. The Undo button restores the previous result. It is a simple history for this tool, not a full text-editor undo stack."}}]}
+</script>
+</head>
+<body class="tool-page tool-page-text">
+<header class="topbar">
+  <nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+    <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
+    <div class="nav-links" id="primary-links">
+      <a href="/categories/">Categories</a>
+      <a href="/new-tools/">New Tools</a>
+      <a href="/news/">News</a>
+      <a href="/blog/">Blog</a>
+      <a href="/tools/">All Tools</a>
+      <a href="/faq/">FAQ</a>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+    </div>
+  </nav>
+</header>
+<div class="site-search-strip" id="search-strip">
+  <div class="container">
+    <div class="search-wrap">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
+      <div class="search-results" id="search-results" role="listbox" hidden></div>
+    </div>
+  </div>
+</div>
+<nav class="container breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../">Home</a><span>/</span>
+  <a href="../../../tools/writing-text/">Writing &amp; Text Tools</a><span>/</span>
+  <span aria-current="page">Text Cleaner</span>
+</nav>
+<section class="container page-head tool-head">
+  <div class="tool-head-copy">
+    <span class="eyebrow">Writing &amp; Text Tools</span>
+    <h1>Text Cleaner</h1>
+    <p>Pick the rules you need from five groups, then clean the text in the reference tool’s processing order. An undo button restores the previous result, and a Default preset selects the commonly used rules.</p>
+  </div>
+  <div class="tool-trust" aria-label="How this tool handles your files">
+    <span class="trust-pill"><span aria-hidden="true">✓</span> Local processing</span>
+    <span class="trust-pill"><span aria-hidden="true">✓</span> No upload</span>
+  </div>
+</section>
+<section class="container workspace engine-workspace" data-engine="text-cleaner">
+<div class="workspace-head"><h2>Interactive tool</h2><div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="cln-all">All</button><button type="button" class="btn btn-secondary btn-small" id="cln-none">None</button><button type="button" class="btn btn-secondary btn-small" id="cln-default">Default</button></div></div>
+<div class="opt-group"><label class="opt"><input type="checkbox" id="cln-wrapLines" checked> <span>Wrap lines in the input box</span></label></div>
+<div class="engine-grid engine-cleaner">
+  <div class="engine-controls">
+    <div class="field"><label>Paste text</label><textarea id="cln-input" rows="7" placeholder="Paste text here. Changes are applied when you click Clean Text."></textarea></div>
+    <div class="opt-set"><h3>Whitespace</h3><label class="opt"><input type="checkbox" id="cln-trim" checked> <span>Trim each line</span></label><label class="opt"><input type="checkbox" id="cln-removeLeadingSpaces" checked> <span>Remove leading spaces</span></label><label class="opt"><input type="checkbox" id="cln-removeTrailingSpaces" checked> <span>Remove trailing spaces</span></label><label class="opt"><input type="checkbox" id="cln-removeBlankLines"> <span>Remove blank lines</span></label><label class="opt"><input type="checkbox" id="cln-replaceLineBreakWithSpace"> <span>Replace line break with space</span></label><label class="opt"><input type="checkbox" id="cln-multipleSpacesToSingle" checked> <span>Multiple spaces to single</span></label><label class="opt"><input type="checkbox" id="cln-multipleBlankLinesToSingle" checked> <span>Multiple blank lines to single</span></label><label class="opt"><input type="checkbox" id="cln-removeAllLineBreaks"> <span>Remove all line breaks</span></label>      <div class="inline-num"><label><input type="checkbox" id="cln-replaceSpacesWithTab"> Replace <input type="number" id="cln-spacesToTab" value="4" min="1" max="20"> spaces with a tab</label></div>      <div class="inline-num"><label><input type="checkbox" id="cln-replaceTabWithSpaces"> Replace 1 tab with <input type="number" id="cln-tabToSpaces" value="4" min="1" max="20"> spaces</label></div>      <div class="inline-num"><label><input type="checkbox" id="cln-trimLeft"> Remove <input type="number" id="cln-trimLeftChars" value="3" min="0" max="50"> characters from left</label></div>      <div class="inline-num"><label><input type="checkbox" id="cln-trimRight"> Remove <input type="number" id="cln-trimRightChars" value="3" min="0" max="50"> characters from right</label></div>    </div>
+    <div class="opt-set"><h3>Characters</h3><label class="opt"><input type="checkbox" id="cln-removePunctuation"> <span>Remove punctuation</span></label><label class="opt"><input type="checkbox" id="cln-stripEmojis" checked> <span>Strip emoji</span></label><label class="opt"><input type="checkbox" id="cln-removeAccents"> <span>Remove accents</span></label><label class="opt"><input type="checkbox" id="cln-normalizeUnicode"> <span>Normalize Unicode (NFKC)</span></label><label class="opt"><input type="checkbox" id="cln-removeReplacement"> <span>Remove replacement character</span></label><label class="opt"><input type="checkbox" id="cln-removeNonAscii"> <span>Remove non-ASCII</span></label><label class="opt"><input type="checkbox" id="cln-removeNonAlphanumeric"> <span>Remove non-alphanumeric</span></label></div>
+    <div class="opt-set"><h3>HTML &amp; decoding</h3><label class="opt"><input type="checkbox" id="cln-unescapeHtml"> <span>Unescape common HTML entities</span></label><label class="opt"><input type="checkbox" id="cln-stripHtmlTags" checked> <span>Strip HTML tags</span></label><label class="opt"><input type="checkbox" id="cln-removeIds"> <span>Remove id attributes</span></label><label class="opt"><input type="checkbox" id="cln-removeClasses"> <span>Remove class attributes</span></label><label class="opt"><input type="checkbox" id="cln-removeInlineStyles"> <span>Remove inline styles</span></label><label class="opt"><input type="checkbox" id="cln-decodeHtmlEntities"> <span>Decode HTML entities</span></label><label class="opt"><input type="checkbox" id="cln-decodeUrlEncoded"> <span>Decode URL-encoded text</span></label></div>
+    <div class="opt-set"><h3>Other text &amp; links</h3><label class="opt"><input type="checkbox" id="cln-stripEmails"> <span>Strip email addresses</span></label><label class="opt"><input type="checkbox" id="cln-removeBbCode"> <span>Remove BBCode</span></label><label class="opt"><input type="checkbox" id="cln-removeWebUrls"> <span>Remove web URLs</span></label><label class="opt"><input type="checkbox" id="cln-convertUrlsToLinks"> <span>Convert URLs to links</span></label></div>
+    <div class="opt-set"><h3>Text formatting</h3><label class="opt"><input type="radio" name="cln-letterCase" value="uppercase"> <span>Uppercase</span></label><label class="opt"><input type="radio" name="cln-letterCase" value="lowercase"> <span>Lowercase</span></label><label class="opt"><input type="radio" name="cln-letterCase" value="sentenceCase"> <span>Sentence case</span></label><label class="opt"><input type="radio" name="cln-letterCase" value="capitalizeWords"> <span>Capitalize each word</span></label><label class="opt"><input type="radio" name="cln-letterCase" value="noChange" checked> <span>Do not change</span></label><label class="opt"><input type="checkbox" id="cln-removeDuplicateLines"> <span>Remove duplicate lines</span></label><label class="opt"><input type="checkbox" id="cln-removeRepeatingWords"> <span>Remove repeating words</span></label><label class="opt"><input type="checkbox" id="cln-smartToRegular"> <span>Smart quotes to regular</span></label><label class="opt"><input type="checkbox" id="cln-regularToSmart"> <span>Regular quotes to smart</span></label><label class="opt"><input type="checkbox" id="cln-fixSpacesAfterPunctuation"> <span>Fix spaces after punctuation</span></label><label class="opt"><input type="checkbox" id="cln-convertShorthand"> <span>Expand common shorthand</span></label></div>
+    <div class="output-actions"><button type="button" class="btn" id="cln-clean">Clean Text</button><button type="button" class="btn btn-secondary btn-small" id="cln-undo" disabled>Undo</button></div>
+  </div>
+  <div class="engine-output">
+    <div class="workspace-head"><h2>Output</h2><button type="button" class="btn btn-secondary btn-small" id="cln-copy">Copy to clipboard</button></div>
+    <textarea id="cln-output" class="output-box" rows="14" readonly></textarea>
+    <div class="status" id="cln-status" role="status" aria-live="polite"></div>
+    <p class="hint">Processing order follows the reference tool. “Strip emoji” covers the common pictograph ranges only; it is not a complete Unicode emoji detector. Original text is kept in an undo stack.</p>
+  </div>
+</div>
+</section>
+<section class="container tool-principles" aria-label="How this tool works">
+  <div class="principle"><span class="principle-icon" aria-hidden="true">⚙️</span><div><strong>Real processing</strong><p>Every result is produced from your own input in this browser, not from a simulated preview.</p></div></div>
+  <div class="principle"><span class="principle-icon" aria-hidden="true">🔒</span><div><strong>Private by default</strong><p>Files stay in browser memory and object URLs are released when you reset, cancel or leave.</p></div></div>
+  <div class="principle"><span class="principle-icon" aria-hidden="true">⬇️</span><div><strong>Clear export</strong><p>Download your result when processing finishes. Optional model downloads are disclosed on the page.</p></div></div>
+</section>
+<section class="section section-soft">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>How to use Text Cleaner</h2>
+      <ol><li>Paste the text you want to clean, or type directly into the input box.</li><li>Choose options under Whitespace, Characters, HTML, Other text and Text formatting.</li><li>Use All, None or Default to set many options at once.</li><li>Click Clean Text. The result appears on the right; use Undo to step back.</li></ol>
+    </div>
+    <div class="info-card">
+      <h2>Example</h2>
+      
+      <div class="example-row"><span class="example-label">Input</span><div class="example-box">Hello   world​!</div></div>
+      <div class="example-row"><span class="example-label">Output</span><div class="example-box">Hello world!</div></div>
+    </div>
+  </div>
+</section>
+<section class="section section-soft">
+  <div class="container"><article class="article-card">
+      <span class="eyebrow">In-depth guide</span>
+      <h2>A fixed processing order</h2>
+      <p>Text Cleaner applies rules in a defined sequence: whitespace first, then character filters, HTML and decoding, links, and finally formatting. This matters because rules can interact. For example, stripping HTML tags before removing extra spaces produces different output from doing it the other way around.</p>
+      <p>The order in this build follows the supplied reference application so that results are predictable for people moving between the two tools.</p>
+      <h2>Honest limitations</h2>
+      <p>HTML rules use regular expressions rather than a real HTML parser. Tag stripping removes anything between angle brackets, and attribute removal only matches quoted values. The “Strip emoji” option covers a small set of Unicode blocks and also treats literal pipe characters as literal characters, matching the reference implementation.</p>
+      <p>If you need precise HTML sanitisation or complete emoji removal, use a dedicated tool instead. This page reproduce the reference behaviour, including its quirks.</p>
+  </article></div>
+</section>
+<section class="section">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>Frequently asked questions</h2>
+      <details class="faq-item">
+  <summary>Does this upload my text?</summary>
+  <p>No. Cleaning happens entirely in your browser. Nothing is sent to a server.</p>
+</details><details class="faq-item">
+  <summary>Does Strip emoji remove every emoji?</summary>
+  <p>No. It targets the common pictograph ranges used by the reference tool, so some modern emoji, flags and joined sequences can remain. Use the Remove Emojis tool for the broader Unicode-range filter.</p>
+</details><details class="faq-item">
+  <summary>What does the Default preset select?</summary>
+  <p>It selects trim, remove leading and trailing spaces, strip HTML tags, strip emoji, collapse multiple spaces and reduce multiple blank lines. It leaves letter case unchanged.</p>
+</details><details class="faq-item">
+  <summary>Can I undo a cleanup?</summary>
+  <p>Yes. The Undo button restores the previous result. It is a simple history for this tool, not a full text-editor undo stack.</p>
+</details>
+    </div>
+    <div class="info-card">
+      <h2>Related tools</h2>
+      <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
+        <a class="card tool-card" href="../../../tools/writing-text/remove-extra-spaces/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">↔️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Remove Extra Spaces</h3><p>Replace every run of whitespace, including tabs and line breaks, with a single space and trim the ends. Upload a .txt file or paste text and copy the cleaned result.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/remove-emojis/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🚫</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Remove Emojis from Text</h3><p>Strip emoji and pictographic symbols using the exact Unicode ranges of the reference tool. Upload a .txt file or paste text; a selected file takes priority over pasted input.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/remove-punctuation/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">✏️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Remove Punctuation</h3><p>Remove Unicode punctuation marks from text while keeping letters, numbers, emoji and symbols intact.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/word-counter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔢</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Word Counter &amp; Text Statistics</h3><p>Count words, grapheme-based characters, sentences and paragraphs. See reading and speaking time, keyword density for one-to-three-word phrases and an optional progress goal.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a>
+      </div>
+    </div>
+  </div>
+</section>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="footer-logo" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+        <p>Free, focused tools that run in your browser. Your files stay on your device, every result is real, and there are no accounts or deceptive downloads.</p>
+        <a class="footer-contact" href="mailto:info@letitedit.com">info@letitedit.com</a>
+      </div>
+      <div class="footer-column">
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="/tools/">All Tools</a></li>
+          <li><a href="/categories/">Categories</a></li>
+          <li><a href="/new-tools/">New Tools</a></li>
+          <li><a href="/news/">News</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Popular categories</h3>
+        <ul>
+          <li><a href="/tools/writing-text/">Text &amp; Writing</a></li>
+          <li><a href="/tools/coding-developer/">Developer Tools</a></li>
+          <li><a href="/tools/image-photo/">Image &amp; Photo</a></li>
+          <li><a href="/tools/video-audio/">Video &amp; Audio</a></li>
+          <li><a href="/tools/social-media/">Social Media</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Trust &amp; policies</h3>
+        <ul>
+          <li><a href="/about/">About LetitEdit</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="/terms-of-service/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-promise">
+      <span aria-hidden="true">🔒</span>
+      <p><strong>Privacy by design.</strong> Files are processed in your browser. Optional AI models download only after you opt in, and are never sent your media.</p>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> LetitEdit.com</span>
+      <span>Built for privacy, accuracy and plain-English tooling.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../../js/search-index.js"></script>
+<script src="../../../js/sidebar-data.js"></script>
+<script src="../../../js/site.js"></script>
+<script src="../../../js/category-sidebar.js"></script>
+<script src="../../../js/reference-core.js"></script>
+<script src="../../../js/reference-runtime.js"></script>
+<script id="tool-config" type="application/json">{"slug":"text-cleaner","engine":"text-cleaner","layout":"single","outputType":"text","controls":[{"type":"checkbox","key":"normalizeUnicode","label":"Normalize Unicode (NFC)","default":true},{"type":"checkbox","key":"zeroWidth","label":"Remove zero-width and control characters","default":true},{"type":"checkbox","key":"tabs","label":"Convert tabs to spaces","default":true},{"type":"checkbox","key":"collapseSpaces","label":"Collapse repeated spaces","default":true},{"type":"checkbox","key":"trim","label":"Trim leading and trailing spaces","default":true}],"example":{"input":"Hello   world​!","output":"Hello world!"}}</script>
+</body>
+</html>

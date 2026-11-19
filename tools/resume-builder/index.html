@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resume / CV Builder — 60 professional templates, export to PDF</title>
+<meta name="description" content="Build a professional resume or CV in your browser. Pick from 60 layout and colour combinations, add your photo, and export a print-perfect PDF. Everything is saved locally and nothing is uploaded.">
+<meta name="theme-color" content="#080a0f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%237c5cff'/%3E%3Cpath d='M4 16l4-5 3 3 4-6 5 8z' fill='white'/%3E%3Ccircle cx='8' cy='7' r='2' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="../../index.html" title="Back to Toolbox">
+      <span class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor" stroke="none"/><path d="m5 17 4.5-5.5 3.5 3.5 3-4 3 6"/></svg>
+      </span>
+      <span class="brand-text">
+        <strong>Resume Builder</strong>
+        <span>Runs in your browser</span>
+      </span>
+    </a>
+
+    <div class="topbar-mid">
+      <span class="status-chip" id="saveChip"><i aria-hidden="true"></i><span id="saveText">Saved locally</span></span>
+      <span class="status-chip status-chip--template" id="templateChip">Classic · Indigo</span>
+    </div>
+
+    <div class="topbar-actions">
+      <button class="btn ghost" id="btnSample" type="button" title="Load the sample resume" aria-label="Load sample CV">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/></svg>
+        <span class="btn-label long">Sample CV</span>
+        <span class="btn-label short">Sample</span>
+      </button>
+      <button class="btn primary" id="btnPrint" type="button" title="Print or save as PDF" aria-label="Print or save as PDF">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+        <span class="btn-label long">Print / Save PDF</span>
+        <span class="btn-label short">PDF</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="editor" aria-label="Resume details">
+      <div class="editor-scroll">
+
+        <details class="panel" id="panelDesign" open>
+          <summary class="panel-summary">
+            <span class="panel-title">Design</span>
+            <span class="panel-hint" id="designMeta">Classic · Indigo</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="panel-body">
+            <div class="design-block">
+              <div class="design-head"><span>Layout</span><b id="layoutName">Classic</b></div>
+              <div class="layout-strip" id="layoutStrip" role="radiogroup" aria-label="Template layout"></div>
+            </div>
+
+            <div class="design-block">
+              <div class="design-head"><span>Colour theme</span><b id="themeName">Indigo</b></div>
+              <div class="theme-strip" id="themeStrip" role="radiogroup" aria-label="Colour theme"></div>
+            </div>
+
+            <div class="design-block">
+              <div class="design-head"><span>All templates</span><b id="templateCount">60</b></div>
+              <div class="template-browser" id="templateBrowser" role="listbox" aria-label="All template combinations"></div>
+            </div>
+          </div>
+        </details>
+
+        <details class="panel" open>
+          <summary class="panel-summary">
+            <span class="panel-title">Personal information</span>
+            <span class="panel-hint">Name &amp; contact</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="panel-body">
+            <div class="photo-block">
+              <div class="photo-preview" id="photoPreview">
+                <img id="photoThumb" alt="Profile photo preview" hidden>
+                <span class="photo-initials" id="photoInitials">AM</span>
+              </div>
+              <div class="photo-actions">
+                <label class="btn soft file-btn" for="photoInput">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5-5 5 5"/><path d="M12 5v12"/></svg>
+                  Upload photo
+                  <input type="file" id="photoInput" accept="image/*" hidden>
+                </label>
+                <button type="button" class="btn ghost" id="btnPhotoRemove" disabled>Remove</button>
+                <p class="field-note">JPG, PNG or WebP. Resized on your device — nothing is uploaded.</p>
+              </div>
+            </div>
+
+            <div class="field-grid">
+              <label class="field" for="pName"><span class="field-label">Full name</span>
+                <input type="text" id="pName" data-bind="personal.name" autocomplete="name" placeholder="Alex Morgan" maxlength="70">
+              </label>
+              <label class="field" for="pTitle"><span class="field-label">Professional title</span>
+                <input type="text" id="pTitle" data-bind="personal.title" autocomplete="organization-title" placeholder="Senior Product Designer" maxlength="90">
+              </label>
+              <label class="field" for="pEmail"><span class="field-label">Email</span>
+                <input type="email" id="pEmail" data-bind="personal.email" autocomplete="email" placeholder="you@example.com" maxlength="120">
+              </label>
+              <label class="field" for="pPhone"><span class="field-label">Phone</span>
+                <input type="tel" id="pPhone" data-bind="personal.phone" autocomplete="tel" placeholder="+1 (415) 555-0142" maxlength="40">
+              </label>
+              <label class="field" for="pLocation"><span class="field-label">Location</span>
+                <input type="text" id="pLocation" data-bind="personal.location" autocomplete="address-level2" placeholder="San Francisco, CA" maxlength="80">
+              </label>
+              <label class="field" for="pWebsite"><span class="field-label">Website</span>
+                <input type="text" id="pWebsite" data-bind="personal.website" autocomplete="url" placeholder="alexmorgan.design" maxlength="90" spellcheck="false">
+              </label>
+            </div>
+          </div>
+        </details>
+
+        <details class="panel" open>
+          <summary class="panel-summary">
+            <span class="panel-title">Professional summary</span>
+            <span class="panel-hint" id="summaryCount">0 words</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="panel-body">
+            <label class="field" for="pSummary"><span class="field-label">A short pitch</span>
+              <textarea id="pSummary" data-bind="summary" rows="4" maxlength="1200" placeholder="Two or three sentences about your experience, strengths and what you are looking for."></textarea>
+            </label>
+          </div>
+        </details>
+
+        <details class="panel" open>
+          <summary class="panel-summary">
+            <span class="panel-title">Work experience</span>
+            <span class="panel-hint" id="countExperience">0 roles</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="panel-body">
+            <div class="list" id="listExperience"></div>
+            <button type="button" class="btn add-btn" data-add="experience">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+              Add more experience
+            </button>
+          </div>
+        </details>
+
+        <details class="panel">
+          <summary class="panel-summary">
+            <span class="panel-title">Education</span>
+            <span class="panel-hint" id="countEducation">0 entries</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="panel-body">
+            <div class="list" id="listEducation"></div>
+            <button type="button" class="btn add-btn" data-add="education">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+              Add more education
+            </button>
+          </div>
+        </details>
+
+        <details class="panel">
+          <summary class="panel-summary">
+            <span class="panel-title">Skills</span>
+            <span class="panel-hint" id="countSkills">0 skills</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="panel-body">
+            <label class="field" for="pSkills"><span class="field-label">Comma separated</span>
+              <textarea id="pSkills" data-bind="skills" rows="3" maxlength="600" placeholder="Product strategy, Design systems, Figma, User research"></textarea>
+            </label>
+            <p class="field-note">Each skill becomes a tag in sidebar templates and a clean list in single-column templates.</p>
+          </div>
+        </details>
+
+        <details class="panel">
+          <summary class="panel-summary">
+            <span class="panel-title">Projects</span>
+            <span class="panel-hint" id="countProjects">0 projects</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="panel-body">
+            <div class="list" id="listProjects"></div>
+            <button type="button" class="btn add-btn" data-add="projects">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+              Add more projects
+            </button>
+          </div>
+        </details>
+
+        <details class="panel">
+          <summary class="panel-summary">
+            <span class="panel-title">Certifications</span>
+            <span class="panel-hint" id="countCertifications">0 certificates</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="panel-body">
+            <div class="list" id="listCertifications"></div>
+            <button type="button" class="btn add-btn" data-add="certifications">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+              Add more certifications
+            </button>
+          </div>
+        </details>
+
+        <details class="panel">
+          <summary class="panel-summary">
+            <span class="panel-title">Languages</span>
+            <span class="panel-hint" id="countLanguages">0 languages</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="panel-body">
+            <div class="list" id="listLanguages"></div>
+            <button type="button" class="btn add-btn" data-add="languages">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+              Add more languages
+            </button>
+          </div>
+        </details>
+
+        <div class="danger-zone">
+          <div>
+            <strong>Clear everything</strong>
+            <p>Removes this CV from your browser. This cannot be undone.</p>
+          </div>
+          <button type="button" class="btn danger" id="btnReset">Clear data</button>
+        </div>
+
+        <p class="editor-foot">Your CV is saved in this browser only. Close the tab and come back later — it will still be here.</p>
+      </div>
+    </section>
+
+    <section class="preview-pane" aria-label="Live A4 preview">
+      <div class="preview-bar">
+        <div class="preview-bar-left">
+          <span class="preview-label"><i aria-hidden="true"></i>A4 preview</span>
+          <span class="preview-meta" id="pageInfo">1 page</span>
+        </div>
+        <p class="print-hint">Print dialog: choose <b>Save as PDF</b>, paper <b>A4</b>, margins <b>None</b>.</p>
+      </div>
+      <div class="preview-scroll" id="previewScroll">
+        <div class="preview-fit" id="previewFit">
+          <article class="cv" id="cvPage" aria-label="Resume preview"></article>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

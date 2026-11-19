@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Redact Text — Mask Sensitive Data and Restore It Locally</title>
+<meta name="description" content="Mask names, emails, phone numbers, card numbers and API keys with stable labels, copy the redacted text, then restore original values from a key. Detection is heuristic and key files contain the original data.">
+<meta name="theme-color" content="#2563eb">
+<link rel="canonical" href="https://letitedit.com/tools/writing-text/text-redactor/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Redact Text — Mask Sensitive Data and Restore It Locally">
+<meta property="og:description" content="Mask names, emails, phone numbers, card numbers and API keys with stable labels, copy the redacted text, then restore original values from a key. Detection is heuristic and key files contain the original data.">
+<meta property="og:url" content="https://letitedit.com/tools/writing-text/text-redactor/">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../../css/site.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","name":"Text Redactor","mainEntity":[{"@type":"Question","name":"Is redaction the same as anonymisation?","acceptedAnswer":{"@type":"Answer","text":"No. Detection is heuristic, and writing style or context can still identify someone. Always review the redacted text before sharing it."}},{"@type":"Question","name":"Does this tool send my text anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. Detection, replacement and restoration happen in your browser. This tool makes no network requests."}},{"@type":"Question","name":"What is inside a saved key?","acceptedAnswer":{"@type":"Answer","text":"The key contains the original values for every label. Treat the file as sensitive, store it privately and delete it when you no longer need it."}},{"@type":"Question","name":"Can black bars be restored?","acceptedAnswer":{"@type":"Answer","text":"No. Black-bar mode is irreversible because the original characters are not written into the text. Use labels or fake values when you need restoration."}}]}
+</script>
+</head>
+<body class="tool-page tool-page-text">
+<header class="topbar">
+  <nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+    <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
+    <div class="nav-links" id="primary-links">
+      <a href="/categories/">Categories</a>
+      <a href="/new-tools/">New Tools</a>
+      <a href="/news/">News</a>
+      <a href="/blog/">Blog</a>
+      <a href="/tools/">All Tools</a>
+      <a href="/faq/">FAQ</a>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+    </div>
+  </nav>
+</header>
+<div class="site-search-strip" id="search-strip">
+  <div class="container">
+    <div class="search-wrap">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
+      <div class="search-results" id="search-results" role="listbox" hidden></div>
+    </div>
+  </div>
+</div>
+<nav class="container breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../">Home</a><span>/</span>
+  <a href="../../../tools/writing-text/">Writing &amp; Text Tools</a><span>/</span>
+  <span aria-current="page">Text Redactor</span>
+</nav>
+<section class="container page-head tool-head">
+  <div class="tool-head-copy">
+    <span class="eyebrow">Writing &amp; Text Tools</span>
+    <h1>Redact Text</h1>
+    <p>Three steps: paste and redact, copy the masked text, then paste a reply to restore values. Custom terms and category switches are available; the redaction key is generated on your device.</p>
+  </div>
+  <div class="tool-trust" aria-label="How this tool handles your files">
+    <span class="trust-pill"><span aria-hidden="true">✓</span> Local processing</span>
+    <span class="trust-pill"><span aria-hidden="true">✓</span> No upload</span>
+  </div>
+</section>
+<section class="container workspace engine-workspace" data-engine="text-redactor">
+<div class="workspace-head"><h2>Redact before you paste</h2><span class="card-tag">Runs in your browser</span></div>
+<div class="engine-grid engine-redact">
+  <div class="engine-controls">
+    <h3 class="step-heading">1 · Paste your text</h3>
+    <div class="field"><label>Source text</label><textarea id="rdx-input" rows="8" placeholder="Paste an email, chat, document or log file…"></textarea></div>
+    <div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="rdx-sample">Sample</button><button type="button" class="btn btn-secondary btn-small" id="rdx-clear">Clear</button><button type="button" class="btn btn-secondary btn-small" id="rdx-upload-btn">Upload file</button><input type="file" id="rdx-upload" accept=".txt,.log,.csv,.tsv,.json,.md,.eml,.xml,.yaml,.yml,.html,.htm,.env,.ini,.cfg,.conf,.properties,.toml,.sql,.js,.ts,.py,.rb,.php,.java,.go,.sh,.har,text/*,application/json" hidden></div>
+    <div class="opt-set"><h4>What to hide</h4><label class="opt"><input type="checkbox" id="rdx-name" checked> <span>Names</span></label><label class="opt"><input type="checkbox" id="rdx-email" checked> <span>Emails</span></label><label class="opt"><input type="checkbox" id="rdx-phone" checked> <span>Phone numbers</span></label><label class="opt"><input type="checkbox" id="rdx-address" checked> <span>Addresses</span></label><label class="opt"><input type="checkbox" id="rdx-money" checked> <span>Cards &amp; account numbers</span></label><label class="opt"><input type="checkbox" id="rdx-id" checked> <span>SSNs &amp; IDs</span></label><label class="opt"><input type="checkbox" id="rdx-secret" checked> <span>Keys &amp; passwords</span></label><label class="opt"><input type="checkbox" id="rdx-net" checked> <span>IP addresses</span></label><label class="opt"><input type="checkbox" id="rdx-user" checked> <span>Usernames</span></label><label class="opt"><input type="checkbox" id="rdx-url"> <span>URLs &amp; domains</span></label><label class="opt"><input type="checkbox" id="rdx-date"> <span>Dates</span></label></div>
+    <div class="opt-set"><h4>Replace with</h4><label class="opt"><input type="radio" name="rdx-style" value="label" checked> <span>Labels, like [EMAIL_1]</span></label><label class="opt"><input type="radio" name="rdx-style" value="fake"> <span>Realistic fake data</span></label><label class="opt"><input type="radio" name="rdx-style" value="bars"> <span>Black bars █████</span></label></div>
+    <div class="field"><label>Always hide these words (comma or newline separated)</label><textarea id="rdx-words" rows="2" placeholder="Project Falcon, Jane Doe"></textarea></div>
+    <div class="opt-group"><label class="opt"><input type="checkbox" id="rdx-remember"> <span>Remember these words on this device</span></label></div>
+    <p class="hint warning">Detection is heuristic: it can miss values or flag ordinary text. Your text is never transmitted by this tool. A saved key contains the <strong>original sensitive values</strong> — store it privately and delete it when finished. Black bars cannot be reversed.</p>
+  </div>
+  <div class="engine-output">
+    <h3 class="step-heading">2 · Copy the redacted text</h3>
+    <div class="workspace-head"><button type="button" class="btn btn-secondary btn-small" id="rdx-copy">Copy redacted text</button><button type="button" class="btn btn-secondary btn-small" id="rdx-save-key">Save key</button></div>
+    <textarea id="rdx-output" class="output-box" rows="8" readonly></textarea>
+    <p class="hint" id="rdx-found">0 items found</p>
+    <h3 class="step-heading">3 · Put the real values back</h3>
+    <div class="field"><label>Paste the reply</label><textarea id="rdx-restore-input" rows="5" placeholder="Paste the AI reply containing labels…"></textarea></div>
+    <div class="output-actions"><button type="button" class="btn" id="rdx-restore">Restore values</button><button type="button" class="btn btn-secondary btn-small" id="rdx-load-key">Load key</button><input type="file" id="rdx-key-file" accept="application/json,.json" hidden></div>
+    <textarea id="rdx-restored" class="output-box" rows="6" readonly></textarea>
+    <div class="workspace-head"><button type="button" class="btn btn-secondary btn-small" id="rdx-copy-restored">Copy restored text</button></div>
+    <div class="status" id="rdx-status" role="status" aria-live="polite"></div>
+  </div>
+</div>
+</section>
+<section class="container tool-principles" aria-label="How this tool works">
+  <div class="principle"><span class="principle-icon" aria-hidden="true">⚙️</span><div><strong>Real processing</strong><p>Every result is produced from your own input in this browser, not from a simulated preview.</p></div></div>
+  <div class="principle"><span class="principle-icon" aria-hidden="true">🔒</span><div><strong>Private by default</strong><p>Files stay in browser memory and object URLs are released when you reset, cancel or leave.</p></div></div>
+  <div class="principle"><span class="principle-icon" aria-hidden="true">⬇️</span><div><strong>Clear export</strong><p>Download your result when processing finishes. Optional model downloads are disclosed on the page.</p></div></div>
+</section>
+<section class="section section-soft">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>How to use Text Redactor</h2>
+      <ol><li>Paste text or load a plain-text file, then choose which categories to hide.</li><li>Choose labels, realistic fake values or black bars, and add any custom words to hide.</li><li>Copy the redacted text and paste it into another service only if you are comfortable doing so.</li><li>Paste that service’s reply into step 3 and restore the original values using the in-memory key or a saved key file.</li></ol>
+    </div>
+    <div class="info-card">
+      <h2>Example</h2>
+      
+      <div class="example-row"><span class="example-label">Input</span><div class="example-box">Email me at jane@example.com</div></div>
+      <div class="example-row"><span class="example-label">Output</span><div class="example-box">Email me at [EMAIL_1]</div></div>
+    </div>
+  </div>
+</section>
+<section class="section section-soft">
+  <div class="container"><article class="article-card">
+      <span class="eyebrow">In-depth guide</span>
+      <h2>How labels stay consistent</h2>
+      <p>Detected values are normalised so the same email, phone number or secret always receives the same label within one session. Overlapping matches are resolved by priority, length and position, and custom words are expanded to align with detected spans.</p>
+      <p>Restoration replaces bracketed labels and bare labels from the key. Fake values are mapped back as well; unknown labels are reported and left unchanged.</p>
+      <h2>Limits and safety</h2>
+      <p>The reference tool caps uploads at 20 MB and internal scanning at one million characters, with lower caps for highlighted paths. This build applies a 5 MB upload limit for responsiveness.</p>
+      <p>Redaction reduces risk but cannot guarantee privacy. Check the output for anything the detectors missed, and remember that any service you paste redacted text into receives the redacted version, not the original.</p>
+  </article></div>
+</section>
+<section class="section">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>Frequently asked questions</h2>
+      <details class="faq-item">
+  <summary>Is redaction the same as anonymisation?</summary>
+  <p>No. Detection is heuristic, and writing style or context can still identify someone. Always review the redacted text before sharing it.</p>
+</details><details class="faq-item">
+  <summary>Does this tool send my text anywhere?</summary>
+  <p>No. Detection, replacement and restoration happen in your browser. This tool makes no network requests.</p>
+</details><details class="faq-item">
+  <summary>What is inside a saved key?</summary>
+  <p>The key contains the original values for every label. Treat the file as sensitive, store it privately and delete it when you no longer need it.</p>
+</details><details class="faq-item">
+  <summary>Can black bars be restored?</summary>
+  <p>No. Black-bar mode is irreversible because the original characters are not written into the text. Use labels or fake values when you need restoration.</p>
+</details>
+    </div>
+    <div class="info-card">
+      <h2>Related tools</h2>
+      <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
+        <a class="card tool-card" href="../../../tools/writing-text/extract-emails/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📧</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Extract Emails from Text</h3><p>Find and extract unique email addresses from pasted text, logs or documents. No uploads, no sign-up.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/extract-urls/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔗</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Extract URLs from Text</h3><p>Extract unique http and https links from pasted text, trimming trailing punctuation automatically.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/text-filter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧽</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Text Filter</h3><p>Remove whole words and highlight others with safe DOM spans. Terms are comma separated, matched case-insensitively with word boundaries, and input HTML is never executed.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/find-and-replace/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔎</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Find and Replace</h3><p>Replace all occurrences of a literal string, or turn off case sensitivity to treat Find as a live regular expression with global and case-insensitive flags. Invalid patterns show a clear error.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a>
+      </div>
+    </div>
+  </div>
+</section>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="footer-logo" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+        <p>Free, focused tools that run in your browser. Your files stay on your device, every result is real, and there are no accounts or deceptive downloads.</p>
+        <a class="footer-contact" href="mailto:info@letitedit.com">info@letitedit.com</a>
+      </div>
+      <div class="footer-column">
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="/tools/">All Tools</a></li>
+          <li><a href="/categories/">Categories</a></li>
+          <li><a href="/new-tools/">New Tools</a></li>
+          <li><a href="/news/">News</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Popular categories</h3>
+        <ul>
+          <li><a href="/tools/writing-text/">Text &amp; Writing</a></li>
+          <li><a href="/tools/coding-developer/">Developer Tools</a></li>
+          <li><a href="/tools/image-photo/">Image &amp; Photo</a></li>
+          <li><a href="/tools/video-audio/">Video &amp; Audio</a></li>
+          <li><a href="/tools/social-media/">Social Media</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Trust &amp; policies</h3>
+        <ul>
+          <li><a href="/about/">About LetitEdit</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="/terms-of-service/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-promise">
+      <span aria-hidden="true">🔒</span>
+      <p><strong>Privacy by design.</strong> Files are processed in your browser. Optional AI models download only after you opt in, and are never sent your media.</p>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> LetitEdit.com</span>
+      <span>Built for privacy, accuracy and plain-English tooling.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../../js/search-index.js"></script>
+<script src="../../../js/sidebar-data.js"></script>
+<script src="../../../js/site.js"></script>
+<script src="../../../js/category-sidebar.js"></script>
+<script src="../../../js/reference-core.js"></script>
+<script src="../../../js/reference-runtime.js"></script>
+<script id="tool-config" type="application/json">{"slug":"text-redactor","engine":"text-redactor","layout":"single","outputType":"redactor","controls":[{"type":"checkbox","key":"email","label":"Email addresses","default":true},{"type":"checkbox","key":"phone","label":"Phone numbers","default":true},{"type":"checkbox","key":"card","label":"Card-like numbers","default":true},{"type":"checkbox","key":"key","label":"API keys and tokens","default":true}],"example":{"input":"Email me at jane@example.com","output":"Email me at [EMAIL_1]"}}</script>
+</body>
+</html>
