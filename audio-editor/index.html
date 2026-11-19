@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Audio Editor — Trim, Fade and Export Audio Locally</title>
+<meta name="description" content="Trim audio or a video soundtrack, adjust gain, add fades, reverse a clip and play it back locally, then download WAV or MP3 where your browser supports it. No upload.">
+<meta name="theme-color" content="#2563eb">
+<link rel="canonical" href="https://letitedit.com/audio-editor/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Audio Editor — Trim, Fade and Export Audio Locally">
+<meta property="og:description" content="Trim audio or a video soundtrack, adjust gain, add fades, reverse a clip and play it back locally, then download WAV or MP3 where your browser supports it. No upload.">
+<meta property="og:url" content="https://letitedit.com/audio-editor/">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/css/site.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","name":"Audio Editor","mainEntity":[{"@type":"Question","name":"Is my audio uploaded anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. Decoding, editing and playback all happen in your browser. The file is not sent to LetitEdit or to an audio conversion service, and closing or reloading the page clears the working copy."}},{"@type":"Question","name":"Can I edit the audio from a video file?","acceptedAnswer":{"@type":"Answer","text":"Yes. Load a video and the tool extracts its soundtrack locally. Only the audio is edited; this tool does not save a new video file. For picture edits, use the video editor."}},{"@type":"Question","name":"Why is M4A sometimes unavailable?","acceptedAnswer":{"@type":"Answer","text":"M4A needs an AAC encoder, and not every browser provides one. The option appears only when the browser can encode AAC. WAV and MP3 are the dependable export choices; nothing is wrong with your file if M4A is missing."}},{"@type":"Question","name":"What do gain and fade actually change?","acceptedAnswer":{"@type":"Answer","text":"Gain raises or lowers the level of the whole selection. Fade in ramps from silence at the start, and fade out ramps down to silence at the end. Fades remove clicks and make edits sound smoother; they do not remove background noise."}},{"@type":"Question","name":"Can this remove noise or fix a distorted recording?","acceptedAnswer":{"@type":"Answer","text":"No. There is no noise reduction, equaliser or clipping repair here. You can trim damaged sections and lower excessive gain, but information that was recorded badly cannot be restored by these controls."}},{"@type":"Question","name":"Why is a long recording slow to process?","acceptedAnswer":{"@type":"Answer","text":"A long file holds a lot of samples, so decoding, drawing the waveform and encoding the export all take more work. Keep the tab active while it runs, close other heavy tabs and try trimming to a shorter region first if the page becomes sluggish."}}]}
+</script>
+</head>
+<body class="tool-page tool-page-video">
+<header class="topbar">
+  <nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+    <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
+    <div class="nav-links" id="primary-links">
+      <a href="/categories/">Categories</a>
+      <a href="/new-tools/">New Tools</a>
+      <a href="/news/">News</a>
+      <a href="/blog/">Blog</a>
+      <a href="/tools/">All Tools</a>
+      <a href="/faq/">FAQ</a>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+    </div>
+  </nav>
+</header>
+<div class="site-search-strip" id="search-strip">
+  <div class="container">
+    <div class="search-wrap">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
+      <div class="search-results" id="search-results" role="listbox" hidden></div>
+    </div>
+  </div>
+</div>
+<nav class="container breadcrumbs" aria-label="Breadcrumb">
+  <a href="/">Home</a><span>/</span>
+  <a href="/tools/video-audio/">Video &amp; Audio Tools</a><span>/</span>
+  <span aria-current="page">Audio Editor</span>
+</nav>
+<section class="container page-head tool-head">
+  <div class="tool-head-copy">
+    <span class="eyebrow">Video &amp; Audio Tools</span>
+    <h1>Audio Editor</h1>
+    <p>A small editor for the audio changes you need most: cut dead air, lift a quiet recording, soften an abrupt ending or reverse a short sound. Load an audio file or take the soundtrack from a video, work against a real waveform and play the result before you download it. Everything runs in your browser, with no upload queue or account.</p>
+  </div>
+  <div class="tool-trust" aria-label="How this tool handles your files">
+    <span class="trust-pill"><span aria-hidden="true">✓</span> Local processing</span>
+    <span class="trust-pill"><span aria-hidden="true">✓</span> No upload</span>
+  </div>
+</section>
+<section class="container"><div class="workspace video-workspace"><div class="workspace-head"><h2>Audio Editor workspace</h2><span class="card-tag">Local processing</span></div><div class="image-grid video-grid"><div class="image-controls video-controls"><div class="opt-group"><span class="opt-title">Source</span><div class="field"><label>Audio or video file</label><input type="file" id="v-file" accept="audio/*,video/*"><p class="hint">Decoded locally. WAV, MP3, M4A, OGG, MP4 and WebM usually work.</p></div></div><div class="opt-group"><span class="opt-title">Trim</span><div class="field range-field"><label for="v-start">Start <output id="v-start-value">0</output></label><input type="range" id="v-start" min="0" max="1000" step="1" value="0"></div><div class="field range-field"><label for="v-end">End <output id="v-end-value">1000</output></label><input type="range" id="v-end" min="0" max="1000" step="1" value="1000"></div></div><div class="opt-group"><span class="opt-title">Sound</span><div class="field range-field"><label for="v-gain">Volume % <output id="v-gain-value">100</output></label><input type="range" id="v-gain" min="0" max="200" step="1" value="100"></div><div class="field range-field"><label for="v-fade-in">Fade in (ms) <output id="v-fade-in-value">0</output></label><input type="range" id="v-fade-in" min="0" max="3000" step="50" value="0"></div><div class="field range-field"><label for="v-fade-out">Fade out (ms) <output id="v-fade-out-value">0</output></label><input type="range" id="v-fade-out" min="0" max="3000" step="50" value="0"></div><label class="check-line"><input type="checkbox" id="v-reverse"> <span>Reverse audio</span></label></div><div class="opt-group"><span class="opt-title">Export</span><div class="field"><label>Format</label><select id="v-format"><option value="mp3">MP3 (local LAME)</option><option value="wav">WAV (lossless)</option><option value="m4a">M4A / AAC (if supported)</option></select></div><div class="output-actions"><button class="btn btn-small btn-primary" type="button" id="v-process">Apply edits</button><button class="btn btn-small" type="button" id="v-play">Play preview</button><button class="btn btn-small" type="button" id="v-stop">Stop</button><button class="btn btn-small" type="button" id="v-reset">Reset</button></div><p class="hint">The preview and export use the same edited samples.</p></div></div><div class="image-output video-output"><div class="image-preview-frame video-preview-frame"><canvas id="v-waveform" class="video-canvas waveform" width="640" height="170" role="img" aria-label="Audio waveform preview"></canvas><audio id="v-audio" controls playsinline hidden></audio></div><p class="status" id="v-status" role="status" aria-live="polite">Choose a file to begin.</p><div class="output-actions"><button class="btn btn-small" type="button" id="v-cancel" disabled>Cancel</button><button class="btn btn-small btn-primary" type="button" id="v-download" disabled>Download</button></div></div></div></div></section>
+<section class="container tool-principles" aria-label="How this tool works">
+  <div class="principle"><span class="principle-icon" aria-hidden="true">⚙️</span><div><strong>Real processing</strong><p>Every result is produced from your own input in this browser, not from a simulated preview.</p></div></div>
+  <div class="principle"><span class="principle-icon" aria-hidden="true">🔒</span><div><strong>Private by default</strong><p>Files stay in browser memory and object URLs are released when you reset, cancel or leave.</p></div></div>
+  <div class="principle"><span class="principle-icon" aria-hidden="true">⬇️</span><div><strong>Clear export</strong><p>Download your audio file when processing finishes. Optional model downloads are disclosed on the page.</p></div></div>
+</section>
+<section class="section section-soft">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>How to use Audio Editor</h2>
+      <ol><li>Choose an audio file or a video whose soundtrack you want to edit.</li><li>Wait for the browser to decode the file and draw the local waveform.</li><li>Drag the start and end handles to trim the part you want to keep.</li><li>Adjust gain, then add fade in and fade out times if the edges sound abrupt.</li><li>Use reverse for a creative effect, then play the clip back to check it.</li><li>Download WAV or MP3, or M4A if your browser can encode AAC.</li></ol>
+    </div>
+    <div class="info-card">
+      <h2>Example</h2>
+      
+      <div class="example-row"><span class="example-label">Input</span><div class="example-box">Two-minute MP3 voice memo with silence at the start and a sudden ending</div></div>
+      <div class="example-row"><span class="example-label">Output</span><div class="example-box">Trimmed WAV with a short fade in, a gentle fade out and no leading silence</div></div>
+    </div>
+  </div>
+</section>
+<section class="section section-soft">
+  <div class="container"><article class="article-card">
+      <span class="eyebrow">In-depth guide</span>
+      <h2>Edit audio in your browser without an upload</h2>
+      <p>Audio edits are often small: remove a pause at the start, drop the level of a loud intro, fade the ending so it does not cut off abruptly. This editor keeps those jobs in one place and runs them in your browser. Load an audio file or the audio track of a video, watch the waveform draw locally, then set a trim range and apply gain, fades or reverse. You can play the result back before exporting, which makes it much easier to judge a fade or a cut than guessing from numbers alone. Nothing is uploaded to LetitEdit or to a conversion service, so a private recording stays on the device where it was made. The original file is never changed; every edit produces a new download. That means you can try a short fade, compare it with a longer one and keep whichever copy you prefer without damaging the source.</p>
+      <h2>Loading a file and reading the waveform</h2>
+      <p>Choose an audio file such as MP3, WAV or M4A, or select a video file if you want to work with its soundtrack. The browser decodes the file locally and draws a waveform: a picture of signal level over time. Loud passages appear as tall peaks, quiet passages as lower areas, and silence as a flat line. The waveform is your main guide for trimming. A long flat section at the beginning usually means dead air you can remove, while a sharp block of tall peaks may point to a click or an unexpectedly loud word. Zoom and scroll if the tool offers them, because a full recording compressed into a narrow strip hides detail. If decoding fails, the tool reports it rather than showing a fake waveform; that usually means the browser cannot read that particular codec, and converting the source elsewhere is the practical next step.</p>
+      <h2>Trim, gain and fades</h2>
+      <p>Trimming sets the start and end of the piece you keep. Drag the handles on the waveform, then play just the selected region to check that no word is clipped. Gain changes the overall level: raising it makes a quiet recording easier to hear, but pushing too far can introduce distortion, especially on already loud peaks. Lowering gain is safer and often useful when a clip was recorded too hot. Fade in ramps the level from silence at the start, and fade out does the same at the end. They remove the click you get when a waveform begins or ends mid-cycle and make speech sound less abrupt. Use short fades on voice and longer ones on music. Each control can be adjusted independently, so change one at a time and listen again before moving on.</p>
+      <h2>Reverse and playback</h2>
+      <p>Reverse flips the selected audio so it plays backwards. It is mainly a creative effect for short stings and sound design, and it can also make certain speech patterns easier to notice when you are studying them. Because reversing a long track means re-reading the whole buffer, it may take a moment on a large file. Playback is the check that ties everything together. Listen from the beginning of the trimmed region, then jump to the last few seconds to confirm the fade actually reaches silence. Headphones help you hear low-level hiss or a small click that a laptop speaker may hide. If something sounds wrong, reset the last edit rather than stacking more corrections on top: a modest gain change plus a clean trim is usually better than several extreme settings fighting each other.</p>
+      <h2>Export formats and limits</h2>
+      <p>You can download the edited clip as WAV or MP3. WAV is uncompressed and preserves the samples the browser produced, which is useful when you plan to edit the file again or need a clean master. MP3 is much smaller and convenient for sharing, but it is lossy, so quiet detail can soften slightly after saving. M4A is offered only when the browser can encode AAC; if the option is missing, that is a browser limitation, not a broken tool. This editor works on one clip at a time and does not provide multi-track mixing, noise reduction or pitch correction. Very long recordings use more memory and may be slow to decode and export. Keep the tab active during export, and reload the page if the preview stops responding. Closing or reloading clears the working copy, so download anything you want to keep.</p>
+  </article></div>
+</section>
+<section class="section">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>Frequently asked questions</h2>
+      <details class="faq-item">
+  <summary>Is my audio uploaded anywhere?</summary>
+  <p>No. Decoding, editing and playback all happen in your browser. The file is not sent to LetitEdit or to an audio conversion service, and closing or reloading the page clears the working copy.</p>
+</details><details class="faq-item">
+  <summary>Can I edit the audio from a video file?</summary>
+  <p>Yes. Load a video and the tool extracts its soundtrack locally. Only the audio is edited; this tool does not save a new video file. For picture edits, use the video editor.</p>
+</details><details class="faq-item">
+  <summary>Why is M4A sometimes unavailable?</summary>
+  <p>M4A needs an AAC encoder, and not every browser provides one. The option appears only when the browser can encode AAC. WAV and MP3 are the dependable export choices; nothing is wrong with your file if M4A is missing.</p>
+</details><details class="faq-item">
+  <summary>What do gain and fade actually change?</summary>
+  <p>Gain raises or lowers the level of the whole selection. Fade in ramps from silence at the start, and fade out ramps down to silence at the end. Fades remove clicks and make edits sound smoother; they do not remove background noise.</p>
+</details><details class="faq-item">
+  <summary>Can this remove noise or fix a distorted recording?</summary>
+  <p>No. There is no noise reduction, equaliser or clipping repair here. You can trim damaged sections and lower excessive gain, but information that was recorded badly cannot be restored by these controls.</p>
+</details><details class="faq-item">
+  <summary>Why is a long recording slow to process?</summary>
+  <p>A long file holds a lot of samples, so decoding, drawing the waveform and encoding the export all take more work. Keep the tab active while it runs, close other heavy tabs and try trimming to a shorter region first if the page becomes sluggish.</p>
+</details>
+    </div>
+    <div class="info-card">
+      <h2>Related tools</h2>
+      <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
+        <a class="card tool-card" href="/video-trimmer/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">✂️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Video Trimmer</h3><p>Pick start and end points on a real preview, then cut a clip without an upload. The tool uses stream copy when it can and re-encodes only when a cut needs it. Export MP4 or WebM.</p><span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/screen-recorder/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">🖥️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Screen Recorder</h3><p>Record a tab, window or whole screen in your browser, add microphone audio if you want, pause and resume, then download a WebM file. All capture stays on your device.</p><span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/video-to-shorts/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">📱</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>AI Video-to-Shorts</h3><p>Find candidate highlight windows from audio loudness and motion in your video, then export vertical 9:16 clips. Optional local Whisper transcript ranking adds SRT when enabled.</p><span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/subtitle-generator/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">📝</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Multilingual Subtitle Generator</h3><p>Generate editable captions from video or audio with opt-in local Whisper tiny speech recognition. Review word-level timestamps and export SRT, VTT or TXT. No media is uploaded.</p><span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span></a>
+      </div>
+    </div>
+  </div>
+</section>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="footer-logo" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+        <p>Free, focused tools that run in your browser. Your files stay on your device, every result is real, and there are no accounts or deceptive downloads.</p>
+        <a class="footer-contact" href="mailto:info@letitedit.com">info@letitedit.com</a>
+      </div>
+      <div class="footer-column">
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="/tools/">All Tools</a></li>
+          <li><a href="/categories/">Categories</a></li>
+          <li><a href="/new-tools/">New Tools</a></li>
+          <li><a href="/news/">News</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Popular categories</h3>
+        <ul>
+          <li><a href="/tools/writing-text/">Text &amp; Writing</a></li>
+          <li><a href="/tools/coding-developer/">Developer Tools</a></li>
+          <li><a href="/tools/image-photo/">Image &amp; Photo</a></li>
+          <li><a href="/tools/video-audio/">Video &amp; Audio</a></li>
+          <li><a href="/tools/social-media/">Social Media</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Trust &amp; policies</h3>
+        <ul>
+          <li><a href="/about/">About LetitEdit</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="/terms-of-service/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-promise">
+      <span aria-hidden="true">🔒</span>
+      <p><strong>Privacy by design.</strong> Files are processed in your browser. Optional AI models download only after you opt in, and are never sent your media.</p>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> LetitEdit.com</span>
+      <span>Built for privacy, accuracy and plain-English tooling.</span>
+    </div>
+  </div>
+</footer>
+<script src="/js/search-index.js"></script>
+<script src="/js/sidebar-data.js"></script>
+<script src="/js/site.js"></script>
+<script src="/js/category-sidebar.js"></script>
+<script src="/js/video-core.js"></script>
+<script src="/js/video-runtime.js"></script>
+<script id="tool-config" type="application/json">{"slug":"audio-editor","engine":"audio-editor","layout":"engine","outputType":"audio","example":{"input":"Two-minute MP3 voice memo with silence at the start and a sudden ending","output":"Trimmed WAV with a short fade in, a gentle fade out and no leading silence"}}</script>
+</body>
+</html>
