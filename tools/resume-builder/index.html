@@ -72,6 +72,48 @@
           </div>
         </details>
 
+        <details class="panel" id="panelLayout">
+          <summary class="panel-summary">
+            <span class="panel-title">Layout fine-tuning</span>
+            <span class="panel-hint" id="layoutAdjustHint">Off</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="panel-body">
+            <button type="button" class="btn soft adjust-toggle" id="btnAdjustEditor" aria-pressed="false">Enable block positioning</button>
+            <p class="field-note">Turn this on, then drag blocks in the preview. Use the controls below for exact placement, layer order and width.</p>
+
+            <div class="adjust-controls" id="adjustControls" hidden>
+              <label class="field" for="blockSelect"><span class="field-label">Selected block</span>
+                <select id="blockSelect"><option value="">No block selected</option></select>
+              </label>
+
+              <div class="field-grid adjust-grid">
+                <label class="field" for="blockX"><span class="field-label">X offset (px)</span>
+                  <input type="number" id="blockX" min="-1000" max="1000" step="1" value="0" inputmode="numeric">
+                </label>
+                <label class="field" for="blockY"><span class="field-label">Y offset (px)</span>
+                  <input type="number" id="blockY" min="-1000" max="1000" step="1" value="0" inputmode="numeric">
+                </label>
+              </div>
+
+              <label class="field" for="blockWidth"><span class="field-label">Width: <b id="blockWidthValue">auto</b></span>
+                <div class="range-row">
+                  <input type="range" id="blockWidth" min="80" max="794" step="1" value="400">
+                  <input type="number" id="blockWidthNum" min="80" max="794" step="1" value="400" aria-label="Block width in pixels" inputmode="numeric">
+                </div>
+              </label>
+
+              <div class="adjust-actions">
+                <button type="button" class="btn ghost" id="btnLayerUp" disabled>Layer up</button>
+                <button type="button" class="btn ghost" id="btnLayerDown" disabled>Layer down</button>
+                <button type="button" class="btn ghost" id="btnBlockReset" disabled>Reset block</button>
+                <button type="button" class="btn soft" id="btnRestoreLayout2">Restore original layout</button>
+              </div>
+              <p class="field-note">Arrow keys nudge the selected block by 1 px (Shift = 10 px). Alignment guides snap to other blocks and the page centre while dragging.</p>
+            </div>
+          </div>
+        </details>
+
         <details class="panel" open>
           <summary class="panel-summary">
             <span class="panel-title">Personal information</span>
@@ -90,8 +132,9 @@
                   Upload photo
                   <input type="file" id="photoInput" accept="image/*" hidden>
                 </label>
+                <button type="button" class="btn ghost" id="btnPhotoEdit" disabled>Edit</button>
                 <button type="button" class="btn ghost" id="btnPhotoRemove" disabled>Remove</button>
-                <p class="field-note">JPG, PNG or WebP. Resized on your device — nothing is uploaded.</p>
+                <p class="field-note">JPG, PNG or WebP. Crop and adjust it on your device — nothing is uploaded.</p>
               </div>
             </div>
 
@@ -238,6 +281,10 @@
           <span class="preview-label"><i aria-hidden="true"></i>A4 preview</span>
           <span class="preview-meta" id="pageInfo">1 page</span>
         </div>
+        <div class="preview-bar-tools">
+          <button type="button" class="btn tool-btn" id="btnAdjust" aria-pressed="false" title="Enable dragging of resume blocks">Adjust layout</button>
+          <button type="button" class="btn tool-btn" id="btnRestoreLayout" hidden title="Clear all block moves and sizes">Restore layout</button>
+        </div>
         <p class="print-hint">Print dialog: choose <b>Save as PDF</b>, paper <b>A4</b>, margins <b>None</b>.</p>
       </div>
       <div class="preview-scroll" id="previewScroll">
@@ -247,6 +294,75 @@
       </div>
     </section>
   </main>
+</div>
+
+<!-- Photo editor: the original stays untouched until Apply -->
+<div class="modal-backdrop" id="photoModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="photoModalTitle">
+    <div class="modal-head">
+      <div>
+        <h2 id="photoModalTitle">Edit photo</h2>
+        <p class="modal-sub">Drag the photo inside the crop frame. Nothing is saved until you apply.</p>
+      </div>
+      <button type="button" class="icon-btn modal-close" id="btnPhotoClose" aria-label="Cancel photo editing" title="Cancel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="photo-editor">
+      <div class="pe-stage-col">
+        <div class="pe-stage-wrap">
+          <canvas id="photoStage" width="360" height="360" aria-label="Photo crop and adjustment preview"></canvas>
+        </div>
+        <p class="pe-hint">Drag to reposition · scroll the sliders for fine control</p>
+        <div class="pe-result">
+          <span class="pe-result-thumb"><img id="photoEditThumb" alt="Result preview at resume size"></span>
+          <span>Final circular preview</span>
+        </div>
+      </div>
+
+      <div class="pe-controls">
+        <label class="pe-control" for="peZoom"><span>Zoom <output id="peZoomOut">100%</output></span>
+          <input type="range" id="peZoom" min="40" max="300" step="1" value="100">
+        </label>
+        <label class="pe-control" for="peRotate"><span>Rotate <output id="peRotateOut">0°</output></span>
+          <input type="range" id="peRotate" min="-180" max="180" step="1" value="0">
+        </label>
+        <label class="pe-control" for="peCrop"><span>Crop area <output id="peCropOut">100%</output></span>
+          <input type="range" id="peCrop" min="45" max="100" step="1" value="100">
+        </label>
+        <label class="pe-control" for="peBrightness"><span>Brightness <output id="peBrightnessOut">0</output></span>
+          <input type="range" id="peBrightness" min="-100" max="100" step="1" value="0">
+        </label>
+        <label class="pe-control" for="peContrast"><span>Contrast <output id="peContrastOut">0</output></span>
+          <input type="range" id="peContrast" min="-100" max="100" step="1" value="0">
+        </label>
+
+        <div class="pe-control pe-control--row">
+          <label for="peBackground">Background <span class="pe-note">(fills transparent/empty corners)</span>
+            <input type="color" id="peBackground" value="#ffffff" aria-label="Background colour">
+          </label>
+          <button type="button" class="btn ghost pe-small" id="btnPeEdge">Use edge colour</button>
+        </div>
+
+        <label class="pe-control" for="peSize"><span>Output size
+            <select id="peSize">
+              <option value="256">256 px</option>
+              <option value="320" selected>320 px</option>
+              <option value="512">512 px</option>
+              <option value="640">640 px</option>
+            </select>
+          </span>
+        </label>
+
+        <div class="pe-buttons">
+          <button type="button" class="btn ghost" id="btnPeReset">Reset all</button>
+          <button type="button" class="btn ghost" id="btnPeCancel">Cancel</button>
+          <button type="button" class="btn primary" id="btnPeApply">Apply photo</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>

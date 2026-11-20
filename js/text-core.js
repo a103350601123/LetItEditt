@@ -121,15 +121,40 @@
     return text;
   }
 
-  function removeEmptyLines(value) {
-    return normalizeNewlines(value).split('\n').filter(line => line.trim() !== '').join('\n');
+  function removeEmptyLines(value, options) {
+    const opts = options || {};
+    const source = normalizeNewlines(value).split('\n');
+    if (!opts.preserveParagraphs) {
+      return source.filter(line => line.trim() !== '').join('\n');
+    }
+    const output = [];
+    let previousEmpty = false;
+    source.forEach(line => {
+      const empty = line.trim() === '';
+      if (empty) {
+        if (output.length && !previousEmpty) output.push('');
+        previousEmpty = true;
+      } else {
+        output.push(line);
+        previousEmpty = false;
+      }
+    });
+    while (output.length && output[output.length - 1] === '') output.pop();
+    return output.join('\n');
   }
 
   function removeEmojis(value) {
     return str(value).replace(/(?:[\uFE0F\u200D]|\p{Extended_Pictographic}|\p{Emoji_Modifier}|\p{Regional_Indicator})/gu, '');
   }
 
-  function removePunctuation(value) {
+  function removePunctuation(value, options) {
+    const opts = options || {};
+    const mode = opts.types || 'all';
+    if (mode === 'custom') {
+      const chars = str(opts.chars).replace(/[\\\]^-]/g, '\\$&');
+      return chars ? str(value).replace(new RegExp('[' + chars + ']', 'gu'), '') : str(value);
+    }
+    if (mode === 'common') return str(value).replace(/[.,!?;:'"()\[\]{}]/g, '');
     return str(value).replace(/[\p{P}]/gu, '');
   }
 
@@ -266,20 +291,74 @@
     }).join('\n');
   }
 
-  function textToBinary(value) {
-    const bytes = new TextEncoder().encode(str(value));
-    return Array.from(bytes, b => b.toString(2).padStart(8, '0')).join(' ');
+  function textToBinary(value, options) {
+    const structured = arguments.length > 1;
+    const opts = options || {};
+    const text = str(value);
+    const encoding = opts.encoding === 'ascii' || opts.encoding === 'utf-16' ? opts.encoding : 'utf-8';
+    const finish = (bits, groupSize, error) => structured
+      ? { ok: !error, text: error ? '' : bits, error: error || '', groupSize }
+      : (error ? '' : bits);
+    if (encoding === 'ascii') {
+      const bad = Array.from(text).find(ch => ch.codePointAt(0) > 127);
+      if (bad) return finish('', 8, 'ASCII supports characters 0–127 only. Remove or switch encoding for: ' + bad);
+      return finish(Array.from(text, ch => ch.charCodeAt(0).toString(2).padStart(8, '0')).join(' '), 8, '');
+    }
+    if (encoding === 'utf-16') {
+      const groups = [];
+      Array.from(text).forEach(ch => {
+        const cp = ch.codePointAt(0);
+        if (cp > 0xffff) {
+          const high = 0xd800 + ((cp - 0x10000) >> 10);
+          const low = 0xdc00 + ((cp - 0x10000) & 0x3ff);
+          groups.push(high.toString(2).padStart(16, '0'), low.toString(2).padStart(16, '0'));
+        } else {
+          groups.push(cp.toString(2).padStart(16, '0'));
+        }
+      });
+      return finish(groups.join(' '), 16, '');
+    }
+    const bytes = new TextEncoder().encode(text);
+    return finish(Array.from(bytes, b => b.toString(2).padStart(8, '0')).join(' '), 8, '');
   }
 
-  function binaryToText(value) {
+  function binaryToText(value, options) {
+    const opts = options || {};
     const raw = str(value).trim();
     if (!raw) return { ok: true, text: '', error: '' };
-    const cleaned = raw.replace(/[^01\s]/g, ' ');
-    const parts = cleaned.split(/\s+/).filter(Boolean);
-    const bad = parts.find(p => p.length !== 8);
-    if (bad) return { ok: false, text: '', error: 'Use 8-bit groups separated by spaces. Invalid group: ' + bad };
-    const bytes = new Uint8Array(parts.map(p => parseInt(p, 2)));
-    return { ok: true, text: new TextDecoder('utf-8').decode(bytes), error: '' };
+    const encoding = opts.encoding === 'ascii' || opts.encoding === 'utf-16' ? opts.encoding : 'utf-8';
+    const groupSize = encoding === 'utf-16' ? 16 : 8;
+    const parts = raw.split(/\s+/).filter(Boolean);
+    const nonBinary = parts.find(part => !/^[01]+$/.test(part));
+    if (nonBinary) {
+      return { ok: false, text: '', error: 'Invalid binary group. Use only 0 and 1 in each group. Invalid group: ' + nonBinary };
+    }
+    const bad = parts.find(part => part.length !== groupSize);
+    if (bad) {
+      return { ok: false, text: '', error: 'Use ' + groupSize + '-bit groups separated by spaces. Invalid group: ' + bad };
+    }
+    try {
+      if (encoding === 'utf-16') {
+        const units = parts.map(part => parseInt(part, 2));
+        let decodedUtf16 = '';
+        for (let i = 0; i < units.length; i += 8192) {
+          decodedUtf16 += String.fromCharCode.apply(null, units.slice(i, i + 8192));
+        }
+        return { ok: true, text: decodedUtf16, error: '' };
+      }
+      const values = parts.map(part => parseInt(part, 2));
+      if (encoding === 'ascii') {
+        const invalid = values.find(byte => byte > 127);
+        if (invalid !== undefined) {
+          return { ok: false, text: '', error: 'ASCII bytes must be 0–127. Received: ' + invalid };
+        }
+      }
+      const bytes = new Uint8Array(values);
+      const decoded = new TextDecoder(encoding === 'ascii' ? 'windows-1252' : 'utf-8', { fatal: true }).decode(bytes);
+      return { ok: true, text: decoded, error: '' };
+    } catch (error) {
+      return { ok: false, text: '', error: 'These bytes are not valid ' + (encoding === 'utf-8' ? 'UTF-8' : 'ASCII') + ' text.' };
+    }
   }
 
   const MORSE = {
@@ -293,13 +372,14 @@
   const MORSE_REVERSE = Object.fromEntries(Object.entries(MORSE).map(([k, v]) => [v, k]));
 
   function morseEncode(value) {
-    return graphemes(str(value).toLocaleUpperCase()).map(ch => MORSE[ch] || '').filter(Boolean).join(' ');
+    const words = str(value).toLocaleUpperCase().trim().split(/\s+/).filter(Boolean);
+    return words.map(word => graphemes(word).map(ch => MORSE[ch] || '').filter(Boolean).join(' ')).filter(Boolean).join(' / ');
   }
 
   function morseDecode(value) {
     return str(value).trim().split(/\s*\/\s*/).map(wordGroup =>
       wordGroup.trim().split(/\s+/).filter(Boolean).map(code => MORSE_REVERSE[code] || '').join('')
-    ).join(' ');
+    ).filter(Boolean).join(' ');
   }
 
   function escapeHtml(value) {
@@ -322,52 +402,165 @@
     }).join('');
   }
 
+  function escapeMarkdownText(text) {
+    return str(text).replace(/[\\`*_[\]<>]/g, ch => '\\' + ch).replace(/\r/g, '');
+  }
+
   function htmlToMarkdown(value) {
     const source = str(value);
+    if (!source.trim()) return '';
     if (typeof DOMParser === 'undefined') {
-      return source.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').trim();
+      return source
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<\/(p|div|h[1-6]|li|tr|blockquote|pre)>/gi, '\n\n')
+        .replace(/<[^>]+>/g, '')
+        .replace(/[ \t]+/g, ' ')
+        .trim();
     }
     const doc = new DOMParser().parseFromString(source, 'text/html');
+
     function inline(node) {
       let out = '';
       node.childNodes.forEach(child => {
-        if (child.nodeType === 3) out += child.textContent;
-        else if (child.nodeType === 1) {
-          const tag = child.tagName.toLowerCase();
-          const inner = inline(child);
-          if (tag === 'strong' || tag === 'b') out += '**' + inner + '**';
-          else if (tag === 'em' || tag === 'i') out += '_' + inner + '_';
-          else if (tag === 'code') out += '`' + inner + '`';
-          else if (tag === 'a') out += '[' + inner + '](' + (child.getAttribute('href') || '') + ')';
-          else if (tag === 'br') out += '\n';
-          else out += inner;
+        if (child.nodeType === 3) {
+          out += escapeMarkdownText(child.textContent || '');
+          return;
+        }
+        if (child.nodeType !== 1) return;
+        const tag = child.tagName.toLowerCase();
+        if (['script', 'style', 'noscript', 'template'].includes(tag)) return;
+        if (tag === 'br') { out += '  \n'; return; }
+        if (tag === 'wbr') return;
+        const inner = inline(child).replace(/[ \t]+/g, ' ');
+        if (tag === 'strong' || tag === 'b') out += '**' + inner + '**';
+        else if (tag === 'em' || tag === 'i') out += '_' + inner + '_';
+        else if (tag === 'del' || tag === 's' || tag === 'strike') out += '~~' + inner + '~~';
+        else if (tag === 'code') out += '`' + inner.replace(/`/g, '\\`') + '`';
+        else if (tag === 'a') {
+          const href = (child.getAttribute('href') || '').replace(/[()\s]/g, encodeURIComponent);
+          out += '[' + inner.replace(/\]/g, '\\]') + '](' + href + ')';
+        } else if (tag === 'img') {
+          const alt = escapeMarkdownText(child.getAttribute('alt') || '');
+          const src = (child.getAttribute('src') || '').replace(/\s/g, encodeURIComponent);
+          const title = child.getAttribute('title');
+          out += '![' + alt + '](' + src + (title ? ' "' + escapeMarkdownText(title) + '"' : '') + ')';
+        } else if (tag === 'input' && child.type === 'checkbox') {
+          out += child.checked ? '[x] ' : '[ ] ';
+        } else out += inner;
+      });
+      return out.replace(/\n[ \t]+/g, '\n').trim();
+    }
+
+    function listMarkdown(list, depth) {
+      const ordered = list.tagName.toLowerCase() === 'ol';
+      const lines = [];
+      let index = Number(list.getAttribute('start')) || 1;
+      Array.from(list.children).forEach(child => {
+        if (child.tagName.toLowerCase() !== 'li') return;
+        const parts = [];
+        let checkbox = '';
+        child.childNodes.forEach(node => {
+          if (node.nodeType === 1 && /^(UL|OL)$/i.test(node.tagName)) {
+            parts.push(listMarkdown(node, depth + 1));
+          } else if (node.nodeType === 1 && node.querySelector && node.querySelector(':scope > ul, :scope > ol')) {
+            const nested = node.querySelector(':scope > ul, :scope > ol');
+            const clone = node.cloneNode(true);
+            const nestedClone = clone.querySelector(':scope > ul, :scope > ol');
+            if (nestedClone) nestedClone.remove();
+            parts.push(inline(clone));
+            parts.push(listMarkdown(nested, depth + 1));
+          } else if (node.nodeType === 1 && node.tagName.toLowerCase() === 'input' && node.type === 'checkbox') {
+            checkbox = node.checked ? '[x] ' : '[ ] ';
+          } else {
+            parts.push(inline(node.nodeType === 1 ? node : { childNodes: [node] }));
+          }
+        });
+        const content = parts.filter(Boolean).join('\n').replace(/\n{3,}/g, '\n\n').trim();
+        const prefix = '  '.repeat(depth) + (ordered ? index + '. ' : '- ') + checkbox;
+        lines.push(content.split('\n').map((line, i) => i === 0 ? prefix + line : '  '.repeat(depth + 1) + line).join('\n'));
+        index += 1;
+      });
+      return lines.join('\n');
+    }
+
+    function tableMarkdown(table) {
+      const rows = Array.from(table.querySelectorAll('tr'));
+      if (!rows.length) return '';
+      const cells = row => Array.from(row.children)
+        .filter(cell => /^(TH|TD)$/i.test(cell.tagName))
+        .map(cell => inline(cell).replace(/\|/g, '\\|').replace(/\n/g, ' ').trim() || ' ');
+      const header = cells(rows[0]);
+      if (!header.length) return '';
+      const body = rows.slice(1).map(cells);
+      return ['| ' + header.join(' | ') + ' |', '| ' + header.map(() => '---').join(' | ') + ' |']
+        .concat(body.map(row => '| ' + row.join(' | ') + ' |')).join('\n');
+    }
+
+    const blocks = [];
+    function walk(parent) {
+      Array.from(parent.childNodes).forEach(node => {
+        if (node.nodeType === 3) {
+          const text = node.textContent.trim();
+          if (text) blocks.push(escapeMarkdownText(text));
+          return;
+        }
+        if (node.nodeType !== 1) return;
+        const tag = node.tagName.toLowerCase();
+        if (['script', 'style', 'noscript', 'template'].includes(tag)) return;
+        if (/^h[1-6]$/.test(tag)) {
+          blocks.push('#'.repeat(Number(tag[1])) + ' ' + inline(node));
+        } else if (tag === 'pre') {
+          const code = (node.textContent || '').replace(/\n$/, '');
+          const codeElement = node.querySelector ? node.querySelector(':scope code') : null;
+          const language = Array.from(node.classList || []).find(c => /^language-/.test(c))
+            || (codeElement && Array.from(codeElement.classList || []).find(c => /^language-/.test(c)));
+          blocks.push('```' + (language ? language.slice(9) : '') + '\n' + code + '\n```');
+        } else if (tag === 'blockquote') {
+          const quoted = [];
+          walkInto(node, quoted);
+          blocks.push(quoted.join('\n\n').split('\n').map(line => '> ' + line).join('\n'));
+        } else if (tag === 'ul' || tag === 'ol') {
+          blocks.push(listMarkdown(node, 0));
+        } else if (tag === 'table') {
+          blocks.push(tableMarkdown(node));
+        } else if (tag === 'hr') {
+          blocks.push('---');
+        } else if (tag === 'img') {
+          blocks.push(inline(node));
+        } else if (tag === 'p' || tag === 'div' || tag === 'section' || tag === 'article' || tag === 'figure' || tag === 'header' || tag === 'footer') {
+          const direct = inline(node);
+          const nestedLists = Array.from(node.querySelectorAll(':scope > ul, :scope > ol, :scope > table, :scope > pre'));
+          if (direct) blocks.push(direct);
+          nestedLists.forEach(nested => {
+            const nestedTag = nested.tagName.toLowerCase();
+            blocks.push(nestedTag === 'table' ? tableMarkdown(nested) : nestedTag === 'pre' ? '```\n' + nested.textContent.trim() + '\n```' : listMarkdown(nested, 0));
+          });
+        } else if (node.children.length && !['a', 'span', 'strong', 'b', 'em', 'i', 'code', 'small', 'label'].includes(tag)) {
+          walk(node);
+        } else {
+          const content = inline(node);
+          if (content) blocks.push(content);
         }
       });
-      return out.replace(/[ \t]+/g, ' ').trim();
     }
-    const blocks = [];
-    doc.body.childNodes.forEach(node => {
-      if (node.nodeType !== 1) {
-        const t = node.textContent.trim();
-        if (t) blocks.push(t);
-        return;
-      }
-      const tag = node.tagName.toLowerCase();
-      const content = inline(node);
-      if (tag === 'h1') blocks.push('# ' + content);
-      else if (tag === 'h2') blocks.push('## ' + content);
-      else if (tag === 'h3') blocks.push('### ' + content);
-      else if (tag === 'h4') blocks.push('#### ' + content);
-      else if (tag === 'blockquote') blocks.push(content.split('\n').map(l => '> ' + l).join('\n'));
-      else if (tag === 'ul') {
-        blocks.push(Array.from(node.querySelectorAll(':scope > li'), li => '- ' + inline(li)).join('\n'));
-      } else if (tag === 'ol') {
-        blocks.push(Array.from(node.querySelectorAll(':scope > li'), (li, i) => (i + 1) + '. ' + inline(li)).join('\n'));
-      } else if (tag === 'pre') blocks.push('```\n' + (node.textContent || '').trim() + '\n```');
-      else if (tag === 'p' || tag === 'div') { if (content) blocks.push(content); }
-      else if (content) blocks.push(content);
-    });
-    return blocks.join('\n\n').trim();
+    function walkInto(node, target) {
+      Array.from(node.childNodes).forEach(child => {
+        if (child.nodeType === 3) {
+          const text = child.textContent.trim();
+          if (text) target.push(escapeMarkdownText(text));
+          return;
+        }
+        if (child.nodeType !== 1) return;
+        const tag = child.tagName.toLowerCase();
+        if (['script', 'style', 'noscript', 'template'].includes(tag)) return;
+        if (tag === 'p' || tag === 'div') target.push(inline(child));
+        else if (tag === 'ul' || tag === 'ol') target.push(listMarkdown(child, 0));
+        else if (tag === 'pre') target.push('```\n' + child.textContent.trim() + '\n```');
+        else target.push(inline(child));
+      });
+    }
+    walk(doc.body);
+    return blocks.filter(Boolean).join('\n\n').replace(/\n{3,}/g, '\n\n').trim();
   }
 
   function removeDuplicateLines(value, options) {
@@ -481,9 +674,59 @@
     return Array.from(new Set(found)).join('\n');
   }
 
+  function trimUrlPunctuation(candidate) {
+    let url = candidate;
+    let changed = true;
+    while (changed && url) {
+      changed = false;
+      const last = url[url.length - 1];
+      if ('.,;:!?\'"'.includes(last)) {
+        url = url.slice(0, -1);
+        changed = true;
+      } else if (last === ')' || last === ']' || last === '}') {
+        const open = last === ')' ? '(' : last === ']' ? '[' : '{';
+        if ((url.match(new RegExp('\\' + open, 'g')) || []).length < (url.match(new RegExp('\\' + last, 'g')) || []).length) {
+          url = url.slice(0, -1);
+          changed = true;
+        }
+      }
+    }
+    return url;
+  }
+
+  function validUrlCandidate(candidate) {
+    try {
+      const normalized = /^(?:https?:)?\/\//i.test(candidate) ? candidate : 'https://' + candidate.replace(/^www\./i, '');
+      const parsed = new URL(normalized);
+      if (!/^https?:$/.test(parsed.protocol)) return false;
+      const host = parsed.hostname;
+      if (!host || host.includes('..') || host.startsWith('.') || host.endsWith('.')) return false;
+      if (/^\d+$/.test(host.replace(/\./g, ''))) return false;
+      const labels = host.split('.');
+      if (labels.length < 2 || labels[labels.length - 1].length < 2) return false;
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function extractUrlsDetailed(value) {
+    const source = str(value);
+    const pattern = /(^|[^\p{L}\p{N}@._-])((?:https?:\/\/|www\.)[^\s<>"'`]+|(?:(?:[\p{L}\p{N}](?:[\p{L}\p{N}-]*[\p{L}\p{N}])?)\.)+(?:[\p{L}]{2,24})(?::\d{1,5})?(?:\/[^\s<>"'`]*)?)/giu;
+    const found = [];
+    const seen = new Set();
+    let match;
+    while ((match = pattern.exec(source)) !== null) {
+      const url = trimUrlPunctuation(match[2]);
+      if (!url || !validUrlCandidate(url) || seen.has(url)) continue;
+      seen.add(url);
+      found.push(url);
+    }
+    return { urls: found, count: found.length, text: found.join('\n') };
+  }
+
   function extractUrls(value) {
-    const found = str(value).match(/https?:\/\/[^\s<>"')\]]+/giu) || [];
-    return Array.from(new Set(found.map(u => u.replace(/[.,;:!?]+$/, '')))).join('\n');
+    return extractUrlsDetailed(value).text;
   }
 
   function textFilter(value, options) {
@@ -584,6 +827,6 @@
     wordWrap, smartQuotes, repeatText, caseConvert, findReplace, textToList, addAffix,
     textToBinary, binaryToText, morseEncode, morseDecode, escapeHtml, bionicReading,
     htmlToMarkdown, removeDuplicateLines, duplicateWordRemover, textSorter, textSplitter,
-    textDiff, extractEmails, extractUrls, textFilter, redactText, restoreText, loremIpsum
+    textDiff, extractEmails, extractUrls, extractUrlsDetailed, textFilter, redactText, restoreText, loremIpsum
   };
 });

@@ -11,14 +11,17 @@
 <meta property="og:title" content="Bank Statement Converter — Text and CSV Transactions">
 <meta property="og:description" content="Parse pasted statement text or a text/CSV file into transactions with amounts, balances and running checks, then download CSV or QIF. PDF extraction and OCR are not included in this build.">
 <meta property="og:url" content="https://letitedit.com/tools/writing-text/bank-statement-converter/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../../../css/site.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","name":"Bank Statement Converter","mainEntity":[{"@type":"Question","name":"Can it read PDF statements?","acceptedAnswer":{"@type":"Answer","text":"Not in this build. The reference application loads PDF.js and Tesseract.js from content delivery networks to extract text and run OCR. Those dependencies are not bundled here, so this tool deliberately accepts text and CSV only."}},{"@type":"Question","name":"Are every balance checked?","acceptedAnswer":{"@type":"Answer","text":"Only when opening, closing or running balances are present in the text. If no balances are found, the summary says there is nothing to check."}},{"@type":"Question","name":"Are my statements uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. Parsing happens in your browser and no statement data is sent to a server."}},{"@type":"Question","name":"Which formats can I download?","acceptedAnswer":{"@type":"Answer","text":"This build exports CSV and QIF. The reference tool also offers XLSX, QuickBooks CSV, Xero CSV and OFX, which are not reproduced here."}}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Bank Statement Converter","description":"Parse pasted statement text or a text/CSV file into transactions with amounts, balances and running checks, then download CSV or QIF. PDF extraction and OCR are not included in this build.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/writing-text/bank-statement-converter/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Writing \u0026 Text Tools","item":"https://letitedit.com/tools/writing-text/"},{"@type":"ListItem","position":3,"name":"Bank Statement Converter","item":"https://letitedit.com/tools/writing-text/bank-statement-converter/"}]},{"@type":"FAQPage","name":"Bank Statement Converter","mainEntity":[{"@type":"Question","name":"Can it read PDF statements?","acceptedAnswer":{"@type":"Answer","text":"Not in this build. The reference application loads PDF.js and Tesseract.js from content delivery networks to extract text and run OCR. Those dependencies are not bundled here, so this tool deliberately accepts text and CSV only."}},{"@type":"Question","name":"Are every balance checked?","acceptedAnswer":{"@type":"Answer","text":"Only when opening, closing or running balances are present in the text. If no balances are found, the summary says there is nothing to check."}},{"@type":"Question","name":"Are my statements uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. Parsing happens in your browser and no statement data is sent to a server."}},{"@type":"Question","name":"Which formats can I download?","acceptedAnswer":{"@type":"Answer","text":"This build exports CSV and QIF. The reference tool also offers XLSX, QuickBooks CSV, Xero CSV and OFX, which are not reproduced here."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-text">
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
@@ -30,19 +33,21 @@
       <a href="/blog/">Blog</a>
       <a href="/tools/">All Tools</a>
       <a href="/faq/">FAQ</a>
-      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" aria-controls="search-strip" aria-expanded="false" title="Search tools"><span aria-hidden="true">🔍</span></button>
     </div>
   </nav>
 </header>
-<div class="site-search-strip" id="search-strip">
+<div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
+      <label class="sr-only" for="site-search">Search all 61 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
-      <div class="search-results" id="search-results" role="listbox" hidden></div>
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
+<div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="../../../">Home</a><span>/</span>
   <a href="../../../tools/writing-text/">Writing &amp; Text Tools</a><span>/</span>
@@ -63,12 +68,12 @@
 <div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>
 <div class="engine-grid engine-statement">
   <div class="engine-controls">
-    <div class="field"><label>Statement text or CSV</label><textarea id="bk-input" rows="12" placeholder="Paste plain-text transactions, one per line, for example:
+    <div class="field"><label>Statement text or CSV</label><textarea id="bk-input" rows="8" placeholder="Paste plain-text transactions, one per line, for example:
 01/15/2026 Coffee Shop 4.50 995.50"></textarea></div>
-    <div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="bk-sample">Load sample</button><button type="button" class="btn btn-secondary btn-small" id="bk-upload-btn">Open text file</button><input type="file" id="bk-upload" accept=".txt,.csv,text/plain,text/csv" hidden><button type="button" class="btn btn-secondary btn-small" id="bk-clear">Clear</button></div>
-    <div class="two-cols"><div class="field"><label>Date order</label><select id="bk-date-order"><option value="auto">Automatic</option><option value="mdy">Month first (MM/DD)</option><option value="dmy">Day first (DD/MM)</option></select></div><div class="field"><label>Statement type</label><select id="bk-kind"><option value="auto">Automatic</option><option value="bank">Bank account</option><option value="credit">Credit card</option></select></div></div>
-    <div class="output-actions"><button type="button" class="btn" id="bk-parse">Parse transactions</button></div>
-    <p class="hint warning">Scope: this browser-side build parses pasted text and text/CSV files. It does <strong>not</strong> extract PDF text, run OCR, or export XLSX/QBO/XERO/OFX. Every row should be checked against the original statement.</p>
+    <div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="bk-sample">Load sample</button><button type="button" class="btn btn-secondary btn-small" id="bk-upload-btn">Open file</button><input type="file" id="bk-upload" accept=".txt,.csv,.tsv,.md,.markdown,.json,.log,.xml,.docx,text/plain,text/csv" hidden><button type="button" class="btn btn-secondary btn-small" id="bk-clear">Clear</button></div>
+    <div class="two-cols"><div class="field"><label>Input format</label><select id="bk-format"><option value="auto">Automatic</option><option value="text">Plain text</option><option value="csv">CSV / TSV / semicolon</option></select></div><div class="field"><label>Date order</label><select id="bk-date-order"><option value="auto">Automatic</option><option value="mdy">Month first (MM/DD)</option><option value="dmy">Day first (DD/MM)</option></select></div><div class="field"><label>Statement type</label><select id="bk-kind"><option value="auto">Automatic</option><option value="bank">Bank account</option><option value="credit">Credit card</option></select></div><div class="field"><label>date</label><select id="bk-col-date"><option value="auto">Auto</option><option value="0">1</option><option value="1">2</option><option value="2">3</option><option value="3">4</option><option value="4">5</option><option value="5">6</option><option value="6">7</option><option value="7">8</option><option value="8">9</option><option value="9">10</option><option value="10">11</option><option value="11">12</option></select></div><div class="field"><label>description</label><select id="bk-col-description"><option value="auto">Auto</option><option value="0">1</option><option value="1">2</option><option value="2">3</option><option value="3">4</option><option value="4">5</option><option value="5">6</option><option value="6">7</option><option value="7">8</option><option value="8">9</option><option value="9">10</option><option value="10">11</option><option value="11">12</option></select></div><div class="field"><label>amount</label><select id="bk-col-amount"><option value="auto">Auto</option><option value="0">1</option><option value="1">2</option><option value="2">3</option><option value="3">4</option><option value="4">5</option><option value="5">6</option><option value="6">7</option><option value="7">8</option><option value="8">9</option><option value="9">10</option><option value="10">11</option><option value="11">12</option></select></div><div class="field"><label>balance</label><select id="bk-col-balance"><option value="auto">Auto</option><option value="0">1</option><option value="1">2</option><option value="2">3</option><option value="3">4</option><option value="4">5</option><option value="5">6</option><option value="6">7</option><option value="7">8</option><option value="8">9</option><option value="9">10</option><option value="10">11</option><option value="11">12</option></select></div><div class="field"><label>debit</label><select id="bk-col-debit"><option value="auto">Auto</option><option value="0">1</option><option value="1">2</option><option value="2">3</option><option value="3">4</option><option value="4">5</option><option value="5">6</option><option value="6">7</option><option value="7">8</option><option value="8">9</option><option value="9">10</option><option value="10">11</option><option value="11">12</option></select></div><div class="field"><label>credit</label><select id="bk-col-credit"><option value="auto">Auto</option><option value="0">1</option><option value="1">2</option><option value="2">3</option><option value="3">4</option><option value="4">5</option><option value="5">6</option><option value="6">7</option><option value="7">8</option><option value="8">9</option><option value="9">10</option><option value="10">11</option><option value="11">12</option></select></div></div>
+    <div class="output-actions"><button type="button" class="btn" id="bk-parse">Parse transactions</button><button type="button" class="btn btn-secondary btn-small" id="bk-edit">Edit values</button><button type="button" class="btn btn-secondary btn-small" id="bk-apply-edits">Apply edits</button></div>
+    <p class="hint warning">Scope: this browser-side build parses pasted text, CSV/TSV and DOCX text. It does <strong>not</strong> extract PDF text, run OCR, or export XLSX/QBO/XERO/OFX. Amounts are never rounded; check every row against the original statement.</p>
   </div>
   <div class="engine-output">
     <div class="summary-grid">
@@ -77,6 +82,7 @@
       <div class="stat-tile"><span>Money out</span><strong id="bk-sum-out">0.00</strong></div>
       <div class="stat-tile"><span>Balance check</span><strong id="bk-sum-check">No balances to check</strong></div>
     </div>
+    <p class="hint" id="bk-warnings">No automatic warnings; review every row against the original statement.</p>
     <div class="table-wrap" id="bk-table"><p class="hint">Parse a statement to see its transactions.</p></div>
     <div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="bk-csv">Download CSV</button><button type="button" class="btn btn-secondary btn-small" id="bk-qif">Download QIF</button></div>
     <div class="status" id="bk-status" role="status" aria-live="polite"></div>
@@ -126,6 +132,7 @@
     </div>
   </div>
 </section>
+</div>
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">

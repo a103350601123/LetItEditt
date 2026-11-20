@@ -4,19 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>All Tools — Every Free LetitEdit Utility</title>
-<meta name="description" content="Browse all 60 published LetitEdit tools across 10 categories. Filter by name or category; every tool runs locally in your browser.">
+<meta name="description" content="Browse all 61 published LetitEdit tools across 10 categories. Filter by name or category; every tool runs locally in your browser.">
 <meta name="theme-color" content="#2563eb">
 <link rel="canonical" href="https://letitedit.com/tools/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="All Tools — Every Free LetitEdit Utility">
-<meta property="og:description" content="Browse all 60 published LetitEdit tools across 10 categories. Filter by name or category; every tool runs locally in your browser.">
+<meta property="og:description" content="Browse all 61 published LetitEdit tools across 10 categories. Filter by name or category; every tool runs locally in your browser.">
 <meta property="og:url" content="https://letitedit.com/tools/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../css/site.css">
 
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
@@ -28,19 +31,21 @@
       <a href="/blog/">Blog</a>
       <a href="/tools/" aria-current="page">All Tools</a>
       <a href="/faq/">FAQ</a>
-      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" aria-controls="search-strip" aria-expanded="false" title="Search tools"><span aria-hidden="true">🔍</span></button>
     </div>
   </nav>
 </header>
-<div class="site-search-strip" id="search-strip">
+<div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
+      <label class="sr-only" for="site-search">Search all 61 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
-      <div class="search-results" id="search-results" role="listbox" hidden></div>
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
+<div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="../">Home</a><span>/</span>
   <span aria-current="page">All Tools</span>
@@ -59,11 +64,11 @@
   </div>
   <nav class="sidebar-list" aria-label="Categories"><a class="sidebar-link is-active" href="../tools/" data-sidebar-key="all" aria-current="page">
       <span class="sidebar-icon" style="--icon-bg:#dbeafe;--icon-color:#1d4ed8" aria-hidden="true">📚</span>
-      <span class="sidebar-name">All Tools</span><span class="sidebar-count">60</span>
+      <span class="sidebar-name">All Tools</span><span class="sidebar-count">61</span>
     </a>
     <a class="sidebar-link" href="../tools/writing-text/" data-sidebar-key="writing">
       <span class="sidebar-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">✍️</span>
-      <span class="sidebar-name">Text &amp; Writing</span><span class="sidebar-count">35</span>
+      <span class="sidebar-name">Text &amp; Writing</span><span class="sidebar-count">36</span>
     </a>
     <a class="sidebar-link" href="../tools/coding-developer/" data-sidebar-key="dev">
       <span class="sidebar-icon" style="--icon-bg:#0ea5e91a;--icon-color:#0ea5e9" aria-hidden="true">&lt;/&gt;</span>
@@ -108,7 +113,7 @@
       <div class="directory-bar">
         <div>
           <h2>All Tools</h2>
-          <p class="directory-count">60 tools</p>
+          <p class="directory-count">61 tools</p>
         </div>
         <div class="directory-filter">
           <label class="sr-only" for="tool-filter">Filter tools on this page</label>
@@ -138,7 +143,7 @@
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>AI Video-to-Shorts<span class="card-new">New</span></h3>
-  <p>Find candidate highlight windows from audio loudness and motion in your video, then export vertical 9:16 clips. Optional local Whisper transcript ranking adds SRT when enabled.</p>
+  <p>Preview a real source video, add and retime clips, reorder them, choose crops and layouts, edit captions, then export locally rendered MP4 or WebM shorts. Optional local Whisper and face models require explicit opt-in.</p>
   <span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="../tools/writing-text/ap-case-converter/">
   <span class="card-top">
@@ -154,7 +159,7 @@
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Audio Editor<span class="card-new">New</span></h3>
-  <p>Trim audio or a video soundtrack, adjust gain, add fades, reverse a clip and play it back locally, then download WAV or MP3 where your browser supports it. No upload.</p>
+  <p>Edit audio or a video soundtrack locally with a wave-form, real gains, fades, compression, EQ, filtering, pitch/speed, music mixing, A/B playback and undo. Export WAV, MP3 or M4A without uploading.</p>
   <span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="../tools/writing-text/bank-statement-converter/">
   <span class="card-top">
@@ -226,7 +231,7 @@
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Extract URLs from Text</h3>
-  <p>Extract unique http and https links from pasted text, trimming trailing punctuation automatically.</p>
+  <p>Extract unique http, https, www and bare-domain links from pasted text, logs or DOCX files with trailing punctuation trimmed automatically.</p>
   <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="../tools/writing-text/find-and-replace/">
   <span class="card-top">
@@ -235,6 +240,14 @@
   </span>
   <h3>Find and Replace</h3>
   <p>Replace all occurrences of a literal string, or turn off case sensitivity to treat Find as a live regular expression with global and case-insensitive flags. Invalid patterns show a clear error.</p>
+  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card" href="../tools/writing-text/grammar-spell-checker/">
+  <span class="card-top">
+    <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧠</span>
+    <span class="card-arrow" aria-hidden="true">↗</span>
+  </span>
+  <h3>Grammar &amp; Spell Checker<span class="card-new">New</span></h3>
+  <p>Check English text with local rules for common spelling, grammar, repeated words, spacing and clarity. Review suggestions, apply the ones you accept and keep the original text unchanged. No AI rewriting and no external or paid API.</p>
   <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="../tools/writing-text/handwriting-to-font-converter/">
   <span class="card-top">
@@ -267,14 +280,6 @@
   </span>
   <h3>Image Editor<span class="card-new">New</span></h3>
   <p>Crop, rotate and flip photos, adjust brightness, contrast and colour, add a text overlay, then export PNG, JPG or WebP — all locally in your browser.</p>
-  <span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../image-flip-rotate/index.html">
-  <span class="card-top">
-    <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔄</span>
-    <span class="card-arrow" aria-hidden="true">↗</span>
-  </span>
-  <h3>Image Flip &amp; Rotate<span class="card-new">New</span></h3>
-  <p>Flip or rotate images in your browser. Mirror horizontally or vertically, turn in 90-degree steps, combine operations, and export PNG, JPG or WebP without upload.</p>
   <span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="../image-inverter/index.html">
   <span class="card-top">
@@ -346,7 +351,7 @@
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Multilingual Subtitle Generator<span class="card-new">New</span></h3>
-  <p>Generate editable captions from video or audio with opt-in local Whisper tiny speech recognition. Review word-level timestamps and export SRT, VTT or TXT. No media is uploaded.</p>
+  <p>Generate editable captions from video or audio with opt-in local Whisper tiny speech recognition. Review editable timed lines and export SRT, VTT or TXT. No media is uploaded.</p>
   <span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="../photo-merger/index.html">
   <span class="card-top">
@@ -402,7 +407,7 @@
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Remove Empty Lines</h3>
-  <p>Remove blank and whitespace-only lines from pasted text while preserving the order of every real line.</p>
+  <p>Remove blank and whitespace-only lines from pasted text, TXT, CSV, Markdown or DOCX while preserving every real line and its formatting.</p>
   <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="../tools/writing-text/remove-extra-spaces/">
   <span class="card-top">
@@ -418,7 +423,7 @@
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Remove Punctuation</h3>
-  <p>Remove Unicode punctuation marks from text while keeping letters, numbers, emoji and symbols intact.</p>
+  <p>Remove all Unicode punctuation, common English marks or your own chosen characters from pasted text, TXT, CSV, Markdown or DOCX while keeping letters and numbers.</p>
   <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="../tools/resume-builder/index.html">
   <span class="card-top">
@@ -434,7 +439,7 @@
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Rich Text / HTML to Markdown</h3>
-  <p>Convert pasted HTML or rich text into clean Markdown with headings, links, lists, bold and italic preserved.</p>
+  <p>Convert pasted HTML, rich text, text files or DOCX text into clean Markdown with headings, links, lists, tables, code and emphasis preserved.</p>
   <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="../screen-recorder/index.html">
   <span class="card-top">
@@ -442,7 +447,7 @@
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Screen Recorder<span class="card-new">New</span></h3>
-  <p>Record a tab, window or whole screen in your browser, add microphone audio if you want, pause and resume, then download a WebM file. All capture stays on your device.</p>
+  <p>Use your browser&#39;s share picker to record a tab, window or whole screen, add microphone audio if you want, pause and resume, then download a WebM file. All capture stays on your device.</p>
   <span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="../screenshot-beautifier/index.html">
   <span class="card-top">
@@ -474,7 +479,7 @@
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Text Comparer / Diff</h3>
-  <p>Compare two texts line by line or word by word with added and removed content highlighted.</p>
+  <p>Compare two texts or documents line by line or word by word with additions and removals highlighted, using a real LCS diff.</p>
   <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="../tools/writing-text/text-filter/">
   <span class="card-top">
@@ -556,6 +561,14 @@
   <h3>Text to Slug Converter</h3>
   <p>Turn headlines into clean URL slugs. Unicode-aware, lowercase and hyphen-separated, with a length limit.</p>
   <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card" href="../thumbnail-generator/index.html">
+  <span class="card-top">
+    <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🖼️</span>
+    <span class="card-arrow" aria-hidden="true">↗</span>
+  </span>
+  <h3>Thumbnail Generator<span class="card-new">New</span></h3>
+  <p>Create thumbnails at verified YouTube, Shorts, Instagram, TikTok, Facebook, LinkedIn, X and Pinterest dimensions. Edit text, shapes and photos locally; no upload.</p>
+  <span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="../video-background-remover/index.html">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">🎭</span>
@@ -570,7 +583,7 @@
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Video Text &amp; Watermark Remover<span class="card-new">New</span></h3>
-  <p>Cover a selected region of a video with a local mask using blur, mosaic, solid fill or nearby colour. This hides text and marks without reconstructing pixels. Export MP4 or WebM.</p>
+  <p>Cover a selected region of a video with a local mask using blur, mosaic, solid fill or nearby colour. This hides text and marks without reconstructing pixels. Export MP4.</p>
   <span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="../video-trimmer/index.html">
   <span class="card-top">
@@ -600,6 +613,7 @@
     </main>
   </div>
 </section>
+</div>
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">

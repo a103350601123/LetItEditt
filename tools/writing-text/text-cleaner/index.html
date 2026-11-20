@@ -11,14 +11,17 @@
 <meta property="og:title" content="Text Cleaner — Remove Unwanted Characters, Spaces and HTML">
 <meta property="og:description" content="Clean messy text in one ordered pass: trim whitespace, strip HTML tags and emoji, remove accents, unify quotes, fix punctuation and expand shorthand. Everything runs in your browser.">
 <meta property="og:url" content="https://letitedit.com/tools/writing-text/text-cleaner/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../../../css/site.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","name":"Text Cleaner","mainEntity":[{"@type":"Question","name":"Does this upload my text?","acceptedAnswer":{"@type":"Answer","text":"No. Cleaning happens entirely in your browser. Nothing is sent to a server."}},{"@type":"Question","name":"Does Strip emoji remove every emoji?","acceptedAnswer":{"@type":"Answer","text":"No. It targets the common pictograph ranges used by the reference tool, so some modern emoji, flags and joined sequences can remain. Use the Remove Emojis tool for the broader Unicode-range filter."}},{"@type":"Question","name":"What does the Default preset select?","acceptedAnswer":{"@type":"Answer","text":"It selects trim, remove leading and trailing spaces, strip HTML tags, strip emoji, collapse multiple spaces and reduce multiple blank lines. It leaves letter case unchanged."}},{"@type":"Question","name":"Can I undo a cleanup?","acceptedAnswer":{"@type":"Answer","text":"Yes. The Undo button restores the previous result. It is a simple history for this tool, not a full text-editor undo stack."}}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Text Cleaner","description":"Clean messy text in one ordered pass: trim whitespace, strip HTML tags and emoji, remove accents, unify quotes, fix punctuation and expand shorthand. Everything runs in your browser.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/writing-text/text-cleaner/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Writing \u0026 Text Tools","item":"https://letitedit.com/tools/writing-text/"},{"@type":"ListItem","position":3,"name":"Text Cleaner","item":"https://letitedit.com/tools/writing-text/text-cleaner/"}]},{"@type":"FAQPage","name":"Text Cleaner","mainEntity":[{"@type":"Question","name":"Does this upload my text?","acceptedAnswer":{"@type":"Answer","text":"No. Cleaning happens entirely in your browser. Nothing is sent to a server."}},{"@type":"Question","name":"Does Strip emoji remove every emoji?","acceptedAnswer":{"@type":"Answer","text":"No. It targets the common pictograph ranges used by the reference tool, so some modern emoji, flags and joined sequences can remain. Use the Remove Emojis tool for the broader Unicode-range filter."}},{"@type":"Question","name":"What does the Default preset select?","acceptedAnswer":{"@type":"Answer","text":"It selects trim, remove leading and trailing spaces, strip HTML tags, strip emoji, collapse multiple spaces and reduce multiple blank lines. It leaves letter case unchanged."}},{"@type":"Question","name":"Can I undo a cleanup?","acceptedAnswer":{"@type":"Answer","text":"Yes. The Undo button restores the previous result. It is a simple history for this tool, not a full text-editor undo stack."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-text">
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
@@ -30,19 +33,21 @@
       <a href="/blog/">Blog</a>
       <a href="/tools/">All Tools</a>
       <a href="/faq/">FAQ</a>
-      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" aria-controls="search-strip" aria-expanded="false" title="Search tools"><span aria-hidden="true">🔍</span></button>
     </div>
   </nav>
 </header>
-<div class="site-search-strip" id="search-strip">
+<div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
+      <label class="sr-only" for="site-search">Search all 61 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
-      <div class="search-results" id="search-results" role="listbox" hidden></div>
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
+<div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="../../../">Home</a><span>/</span>
   <a href="../../../tools/writing-text/">Writing &amp; Text Tools</a><span>/</span>
@@ -131,11 +136,12 @@
     <div class="info-card">
       <h2>Related tools</h2>
       <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
-        <a class="card tool-card" href="../../../tools/writing-text/remove-extra-spaces/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">↔️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Remove Extra Spaces</h3><p>Replace every run of whitespace, including tabs and line breaks, with a single space and trim the ends. Upload a .txt file or paste text and copy the cleaned result.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/remove-emojis/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🚫</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Remove Emojis from Text</h3><p>Strip emoji and pictographic symbols using the exact Unicode ranges of the reference tool. Upload a .txt file or paste text; a selected file takes priority over pasted input.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/remove-punctuation/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">✏️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Remove Punctuation</h3><p>Remove Unicode punctuation marks from text while keeping letters, numbers, emoji and symbols intact.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/word-counter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔢</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Word Counter &amp; Text Statistics</h3><p>Count words, grapheme-based characters, sentences and paragraphs. See reading and speaking time, keyword density for one-to-three-word phrases and an optional progress goal.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a>
+        <a class="card tool-card" href="../../../tools/writing-text/remove-extra-spaces/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">↔️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Remove Extra Spaces</h3><p>Replace every run of whitespace, including tabs and line breaks, with a single space and trim the ends. Upload a .txt file or paste text and copy the cleaned result.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/remove-emojis/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🚫</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Remove Emojis from Text</h3><p>Strip emoji and pictographic symbols using the exact Unicode ranges of the reference tool. Upload a .txt file or paste text; a selected file takes priority over pasted input.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/remove-punctuation/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">✏️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Remove Punctuation</h3><p>Remove all Unicode punctuation, common English marks or your own chosen characters from pasted text, TXT, CSV, Markdown or DOCX while keeping letters and numbers.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/word-counter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔢</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Word Counter &amp; Text Statistics</h3><p>Count words, grapheme-based characters, sentences and paragraphs. See reading and speaking time, keyword density for one-to-three-word phrases and an optional progress goal.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a>
       </div>
     </div>
   </div>
 </section>
+</div>
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">

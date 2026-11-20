@@ -2,8 +2,8 @@
  * This is the single source of truth for categories, tool metadata, routes,
  * tool counts, "new" status and search data. Adding a tool never requires
  * editing the homepage, sidebar, sitemap or search code: register the tool in
- * one of the data files (or a new data file listed in TOOL_SOURCES) and the
- * build regenerates every derived page automatically.
+ * one of the data files referenced by CATEGORIES below and the build
+ * regenerates every derived page automatically.
  */
 'use strict';
 
@@ -198,12 +198,18 @@ CATEGORIES.forEach(category => {
   if (!category.dataFile) return;
   const list = JSON.parse(fs.readFileSync(path.join(root, 'data', category.dataFile), 'utf8'));
   list.forEach(tool => {
+    const redirectTo = tool.redirectTo
+      ? (String(tool.redirectTo).charAt(0) === '/' ? String(tool.redirectTo) : `/${String(tool.redirectTo).replace(/^\.\//, '')}`)
+      : null;
     const item = Object.assign({}, tool, {
       categoryKey: category.key,
       category: category,
-      published: tool.published !== false,
-      isNew: tool.isNew === true,
-      featured: tool.featured === true || (category.featured || []).indexOf(tool.slug) !== -1,
+      redirectTo: redirectTo,
+      /* A redirect stub replaces the published page: it must never be counted,
+       * indexed, searched or surfaced as a working tool. */
+      published: tool.published !== false && !redirectTo,
+      isNew: tool.isNew === true && !redirectTo,
+      featured: (tool.featured === true || (category.featured || []).indexOf(tool.slug) !== -1) && !redirectTo,
       added: tool.added || '2026-11-18',
       pageUrl: tool.url ? `/${tool.url.replace(/index\.html$/, '')}` : `${category.path}${tool.slug}/`
     });
@@ -213,6 +219,7 @@ CATEGORIES.forEach(category => {
 });
 
 const publishedTools = tools.filter(tool => tool.published);
+const redirectTools = tools.filter(tool => tool.redirectTo);
 const bySlug = new Map(tools.map(tool => [tool.slug, tool]));
 
 if (bySlug.size !== tools.length) throw new Error('Duplicate tool slugs found in the registry');
@@ -231,6 +238,26 @@ function newTools(limit) {
     .filter(tool => tool.isNew)
     .sort((a, b) => String(b.added).localeCompare(String(a.added)) || a.name.localeCompare(b.name));
   return typeof limit === 'number' ? list.slice(0, limit) : list;
+}
+
+/* Featured picks are declared in tool metadata or a category's featured list.
+ * The fallback keeps the section useful when a category has no explicit picks:
+ * spread flagged tools across categories first, then fill alphabetically. */
+function featuredTools(limit) {
+  const chosen = [];
+  const seen = new Set();
+  function add(tool) {
+    if (!tool || seen.has(tool.slug)) return;
+    seen.add(tool.slug);
+    chosen.push(tool);
+  }
+  CATEGORIES.forEach(category => {
+    publishedTools.filter(tool => tool.categoryKey === category.key && tool.featured)
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .forEach(add);
+  });
+  publishedTools.slice().sort((a, b) => a.name.localeCompare(b.name)).forEach(add);
+  return typeof limit === 'number' ? chosen.slice(0, limit) : chosen;
 }
 
 function searchItems() {
@@ -275,9 +302,11 @@ module.exports = {
   categoryBySlug,
   tools,
   publishedTools,
+  redirectTools,
   publishedByCategory,
   bySlug,
   newTools,
+  featuredTools,
   searchItems,
   sidebarItems
 };

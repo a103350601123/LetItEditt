@@ -16,6 +16,42 @@ async function readDownload(download) {
   return fs.readFileSync(await download.path(), 'utf8');
 }
 
+// Minimal DOCX built as a ZIP with one stored word/document.xml entry. The
+// runtime reads that entry directly, so a CRC of zero is sufficient for a test.
+function makeDocx(lines) {
+  const escape = value => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const name = Buffer.from('word/document.xml', 'utf8');
+  const body = Buffer.from(
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>' +
+    lines.map(line => '<w:p><w:r><w:t xml:space="preserve">' + escape(line) + '</w:t></w:r></w:p>').join('') +
+    '</w:body></w:document>', 'utf8');
+  const local = Buffer.alloc(30 + name.length);
+  local.writeUInt32LE(0x04034b50, 0);
+  local.writeUInt16LE(20, 4);
+  local.writeUInt16LE(0, 8); // stored
+  local.writeUInt32LE(body.length, 18);
+  local.writeUInt32LE(body.length, 22);
+  local.writeUInt16LE(name.length, 26);
+  name.copy(local, 30);
+  const central = Buffer.alloc(46 + name.length);
+  central.writeUInt32LE(0x02014b50, 0);
+  central.writeUInt16LE(20, 4);
+  central.writeUInt16LE(20, 6);
+  central.writeUInt16LE(0, 10);
+  central.writeUInt32LE(body.length, 20);
+  central.writeUInt32LE(body.length, 24);
+  central.writeUInt16LE(name.length, 28);
+  name.copy(central, 46);
+  const end = Buffer.alloc(22);
+  end.writeUInt32LE(0x06054b50, 0);
+  end.writeUInt16LE(1, 8);
+  end.writeUInt16LE(1, 10);
+  end.writeUInt32LE(central.length, 12);
+  end.writeUInt32LE(local.length + body.length, 16);
+  return Buffer.concat([local, body, central, end]);
+}
+
 test.describe('Reference-backed writing tools', () => {
   test('01 Text Cleaner applies default rules, auto-processes, undoes and copies', async ({ page }) => {
     await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
@@ -270,6 +306,7 @@ test.describe('Reference-backed writing tools', () => {
     await expect(page.locator('#fr-status')).toContainText('Replacement applied.');
 
     await page.click('#fr-copy');
+    await expect(page.locator('#fr-status')).toContainText('Output copied to clipboard.');
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('dog dog dog');
 
     // Unchecking case-sensitive switches Find to the reference's live-regex mode.
@@ -495,6 +532,219 @@ test.describe('Reference-backed writing tools', () => {
     ]);
     expect(download.suggestedFilename()).toBe('handwriting-preview.png');
     await expect(page.locator('#hf-status')).toContainText('Preview image downloaded.');
+    expect(errors).toEqual([]);
+  });
+
+  test('11 Find and Replace previews matches, navigates, replaces one, restores and downloads', async ({ page }) => {
+    await page.goto(toolPath('find-and-replace'));
+    await page.fill('#fr-input', 'cat dog cat');
+    await page.fill('#fr-find', 'cat');
+    await page.fill('#fr-replace', 'fox');
+    await expect(page.locator('#fr-count')).toHaveText('2 matches');
+    await expect(page.locator('#fr-preview .fr-hit')).toHaveCount(2);
+    await expect(page.locator('#fr-preview .fr-hit.is-active')).toHaveCount(1);
+    await expect(page.locator('#fr-status')).toContainText('2 match(es) highlighted');
+
+    await page.click('#fr-next');
+    await expect(page.locator('#fr-status')).toContainText('Match 2 of 2.');
+    await page.click('#fr-replace-one');
+    await expect(page.locator('#fr-result')).toHaveValue('cat dog fox');
+    await page.click('#fr-undo');
+    await expect(page.locator('#fr-input')).toHaveValue('cat dog cat');
+
+    // Explicit regex opt-in still works while literal case-sensitive mode is on.
+    await page.fill('#fr-find', 'c.t');
+    await expect(page.locator('#fr-count')).toHaveText('0 matches');
+    await page.check('#fr-regex');
+    await expect(page.locator('#fr-count')).toHaveText('2 matches');
+    await page.click('#fr-apply');
+    await expect(page.locator('#fr-result')).toHaveValue('fox dog fox');
+
+    await page.locator('#fr-upload').setInputFiles({
+      name: 'source.txt', mimeType: 'text/plain', buffer: Buffer.from('one two one')
+    });
+    await expect(page.locator('#fr-input')).toHaveValue('one two one');
+    await expect(page.locator('#fr-status')).toContainText('File loaded.');
+
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      page.click('#fr-download')
+    ]);
+    expect(download.suggestedFilename()).toBe('find-replace-result.txt');
+  });
+
+  test('15 Remove Empty Lines cleans text, preserves paragraphs and reads documents', async ({ page }) => {
+    await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.goto(toolPath('remove-empty-lines'));
+    await page.fill('#tool-input', 'one\n\n\ntwo\n   \nthree');
+    await page.click('#rel-apply');
+    await expect(page.locator('#tool-output')).toHaveText('one\ntwo\nthree');
+    await expect(page.locator('#tool-status')).toContainText('Empty lines removed.');
+
+    await page.check('#rel-preserve');
+    await expect(page.locator('#tool-output')).toHaveText('one\n\ntwo\n\nthree');
+    await page.uncheck('#rel-preserve');
+
+    await page.locator('#rel-upload').setInputFiles({
+      name: 'lines.txt', mimeType: 'text/plain', buffer: Buffer.from('a\n\n\nb')
+    });
+    await expect(page.locator('#tool-input')).toHaveValue('a\n\n\nb');
+    await expect(page.locator('#tool-output')).toHaveText('a\nb');
+
+    await page.locator('#rel-upload').setInputFiles({
+      name: 'report.docx', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      buffer: makeDocx(['first', '', 'second'])
+    });
+    await expect(page.locator('#tool-input')).toHaveValue('first\n\nsecond');
+    await expect(page.locator('#tool-output')).toHaveText('first\nsecond');
+    await expect(page.locator('#tool-status')).toContainText('Only the text in the DOCX was extracted');
+
+    await page.click('#copy-output');
+    await expect(page.locator('#tool-status')).toContainText('Output copied to clipboard.');
+    expect((await page.evaluate(() => navigator.clipboard.readText())).replace(/\r\n/g, '\n')).toBe('first\nsecond');
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      page.click('#download-output')
+    ]);
+    expect(download.suggestedFilename()).toBe('lines-cleaned.txt');
+    expect(await readDownload(download)).toBe('first\nsecond');
+  });
+
+  test('15 Remove Empty Lines rejects PDF and legacy DOC instead of guessing', async ({ page }) => {
+    await page.goto(toolPath('remove-empty-lines'));
+    await page.locator('#rel-upload').setInputFiles({
+      name: 'scan.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4')
+    });
+    await expect(page.locator('#tool-status')).toContainText('PDF files cannot be parsed reliably');
+    await page.locator('#rel-upload').setInputFiles({
+      name: 'old.doc', mimeType: 'application/msword', buffer: Buffer.from('legacy')
+    });
+    await expect(page.locator('#tool-status')).toContainText('Legacy .doc files are not supported');
+  });
+
+  test('16 Remove Punctuation offers all, common and custom modes with Unicode preserved', async ({ page }) => {
+    await page.goto(toolPath('remove-punctuation'));
+    const source = 'Hello, world! Café — ok?';
+    await page.fill('#tool-input', source);
+    await expect(page.locator('#tool-output')).toHaveText('Hello world Café  ok');
+    await expect(page.locator('#rp-chars')).toBeDisabled();
+
+    await page.selectOption('#rp-types', 'common');
+    await expect(page.locator('#rp-chars')).toBeDisabled();
+    await expect(page.locator('#tool-output')).toHaveText('Hello world Café — ok');
+
+    await page.selectOption('#rp-types', 'custom');
+    await expect(page.locator('#rp-chars')).toBeEnabled();
+    await page.fill('#rp-chars', ',!');
+    await expect(page.locator('#tool-output')).toHaveText('Hello world Café — ok?'.replace(/[,!]/g, ''));
+
+    await page.locator('#rp-upload').setInputFiles({
+      name: 'words.md', mimeType: 'text/markdown', buffer: Buffer.from('One, two! Café 123 😀')
+    });
+    await expect(page.locator('#tool-input')).toHaveValue('One, two! Café 123 😀');
+    await expect(page.locator('#tool-output')).toHaveText('One two Café 123 😀');
+  });
+
+  test('17 Text Comparer diffs two sides, switches units and loads both documents', async ({ page }) => {
+    await page.goto(toolPath('text-comparer'));
+    await expect(page.locator('.hint.warning')).toContainText('Only extracted text is compared');
+    await page.fill('#tool-input-left', 'a\nb\nc');
+    await page.fill('#tool-input-right', 'a\nx\nc');
+    await page.click('#cmp-compare');
+    await expect(page.locator('#cmp-summary')).toHaveText('1 added · 1 removed');
+    await expect(page.locator('#tool-output .diff-remove')).toHaveText('- b');
+    await expect(page.locator('#tool-output .diff-add')).toHaveText('+ x');
+    await expect(page.locator('#tool-output .diff-equal')).toHaveCount(2);
+
+    await page.fill('#tool-input-left', 'the cat sat');
+    await page.fill('#tool-input-right', 'the dog sat');
+    await page.check('input[name="cmp-unit"][value="words"]');
+    await expect(page.locator('#cmp-summary')).toHaveText('1 added · 1 removed');
+    await page.click('#cmp-swap');
+    await expect(page.locator('#tool-input-left')).toHaveValue('the dog sat');
+    await expect(page.locator('#tool-output .diff-add')).toHaveText('+ cat');
+
+    await page.locator('#cmp-upload-left').setInputFiles({
+      name: 'left.txt', mimeType: 'text/plain', buffer: Buffer.from('left one')
+    });
+    await page.locator('#cmp-upload-right').setInputFiles({
+      name: 'right.txt', mimeType: 'text/plain', buffer: Buffer.from('left two')
+    });
+    await expect(page.locator('#tool-input-left')).toHaveValue('left one');
+    await expect(page.locator('#tool-input-right')).toHaveValue('left two');
+    await expect(page.locator('#tool-status')).toContainText('File loaded for the changed side.');
+  });
+
+  test('18 HTML to Markdown converts locally and previews with safe DOM nodes', async ({ page }) => {
+    await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.goto(toolPath('html-to-markdown'));
+    await page.fill('#h2m-input', '<h2>Hello</h2><p><strong>World</strong> &amp; <a href="https://x.com">link</a></p><ul><li>one</li><li>two</li></ul>');
+    await expect(page.locator('#h2m-source')).toHaveText('## Hello\n\n**World** & [link](https://x.com)\n\n- one\n- two');
+    await expect(page.locator('#h2m-preview h2')).toHaveText('Hello');
+    await expect(page.locator('#h2m-count')).toContainText('Markdown characters');
+    await expect(page.locator('#h2m-status')).toContainText('safe DOM nodes only');
+
+    await page.fill('#h2m-input', '<script>window.__xss=1</script><p onclick="window.__xss=2">safe text</p>');
+    await expect(page.locator('#h2m-preview script')).toHaveCount(0);
+    expect(await page.evaluate(() => window.__xss)).toBeUndefined();
+    expect(await page.locator('#h2m-preview p').getAttribute('onclick')).toBeNull();
+
+    await page.click('#h2m-copy');
+    await expect(page.locator('#h2m-status')).toContainText('Markdown copied to clipboard.');
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toContain('safe text');
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      page.click('#h2m-download')
+    ]);
+    expect(download.suggestedFilename()).toBe('converted.md');
+  });
+
+  test('19 Extract URLs de-duplicates and validates links without fetching them', async ({ page }) => {
+    await page.goto(toolPath('extract-urls'));
+    await page.fill('#url-input', 'Visit https://example.com/page. Then www.test.org/x?a=1 and example.com, skip mailto:a@b.com and ftp://x.com');
+    await expect(page.locator('#url-count')).toHaveText('3 unique URLs');
+    await expect(page.locator('#url-list .url-row')).toHaveCount(3);
+    await expect(page.locator('#url-list .url-row a').first()).toHaveText('https://example.com/page');
+    await expect(page.locator('#url-status')).toContainText('first-seen order');
+
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      page.click('#url-download')
+    ]);
+    expect(download.suggestedFilename()).toBe('extracted-urls.txt');
+    expect(await readDownload(download)).toContain('https://www.test.org/x?a=1');
+  });
+
+  test('20 Grammar Checker is rule-based, English-only and applies chosen suggestions', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', error => errors.push(error.message));
+    await page.goto(toolPath('grammar-spell-checker'));
+    await expect(page.locator('.hint.warning')).toContainText('English only');
+    await expect(page.locator('.hint.warning')).toContainText('not full NLP');
+    await expect(page.locator('.hint.warning')).toContainText('no external or paid API');
+
+    const source = 'I are teh best. This is the the test .  we recieve it.';
+    await page.fill('#gs-input', source);
+    await expect(page.locator('#gs-count')).toContainText('suggestions');
+    await expect(page.locator('#gs-list .gs-suggestion').first()).toBeVisible();
+    await expect(page.locator('#gs-highlight .gs-hit').first()).toBeVisible();
+    expect(await page.locator('#gs-corrected').evaluate(el => el.textContent)).toBe('I am the best. This is the test. We receive it.');
+    expect(await page.locator('#gs-original').evaluate(el => el.textContent)).toBe(source);
+
+    await page.click('#gs-reject-all');
+    expect(await page.locator('#gs-corrected').evaluate(el => el.textContent)).toBe(source);
+    await page.click('#gs-select-all');
+    await page.click('#gs-apply');
+    await expect(page.locator('#gs-status')).toContainText('Your original text is unchanged.');
+    expect(await page.locator('#gs-input').inputValue()).toBe(source);
+
+    await page.selectOption('#gs-style', 'Simple English');
+    await expect(page.locator('#gs-status')).toContainText('Style emphasis changed');
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      page.click('#gs-download')
+    ]);
+    expect(download.suggestedFilename()).toBe('grammar-corrected.txt');
     expect(errors).toEqual([]);
   });
 

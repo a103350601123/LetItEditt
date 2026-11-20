@@ -11,12 +11,15 @@
 <meta property="og:title" content="Contact LetitEdit — feedback and tool requests">
 <meta property="og:description" content="Contact LetitEdit about a broken tool, a missing text utility or a correction to tool documentation.">
 <meta property="og:url" content="https://letitedit.com/contact/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../css/site.css">
 
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
@@ -28,20 +31,23 @@
       <a href="/blog/">Blog</a>
       <a href="/tools/">All Tools</a>
       <a href="/faq/">FAQ</a>
-      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" aria-controls="search-strip" aria-expanded="false" title="Search tools"><span aria-hidden="true">🔍</span></button>
     </div>
   </nav>
 </header>
-<div class="site-search-strip" id="search-strip">
+<div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
+      <label class="sr-only" for="site-search">Search all 61 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
-      <div class="search-results" id="search-results" role="listbox" hidden></div>
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
+<div id="main-content">
 <main><section class="container page-head"><span class="eyebrow">Get in touch</span><h1>Contact us</h1><p>Tell us what broke, what tool is missing, or where an explanation was unclear. Specific examples help us reproduce and fix problems quickly.</p></section><section class="section legal"><div class="container"><div class="info-card"><h2>Email</h2><p><a href="mailto:info@letitedit.com">info@letitedit.com</a></p><h2>What to include</h2><ul><li>The tool name and page URL.</li><li>Your browser and device type.</li><li>The exact input that caused a problem, if you are comfortable sharing it.</li><li>What you expected and what happened instead.</li></ul><h2>Privacy note</h2><p>Please do not email passwords, API keys or sensitive personal data. Our tools are designed to keep that information in your browser; email is not a secure channel for secrets.</p><h2>Response times</h2><p>We read every message but cannot promise an immediate reply. Bug reports with clear reproduction steps are prioritised.</p></div></div></section></main>
+</div>
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">

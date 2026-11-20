@@ -252,17 +252,17 @@
   {
     "slug": "remove-empty-lines",
     "name": "Remove Empty Lines",
-    "title": "Remove Empty Lines — Clean Blank Lines in Text",
-    "description": "Remove blank and whitespace-only lines from pasted text while preserving the order of every real line.",
+    "title": "Remove Empty Lines — Clean Blank Lines in Text and Documents",
+    "description": "Remove blank and whitespace-only lines from pasted text, TXT, CSV, Markdown or DOCX while preserving every real line and its formatting.",
     "h1": "Remove Empty Lines",
     "icon": "📏",
     "layout": "single",
     "outputType": "text",
-    "intro": "A focused line-cleaning tool. Lines containing only spaces or tabs are treated as empty.",
+    "intro": "A focused line-cleaning tool with file support. Lines containing only spaces or tabs are treated as empty; choose whether to keep one blank line between paragraphs.",
     "instructions": [
-      "Paste text.",
-      "Blank lines disappear automatically.",
-      "Copy the compact output."
+      "Paste text or load a TXT, CSV, Markdown or DOCX file.",
+      "Choose whether to preserve one blank line between paragraphs.",
+      "Click Remove empty lines, then copy or download the result."
     ],
     "example": {
       "input": "one\n\n\ntwo\n   \nthree",
@@ -270,8 +270,16 @@
     },
     "faqs": [
       {
-        "q": "Will it change the order of lines?",
-        "a": "No. Only empty lines are removed; all other lines keep their original order."
+        "q": "Will it change the order or formatting of real lines?",
+        "a": "No. Only empty and whitespace-only lines are removed. Indentation, tabs, punctuation and all other characters on real lines stay exactly as they were."
+      },
+      {
+        "q": "What does preserve paragraphs do?",
+        "a": "It collapses each run of blank lines to a single empty line, so paragraphs stay visually separated without leaving stacks of empty lines."
+      },
+      {
+        "q": "Can I open a Word document?",
+        "a": "DOCX files are read locally where the browser supports decompression. Only paragraph text is extracted; tables, columns and styling are not preserved. PDF and legacy .doc files are rejected with an explanation instead of being silently mangled."
       }
     ],
     "related": [
@@ -280,7 +288,38 @@
       "text-splitter",
       "text-sorter"
     ],
-    "controls": []
+    "controls": [
+      {
+        "type": "checkbox",
+        "key": "preserveParagraphs",
+        "label": "Keep one blank line between paragraphs",
+        "default": false
+      }
+    ],
+    "engine": "remove-empty-lines",
+    "keywords": [
+      "remove blank lines",
+      "remove empty lines",
+      "clean text file",
+      "docx text",
+      "preserve paragraphs"
+    ],
+    "article": [
+      {
+        "heading": "What counts as an empty line",
+        "paragraphs": [
+          "A line is empty when it contains nothing, or only spaces and tabs after the line break is removed. That means a line of indentation is treated the same as a completely blank line, which is what most people expect when cleaning pasted code, logs or documents. Every other line is copied verbatim, including its indentation and trailing spaces.",
+          "If you turn on the paragraph option, consecutive empty lines become a single blank separator and trailing blank lines at the end of the document are removed. The order of real lines never changes."
+        ]
+      },
+      {
+        "heading": "Files, DOCX and honest limits",
+        "paragraphs": [
+          "Text-like files such as TXT, CSV, TSV, Markdown, JSON and HTML are read as text. DOCX files are opened as ZIP archives in your browser, and the paragraph text inside word/document.xml is extracted with the browser’s XML parser. This needs browser support for raw DEFLATE decompression; if it is missing, the tool says so and suggests saving the file as text instead.",
+          "A DOCX is a layout format, so tables, columns, headers, footers and character styling are not kept. Only the extracted text is cleaned. PDF files would require a layout-aware parser and legacy .doc is a different binary format, so neither is guessed at. The tool shows a clear limitation rather than returning damaged text."
+        ]
+      }
+    ]
   },
   {
     "slug": "remove-emojis",
@@ -343,17 +382,17 @@
   {
     "slug": "remove-punctuation",
     "name": "Remove Punctuation",
-    "title": "Remove Punctuation — Strip Punctuation Marks Online",
-    "description": "Remove Unicode punctuation marks from text while keeping letters, numbers, emoji and symbols intact.",
+    "title": "Remove Punctuation — Strip Punctuation Marks in Text and Documents",
+    "description": "Remove all Unicode punctuation, common English marks or your own chosen characters from pasted text, TXT, CSV, Markdown or DOCX while keeping letters and numbers.",
     "h1": "Remove Punctuation",
     "icon": "✏️",
     "layout": "single",
     "outputType": "text",
-    "intro": "Use Unicode punctuation properties rather than a short English-only list, so accented and multilingual text is handled correctly.",
+    "intro": "Choose between all Unicode punctuation, a smaller common-English set, or a custom list of characters. Accented letters, numbers, emoji and line breaks are preserved.",
     "instructions": [
-      "Paste your text.",
-      "Punctuation marks are removed live.",
-      "Copy the result."
+      "Paste text or load a TXT, CSV, Markdown or DOCX file.",
+      "Choose All Unicode punctuation, Common English marks, or Custom characters.",
+      "In Custom mode, type the exact characters to remove, then copy or download the result."
     ],
     "example": {
       "input": "Hello, world! How's it going?",
@@ -361,8 +400,16 @@
     },
     "faqs": [
       {
-        "q": "Are emoji kept?",
-        "a": "Yes. This tool removes punctuation marks only. Use Remove Emojis for pictographic symbols."
+        "q": "Are emoji and non-Latin scripts kept?",
+        "a": "Yes. Only punctuation characters are removed. Letters from every script, numbers, emoji, symbols, spaces and line breaks are kept."
+      },
+      {
+        "q": "What is the difference between all and common punctuation?",
+        "a": "All uses the Unicode punctuation property and also removes marks such as curly quotes, em dashes and CJK punctuation. Common removes only the familiar English marks: . , ! ? ; : ' \" ( ) [ ] { } - – — _ / \\ @ # & * and the quotation variants."
+      },
+      {
+        "q": "Can I open a Word document?",
+        "a": "DOCX files are read locally where the browser supports decompression and only their text is cleaned. Layout, tables and styling are not kept. PDF and legacy .doc files are rejected with an explanation instead of being silently mangled."
       }
     ],
     "related": [
@@ -371,7 +418,50 @@
       "smart-quotes",
       "case-converter"
     ],
-    "controls": []
+    "controls": [
+      {
+        "type": "select",
+        "key": "types",
+        "label": "Punctuation to remove",
+        "default": "all",
+        "options": [
+          ["all", "All Unicode punctuation"],
+          ["common", "Common English marks"],
+          ["custom", "Custom characters"]
+        ]
+      },
+      {
+        "type": "text",
+        "key": "chars",
+        "label": "Custom characters",
+        "default": ""
+      }
+    ],
+    "engine": "remove-punctuation",
+    "keywords": [
+      "remove punctuation",
+      "strip punctuation marks",
+      "remove commas",
+      "custom punctuation",
+      "unicode punctuation",
+      "clean docx text"
+    ],
+    "article": [
+      {
+        "heading": "Three ways to choose what gets removed",
+        "paragraphs": [
+          "The default All mode looks at the Unicode punctuation property, so it handles straight and curly quotes, em and en dashes, ellipses, and punctuation from scripts beyond Latin. Common mode uses a shorter list of marks that are familiar in English prose, which is useful when you want dashes or apostrophes left alone. Custom mode removes exactly the characters you type into the box and nothing else.",
+          "Whitespace is never treated as punctuation. Spaces, tabs and line breaks stay where they are, so the shape of your paragraphs and lists survives the operation. That makes the output safe to paste into a spreadsheet or a plain-text editor."
+        ]
+      },
+      {
+        "heading": "Documents and honest scope",
+        "paragraphs": [
+          "Text-like files such as TXT, CSV, TSV, Markdown, JSON and HTML are read directly as text. DOCX files are opened as ZIP archives in the browser and the paragraph text is extracted from the document XML. If the browser cannot decompress the archive, the tool reports the problem and suggests saving the document as text instead.",
+          "Only text is processed. A DOCX file can contain tables, columns, text boxes, headers and character formatting; none of that layout is preserved. PDF files and legacy .doc files need parsers this browser tool does not include, so they are rejected clearly rather than guessed at."
+        ]
+      }
+    ]
   },
   {
     "slug": "word-wrap",
@@ -988,7 +1078,19 @@
       "text-reverser",
       "text-cleaner"
     ],
-    "controls": []
+    "controls": [
+      {
+        "type": "select",
+        "key": "encoding",
+        "label": "Character encoding",
+        "default": "utf-8",
+        "options": [
+          ["utf-8", "UTF-8"],
+          ["ascii", "ASCII"],
+          ["utf-16", "UTF-16"]
+        ]
+      }
+    ]
   },
   {
     "slug": "binary-to-text",
@@ -1021,7 +1123,19 @@
       "text-cleaner",
       "text-to-list"
     ],
-    "controls": []
+    "controls": [
+      {
+        "type": "select",
+        "key": "encoding",
+        "label": "Character encoding",
+        "default": "utf-8",
+        "options": [
+          ["utf-8", "UTF-8"],
+          ["ascii", "ASCII"],
+          ["utf-16", "UTF-16"]
+        ]
+      }
+    ]
   },
   {
     "slug": "bionic-reading",
@@ -1101,17 +1215,17 @@
   {
     "slug": "html-to-markdown",
     "name": "Rich Text / HTML to Markdown",
-    "title": "Rich Text / HTML to Markdown Converter",
-    "description": "Convert pasted HTML or rich text into clean Markdown with headings, links, lists, bold and italic preserved.",
+    "title": "Rich Text / HTML to Markdown Converter — Local, Safe Markdown",
+    "description": "Convert pasted HTML, rich text, text files or DOCX text into clean Markdown with headings, links, lists, tables, code and emphasis preserved.",
     "h1": "Rich Text / HTML to Markdown",
     "icon": "🅼",
     "layout": "single",
     "outputType": "text",
-    "intro": "Paste markup from a webpage or rich-text editor. Common inline and block formatting is converted to standard Markdown.",
+    "intro": "Paste markup from a webpage or rich-text editor, or load a text-like file or DOCX. A local DOM-free parser produces Markdown and a safe preview built from DOM nodes.",
     "instructions": [
-      "Paste HTML into the input box.",
-      "Markdown is generated automatically.",
-      "Copy the Markdown output."
+      "Paste HTML or rich text, or load an HTML, TXT, CSV, Markdown or DOCX file.",
+      "Markdown source and a safe preview update automatically.",
+      "Copy the Markdown or download it as a .md file."
     ],
     "example": {
       "input": "<h2>Hello</h2><p><strong>World</strong></p>",
@@ -1120,11 +1234,15 @@
     "faqs": [
       {
         "q": "Which elements are supported?",
-        "a": "Headings, paragraphs, links, bold, italic, inline code, lists, blockquotes, line breaks and preformatted blocks."
+        "a": "Headings, paragraphs, links, bold, italic, inline code, fenced code, ordered and unordered lists, nested lists, blockquotes, tables, horizontal rules, line breaks and images."
       },
       {
-        "q": "Do I need to upload a .docx file?",
-        "a": "No. This version accepts pasted HTML or rich text. Complex Word files should be saved as HTML first."
+        "q": "Is pasted script or styling executed?",
+        "a": "No. Scripts, styles, SVG, iframes and unsafe attributes are discarded. The preview is built with text nodes and a small allow-list of safe elements, never with innerHTML containing your content."
+      },
+      {
+        "q": "Can I convert a Word document?",
+        "a": "You can load a DOCX, but only its text is extracted. Tables, columns and styling are not kept. For a fully faithful layout conversion, export the document as HTML first."
       }
     ],
     "related": [
@@ -1133,7 +1251,31 @@
       "text-to-slug",
       "smart-quotes"
     ],
-    "controls": []
+    "controls": [],
+    "engine": "html-to-markdown",
+    "keywords": [
+      "HTML to Markdown",
+      "rich text to Markdown",
+      "convert HTML to md",
+      "safe HTML preview",
+      "DOCX to Markdown text"
+    ],
+    "article": [
+      {
+        "heading": "What the converter preserves",
+        "paragraphs": [
+          "The converter reads the markup as text and walks it locally. Headings keep their level, links keep their destination and title, and emphasis becomes asterisks or underscores. Lists are nested with indentation, blockquotes get a leading marker, code blocks are fenced, and simple tables are emitted as pipe tables. Images keep their source and alt text.",
+          "Whitespace is normalised between inline elements so pasted rich text does not produce broken sentences. Entities such as ampersands and non-breaking spaces are decoded before the Markdown is written."
+        ]
+      },
+      {
+        "heading": "Safety and honest limits",
+        "paragraphs": [
+          "Nothing is uploaded and no remote service is called. Script, style, SVG, iframe, object and form elements are dropped, as are event-handler and javascript: attributes. The side-by-side preview is assembled from DOM nodes using a strict allow-list, so markup in your own input cannot run code or alter the page.",
+          "This is a pragmatic converter for common web markup, not a full HTML5-to-CommonMark implementation. Complex nested tables, definition lists and custom elements may be simplified. DOCX files are read as ZIP archives where the browser supports decompression; only paragraph text is extracted, so layout and styling are lost."
+        ]
+      }
+    ]
   },
   {
     "slug": "remove-duplicate-lines",
@@ -1390,17 +1532,17 @@
   {
     "slug": "text-comparer",
     "name": "Text Comparer / Diff",
-    "title": "Text Comparer — Compare Two Texts and See the Difference",
-    "description": "Compare two texts line by line or word by word with added and removed content highlighted.",
+    "title": "Text Comparer — Compare Two Texts or Documents and See the Difference",
+    "description": "Compare two texts or documents line by line or word by word with additions and removals highlighted, using a real LCS diff.",
     "h1": "Text Comparer / Diff",
     "icon": "⚖️",
     "layout": "diff",
     "outputType": "diff",
-    "intro": "A real LCS-based diff, not a character-by-character guess. Comparison is capped at 1,200 units per side for browser performance.",
+    "intro": "A real LCS-based diff, not a character-by-character guess. Paste on both sides or load TXT, CSV, Markdown or DOCX files. Only extracted text is compared, never formatting. Comparison is capped at 1,200 units per side for browser performance.",
     "instructions": [
-      "Paste the original text on the left.",
-      "Paste the changed text on the right.",
-      "Review highlighted additions and removals."
+      "Paste the original text on the left or open a text file for that side.",
+      "Paste the changed text on the right or open a second file.",
+      "Choose lines or words, then review highlighted additions and removals."
     ],
     "example": {
       "input": "Left: The cat sat\nRight: The dog sat",
@@ -1410,6 +1552,14 @@
       {
         "q": "How large a text can I compare?",
         "a": "Up to 1,200 lines or words per side. Larger inputs show a clear error instead of freezing your browser."
+      },
+      {
+        "q": "Does it compare document formatting?",
+        "a": "No. Only extracted text is compared. DOCX uploads provide paragraph text; tables, columns and styling are not part of the comparison."
+      },
+      {
+        "q": "Can I compare a PDF?",
+        "a": "No. PDF text extraction would require a layout-aware parser, so PDF and legacy .doc uploads are rejected with an explanation rather than guessed at."
       }
     ],
     "related": [
@@ -1433,6 +1583,31 @@
             "words",
             "Words"
           ]
+        ]
+      }
+    ],
+    "engine": "text-comparer",
+    "keywords": [
+      "compare two texts",
+      "text diff",
+      "compare documents",
+      "line diff",
+      "word diff",
+      "compare docx text"
+    ],
+    "article": [
+      {
+        "heading": "How the diff is calculated",
+        "paragraphs": [
+          "Both sides are split into lines or words and compared with a longest-common-subsequence algorithm. Unchanged units are shown with a leading space, additions with a plus sign and removals with a minus sign. The summary counts added and removed units so you can see the size of the change at a glance.",
+          "The output is rendered with text nodes inside safe elements, so markup in either input is displayed as text and never executed. Each side can be swapped, cleared or filled from its own file input, which makes it practical to review two versions of a document without a separate editor."
+        ]
+      },
+      {
+        "heading": "Text only, and a firm size limit",
+        "paragraphs": [
+          "This tool compares text, not formatting. A DOCX upload is opened as a ZIP archive in the browser and its paragraph text is extracted; tables, columns, headers and styling are outside the comparison. The status line states this explicitly so nobody mistakes the result for a visual track-changes view.",
+          "A full LCS comparison grows with the product of the two input sizes, so each side is capped at 1,200 units. Larger inputs return a clear error rather than freezing the page. PDF and legacy .doc files are rejected because reliable extraction would require a parser this local tool does not ship."
         ]
       }
     ]
@@ -1473,17 +1648,17 @@
   {
     "slug": "extract-urls",
     "name": "Extract URLs from Text",
-    "title": "Extract URLs from Text — Link Extractor Online",
-    "description": "Extract unique http and https links from pasted text, trimming trailing punctuation automatically.",
+    "title": "Extract URLs from Text — Link Extractor for Pasted Text and Documents",
+    "description": "Extract unique http, https, www and bare-domain links from pasted text, logs or DOCX files with trailing punctuation trimmed automatically.",
     "h1": "Extract URLs from Text",
     "icon": "🔗",
     "layout": "single",
     "outputType": "text",
-    "intro": "Pull links out of paragraphs, logs and chat messages with one clean URL per line.",
+    "intro": "Pull web links out of paragraphs, chat logs and documents. Each URL is validated, de-duplicated in first-seen order and shown on its own line.",
     "instructions": [
-      "Paste text containing links.",
-      "Unique URLs are extracted live.",
-      "Copy the result."
+      "Paste text containing links or load a TXT, CSV, Markdown or DOCX file.",
+      "Unique web URLs appear automatically, one per line.",
+      "Copy all links or download them as a text file."
     ],
     "example": {
       "input": "Visit https://example.com/page.",
@@ -1492,7 +1667,15 @@
     "faqs": [
       {
         "q": "Does it remove trailing punctuation?",
-        "a": "Yes. A final period, comma or closing mark is not included in the URL."
+        "a": "Yes. A final period, comma, closing bracket or quote is not included in the URL."
+      },
+      {
+        "q": "Which link forms are recognised?",
+        "a": "Full http and https URLs, www. addresses and bare domains with a public-style suffix. mailto: and javascript: values are ignored because they are not web URLs."
+      },
+      {
+        "q": "Can it read a Word document?",
+        "a": "DOCX files are read locally where the browser supports decompression and only their text is scanned. PDF and legacy .doc files are rejected with an explanation."
       }
     ],
     "related": [
@@ -1501,7 +1684,32 @@
       "text-redactor",
       "text-to-slug"
     ],
-    "controls": []
+    "controls": [],
+    "engine": "extract-urls",
+    "keywords": [
+      "extract URLs",
+      "link extractor",
+      "find links in text",
+      "unique URLs",
+      "www domain extraction",
+      "extract links from docx"
+    ],
+    "article": [
+      {
+        "heading": "What counts as a link",
+        "paragraphs": [
+          "The extractor looks for explicit http and https URLs, www-prefixed addresses and bare domains with a sensible suffix. Each candidate is trimmed of surrounding punctuation and validated before it is kept, so a sentence ending in a period does not produce a broken link. Results are de-duplicated in the order they first appear, which makes it easy to compare a pasted block with a source list.",
+          "Schemes other than http and https are deliberately ignored. A mailto: address is an email, not a web link, and javascript: values are never emitted, which keeps the output safe to paste into a document or a browser address bar."
+        ]
+      },
+      {
+        "heading": "Files, privacy and limits",
+        "paragraphs": [
+          "Text-like files such as TXT, CSV, TSV, Markdown, JSON and HTML are read directly. DOCX files are opened as ZIP archives in the browser and the paragraph text is scanned from the document XML; if raw decompression is unavailable, the tool explains how to save the file as text instead.",
+          "Everything runs on your device. No URL is fetched, followed or resolved, so the tool never contacts the sites it finds. Only links written in the input are reported; links hidden behind shortened redirects or generated by scripts cannot be recovered from pasted text."
+        ]
+      }
+    ]
   },
   {
     "slug": "text-filter",
@@ -2028,6 +2236,111 @@
       "bionic-reading",
       "text-cleaner",
       "word-counter"
+    ]
+  },
+  {
+    "slug": "grammar-spell-checker",
+    "name": "Grammar & Spell Checker",
+    "title": "Grammar & Spell Checker — Rule-Based English Proofreading in Your Browser",
+    "h1": "Grammar & Spell Checker",
+    "icon": "🧠",
+    "description": "Check English text with local rules for common spelling, grammar, repeated words, spacing and clarity. Review suggestions, apply the ones you accept and keep the original text unchanged. No AI rewriting and no external or paid API.",
+    "intro": "A transparent, rule-based English checker. It highlights probable mistakes, explains each suggestion and lets you accept or reject individually. It is deliberately honest about what local rules can and cannot do.",
+    "layout": "single",
+    "outputType": "text",
+    "engine": "grammar-spell-checker",
+    "isNew": true,
+    "added": "2026-11-20",
+    "keywords": [
+      "grammar checker",
+      "spell checker",
+      "English proofreading",
+      "rule-based grammar check",
+      "repeated word checker",
+      "clarity suggestions",
+      "private grammar tool"
+    ],
+    "instructions": [
+      "Paste English text or load a TXT, CSV, Markdown or DOCX file.",
+      "Choose a style emphasis and review the highlighted text and the suggestion list.",
+      "Select the suggestions to apply, or reject them all, then copy or download the corrected copy."
+    ],
+    "faqs": [
+      {
+        "q": "Is this an AI writing tool?",
+        "a": "No. It is an explicitly rule-based, English-only checker. It uses local dictionaries and grammar rules, not a language model, and it does not rewrite your prose or invent new sentences."
+      },
+      {
+        "q": "Does it send my text anywhere?",
+        "a": "No. Every check runs in your browser. There is no external, paid or third-party API, and no text is uploaded to a server."
+      },
+      {
+        "q": "Will it catch every mistake?",
+        "a": "No. It covers common spelling errors, frequent grammar patterns, repeated words, spacing and a few clarity rules. It is an aid to proofreading, not a replacement for a human reader or a specialist editor."
+      },
+      {
+        "q": "Does it work in languages other than English?",
+        "a": "No. The dictionaries and rules are English only. Other languages will produce unreliable suggestions, so the tool states that scope plainly."
+      }
+    ],
+    "related": [
+      "text-cleaner",
+      "word-counter",
+      "find-and-replace",
+      "bionic-reading"
+    ],
+    "controls": [
+      {
+        "type": "select",
+        "key": "style",
+        "label": "Style emphasis",
+        "default": "Professional",
+        "options": [
+          ["Professional", "Professional"],
+          ["Academic", "Academic"],
+          ["Formal", "Formal"],
+          ["Casual", "Casual"],
+          ["Simple English", "Simple English"]
+        ]
+      }
+    ],
+    "article": [
+      {
+        "heading": "What rule-based checking means",
+        "paragraphs": [
+          "A rule-based checker does not understand your text the way a person does. Instead, it compares each word with a local word list and applies a small set of hand-written patterns for the mistakes that appear most often in English prose. When a pattern matches, the tool records the exact character range, the original text, a proposed replacement and a short explanation. You see those findings as highlights over the original text and as a list of suggestions underneath.",
+          "This design has a useful property: the result is predictable. The same input and the same style emphasis always produce the same suggestions, and every suggestion can be traced to a dictionary entry or a named rule. Nothing is generated, paraphrased or invented. The corrected copy is simply your own text with only the changes you chose to accept, applied from the end of the document backwards so earlier character offsets stay valid."
+        ]
+      },
+      {
+        "heading": "The categories it checks",
+        "paragraphs": [
+          "Spelling covers a curated set of frequently confused and commonly misspelled English words, such as their versus there, its versus it is, affect versus effect, and words like accomodate or occured. These are high-value targets because they survive spell-check in a surprising number of drafts: every candidate is a real word, so a generic dictionary check would not flag it.",
+          "Grammar rules look for repeated words, missing spaces after punctuation, extra spaces before punctuation, a missing capital at the start of a sentence and the common contraction confusions involving apostrophes. Repeated-word detection catches accidental doubles like the the or to to, which are easy to miss when rereading your own writing. Spacing rules catch the small but distracting errors that appear when text is pasted between applications.",
+          "Clarity suggestions are deliberately conservative. They point at wordy phrases that have a shorter common equivalent and at obvious filler, but they never rewrite a sentence. Style emphasis changes which suggestions are shown: an academic emphasis keeps formal phrasing, while a simple-English emphasis favours shorter alternatives. Choosing a style never changes your text on its own; it only affects the suggestions offered for review."
+        ]
+      },
+      {
+        "heading": "Why the scope is English only",
+        "paragraphs": [
+          "Spelling dictionaries, grammar patterns and style guidance are language specific. An English word list would flag perfectly correct words in French, Spanish or German, and English sentence rules do not apply to languages with different word order or no spaces between words. Rather than produce confidently wrong advice, this tool states that it checks English only. If you need another language, a dedicated checker for that language is the honest choice.",
+          "Even within English, local rules have clear limits. They cannot judge whether an argument is convincing, whether a tone suits its audience, or whether a passive construction was intentional. They do not understand context, irony or technical vocabulary, and they cannot detect a correctly spelled word used in the wrong sense. Treat every highlight as a question to answer, not an instruction to obey."
+        ]
+      },
+      {
+        "heading": "Privacy and how to use the results",
+        "paragraphs": [
+          "All work happens on your device. The page loads no dictionary service, calls no translation endpoint and uses no paid API. Text you paste stays in the browser session and is never transmitted. That matters for drafts, student work, legal notes and anything else you would rather not upload to a third-party service.",
+          "The safest workflow is to check a finished draft, read each suggestion in context, accept only the ones you agree with, then proofread the corrected copy once more. Use the highlighted view to find a problem and the suggestion list to understand why it was flagged. Rejecting all suggestions restores the original text, and the corrected copy can be copied or downloaded as a plain text file."
+        ]
+      },
+      {
+        "heading": "What this tool is not",
+        "paragraphs": [
+          "It is not a full natural-language-processing system, not an AI writing assistant and not a replacement for an editor. It does not analyse semantics, does not restructure paragraphs, does not generate alternatives beyond the fixed suggestions shown, and does not claim to improve your style in ways it cannot measure. Any page that promised those things from a small local rule set would be overstating what it can do.",
+          "The value here is a fast, private first pass that catches the mechanical errors people make most often. Used that way, it saves time and leaves the decisions in your hands."
+        ]
+      }
     ]
   },
   {

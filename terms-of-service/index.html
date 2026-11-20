@@ -11,12 +11,15 @@
 <meta property="og:title" content="Terms of Service — LetitEdit">
 <meta property="og:description" content="The terms for using LetitEdit free online tools, including availability, acceptable use and tool output responsibility.">
 <meta property="og:url" content="https://letitedit.com/terms-of-service/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../css/site.css">
 
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
@@ -28,20 +31,23 @@
       <a href="/blog/">Blog</a>
       <a href="/tools/">All Tools</a>
       <a href="/faq/">FAQ</a>
-      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" aria-controls="search-strip" aria-expanded="false" title="Search tools"><span aria-hidden="true">🔍</span></button>
     </div>
   </nav>
 </header>
-<div class="site-search-strip" id="search-strip">
+<div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
+      <label class="sr-only" for="site-search">Search all 61 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
-      <div class="search-results" id="search-results" role="listbox" hidden></div>
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
+<div id="main-content">
 <main><section class="container page-head"><span class="eyebrow">Policies</span><h1>Terms of Service</h1><p>These terms govern your use of LetitEdit.com. By using the site, you agree to the points below.</p></section><section class="section legal"><div class="container"><div class="info-card"><h2>Last updated: 18 November 2026</h2><h2>Free use</h2><p>Tools are provided free of charge for personal and business use. We may add, change or retire tools as the site develops.</p><h2>No guarantee of results</h2><p>Tool output depends on the input you provide and your browser’s supported features. Always review generated text, formatted output, diffs, conversions and regular-expression results before relying on them.</p><h2>Sensitive information</h2><p>Although processing happens in your browser, you remain responsible for what you paste into a tool and where you copy the output. Do not share secrets or personal data through unsupported channels.</p><h2>Acceptable use</h2><p>Do not attempt to disrupt the site, reverse-engineer services beyond normal browser use, or use the tools for illegal activity.</p><h2>Third-party links</h2><p>Links to third-party resources are provided for convenience. We are not responsible for their content or practices.</p><h2>Limitation of liability</h2><p>To the maximum extent permitted by law, LetitEdit is not liable for indirect or consequential losses arising from use of the tools or reliance on their output.</p><h2>Contact</h2><p>Questions about these terms can be sent to <a href="mailto:info@letitedit.com">info@letitedit.com</a>.</p></div></div></section></main>
+</div>
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">

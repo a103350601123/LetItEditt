@@ -11,14 +11,17 @@
 <meta property="og:title" content="Black &amp; White Image Converter — Grayscale and Threshold Modes">
 <meta property="og:description" content="Convert photos to black and white in your browser. Pick smooth grayscale or an adjustable threshold for line art, keep transparency, and export PNG, JPG or WebP.">
 <meta property="og:url" content="https://letitedit.com/black-and-white-image-converter/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="/css/site.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","name":"Black \u0026 White Image Converter","mainEntity":[{"@type":"Question","name":"Is my image uploaded anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. The conversion runs in your browser using the image data you open. Nothing is sent to a server, and closing the page clears the working copy."}},{"@type":"Question","name":"What is the difference between grayscale and threshold?","acceptedAnswer":{"@type":"Answer","text":"Grayscale maps each pixel to a shade of gray, keeping subtle detail. Threshold converts pixels to pure black or white based on a slider, which suits line art, stamps and text scans."}},{"@type":"Question","name":"Will transparent pixels stay transparent?","acceptedAnswer":{"@type":"Answer","text":"Yes. Alpha values are left unchanged in both modes, so logos and cut-outs keep their soft edges. Choose PNG or WebP to preserve transparency; JPG does not support it."}},{"@type":"Question","name":"Can it colorise or restore an old photograph?","acceptedAnswer":{"@type":"Answer","text":"No. It only removes color information. It cannot add color, repair scratches, straighten a skewed page or enlarge a small image."}},{"@type":"Question","name":"Why does my threshold preview look too dark or too noisy?","acceptedAnswer":{"@type":"Answer","text":"Lighting and compression artifacts push pixels across the cut-off. Move the slider slowly, try grayscale first, and use a clean evenly lit scan for crisp line art. Large images may take a moment to render."}}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Black \u0026 White Image Converter","description":"Convert photos to black and white in your browser. Pick smooth grayscale or an adjustable threshold for line art, keep transparency, and export PNG, JPG or WebP.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/black-and-white-image-converter/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Image \u0026 Photo Tools","item":"https://letitedit.com/tools/image-photo/"},{"@type":"ListItem","position":3,"name":"Black \u0026 White Image Converter","item":"https://letitedit.com/black-and-white-image-converter/"}]},{"@type":"FAQPage","name":"Black \u0026 White Image Converter","mainEntity":[{"@type":"Question","name":"Is my image uploaded anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. The conversion runs in your browser using the image data you open. Nothing is sent to a server, and closing the page clears the working copy."}},{"@type":"Question","name":"What is the difference between grayscale and threshold?","acceptedAnswer":{"@type":"Answer","text":"Grayscale maps each pixel to a shade of gray, keeping subtle detail. Threshold converts pixels to pure black or white based on a slider, which suits line art, stamps and text scans."}},{"@type":"Question","name":"Will transparent pixels stay transparent?","acceptedAnswer":{"@type":"Answer","text":"Yes. Alpha values are left unchanged in both modes, so logos and cut-outs keep their soft edges. Choose PNG or WebP to preserve transparency; JPG does not support it."}},{"@type":"Question","name":"Can it colorise or restore an old photograph?","acceptedAnswer":{"@type":"Answer","text":"No. It only removes color information. It cannot add color, repair scratches, straighten a skewed page or enlarge a small image."}},{"@type":"Question","name":"Why does my threshold preview look too dark or too noisy?","acceptedAnswer":{"@type":"Answer","text":"Lighting and compression artifacts push pixels across the cut-off. Move the slider slowly, try grayscale first, and use a clean evenly lit scan for crisp line art. Large images may take a moment to render."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-image">
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
@@ -30,19 +33,21 @@
       <a href="/blog/">Blog</a>
       <a href="/tools/">All Tools</a>
       <a href="/faq/">FAQ</a>
-      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" aria-controls="search-strip" aria-expanded="false" title="Search tools"><span aria-hidden="true">🔍</span></button>
     </div>
   </nav>
 </header>
-<div class="site-search-strip" id="search-strip">
+<div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
+      <label class="sr-only" for="site-search">Search all 61 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
-      <div class="search-results" id="search-results" role="listbox" hidden></div>
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
+<div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="/">Home</a><span>/</span>
   <a href="/tools/image-photo/">Image &amp; Photo Tools</a><span>/</span>
@@ -128,6 +133,7 @@
     </div>
   </div>
 </section>
+</div>
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">

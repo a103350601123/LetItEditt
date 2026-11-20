@@ -25,6 +25,7 @@ let V;
 
 beforeAll(() => {
   globalThis.AudioBuffer = FakeAudioBuffer;
+  globalThis.document = { baseURI: 'http://localhost/', currentScript: null, getElementById: () => null };
   new Function(source)();
   V = globalThis.VideoCore;
   expect(V).toBeTruthy();
@@ -153,5 +154,202 @@ describe('highlight analysis', () => {
     expect(series.length).toBe(4);
     expect(series[0].energy).toBeCloseTo(0.5, 5);
     expect(series[3].energy).toBe(0);
+  });
+});
+
+describe('local DSP helpers', () => {
+  it('slices, joins and splits buffers without mutating the source', () => {
+    const buffer = new FakeAudioBuffer(1000, 1, 1000);
+    for (let i = 0; i < 1000; i++) buffer.getChannelData(0)[i] = i / 1000;
+    const parts = V.splitBuffer(buffer, 0.4);
+    expect(parts[0].length).toBe(400);
+    expect(parts[1].length).toBe(600);
+    const joined = V.concatBuffers(parts);
+    expect(joined.length).toBe(1000);
+    expect(joined.getChannelData(0)[999]).toBeCloseTo(0.999, 3);
+    expect(buffer.getChannelData(0)[0]).toBe(0);
+    expect(() => V.concatBuffers([])).toThrow('no audio buffers');
+  });
+
+  it('measures peaks and normalises only when asked', () => {
+    const buffer = new FakeAudioBuffer(1000, 1, 1000);
+    buffer.getChannelData(0).fill(0.25);
+    const metrics = V.audioMetrics(buffer);
+    expect(metrics.peak).toBeCloseTo(0.25, 5);
+    expect(metrics.rms).toBeCloseTo(0.25, 5);
+
+    const normalised = V.normaliseBuffer(buffer, 0.8);
+    expect(V.audioMetrics(normalised).peak).toBeCloseTo(0.8, 5);
+
+    const untouched = V.editAudio(buffer, {
+      start: 0, end: 1, gain: 100, normalize: false, normalizeTarget: 0.95, loudness: 95
+    });
+    expect(V.audioMetrics(untouched).peak).toBeCloseTo(0.25, 5);
+  });
+
+  it('compresses, limits and applies real EQ to samples', () => {
+    const loud = new FakeAudioBuffer(2000, 1, 8000);
+    loud.getChannelData(0).fill(0.9);
+    expect(V.audioMetrics(V.compressorBuffer(loud, { threshold: -18, ratio: 6 })).peak)
+      .toBeLessThan(0.9);
+    expect(V.audioMetrics(V.limiterBuffer(loud, 0.97)).peak).toBeLessThan(0.97);
+
+    const lowTone = new FakeAudioBuffer(2000, 1, 16000);
+    for (let i = 0; i < 2000; i++) lowTone.getChannelData(0)[i] = Math.sin(2 * Math.PI * 100 * i / 16000) * 0.5;
+    expect(V.audioMetrics(V.toneBuffer(lowTone, { bass: 100 })).peak)
+      .toBeGreaterThan(V.audioMetrics(lowTone).peak);
+  });
+
+  it('changes duration and pitch through honest linear resampling', () => {
+    const buffer = new FakeAudioBuffer(1000, 1, 1000);
+    buffer.getChannelData(0).fill(0.4);
+    const faster = V.resampleSpeed(buffer, { speed: 2, pitch: 0 });
+    expect(faster.length).toBe(500);
+    const higher = V.resampleSpeed(buffer, { speed: 1, pitch: 12 });
+    expect(higher.length).toBe(500);
+    expect(buffer.length).toBe(1000);
+  });
+
+  it('detects and removes silence and adjacent repeats from decoded samples', () => {
+    const buffer = new FakeAudioBuffer(2000, 1, 1000);
+    for (let i = 1000; i < 2000; i++) buffer.getChannelData(0)[i] = 0.5;
+    const silence = V.detectSilence(buffer, { threshold: -42, minDuration: 0.3 });
+    expect(silence.length).toBe(1);
+    expect(silence[0].start).toBeCloseTo(0, 2);
+    expect(silence[0].end).toBeCloseTo(1, 2);
+    expect(V.removeRanges(buffer, silence).length).toBe(1000);
+
+    const repeated = new FakeAudioBuffer(2000, 1, 1000);
+    for (let i = 0; i < 1200; i++) repeated.getChannelData(0)[i] = 0.5;
+    const repeats = V.detectRepeats(repeated, { minDuration: 0.6, tolerance: 0.12 });
+    expect(repeats.length).toBe(1);
+    expect(repeats[0].end - repeats[0].start).toBeGreaterThanOrEqual(0.6);
+  });
+
+  it('applies filtering, voice effects, stereo changes and music mixing', () => {
+    const noise = new FakeAudioBuffer(8000, 1, 8000);
+    for (let i = 0; i < 8000; i++) noise.getChannelData(0)[i] = i % 2 ? 0.08 : -0.08;
+    const reduced = V.noiseReduceBuffer(noise, { profile: 'hiss', strength: 100 });
+    expect(V.audioMetrics(reduced).peak).toBeLessThan(V.audioMetrics(noise).peak);
+
+    const tone = new FakeAudioBuffer(1000, 1, 8000);
+    tone.getChannelData(0).fill(0.4);
+    expect(V.audioMetrics(V.voiceEffectBuffer(tone, 'telephone')).peak).not.toBeCloseTo(0.4, 2);
+
+    const stereo = new FakeAudioBuffer(1000, 2, 1000);
+    stereo.getChannelData(0).fill(0.6);
+    stereo.getChannelData(1).fill(0.2);
+    expect(V.stereoBuffer(stereo, { mono: true }).numberOfChannels).toBe(1);
+    expect(V.stereoBuffer(stereo, { mono: true }).getChannelData(0)[0]).toBeCloseTo(0.4, 5);
+    const balanced = V.stereoBuffer(stereo, { balance: -100 });
+    expect(balanced.getChannelData(0)[0]).toBeCloseTo(1, 5);
+    expect(balanced.getChannelData(1)[0]).toBe(0);
+
+    const music = new FakeAudioBuffer(50, 1, 1000);
+    music.getChannelData(0).fill(0.2);
+    const mixed = V.mixAudio(tone, [{ buffer: music, gain: 0.5, start: 0 }]);
+    expect(mixed.getChannelData(0)[0]).toBeCloseTo(0.5, 5);
+    expect(mixed.getChannelData(0)[99]).toBeCloseTo(0.4, 5);
+  });
+
+  it('samples peaks and computes crop and stereo focus hints', () => {
+    const stereo = new FakeAudioBuffer(100, 2, 1000);
+    stereo.getChannelData(0).fill(0.5);
+    stereo.getChannelData(1).fill(-0.25);
+    const peaks = V.samplePeaks(stereo, 4, 0, 1);
+    expect(peaks).toHaveLength(4);
+    expect(peaks[0].max).toBeCloseTo(0.5, 5);
+    expect(peaks[0].min).toBeCloseTo(-0.25, 5);
+
+    expect(V.layoutDimensions('1:1')).toMatchObject({ width: 1080, height: 1080 });
+    expect(V.layoutDimensions('unknown')).toMatchObject({ width: 720, height: 1280 });
+    const crop = V.cropRect(1920, 1080, 720, 1280, 1, 0.5, 2);
+    expect(crop.width).toBeCloseTo(303.75, 2);
+    expect(crop.height).toBeCloseTo(540, 2);
+    expect(crop.x).toBeCloseTo(1920 - 303.75, 2);
+    expect(crop.y).toBe(270);
+
+    expect(V.audioFocus(stereo, 0, 0.1)).toBeCloseTo(0.8, 5);
+    const rightOnly = new FakeAudioBuffer(100, 2, 1000);
+    rightOnly.getChannelData(1).fill(0.5);
+    expect(V.audioFocus(rightOnly, 0, 0.1)).toBe(0);
+    expect(typeof V.layoutProcessor({ layout: '9:16' })).toBe('function');
+  });
+});
+
+describe('segmentation and cancellation helpers', () => {
+  function withFakeCanvas(run) {
+    const previous = globalThis.document;
+    const canvases = [];
+    globalThis.document = {
+      createElement() {
+        const canvas = { width: 0, height: 0, pixels: null };
+        canvas.getContext = () => ({
+          createImageData(width, height) {
+            const image = { data: new Uint8ClampedArray(width * height * 4) };
+            canvas.pixels = image;
+            return image;
+          },
+          putImageData() {},
+          drawImage() {}
+        });
+        canvases.push(canvas);
+        return canvas;
+      }
+    };
+    try { return run(canvases); } finally { globalThis.document = previous; }
+  }
+
+  it('reads the person confidence mask and falls back to category indices', () => {
+    const result = {
+      categoryMask: { getAsUint8Array: () => new Uint8Array([1, 0]) },
+      confidenceMasks: [
+        { getAsFloat32Array: () => new Float32Array([0.8, 0.2]) },
+        { getAsFloat32Array: () => new Float32Array([0.2, 0.8]) }
+      ]
+    };
+    expect(Array.from(V.segmentationMaskFromResult(result, 1, 2))).toEqual([51, 204]);
+
+    const categoryOnly = { categoryMask: { getAsUint8Array: () => new Uint8Array([0, 1]) } };
+    expect(Array.from(V.segmentationMaskFromResult(categoryOnly, 1, 2))).toEqual([0, 1]);
+    expect(V.segmentationMaskFromResult({}, 1, 2)).toBeNull();
+  });
+
+  it('builds a mask from 0/1 categories or 0-255 confidence bytes', () => {
+    withFakeCanvas(canvases => {
+      const category = V.maskFromCategories(new Uint8Array([0, 1, 1, 0]), 2, 2, 70, 0);
+      expect(category.width).toBe(2);
+      expect(Array.from([3, 7, 11, 15]).map(index => category.pixels.data[index]))
+        .toEqual([0, 255, 255, 0]);
+
+      const confidence = V.maskFromCategories(new Uint8Array([10, 200, 180, 20]), 2, 2, 70, 0);
+      expect(Array.from([3, 7, 11, 15]).map(index => confidence.pixels.data[index]))
+        .toEqual([0, 255, 255, 0]);
+      expect(canvases).toHaveLength(2);
+    });
+  });
+
+  it('honours an aborted signal before and during transcription', async () => {
+    const preAborted = new AbortController();
+    preAborted.abort();
+    await expect(V.transcribe(new Float32Array(1), { signal: preAborted.signal }))
+      .rejects.toThrow('Cancelled.');
+
+    const previousWorker = globalThis.Worker;
+    let terminated = false;
+    globalThis.Worker = class {
+      constructor() { this.onmessage = null; this.onerror = null; }
+      postMessage() {}
+      terminate() { terminated = true; }
+    };
+    const controller = new AbortController();
+    try {
+      const pending = V.transcribe(new Float32Array(1), { signal: controller.signal });
+      controller.abort();
+      await expect(pending).rejects.toThrow('Cancelled.');
+      expect(terminated).toBe(true);
+    } finally {
+      globalThis.Worker = previousWorker;
+    }
   });
 });

@@ -3,22 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rich Text / HTML to Markdown Converter</title>
-<meta name="description" content="Convert pasted HTML or rich text into clean Markdown with headings, links, lists, bold and italic preserved.">
+<title>Rich Text / HTML to Markdown Converter — Local, Safe Markdown</title>
+<meta name="description" content="Convert pasted HTML, rich text, text files or DOCX text into clean Markdown with headings, links, lists, tables, code and emphasis preserved.">
 <meta name="theme-color" content="#2563eb">
 <link rel="canonical" href="https://letitedit.com/tools/writing-text/html-to-markdown/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Rich Text / HTML to Markdown Converter">
-<meta property="og:description" content="Convert pasted HTML or rich text into clean Markdown with headings, links, lists, bold and italic preserved.">
+<meta property="og:title" content="Rich Text / HTML to Markdown Converter — Local, Safe Markdown">
+<meta property="og:description" content="Convert pasted HTML, rich text, text files or DOCX text into clean Markdown with headings, links, lists, tables, code and emphasis preserved.">
 <meta property="og:url" content="https://letitedit.com/tools/writing-text/html-to-markdown/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../../../css/site.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","name":"Rich Text / HTML to Markdown","mainEntity":[{"@type":"Question","name":"Which elements are supported?","acceptedAnswer":{"@type":"Answer","text":"Headings, paragraphs, links, bold, italic, inline code, lists, blockquotes, line breaks and preformatted blocks."}},{"@type":"Question","name":"Do I need to upload a .docx file?","acceptedAnswer":{"@type":"Answer","text":"No. This version accepts pasted HTML or rich text. Complex Word files should be saved as HTML first."}}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Rich Text / HTML to Markdown","description":"Convert pasted HTML, rich text, text files or DOCX text into clean Markdown with headings, links, lists, tables, code and emphasis preserved.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/writing-text/html-to-markdown/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Writing \u0026 Text Tools","item":"https://letitedit.com/tools/writing-text/"},{"@type":"ListItem","position":3,"name":"Rich Text / HTML to Markdown","item":"https://letitedit.com/tools/writing-text/html-to-markdown/"}]},{"@type":"FAQPage","name":"Rich Text / HTML to Markdown","mainEntity":[{"@type":"Question","name":"Which elements are supported?","acceptedAnswer":{"@type":"Answer","text":"Headings, paragraphs, links, bold, italic, inline code, fenced code, ordered and unordered lists, nested lists, blockquotes, tables, horizontal rules, line breaks and images."}},{"@type":"Question","name":"Is pasted script or styling executed?","acceptedAnswer":{"@type":"Answer","text":"No. Scripts, styles, SVG, iframes and unsafe attributes are discarded. The preview is built with text nodes and a small allow-list of safe elements, never with innerHTML containing your content."}},{"@type":"Question","name":"Can I convert a Word document?","acceptedAnswer":{"@type":"Answer","text":"You can load a DOCX, but only its text is extracted. Tables, columns and styling are not kept. For a fully faithful layout conversion, export the document as HTML first."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-text">
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
@@ -30,19 +33,21 @@
       <a href="/blog/">Blog</a>
       <a href="/tools/">All Tools</a>
       <a href="/faq/">FAQ</a>
-      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" aria-controls="search-strip" aria-expanded="false" title="Search tools"><span aria-hidden="true">🔍</span></button>
     </div>
   </nav>
 </header>
-<div class="site-search-strip" id="search-strip">
+<div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
+      <label class="sr-only" for="site-search">Search all 61 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
-      <div class="search-results" id="search-results" role="listbox" hidden></div>
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
+<div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="../../../">Home</a><span>/</span>
   <a href="../../../tools/writing-text/">Writing &amp; Text Tools</a><span>/</span>
@@ -52,32 +57,34 @@
   <div class="tool-head-copy">
     <span class="eyebrow">Writing &amp; Text Tools</span>
     <h1>Rich Text / HTML to Markdown</h1>
-    <p>Paste markup from a webpage or rich-text editor. Common inline and block formatting is converted to standard Markdown.</p>
+    <p>Paste markup from a webpage or rich-text editor, or load a text-like file or DOCX. A local DOM-free parser produces Markdown and a safe preview built from DOM nodes.</p>
   </div>
   <div class="tool-trust" aria-label="How this tool handles your files">
     <span class="trust-pill"><span aria-hidden="true">✓</span> Local processing</span>
     <span class="trust-pill"><span aria-hidden="true">✓</span> No upload</span>
   </div>
 </section>
-<section class="container workspace">
-  <div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>
-  <div class="panel-grid">
-    <div class="workspace-panel"><div class="field"><label for="tool-input">Input text</label><textarea id="tool-input" placeholder="Paste or type your text here…"></textarea></div>
-         <div id="controls"></div>
-         <div class="output-actions"><button class="btn btn-secondary btn-small" id="clear-input" type="button">Clear input</button></div></div>
-    <div class="workspace-panel workspace-panel-output">
-      <div class="workspace-head">
-        <h2>Output</h2>
-        <div class="output-actions">
-          <button class="btn btn-secondary btn-small" id="copy-output" type="button">Copy output</button>
-          <button class="btn btn-secondary btn-small" id="download-output" type="button">Download</button>
-          <button class="btn btn-secondary btn-small" id="restore-output" type="button" hidden>Restore original values</button>
-        </div>
-      </div>
-      <div class="output-box" id="tool-output"></div>
-      <div class="status" id="tool-status" role="status" aria-live="polite"></div>
-    </div>
+<section class="container workspace engine-workspace" data-engine="html-to-markdown">
+<div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>
+<div class="engine-grid engine-simple">
+  <div class="engine-controls">
+    <div class="field"><label>Upload HTML, TXT or DOCX text</label><input type="file" id="h2m-upload" accept=".html,.htm,.txt,.md,.markdown,.csv,.json,.docx,text/html,text/plain"></div>
+    <div class="field"><label>HTML to convert</label><textarea id="h2m-input" rows="9" placeholder="Paste HTML or rich text here…"></textarea></div>
+    <div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="h2m-clear">Clear</button></div>
+    <p class="hint">Headings, links, lists, tables, code, quotes and emphasis are handled by a local parser. Scripts, styles, SVG and unsafe attributes are removed from the preview.</p>
   </div>
+  <div class="engine-output">
+    <div class="workspace-head"><h2>Markdown source</h2><div class="output-actions">
+      <button type="button" class="btn btn-secondary btn-small" id="h2m-copy">Copy</button>
+      <button type="button" class="btn btn-secondary btn-small" id="h2m-download">Download</button>
+    </div></div>
+    <pre id="h2m-source" class="output-box"></pre>
+    <p class="pill" id="h2m-count">0 Markdown characters</p>
+    <div class="workspace-head"><h2>Safe preview</h2><span class="card-tag">DOM nodes only</span></div>
+    <div id="h2m-preview" class="output-box"></div>
+    <div class="status" id="h2m-status" role="status" aria-live="polite"></div>
+  </div>
+</div>
 </section>
 <section class="container tool-principles" aria-label="How this tool works">
   <div class="principle"><span class="principle-icon" aria-hidden="true">⚙️</span><div><strong>Real processing</strong><p>Every result is produced from your own input in this browser, not from a simulated preview.</p></div></div>
@@ -88,7 +95,7 @@
   <div class="container info-grid">
     <div class="info-card">
       <h2>How to use Rich Text / HTML to Markdown</h2>
-      <ol><li>Paste HTML into the input box.</li><li>Markdown is generated automatically.</li><li>Copy the Markdown output.</li></ol>
+      <ol><li>Paste HTML or rich text, or load an HTML, TXT, CSV, Markdown or DOCX file.</li><li>Markdown source and a safe preview update automatically.</li><li>Copy the Markdown or download it as a .md file.</li></ol>
     </div>
     <div class="info-card">
       <h2>Example</h2>
@@ -100,17 +107,30 @@
     </div>
   </div>
 </section>
-
+<section class="section section-soft">
+  <div class="container"><article class="article-card">
+      <span class="eyebrow">In-depth guide</span>
+      <h2>What the converter preserves</h2>
+      <p>The converter reads the markup as text and walks it locally. Headings keep their level, links keep their destination and title, and emphasis becomes asterisks or underscores. Lists are nested with indentation, blockquotes get a leading marker, code blocks are fenced, and simple tables are emitted as pipe tables. Images keep their source and alt text.</p>
+      <p>Whitespace is normalised between inline elements so pasted rich text does not produce broken sentences. Entities such as ampersands and non-breaking spaces are decoded before the Markdown is written.</p>
+      <h2>Safety and honest limits</h2>
+      <p>Nothing is uploaded and no remote service is called. Script, style, SVG, iframe, object and form elements are dropped, as are event-handler and javascript: attributes. The side-by-side preview is assembled from DOM nodes using a strict allow-list, so markup in your own input cannot run code or alter the page.</p>
+      <p>This is a pragmatic converter for common web markup, not a full HTML5-to-CommonMark implementation. Complex nested tables, definition lists and custom elements may be simplified. DOCX files are read as ZIP archives where the browser supports decompression; only paragraph text is extracted, so layout and styling are lost.</p>
+  </article></div>
+</section>
 <section class="section">
   <div class="container info-grid">
     <div class="info-card">
       <h2>Frequently asked questions</h2>
       <details class="faq-item">
   <summary>Which elements are supported?</summary>
-  <p>Headings, paragraphs, links, bold, italic, inline code, lists, blockquotes, line breaks and preformatted blocks.</p>
+  <p>Headings, paragraphs, links, bold, italic, inline code, fenced code, ordered and unordered lists, nested lists, blockquotes, tables, horizontal rules, line breaks and images.</p>
 </details><details class="faq-item">
-  <summary>Do I need to upload a .docx file?</summary>
-  <p>No. This version accepts pasted HTML or rich text. Complex Word files should be saved as HTML first.</p>
+  <summary>Is pasted script or styling executed?</summary>
+  <p>No. Scripts, styles, SVG, iframes and unsafe attributes are discarded. The preview is built with text nodes and a small allow-list of safe elements, never with innerHTML containing your content.</p>
+</details><details class="faq-item">
+  <summary>Can I convert a Word document?</summary>
+  <p>You can load a DOCX, but only its text is extracted. Tables, columns and styling are not kept. For a fully faithful layout conversion, export the document as HTML first.</p>
 </details>
     </div>
     <div class="info-card">
@@ -121,6 +141,7 @@
     </div>
   </div>
 </section>
+</div>
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">
@@ -174,8 +195,8 @@
 <script src="../../../js/sidebar-data.js"></script>
 <script src="../../../js/site.js"></script>
 <script src="../../../js/category-sidebar.js"></script>
-<script src="../../../js/text-core.js"></script>
-<script src="../../../js/tool-runtime.js"></script>
-<script id="tool-config" type="application/json">{"slug":"html-to-markdown","engine":null,"layout":"single","outputType":"text","controls":[],"example":{"input":"\u003ch2\u003eHello\u003c/h2\u003e\u003cp\u003e\u003cstrong\u003eWorld\u003c/strong\u003e\u003c/p\u003e","output":"## Hello\n\n**World**"}}</script>
+<script src="../../../js/reference-core.js"></script>
+<script src="../../../js/reference-runtime.js"></script>
+<script id="tool-config" type="application/json">{"slug":"html-to-markdown","engine":"html-to-markdown","layout":"single","outputType":"text","controls":[],"example":{"input":"\u003ch2\u003eHello\u003c/h2\u003e\u003cp\u003e\u003cstrong\u003eWorld\u003c/strong\u003e\u003c/p\u003e","output":"## Hello\n\n**World**"}}</script>
 </body>
 </html>

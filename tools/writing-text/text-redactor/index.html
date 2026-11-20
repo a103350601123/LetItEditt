@@ -11,14 +11,17 @@
 <meta property="og:title" content="Redact Text — Mask Sensitive Data and Restore It Locally">
 <meta property="og:description" content="Mask names, emails, phone numbers, card numbers and API keys with stable labels, copy the redacted text, then restore original values from a key. Detection is heuristic and key files contain the original data.">
 <meta property="og:url" content="https://letitedit.com/tools/writing-text/text-redactor/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../../../css/site.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","name":"Text Redactor","mainEntity":[{"@type":"Question","name":"Is redaction the same as anonymisation?","acceptedAnswer":{"@type":"Answer","text":"No. Detection is heuristic, and writing style or context can still identify someone. Always review the redacted text before sharing it."}},{"@type":"Question","name":"Does this tool send my text anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. Detection, replacement and restoration happen in your browser. This tool makes no network requests."}},{"@type":"Question","name":"What is inside a saved key?","acceptedAnswer":{"@type":"Answer","text":"The key contains the original values for every label. Treat the file as sensitive, store it privately and delete it when you no longer need it."}},{"@type":"Question","name":"Can black bars be restored?","acceptedAnswer":{"@type":"Answer","text":"No. Black-bar mode is irreversible because the original characters are not written into the text. Use labels or fake values when you need restoration."}}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Text Redactor","description":"Mask names, emails, phone numbers, card numbers and API keys with stable labels, copy the redacted text, then restore original values from a key. Detection is heuristic and key files contain the original data.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/writing-text/text-redactor/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Writing \u0026 Text Tools","item":"https://letitedit.com/tools/writing-text/"},{"@type":"ListItem","position":3,"name":"Text Redactor","item":"https://letitedit.com/tools/writing-text/text-redactor/"}]},{"@type":"FAQPage","name":"Text Redactor","mainEntity":[{"@type":"Question","name":"Is redaction the same as anonymisation?","acceptedAnswer":{"@type":"Answer","text":"No. Detection is heuristic, and writing style or context can still identify someone. Always review the redacted text before sharing it."}},{"@type":"Question","name":"Does this tool send my text anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. Detection, replacement and restoration happen in your browser. This tool makes no network requests."}},{"@type":"Question","name":"What is inside a saved key?","acceptedAnswer":{"@type":"Answer","text":"The key contains the original values for every label. Treat the file as sensitive, store it privately and delete it when you no longer need it."}},{"@type":"Question","name":"Can black bars be restored?","acceptedAnswer":{"@type":"Answer","text":"No. Black-bar mode is irreversible because the original characters are not written into the text. Use labels or fake values when you need restoration."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-text">
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
@@ -30,19 +33,21 @@
       <a href="/blog/">Blog</a>
       <a href="/tools/">All Tools</a>
       <a href="/faq/">FAQ</a>
-      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" aria-controls="search-strip" aria-expanded="false" title="Search tools"><span aria-hidden="true">🔍</span></button>
     </div>
   </nav>
 </header>
-<div class="site-search-strip" id="search-strip">
+<div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
+      <label class="sr-only" for="site-search">Search all 61 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
-      <div class="search-results" id="search-results" role="listbox" hidden></div>
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
+<div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="../../../">Home</a><span>/</span>
   <a href="../../../tools/writing-text/">Writing &amp; Text Tools</a><span>/</span>
@@ -137,11 +142,12 @@
     <div class="info-card">
       <h2>Related tools</h2>
       <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
-        <a class="card tool-card" href="../../../tools/writing-text/extract-emails/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📧</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Extract Emails from Text</h3><p>Find and extract unique email addresses from pasted text, logs or documents. No uploads, no sign-up.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/extract-urls/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔗</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Extract URLs from Text</h3><p>Extract unique http and https links from pasted text, trimming trailing punctuation automatically.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/text-filter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧽</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Text Filter</h3><p>Remove whole words and highlight others with safe DOM spans. Terms are comma separated, matched case-insensitively with word boundaries, and input HTML is never executed.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/find-and-replace/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔎</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Find and Replace</h3><p>Replace all occurrences of a literal string, or turn off case sensitivity to treat Find as a live regular expression with global and case-insensitive flags. Invalid patterns show a clear error.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a>
+        <a class="card tool-card" href="../../../tools/writing-text/extract-emails/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📧</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Extract Emails from Text</h3><p>Find and extract unique email addresses from pasted text, logs or documents. No uploads, no sign-up.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/extract-urls/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔗</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Extract URLs from Text</h3><p>Extract unique http, https, www and bare-domain links from pasted text, logs or DOCX files with trailing punctuation trimmed automatically.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/text-filter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧽</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Text Filter</h3><p>Remove whole words and highlight others with safe DOM spans. Terms are comma separated, matched case-insensitively with word boundaries, and input HTML is never executed.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/find-and-replace/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔎</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Find and Replace</h3><p>Replace all occurrences of a literal string, or turn off case sensitivity to treat Find as a live regular expression with global and case-insensitive flags. Invalid patterns show a clear error.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a>
       </div>
     </div>
   </div>
 </section>
+</div>
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">

@@ -4,13 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LetitEdit — Free Online Tools That Run in Your Browser</title>
-<meta name="description" content="Free browser-side utilities for writing, text cleanup, formatting, developer work and more. 60 tools across 10 categories, with no uploads or accounts.">
+<meta name="description" content="Free browser-side utilities for writing, text cleanup, formatting, developer work and more. 61 tools across 10 categories, with no uploads or accounts.">
 <meta name="theme-color" content="#2563eb">
 <link rel="canonical" href="https://letitedit.com/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="LetitEdit — Free Online Tools That Run in Your Browser">
-<meta property="og:description" content="Free browser-side utilities for writing, text cleanup, formatting, developer work and more. 60 tools across 10 categories, with no uploads or accounts.">
+<meta property="og:description" content="Free browser-side utilities for writing, text cleanup, formatting, developer work and more. 61 tools across 10 categories, with no uploads or accounts.">
 <meta property="og:url" content="https://letitedit.com/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="css/site.css">
@@ -19,6 +21,7 @@
 </script>
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
@@ -30,45 +33,104 @@
       <a href="/blog/">Blog</a>
       <a href="/tools/">All Tools</a>
       <a href="/faq/">FAQ</a>
-      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" aria-controls="search-strip" aria-expanded="false" title="Search tools"><span aria-hidden="true">🔍</span></button>
     </div>
   </nav>
 </header>
-<div class="site-search-strip" id="search-strip">
+<div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
+      <label class="sr-only" for="site-search">Search all 61 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
-      <div class="search-results" id="search-results" role="listbox" hidden></div>
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
+<div id="main-content">
 <main>
 <section class="hero">
+  <div class="hero-atmosphere" aria-hidden="true">
+    <span class="hero-glow hero-glow-a"></span>
+    <span class="hero-glow hero-glow-b"></span>
+    <span class="hero-beam"></span>
+  </div>
   <div class="container hero-inner">
-    <div>
+    <div class="hero-copy">
       <span class="eyebrow">Free tools · Private by default</span>
-      <h1>Practical tools that get <span class="gradient-text">straight to work</span></h1>
-      <p>LetitEdit brings 60 focused browser-side utilities together under ten stable categories. Everything processes locally, with clear instructions and no uploads.</p>
+      <h1>Professional tools.<br><span class="gradient-text">Zero friction.</span></h1>
+      <p>LetitEdit brings 61 focused browser-side utilities together under 10 stable categories. Everything processes locally, with clear instructions and no uploads.</p>
+      <form class="hero-search" role="search" action="/" method="get">
+        <label class="sr-only" for="hero-search">Search all 61 tools</label>
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input class="search-input" id="hero-search" type="search" name="q" data-search-input placeholder="Search tools, e.g. resize image or JSON formatter…" aria-controls="hero-search-results" aria-expanded="false" autocomplete="off">
+        <button class="btn hero-search-button" type="submit">Search tools</button>
+        <div class="search-results" id="hero-search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
+      </form>
       <div class="hero-actions">
-        <a class="btn" href="/tools/">Browse all tools</a>
-        <a class="btn btn-secondary" href="/categories/">Explore categories</a>
-        <a class="btn btn-secondary" href="/faq/">Read the FAQ</a>
+        <a class="btn btn-hero-primary" href="/tools/">Browse all tools</a>
+        <a class="btn btn-hero-secondary" href="/categories/">Explore categories</a>
+        <a class="btn btn-hero-text" href="/faq/">How it works →</a>
       </div>
+      <ul class="hero-proof" aria-label="Site promises"><li>No sign-up</li><li>No uploads</li><li>Real output</li></ul>
     </div>
     <aside class="hero-visual" aria-label="Platform summary">
-      <div class="hero-float float-a" aria-hidden="true"><span>✍️</span> Word Counter</div>
-      <div class="hero-float float-b" aria-hidden="true"><span>🖼️</span> Image Compressor</div>
-      <div class="hero-float float-c" aria-hidden="true"><span>🎬</span> Video Trimmer</div>
+      <div class="hero-float-layer" aria-hidden="true">
+        <div class="hero-float float-a"><span class="float-icon">✍️</span><span class="float-copy"><strong>Word Counter</strong><small>Text tool</small></span></div>
+        <div class="hero-float float-b"><span class="float-icon">🖼️</span><span class="float-copy"><strong>Image Editor</strong><small>Photo tool</small></span></div>
+        <div class="hero-float float-c"><span class="float-icon">🎬</span><span class="float-copy"><strong>Video Trimmer</strong><small>Media tool</small></span></div>
+      </div>
       <div class="hero-card">
-        <div class="hero-card-head"><span class="hero-card-dot" aria-hidden="true"></span><span class="hero-card-title">Built for your browser</span></div>
+        <div class="hero-card-head"><span class="hero-card-dot" aria-hidden="true"></span><span class="hero-card-title">Built for your browser</span><span class="hero-card-live">LIVE</span></div>
         <p class="hero-card-sub">No queue, no upload, no waiting on a server.</p>
         <div class="hero-stat"><span>Processing</span><strong>On-device</strong></div>
-        <div class="hero-stat"><span>Tools ready</span><strong>60</strong></div>
+        <div class="hero-stat"><span>Tools ready</span><strong>61</strong></div>
         <div class="hero-stat"><span>Categories</span><strong>10</strong></div>
         <div class="hero-stat"><span>Accounts needed</span><strong>None</strong></div>
       </div>
     </aside>
+  </div>
+</section>
+
+<section class="section featured-section">
+  <div class="container">
+    <div class="section-head section-head-split">
+      <div><span class="eyebrow">Editor's picks</span><h2>Featured tools</h2><p>A useful starting point across writing, developer, image and media work.</p></div>
+      <a class="text-link" href="/tools/">View all tools →</a>
+    </div>
+    <div class="grid tool-grid"><a class="card tool-card" href="tools/writing-text/find-and-replace/">
+  <span class="card-top">
+    <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔎</span>
+    <span class="card-arrow" aria-hidden="true">↗</span>
+  </span>
+  <h3>Find and Replace</h3>
+  <p>Replace all occurrences of a literal string, or turn off case sensitivity to treat Find as a live regular expression with global and case-insensitive flags. Invalid patterns show a clear error.</p>
+  <span class="card-foot"><span class="card-featured" aria-label="Featured tool">★ Featured</span><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card" href="tools/resume-builder/index.html">
+  <span class="card-top">
+    <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📄</span>
+    <span class="card-arrow" aria-hidden="true">↗</span>
+  </span>
+  <h3>Resume / CV Builder</h3>
+  <p>Build a professional resume or CV in the browser with 60 layout and colour combinations, local autosave and print-to-PDF export. This preserved standalone app keeps its original URL.</p>
+  <span class="card-foot"><span class="card-featured" aria-label="Featured tool">★ Featured</span><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card" href="tools/writing-text/text-cleaner/">
+  <span class="card-top">
+    <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧹</span>
+    <span class="card-arrow" aria-hidden="true">↗</span>
+  </span>
+  <h3>Text Cleaner</h3>
+  <p>Clean messy text in one ordered pass: trim whitespace, strip HTML tags and emoji, remove accents, unify quotes, fix punctuation and expand shorthand. Everything runs in your browser.</p>
+  <span class="card-foot"><span class="card-featured" aria-label="Featured tool">★ Featured</span><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card" href="tools/writing-text/word-counter/">
+  <span class="card-top">
+    <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔢</span>
+    <span class="card-arrow" aria-hidden="true">↗</span>
+  </span>
+  <h3>Word Counter &amp; Text Statistics</h3>
+  <p>Count words, grapheme-based characters, sentences and paragraphs. See reading and speaking time, keyword density for one-to-three-word phrases and an optional progress goal.</p>
+  <span class="card-foot"><span class="card-featured" aria-label="Featured tool">★ Featured</span><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
+</a></div>
   </div>
 </section>
 
@@ -81,11 +143,11 @@
   </div>
   <nav class="sidebar-list" aria-label="Categories"><a class="sidebar-link is-active" href="tools/" data-sidebar-key="all" aria-current="page">
       <span class="sidebar-icon" style="--icon-bg:#dbeafe;--icon-color:#1d4ed8" aria-hidden="true">📚</span>
-      <span class="sidebar-name">All Tools</span><span class="sidebar-count">60</span>
+      <span class="sidebar-name">All Tools</span><span class="sidebar-count">61</span>
     </a>
     <a class="sidebar-link" href="tools/writing-text/" data-sidebar-key="writing">
       <span class="sidebar-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">✍️</span>
-      <span class="sidebar-name">Text &amp; Writing</span><span class="sidebar-count">35</span>
+      <span class="sidebar-name">Text &amp; Writing</span><span class="sidebar-count">36</span>
     </a>
     <a class="sidebar-link" href="tools/coding-developer/" data-sidebar-key="dev">
       <span class="sidebar-icon" style="--icon-bg:#0ea5e91a;--icon-color:#0ea5e9" aria-hidden="true">&lt;/&gt;</span>
@@ -126,9 +188,9 @@
   <div class="sidebar-matches" id="sidebar-matches" hidden></div>
   <p class="sidebar-note">Counts update automatically as tools are registered.</p>
 </aside>
-    <main class="directory-main">
+    <div class="directory-main">
       <div class="directory-bar">
-        <div><h2>Tool directory</h2><p class="directory-count">60 published tools</p></div>
+        <div><h2>Tool directory</h2><p class="directory-count">61 published tools</p></div>
         <div class="directory-filter">
           <label class="sr-only" for="tool-filter">Filter tools on this page</label>
           <input id="tool-filter" type="search" placeholder="Filter tools by name…" autocomplete="off">
@@ -157,7 +219,7 @@
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>AI Video-to-Shorts<span class="card-new">New</span></h3>
-  <p>Find candidate highlight windows from audio loudness and motion in your video, then export vertical 9:16 clips. Optional local Whisper transcript ranking adds SRT when enabled.</p>
+  <p>Preview a real source video, add and retime clips, reorder them, choose crops and layouts, edit captions, then export locally rendered MP4 or WebM shorts. Optional local Whisper and face models require explicit opt-in.</p>
   <span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="tools/writing-text/ap-case-converter/">
   <span class="card-top">
@@ -173,7 +235,7 @@
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Audio Editor<span class="card-new">New</span></h3>
-  <p>Trim audio or a video soundtrack, adjust gain, add fades, reverse a clip and play it back locally, then download WAV or MP3 where your browser supports it. No upload.</p>
+  <p>Edit audio or a video soundtrack locally with a wave-form, real gains, fades, compression, EQ, filtering, pitch/speed, music mixing, A/B playback and undo. Export WAV, MP3 or M4A without uploading.</p>
   <span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="tools/writing-text/bank-statement-converter/">
   <span class="card-top">
@@ -232,15 +294,31 @@
   <p>Remove repeated words from a sentence while keeping the first occurrence and surrounding punctuation.</p>
   <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
 </a></div>
-      <p class="directory-more"><a class="btn btn-secondary" href="/tools/">See all 60 tools</a></p>
-    </main>
+      <p class="directory-more"><a class="btn btn-secondary" href="/tools/">See all 61 tools</a></p>
+    </div>
   </div>
 </section>
 
 <section class="section section-soft">
   <div class="container">
     <div class="section-head"><h2>New Tools</h2><p>Recently added tools, generated from registry metadata.</p></div>
-    <div class="grid tool-grid"><a class="card tool-card" href="add-border-to-image/index.html">
+    <div class="grid tool-grid"><a class="card tool-card" href="tools/writing-text/grammar-spell-checker/">
+  <span class="card-top">
+    <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧠</span>
+    <span class="card-arrow" aria-hidden="true">↗</span>
+  </span>
+  <h3>Grammar &amp; Spell Checker<span class="card-new">New</span></h3>
+  <p>Check English text with local rules for common spelling, grammar, repeated words, spacing and clarity. Review suggestions, apply the ones you accept and keep the original text unchanged. No AI rewriting and no external or paid API.</p>
+  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card" href="thumbnail-generator/index.html">
+  <span class="card-top">
+    <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🖼️</span>
+    <span class="card-arrow" aria-hidden="true">↗</span>
+  </span>
+  <h3>Thumbnail Generator<span class="card-new">New</span></h3>
+  <p>Create thumbnails at verified YouTube, Shorts, Instagram, TikTok, Facebook, LinkedIn, X and Pinterest dimensions. Edit text, shapes and photos locally; no upload.</p>
+  <span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card" href="add-border-to-image/index.html">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔲</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
@@ -254,7 +332,7 @@
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>AI Video-to-Shorts<span class="card-new">New</span></h3>
-  <p>Find candidate highlight windows from audio loudness and motion in your video, then export vertical 9:16 clips. Optional local Whisper transcript ranking adds SRT when enabled.</p>
+  <p>Preview a real source video, add and retime clips, reorder them, choose crops and layouts, edit captions, then export locally rendered MP4 or WebM shorts. Optional local Whisper and face models require explicit opt-in.</p>
   <span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="tools/writing-text/ap-case-converter/">
   <span class="card-top">
@@ -270,24 +348,8 @@
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Audio Editor<span class="card-new">New</span></h3>
-  <p>Trim audio or a video soundtrack, adjust gain, add fades, reverse a clip and play it back locally, then download WAV or MP3 where your browser supports it. No upload.</p>
+  <p>Edit audio or a video soundtrack locally with a wave-form, real gains, fades, compression, EQ, filtering, pitch/speed, music mixing, A/B playback and undo. Export WAV, MP3 or M4A without uploading.</p>
   <span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="tools/writing-text/bank-statement-converter/">
-  <span class="card-top">
-    <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🏦</span>
-    <span class="card-arrow" aria-hidden="true">↗</span>
-  </span>
-  <h3>Bank Statement Converter<span class="card-new">New</span></h3>
-  <p>Parse pasted statement text or a text/CSV file into transactions with amounts, balances and running checks, then download CSV or QIF. PDF extraction and OCR are not included in this build.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="black-and-white-image-converter/index.html">
-  <span class="card-top">
-    <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">⚫</span>
-    <span class="card-arrow" aria-hidden="true">↗</span>
-  </span>
-  <h3>Black &amp; White Image Converter<span class="card-new">New</span></h3>
-  <p>Convert photos to black and white in your browser. Pick smooth grayscale or an adjustable threshold for line art, keep transparency, and export PNG, JPG or WebP.</p>
-  <span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span>
 </a></div>
     <p class="directory-more"><a class="btn btn-secondary" href="/new-tools/">View all new tools</a></p>
   </div>
@@ -295,38 +357,81 @@
 
 <section class="section">
   <div class="container">
-    <div class="section-head"><h2>Explore by category</h2><p>Every category has a working page now. Empty categories show an honest empty state until tools are added.</p></div>
+    <div class="section-head section-head-split">
+      <div><h2>Explore by category</h2><p>Every category has a working page now. Empty categories show an honest empty state until tools are added.</p></div>
+      <a class="text-link" href="/categories/">All categories →</a>
+    </div>
     <div class="grid category-grid">
-      <a class="card category-card" href="tools/writing-text/" style="--icon-bg:#2563eb1a;--icon-color:#2563eb">
-          <span class="card-icon" aria-hidden="true">✍️</span>
-          <h3>Text &amp; Writing</h3><p>Count, clean, convert, format, compare and generate text with private browser-side utilities.</p><span class="card-tag">35 tools</span>
-        </a><a class="card category-card" href="tools/coding-developer/" style="--icon-bg:#0ea5e91a;--icon-color:#0ea5e9">
-          <span class="card-icon" aria-hidden="true">&lt;/&gt;</span>
-          <h3>Developer Tools</h3><p>Format JSON, encode Base64 and test regular expressions without sending code anywhere.</p><span class="card-tag">3 tools</span>
-        </a><a class="card category-card" href="tools/image-photo/" style="--icon-bg:#2563eb1a;--icon-color:#2563eb">
-          <span class="card-icon" aria-hidden="true">🖼️</span>
-          <h3>Image &amp; Photo</h3><p>Edit, convert, combine and understand images with local browser processing and no uploads.</p><span class="card-tag">13 tools</span>
-        </a><a class="card category-card" href="tools/video-audio/" style="--icon-bg:#ec48991a;--icon-color:#ec4899">
-          <span class="card-icon" aria-hidden="true">🎬</span>
-          <h3>Video &amp; Audio</h3><p>Edit, trim, record, caption and convert video and audio files locally in the browser.</p><span class="card-tag">9 tools</span>
-        </a><a class="card category-card" href="tools/social-media/" style="--icon-bg:#f59e0b1a;--icon-color:#f59e0b">
-          <span class="card-icon" aria-hidden="true">📣</span>
-          <h3>Social Media</h3><p>Prepare captions, hashtags and shareable text for social platforms.</p><span class="card-tag">0 tools</span>
-        </a><a class="card category-card" href="tools/website-seo/" style="--icon-bg:#10b9811a;--icon-color:#10b981">
-          <span class="card-icon" aria-hidden="true">📈</span>
-          <h3>Website &amp; SEO</h3><p>Create slugs, meta descriptions and structured data for websites.</p><span class="card-tag">0 tools</span>
-        </a><a class="card category-card" href="tools/generators/" style="--icon-bg:#6366f11a;--icon-color:#6366f1">
-          <span class="card-icon" aria-hidden="true">✨</span>
-          <h3>Generators</h3><p>Generate placeholder text, lists, passwords and other structured data.</p><span class="card-tag">0 tools</span>
-        </a><a class="card category-card" href="tools/counters-calculators/" style="--icon-bg:#14b8a61a;--icon-color:#14b8a6">
-          <span class="card-icon" aria-hidden="true">🧮</span>
-          <h3>Counters &amp; Calculators</h3><p>Count characters, words and values, or calculate common everyday results.</p><span class="card-tag">0 tools</span>
-        </a><a class="card category-card" href="tools/games-fun/" style="--icon-bg:#f43f5e1a;--icon-color:#f43f5e">
-          <span class="card-icon" aria-hidden="true">🎲</span>
-          <h3>Games &amp; Fun</h3><p>Lightweight games and fun text utilities that run entirely in the browser.</p><span class="card-tag">0 tools</span>
-        </a><a class="card category-card" href="tools/device-testers/" style="--icon-bg:#0284c71a;--icon-color:#0284c7">
-          <span class="card-icon" aria-hidden="true">📱</span>
-          <h3>Device Testers</h3><p>Check screen size, fonts, network and browser capabilities on any device.</p><span class="card-tag">0 tools</span>
+      <a class="card category-card" href="/tools/writing-text/" style="--icon-bg:#2563eb1a;--icon-color:#2563eb;--category-accent:#2563eb">
+          <span class="card-top">
+            <span class="card-icon" aria-hidden="true">✍️</span>
+            <span class="card-arrow" aria-hidden="true">↗</span>
+          </span>
+          <h3>Text &amp; Writing</h3><p>Count, clean, convert, format, compare and generate text with private browser-side utilities.</p>
+          <span class="card-foot"><span class="card-tag">36 tools</span><span class="card-explore">Explore →</span></span>
+        </a><a class="card category-card" href="/tools/coding-developer/" style="--icon-bg:#0ea5e91a;--icon-color:#0ea5e9;--category-accent:#0ea5e9">
+          <span class="card-top">
+            <span class="card-icon" aria-hidden="true">&lt;/&gt;</span>
+            <span class="card-arrow" aria-hidden="true">↗</span>
+          </span>
+          <h3>Developer Tools</h3><p>Format JSON, encode Base64 and test regular expressions without sending code anywhere.</p>
+          <span class="card-foot"><span class="card-tag">3 tools</span><span class="card-explore">Explore →</span></span>
+        </a><a class="card category-card" href="/tools/image-photo/" style="--icon-bg:#2563eb1a;--icon-color:#2563eb;--category-accent:#2563eb">
+          <span class="card-top">
+            <span class="card-icon" aria-hidden="true">🖼️</span>
+            <span class="card-arrow" aria-hidden="true">↗</span>
+          </span>
+          <h3>Image &amp; Photo</h3><p>Edit, convert, combine and understand images with local browser processing and no uploads.</p>
+          <span class="card-foot"><span class="card-tag">13 tools</span><span class="card-explore">Explore →</span></span>
+        </a><a class="card category-card" href="/tools/video-audio/" style="--icon-bg:#ec48991a;--icon-color:#ec4899;--category-accent:#ec4899">
+          <span class="card-top">
+            <span class="card-icon" aria-hidden="true">🎬</span>
+            <span class="card-arrow" aria-hidden="true">↗</span>
+          </span>
+          <h3>Video &amp; Audio</h3><p>Edit, trim, record, caption and convert video and audio files locally in the browser.</p>
+          <span class="card-foot"><span class="card-tag">9 tools</span><span class="card-explore">Explore →</span></span>
+        </a><a class="card category-card" href="/tools/social-media/" style="--icon-bg:#f59e0b1a;--icon-color:#f59e0b;--category-accent:#f59e0b">
+          <span class="card-top">
+            <span class="card-icon" aria-hidden="true">📣</span>
+            <span class="card-arrow" aria-hidden="true">↗</span>
+          </span>
+          <h3>Social Media</h3><p>Prepare captions, hashtags and shareable text for social platforms.</p>
+          <span class="card-foot"><span class="card-tag">0 tools</span><span class="card-explore">Explore →</span></span>
+        </a><a class="card category-card" href="/tools/website-seo/" style="--icon-bg:#10b9811a;--icon-color:#10b981;--category-accent:#10b981">
+          <span class="card-top">
+            <span class="card-icon" aria-hidden="true">📈</span>
+            <span class="card-arrow" aria-hidden="true">↗</span>
+          </span>
+          <h3>Website &amp; SEO</h3><p>Create slugs, meta descriptions and structured data for websites.</p>
+          <span class="card-foot"><span class="card-tag">0 tools</span><span class="card-explore">Explore →</span></span>
+        </a><a class="card category-card" href="/tools/generators/" style="--icon-bg:#6366f11a;--icon-color:#6366f1;--category-accent:#6366f1">
+          <span class="card-top">
+            <span class="card-icon" aria-hidden="true">✨</span>
+            <span class="card-arrow" aria-hidden="true">↗</span>
+          </span>
+          <h3>Generators</h3><p>Generate placeholder text, lists, passwords and other structured data.</p>
+          <span class="card-foot"><span class="card-tag">0 tools</span><span class="card-explore">Explore →</span></span>
+        </a><a class="card category-card" href="/tools/counters-calculators/" style="--icon-bg:#14b8a61a;--icon-color:#14b8a6;--category-accent:#14b8a6">
+          <span class="card-top">
+            <span class="card-icon" aria-hidden="true">🧮</span>
+            <span class="card-arrow" aria-hidden="true">↗</span>
+          </span>
+          <h3>Counters &amp; Calculators</h3><p>Count characters, words and values, or calculate common everyday results.</p>
+          <span class="card-foot"><span class="card-tag">0 tools</span><span class="card-explore">Explore →</span></span>
+        </a><a class="card category-card" href="/tools/games-fun/" style="--icon-bg:#f43f5e1a;--icon-color:#f43f5e;--category-accent:#f43f5e">
+          <span class="card-top">
+            <span class="card-icon" aria-hidden="true">🎲</span>
+            <span class="card-arrow" aria-hidden="true">↗</span>
+          </span>
+          <h3>Games &amp; Fun</h3><p>Lightweight games and fun text utilities that run entirely in the browser.</p>
+          <span class="card-foot"><span class="card-tag">0 tools</span><span class="card-explore">Explore →</span></span>
+        </a><a class="card category-card" href="/tools/device-testers/" style="--icon-bg:#0284c71a;--icon-color:#0284c7;--category-accent:#0284c7">
+          <span class="card-top">
+            <span class="card-icon" aria-hidden="true">📱</span>
+            <span class="card-arrow" aria-hidden="true">↗</span>
+          </span>
+          <h3>Device Testers</h3><p>Check screen size, fonts, network and browser capabilities on any device.</p>
+          <span class="card-foot"><span class="card-tag">0 tools</span><span class="card-explore">Explore →</span></span>
         </a>
     </div>
   </div>
@@ -348,6 +453,7 @@
   </div>
 </section>
 </main>
+</div>
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">

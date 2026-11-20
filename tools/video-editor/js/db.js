@@ -2,18 +2,19 @@
 (function () {
   const VE = (window.VE = window.VE || {});
 
-  const DB_NAME = 'clipforge';
+  const DB_NAME = 'letitedit';
   const DB_VERSION = 1;
+  /* Earlier builds used this name. Kept only to migrate existing projects. */
+  const LEGACY_DB_NAME = 'clipforge';
   let dbPromise = null;
   let useMemory = false;
   const mem = { assets: new Map(), meta: new Map() };
 
-  function openDb() {
-    if (dbPromise) return dbPromise;
-    dbPromise = new Promise((resolve, reject) => {
+  function openNamed(name) {
+    return new Promise((resolve, reject) => {
       let req;
       try {
-        req = indexedDB.open(DB_NAME, DB_VERSION);
+        req = indexedDB.open(name, DB_VERSION);
       } catch (err) {
         reject(err);
         return;
@@ -26,7 +27,48 @@
       req.onsuccess = () => resolve(req.result);
       req.onerror = () => reject(req.error);
       req.onblocked = () => reject(new Error('Storage is blocked by another tab'));
-    }).catch(err => {
+    });
+  }
+
+  function allFrom(db, storeName) {
+    return new Promise((resolve, reject) => {
+      if (!db.objectStoreNames.contains(storeName)) { resolve([]); return; }
+      const req = db.transaction(storeName, 'readonly').objectStore(storeName).getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async function migrateLegacy(legacy, target) {
+    for (const name of ['assets', 'meta']) {
+      const rows = await allFrom(legacy, name);
+      if (!rows.length) continue;
+      await new Promise((resolve, reject) => {
+        const s = target.transaction(name, 'readwrite').objectStore(name);
+        rows.forEach(row => s.put(row));
+        s.transaction.oncomplete = resolve;
+        s.transaction.onerror = () => reject(s.transaction.error);
+      });
+    }
+  }
+
+  function openDb() {
+    if (dbPromise) return dbPromise;
+    dbPromise = (async () => {
+      const db = await openNamed(DB_NAME);
+      const current = await allFrom(db, 'assets');
+      const meta = await allFrom(db, 'meta');
+      if (!current.length && !meta.length) {
+        try {
+          const legacy = await openNamed(LEGACY_DB_NAME);
+          await migrateLegacy(legacy, db);
+          legacy.close();
+        } catch (err) {
+          /* no legacy database, or it could not be read — start fresh */
+        }
+      }
+      return db;
+    })().catch(err => {
       console.warn('IndexedDB unavailable, using memory storage.', err);
       useMemory = true;
       return null;
@@ -55,6 +97,7 @@
         id: asset.id,
         name: asset.name,
         type: asset.type,
+        category: asset.category || asset.type,
         mime: asset.mime,
         size: asset.size,
         duration: asset.duration,

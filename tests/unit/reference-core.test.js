@@ -255,4 +255,169 @@ describe('04 — Bank Statement Converter', () => {
     expect(qif).toMatch(/^!Type:CCard/);
     expect(qif).toContain('D01/15/2026');
   });
+
+  it('flags duplicate rows, records confidence and reports no invented values', () => {
+    const result = R.parseStatement('01/15/2026 Shop 4.50 995.50\n01/15/2026 Shop 4.50 995.50');
+    expect(result.duplicates).toBe(1);
+    expect(result.rows[1].duplicate).toBe(true);
+    expect(result.rows[0].confidence).toBe(1);
+    expect(result.rows[1].confidence).toBeLessThan(result.rows[0].confidence);
+    expect(result.warnings.some(warning => /duplicate/i.test(warning))).toBe(true);
+    expect(result.rows[0].amount).toBe(4.5);
+  });
+
+  it('maps CSV columns and detects the delimited format', () => {
+    expect(R.detectStatementFormat('date,description,amount\n01/01/2026,x,2.00')).toBe('csv');
+    expect(R.splitDelimitedLine('a,"b,c",d', ',')).toEqual(['a', 'b,c', 'd']);
+    const result = R.parseStatementDocument('Date,Description,Amount,Balance\n01/15/2026,Shop,4.50,995.50\n01/16/2026,Pay,-2.00,993.50');
+    expect(result.format).toBe('csv');
+    expect(result.rows).toHaveLength(2);
+    expect(result.check).toBe('ok');
+  });
+});
+
+describe('15 — Safe find, replace and highlighted preview', () => {
+  it('keeps the legacy literal/case-sensitive and live-regex modes', () => {
+    expect(R.compileFind({ find: 'a.b', caseSensitive: true }).regex).toBe(false);
+    expect(R.compileFind({ find: 'a.b', caseSensitive: false }).regex).toBe(true);
+    expect(R.findMatches('cat Cat cat', { find: 'cat', caseSensitive: true })).toMatchObject({ count: 2, regex: false });
+    expect(R.findMatches('cat Cat cat', { find: 'cat', caseSensitive: false }).matches).toHaveLength(3);
+  });
+
+  it('lets an explicit regex flag win over case sensitivity', () => {
+    const compiled = R.compileFind({ find: 'a.b', caseSensitive: true, regex: true });
+    expect(compiled).toMatchObject({ error: null, regex: true });
+    expect(R.findMatches('a.b axb', { find: 'a.b', caseSensitive: true, regex: true }).count).toBe(2);
+  });
+
+  it('reports invalid patterns without throwing and rejects nested repetition', () => {
+    expect(R.compileFind({ find: '[', caseSensitive: false })).toMatchObject({ error: 'invalid' });
+    expect(R.compileFind({ find: '(a+)+', caseSensitive: false })).toMatchObject({ error: 'unsafe' });
+    const found = R.findMatches('anything', { find: '[', caseSensitive: false });
+    expect(found.matches).toEqual([]);
+    expect(found.error).toBe('invalid');
+    expect(found.message.length).toBeGreaterThan(0);
+  });
+
+  it('replaces all matches, one chosen match, and keeps literal dollar signs literal', () => {
+    expect(R.replaceText('cat cat dog', { find: 'cat', replace: 'dog', caseSensitive: true })).toMatchObject({ text: 'dog dog dog', count: 2, error: null });
+    expect(R.replaceText('a a a', { find: 'a', replace: 'X', caseSensitive: true, onlyIndex: 1 })).toMatchObject({ text: 'a X a', count: 1 });
+    const dollar = R.replaceText('a.a', { find: 'a.a', replace: '$&', caseSensitive: true });
+    expect(dollar.text).toContain('$&');
+    expect(dollar.text).not.toBe('a.a');
+  });
+
+  it('supports whole-word ranges and builds safe highlight segments', () => {
+    expect(R.findMatches('cat catalog', { find: 'cat', caseSensitive: true, wholeWord: true }).count).toBe(1);
+    const matches = R.findMatches('a b a', { find: 'a', caseSensitive: true }).matches;
+    const segments = R.highlightSegments('a b a', matches, 1);
+    expect(segments).toMatchObject([
+      { text: 'a', hit: true, active: false, start: 0, end: 1 },
+      { text: ' b ', hit: false, active: false, start: 1, end: 4 },
+      { text: 'a', hit: true, active: true, start: 4, end: 5 }
+    ]);
+    expect(segments.map(s => s.text).join('')).toBe('a b a');
+  });
+});
+
+describe('16–17 — Format-preserving helpers and diff', () => {
+  it('removes only empty lines and normalises Windows line endings', () => {
+    expect(R.removeEmptyLines('one\n\n\ntwo\r\n   \r\nthree')).toBe('one\ntwo\nthree');
+    expect(R.removeEmptyLines('  indented  \n\tmore\n', {})).toBe('  indented  \n\tmore');
+  });
+
+  it('collapses blank runs when paragraphs are preserved', () => {
+    expect(R.removeEmptyLines('one\n\n\ntwo\n   \nthree\n\n', { preserveParagraphs: true })).toBe('one\n\ntwo\n\nthree');
+  });
+
+  it('removes punctuation by mode while keeping letters, numbers and Unicode', () => {
+    expect(R.removePunctuation('Hello, world! Café — ok?')).toBe('Hello world Café  ok');
+    expect(R.removePunctuation('Hello, world! Café — ok?', { types: 'common' })).toBe('Hello world Café — ok');
+    expect(R.removePunctuation('a,b.c!d', { types: 'custom', chars: ',!' })).toBe('ab.cd');
+    expect(R.removePunctuation('Café 123 😀', { types: 'all' })).toBe('Café 123 😀');
+  });
+
+  it('produces a real line diff with added and removed units', () => {
+    const result = R.compareTexts('a\nb\nc', 'a\nx\nc');
+    expect(result).toMatchObject({ ok: true, added: 1, removed: 1 });
+    expect(result.ops).toEqual([
+      { type: 'equal', value: 'a' },
+      { type: 'remove', value: 'b' },
+      { type: 'add', value: 'x' },
+      { type: 'equal', value: 'c' }
+    ]);
+  });
+
+  it('compares words and refuses inputs beyond the 1200-unit cap', () => {
+    const words = R.compareTexts('the cat sat', 'the dog sat', { unit: 'words' });
+    expect(words.added).toBe(1);
+    expect(words.removed).toBe(1);
+    const huge = Array(1201).fill('x').join('\n');
+    const result = R.compareTexts(huge, 'x');
+    expect(result.ok).toBe(false);
+    expect(result.error).toContain('1200 lines');
+  });
+});
+
+describe('18–20 — HTML, URLs and rule-based grammar', () => {
+  it('converts common HTML to Markdown without executing markup', () => {
+    const markdown = R.htmlToMarkdown('<h2>Hello</h2><p><strong>World</strong> &amp; <a href="https://x.com">link</a></p><ul><li>one</li><li>two</li></ul>');
+    expect(markdown).toBe('## Hello\n\n**World** & [link](https://x.com)\n\n- one\n- two');
+    const unsafe = R.htmlToMarkdown('<p>&lt;script&gt;alert(1)&lt;/script&gt;</p><script>bad()</script>');
+    // Escaped source text is kept as text (with Markdown angle-bracket escapes),
+    // while a real script element is dropped entirely.
+    expect(unsafe).toContain('script');
+    expect(unsafe).toContain('alert(1)');
+    expect(unsafe).not.toContain('bad()');
+  });
+
+  it('emits tables and decodes entities', () => {
+    expect(R.htmlToMarkdown('<table><thead><tr><th>A</th><th>B</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody></table>'))
+      .toBe('| A | B |\n| --- | --- |\n| 1 | 2 |');
+  });
+
+  it('extracts validated, unique URLs in first-seen order', () => {
+    const result = R.extractUrls('Visit https://example.com/page. Then www.test.org/x?a=1 and example.com, skip mailto:a@b.com and ftp://x.com');
+    expect(result.text.split('\n')).toEqual([
+      'https://example.com/page',
+      'https://www.test.org/x?a=1',
+      'https://example.com'
+    ]);
+    expect(result.count).toBe(3);
+    expect(R.extractUrls('https://x.com and https://x.com').count).toBe(1);
+  });
+
+  it('trims trailing punctuation and rejects non-web schemes', () => {
+    expect(R.trimUrlEdges('(https://x.com/a).')).toBe('https://x.com/a');
+    expect(R.extractUrls('javascript:alert(1) ftp://x.com a@b.com').count).toBe(0);
+  });
+
+  it('finds spelling, grammar, repeated words and spacing with explained suggestions', () => {
+    const result = R.analyzeGrammar('I are teh best. This is the the test .  we recieve it.');
+    expect(result.counts.spelling).toBeGreaterThan(0);
+    expect(result.counts.grammar).toBeGreaterThan(0);
+    expect(result.counts.repeated).toBeGreaterThan(0);
+    expect(result.counts.punctuation).toBeGreaterThan(0);
+    expect(result.suggestions.every(s => s.explanation && s.start >= 0 && s.end > s.start)).toBe(true);
+    expect(result.corrected).toBe('I am the best. This is the test. We receive it.');
+    expect(result.original).toContain('teh');
+  });
+
+  it('applies only chosen suggestions and treats style as opt-in', () => {
+    const result = R.analyzeGrammar('We utilize stuff.', { style: 'Professional' });
+    const style = result.suggestions.filter(s => s.styleOnly);
+    expect(style.length).toBeGreaterThan(0);
+    expect(result.selectedIds).not.toContain(style[0].id);
+    expect(result.corrected).toBe(result.original);
+    expect(R.applyGrammarSuggestions('teh', [], [])).toBe('teh');
+    const applied = R.applyGrammarSuggestions(result.original, result.suggestions, [style[0].id]);
+    expect(applied).not.toBe(result.original);
+    expect(applied).toContain('utilize');
+  });
+
+  it('changes style suggestions with the chosen emphasis', () => {
+    const simple = R.analyzeGrammar('We utilize stuff to do it.', { style: 'Simple English' });
+    expect(simple.suggestions.some(s => s.category === 'style' && s.original === 'utilize' && s.replacement === 'use')).toBe(true);
+    expect(R.GRAMMAR_CATEGORIES).toContain('style');
+  });
 });

@@ -6,9 +6,9 @@ const registry = require('../../data/registry');
 
 const IMAGE_SLUGS = [
   'image-editor', 'heic-viewer', 'add-border-to-image', 'photo-merger',
-  'screenshot-beautifier', 'black-and-white-image-converter', 'image-flip-rotate',
+  'screenshot-beautifier', 'black-and-white-image-converter',
   'image-resizer', 'image-to-svg', 'image-inverter', 'image-to-text',
-  'qr-code-generator', 'image-compressor'
+  'qr-code-generator', 'thumbnail-generator', 'image-compressor'
 ];
 
 function collectErrors(page) {
@@ -222,6 +222,8 @@ test('HEIC viewer decodes real variants, previews, downloads and reports corrupt
   await expect(page.locator('#image-status')).toContainText('Decoded 4 image(s)');
   await expect(page.locator('.heic-card')).toHaveCount(4);
   await expect(page.locator('#image-meta')).toContainText('1 of 4');
+  await expect(page.locator('#heic-original-name')).toContainText('example.heic +3 more');
+  await expect(page.locator('#heic-original-format')).toContainText('mif1 · image/heif');
   await expectCanvasSize(page, 1280, 854);
 
   const download = await downloadBuffer(page, '#image-download');
@@ -392,17 +394,6 @@ test('black and white, inversion, orientation, resizing and SVG wrapping produce
   expect(inverted.pixels[0]).toEqual([0, 255, 255, 255]);
   await page.click('#image-reset');
 
-  await gotoImageTool(page, 'image-flip-rotate');
-  await page.setInputFiles('#image-file', source);
-  await page.click('#fr-rot-right');
-  await expectCanvasSize(page, 40, 80);
-  await page.click('#fr-flip-h');
-  await expectCanvasSize(page, 40, 80);
-  download = await downloadBuffer(page, '#image-download');
-  const oriented = await inspectImage(page, download.buffer, 'image/png', [[2, 2]]);
-  expect([oriented.width, oriented.height]).toEqual([40, 80]);
-  await page.click('#image-reset');
-
   await gotoImageTool(page, 'image-resizer');
   await page.setInputFiles('#image-file', source);
   await page.uncheck('#rs-lock');
@@ -443,6 +434,9 @@ test('QR generator downloads scannable PNG and SVG and refuses oversized private
   const png = await downloadBuffer(page, '#image-download');
   await page.addScriptTag({ url: '/js/vendor/jsQR.js' });
   expect(await decodeQr(page, png.buffer)).toBe('https://letitedit.com/image-editor/');
+
+  await page.click('#qr-verify');
+  await expect(page.locator('#image-status')).toContainText('QR verified');
 
   const svg = await downloadBuffer(page, '#qr-download-svg');
   expect(svg.buffer.toString('utf8')).toContain('<path');
@@ -521,6 +515,7 @@ test('OCR recognises local English text, downloads it and never uploads the imag
   await expect(page.locator('#ocr-extract')).toBeEnabled();
   await page.click('#ocr-extract');
   await expect(page.locator('#ocr-output')).toHaveValue(/LETITEDIT/, { timeout: 180000 });
+  await expect(page.locator('#ocr-confidence')).not.toHaveText('Confidence: —');
   await expect(page.locator('#ocr-copy')).toBeEnabled();
   await expect(page.locator('#ocr-download')).toBeEnabled();
 
@@ -535,6 +530,138 @@ test('OCR recognises local English text, downloads it and never uploads the imag
   await expect(page.locator('#ocr-copy')).toBeDisabled();
   await expect(page.locator('#ocr-download')).toBeDisabled();
   expect(uploads).toEqual([]);
+  expect(errors).toEqual([]);
+});
+
+test('retired image flip and rotate route redirects to the current editor', async ({ page }) => {
+  await page.goto('/image-flip-rotate/');
+  await expect(page).toHaveURL(/\/image-editor\/$/);
+  await expect(page.locator('[data-image-engine="image-editor"]')).toHaveCount(1);
+});
+
+test('image editor supports undo/redo, arbitrary rotation and plain background removal', async ({ page }) => {
+  const errors = collectErrors(page);
+  await gotoImageTool(page, 'image-editor');
+  const source = await makePng(page, { width: 80, height: 40, mode: 'solid', color: '#ff0000' });
+  await page.setInputFiles('#image-file', source);
+  await expectCanvasSize(page, 80, 40);
+
+  await setRange(page, 'ie-rotate-angle', 90);
+  await page.check('#ie-rotate-expand');
+  await page.click('#ie-rotate-apply');
+  await expectCanvasSize(page, 40, 80);
+  await expect(page.locator('#image-status')).toContainText('Edit applied');
+  await page.click('#ie-undo');
+  await expectCanvasSize(page, 80, 40);
+  await page.click('#ie-redo');
+  await expectCanvasSize(page, 40, 80);
+
+  const cutoutData = await page.evaluate(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 40; canvas.height = 40;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 40, 40);
+    ctx.fillStyle = '#ff0000'; ctx.fillRect(15, 15, 10, 10);
+    return canvas.toDataURL('image/png');
+  });
+  await page.setInputFiles('#image-file', {
+    name: 'cutout.png', mimeType: 'image/png',
+    buffer: Buffer.from(cutoutData.split(',')[1], 'base64')
+  });
+  await expectCanvasSize(page, 40, 40);
+  await page.check('#ie-bgremove-enable');
+  await page.click('#ie-bgremove-apply');
+  const removed = await page.locator('#image-preview').evaluate(canvas => {
+    const ctx = canvas.getContext('2d');
+    return [Array.from(ctx.getImageData(2, 2, 1, 1).data), Array.from(ctx.getImageData(20, 20, 1, 1).data)];
+  });
+  expect(removed[0][3]).toBe(0);
+  expect(removed[1]).toEqual([255, 0, 0, 255]);
+  await page.click('#ie-undo');
+  const restored = await page.locator('#image-preview').evaluate(canvas =>
+    Array.from(canvas.getContext('2d').getImageData(2, 2, 1, 1).data)
+  );
+  expect(restored[3]).toBe(255);
+  expect(errors).toEqual([]);
+});
+
+test('photo merger sizes grid cells and reports exact layout metadata', async ({ page }) => {
+  const errors = collectErrors(page);
+  await gotoImageTool(page, 'photo-merger');
+  const files = await Promise.all([
+    makePng(page, { width: 30, height: 20, mode: 'solid', color: '#ff0000', name: 'wide.png' }),
+    makePng(page, { width: 15, height: 10, mode: 'solid', color: '#00ff00', name: 'small.png' }),
+    makePng(page, { width: 20, height: 30, mode: 'solid', color: '#0000ff', name: 'tall.png' })
+  ]);
+  await page.setInputFiles('#image-file', files);
+  await page.check('input[name="pm-direction"][value="grid"]');
+  await page.selectOption('#pm-size-mode', 'custom');
+  await page.fill('#pm-cell-w', '40');
+  await page.fill('#pm-cell-h', '30');
+  await page.fill('#pm-cols', '2');
+  await setRange(page, 'pm-spacing', 5);
+  await expectCanvasSize(page, 85, 65);
+  await expect(page.locator('#image-meta')).toContainText('85×65 · 3 photos');
+
+  const download = await downloadBuffer(page, '#image-download');
+  const result = await inspectImage(page, download.buffer, 'image/png', [[0, 0], [45, 35]]);
+  expect([result.width, result.height]).toEqual([85, 65]);
+  expect(result.pixels[0]).toEqual([255, 255, 255, 255]);
+  expect(errors).toEqual([]);
+});
+
+test('QR tool generates local barcodes with SVG export and clear verification messaging', async ({ page }) => {
+  const errors = collectErrors(page);
+  await gotoImageTool(page, 'qr-code-generator');
+  await page.fill('#qr-text', 'ABC-123');
+  await page.selectOption('#qr-kind', 'code128');
+  await page.click('#qr-generate');
+  await expect(page.locator('#image-status')).toContainText('Code 128 barcode generated');
+  await expect(page.locator('#image-meta')).toContainText('CODE128');
+
+  const svg = await downloadBuffer(page, '#qr-download-svg');
+  expect(svg.name).toMatch(/\.svg$/);
+  expect(svg.buffer.toString('utf8')).toContain('<svg');
+  expect(svg.buffer.toString('utf8')).toContain('<rect');
+  expect(svg.buffer.toString('utf8')).toContain('<path');
+
+  await page.click('#qr-verify');
+  await expect(page.locator('#image-status')).toContainText('Barcodes need a barcode scanner');
+  await page.click('#qr-reset');
+  await expect(page.locator('#image-meta')).toHaveText('No QR code generated');
+  expect(errors).toEqual([]);
+});
+
+test('thumbnail generator creates layered canvases, applies presets and exports real files', async ({ page }) => {
+  const errors = collectErrors(page);
+  await gotoImageTool(page, 'thumbnail-generator');
+  await expectCanvasSize(page, 1280, 720);
+  await expect(page.locator('#tg-layers .pm-order-row')).toHaveCount(1);
+
+  await page.selectOption('#tg-preset', 'instagram-post');
+  await expectCanvasSize(page, 1080, 1080);
+  await expect(page.locator('#tg-preset-note')).toContainText('Instagram feed posts');
+
+  await page.fill('#tg-text', 'SALE');
+  await page.click('#tg-layer-add');
+  await expect(page.locator('#tg-layers .pm-order-row')).toHaveCount(2);
+  await page.click('#tg-templates [data-value="badge"]');
+  await expect(page.locator('#tg-layers .pm-order-row')).toHaveCount(4);
+
+  await page.click('#tg-undo');
+  await expect(page.locator('#tg-layers .pm-order-row')).toHaveCount(2);
+  await page.click('#tg-redo');
+  await expect(page.locator('#tg-layers .pm-order-row')).toHaveCount(4);
+
+  const png = await downloadBuffer(page, '#image-download');
+  expect(png.name).toMatch(/\.png$/);
+  const inspected = await inspectImage(page, png.buffer, 'image/png', [[10, 10], [540, 540]]);
+  expect([inspected.width, inspected.height]).toEqual([1080, 1080]);
+  expect(inspected.pixels[0][3]).toBe(255);
+
+  await page.selectOption('#tg-format', 'jpeg');
+  const jpg = await downloadBuffer(page, '#image-download');
+  expect(jpg.name).toMatch(/\.jpg$/);
   expect(errors).toEqual([]);
 });
 
@@ -594,8 +721,12 @@ test('image workspaces stay within the viewport from 320px through 1440px', asyn
       expect(fit.controlsHeight, `${slug} controls visible at ${width}x${height}`).toBeGreaterThan(120);
       expect(fit.outputHeight, `${slug} preview visible at ${width}x${height}`).toBeGreaterThan(120);
       if (width === 320) {
-        const columns = await page.locator('.image-grid').evaluate(element => getComputedStyle(element).gridTemplateColumns);
-        expect(columns.split(' ').length, `${slug} single-column layout`).toBe(1);
+        const layout = await page.locator('.image-grid').evaluate(element => {
+          const style = getComputedStyle(element);
+          return { display: style.display, direction: style.flexDirection };
+        });
+        expect(layout.display, `${slug} single-column layout`).toBe('flex');
+        expect(layout.direction, `${slug} single-column direction`).toBe('column');
       }
     }
   }

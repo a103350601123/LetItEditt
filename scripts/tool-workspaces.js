@@ -157,7 +157,7 @@ const WORKSPACES = {
       '<div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>\n' +
       '<div class="engine-grid engine-simple">\n' +
       '  <div class="engine-controls">\n' +
-      '    ' + field('Upload file (.txt)', '<input type="file" id="spaces-upload" accept=".txt,text/plain">') + '\n' +
+      '    ' + field('Upload text file (TXT/CSV/MD/DOCX)', '<input type="file" id="spaces-upload" accept=".txt,.csv,.tsv,.md,.markdown,.json,.log,.xml,.html,.htm,.docx,text/plain,text/csv">') + '\n' +
       '    ' + field('Or paste text here', '<textarea id="spaces-input" rows="8" placeholder="Paste text with extra spaces…"></textarea>') + '\n' +
       '    <div class="output-actions"><button type="button" class="btn" id="spaces-apply">Remove Extra Spaces</button></div>\n' +
       '  </div>\n' +
@@ -175,15 +175,32 @@ const WORKSPACES = {
       '<div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>\n' +
       '<div class="engine-grid engine-simple">\n' +
       '  <div class="engine-controls">\n' +
-      '    <div class="two-cols">' + field('Find', '<input type="text" id="fr-find" placeholder="Text to find">') + field('Replace', '<input type="text" id="fr-replace" placeholder="Replacement text">') + '</div>\n' +
-      '    <div class="opt-group">' + checkbox('fr-case', 'Case-sensitive (literal match)', true) + '</div>\n' +
-      '    <p class="hint">When case sensitivity is off, <strong>Find is treated as a regular expression</strong> with global and case-insensitive flags, matching the reference behaviour. Invalid patterns show a clear error.</p>\n' +
-      '    ' + field('Source text', '<textarea id="fr-input" rows="9" placeholder="Paste the source text here…"></textarea>') + '\n' +
-      '    <div class="output-actions"><button type="button" class="btn" id="fr-apply">Replace all</button></div>\n' +
+      '    <div class="two-cols">' + field('Find', '<input type="text" id="fr-find" placeholder="Text or pattern to find">') + field('Replace', '<input type="text" id="fr-replace" placeholder="Replacement text">') + '</div>\n' +
+      '    <div class="opt-group"><span class="opt-title">Matching</span>\n' +
+      '      ' + checkbox('fr-case', 'Case-sensitive literal match', true) + '\n' +
+      '      ' + checkbox('fr-regex', 'Force regular expression (even when case-sensitive)') + '\n' +
+      '      ' + checkbox('fr-whole', 'Whole word only') + '\n' +
+      '    </div>\n' +
+      '    <p class="hint">With Case-sensitive on, Find is literal. With it off, Find follows the reference behaviour and is compiled as a global, case-insensitive regular expression. Use Force regular expression to opt in explicitly.</p>\n' +
+      '    ' + field('Upload TXT, CSV, MD or DOCX', '<input type="file" id="fr-upload" accept=".txt,.csv,.tsv,.md,.markdown,.json,.log,.xml,.html,.htm,.docx,text/plain,text/csv">') + '\n' +
+      '    ' + field('Source text', '<textarea id="fr-input" rows="6" placeholder="Paste the source text here…"></textarea>') + '\n' +
+      '    <p class="pill" id="fr-count">0 matches</p>\n' +
+      '    <div class="output-actions">\n' +
+      '      <button type="button" class="btn" id="fr-apply">Replace all</button>\n' +
+      '      <button type="button" class="btn btn-secondary btn-small" id="fr-replace-one">Replace one</button>\n' +
+      '      <button type="button" class="btn btn-secondary btn-small" id="fr-prev">Previous</button>\n' +
+      '      <button type="button" class="btn btn-secondary btn-small" id="fr-next">Next</button>\n' +
+      '      <button type="button" class="btn btn-secondary btn-small" id="fr-undo">Restore original</button>\n' +
+      '    </div>\n' +
       '  </div>\n' +
       '  <div class="engine-output">\n' +
-      '    <div class="workspace-head"><h2>Result</h2><button type="button" class="btn btn-secondary btn-small" id="fr-copy">Copy</button></div>\n' +
-      '    <textarea id="fr-result" class="output-box" rows="9" readonly></textarea>\n' +
+      '    <div class="workspace-head"><h2>Source with matches</h2><span class="card-tag">Safe DOM preview</span></div>\n' +
+      '    <div id="fr-preview" class="output-box"></div>\n' +
+      '    <div class="workspace-head"><h2>Result</h2><div class="output-actions">\n' +
+      '      <button type="button" class="btn btn-secondary btn-small" id="fr-copy">Copy</button>\n' +
+      '      <button type="button" class="btn btn-secondary btn-small" id="fr-download">Download</button>\n' +
+      '    </div></div>\n' +
+      '    <textarea id="fr-result" class="output-box" rows="6" readonly></textarea>\n' +
       '    <div class="status" id="fr-status" role="status" aria-live="polite"></div>\n' +
       '  </div>\n' +
       '</div>\n</section>';
@@ -312,7 +329,7 @@ const WORKSPACES = {
   /* 06 — Word Counter */
   'word-counter': function () {
     return '<section class="container workspace engine-workspace" data-engine="word-counter">\n' +
-      '<div class="workspace-head"><h2>Interactive tool</h2><div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="wc-sample">Sample text</button><button type="button" class="btn btn-secondary btn-small" id="wc-file">Open file</button><input type="file" id="wc-upload" accept=".txt,.md,.markdown,text/plain,text/markdown" hidden><button type="button" class="btn btn-secondary btn-small" id="wc-copy">Copy</button><button type="button" class="btn btn-secondary btn-small" id="wc-clear">Clear</button></div></div>\n' +
+      '<div class="workspace-head"><h2>Interactive tool</h2><div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="wc-sample">Sample text</button><button type="button" class="btn btn-secondary btn-small" id="wc-file">Open file</button><input type="file" id="wc-upload" accept=".txt,.csv,.tsv,.md,.markdown,.json,.log,.xml,.html,.htm,.docx,text/plain,text/csv" hidden><button type="button" class="btn btn-secondary btn-small" id="wc-copy">Copy</button><button type="button" class="btn btn-secondary btn-small" id="wc-clear">Clear</button></div></div>\n' +
       '<div class="engine-grid engine-counter">\n' +
       '  <div class="engine-controls">\n' +
       '    ' + field('Text', '<textarea id="wc-input" rows="10" placeholder="Start typing, paste text, or drop a .txt file here…"></textarea>') + '\n' +
@@ -381,18 +398,25 @@ const WORKSPACES = {
       '</div>\n</section>';
   },
 
-  /* 04 — Bank Statement Converter (text / CSV subset) */
+  /* 04 — Bank Statement Converter (text / CSV / DOCX text subset) */
   'bank-statement-converter': function () {
+    const columnOptions = function (label) {
+      let html = '<option value="auto">Auto</option>';
+      for (let i = 0; i < 12; i++) html += '<option value="' + i + '">' + (i + 1) + '</option>';
+      return field(label, '<select id="bk-col-' + label + '">' + html + '</select>');
+    };
     return '<section class="container workspace engine-workspace" data-engine="bank-statement-converter">\n' +
       '<div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>\n' +
       '<div class="engine-grid engine-statement">\n' +
       '  <div class="engine-controls">\n' +
-      '    ' + field('Statement text or CSV', '<textarea id="bk-input" rows="12" placeholder="Paste plain-text transactions, one per line, for example:\n01/15/2026 Coffee Shop 4.50 995.50"></textarea>') + '\n' +
-      '    <div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="bk-sample">Load sample</button><button type="button" class="btn btn-secondary btn-small" id="bk-upload-btn">Open text file</button><input type="file" id="bk-upload" accept=".txt,.csv,text/plain,text/csv" hidden><button type="button" class="btn btn-secondary btn-small" id="bk-clear">Clear</button></div>\n' +
-      '    <div class="two-cols">' + field('Date order', '<select id="bk-date-order"><option value="auto">Automatic</option><option value="mdy">Month first (MM/DD)</option><option value="dmy">Day first (DD/MM)</option></select>') +
-      field('Statement type', '<select id="bk-kind"><option value="auto">Automatic</option><option value="bank">Bank account</option><option value="credit">Credit card</option></select>') + '</div>\n' +
-      '    <div class="output-actions"><button type="button" class="btn" id="bk-parse">Parse transactions</button></div>\n' +
-      '    <p class="hint warning">Scope: this browser-side build parses pasted text and text/CSV files. It does <strong>not</strong> extract PDF text, run OCR, or export XLSX/QBO/XERO/OFX. Every row should be checked against the original statement.</p>\n' +
+      '    ' + field('Statement text or CSV', '<textarea id="bk-input" rows="8" placeholder="Paste plain-text transactions, one per line, for example:\n01/15/2026 Coffee Shop 4.50 995.50"></textarea>') + '\n' +
+      '    <div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="bk-sample">Load sample</button><button type="button" class="btn btn-secondary btn-small" id="bk-upload-btn">Open file</button><input type="file" id="bk-upload" accept=".txt,.csv,.tsv,.md,.markdown,.json,.log,.xml,.docx,text/plain,text/csv" hidden><button type="button" class="btn btn-secondary btn-small" id="bk-clear">Clear</button></div>\n' +
+      '    <div class="two-cols">' + field('Input format', '<select id="bk-format"><option value="auto">Automatic</option><option value="text">Plain text</option><option value="csv">CSV / TSV / semicolon</option></select>') +
+      field('Date order', '<select id="bk-date-order"><option value="auto">Automatic</option><option value="mdy">Month first (MM/DD)</option><option value="dmy">Day first (DD/MM)</option></select>') +
+      field('Statement type', '<select id="bk-kind"><option value="auto">Automatic</option><option value="bank">Bank account</option><option value="credit">Credit card</option></select>') +
+      columnOptions('date') + columnOptions('description') + columnOptions('amount') + columnOptions('balance') + columnOptions('debit') + columnOptions('credit') + '</div>\n' +
+      '    <div class="output-actions"><button type="button" class="btn" id="bk-parse">Parse transactions</button><button type="button" class="btn btn-secondary btn-small" id="bk-edit">Edit values</button><button type="button" class="btn btn-secondary btn-small" id="bk-apply-edits">Apply edits</button></div>\n' +
+      '    <p class="hint warning">Scope: this browser-side build parses pasted text, CSV/TSV and DOCX text. It does <strong>not</strong> extract PDF text, run OCR, or export XLSX/QBO/XERO/OFX. Amounts are never rounded; check every row against the original statement.</p>\n' +
       '  </div>\n' +
       '  <div class="engine-output">\n' +
       '    <div class="summary-grid">\n' +
@@ -401,6 +425,7 @@ const WORKSPACES = {
       '      <div class="stat-tile"><span>Money out</span><strong id="bk-sum-out">0.00</strong></div>\n' +
       '      <div class="stat-tile"><span>Balance check</span><strong id="bk-sum-check">No balances to check</strong></div>\n' +
       '    </div>\n' +
+      '    <p class="hint" id="bk-warnings">No automatic warnings; review every row against the original statement.</p>\n' +
       '    <div class="table-wrap" id="bk-table"><p class="hint">Parse a statement to see its transactions.</p></div>\n' +
       '    <div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="bk-csv">Download CSV</button><button type="button" class="btn btn-secondary btn-small" id="bk-qif">Download QIF</button></div>\n' +
       '    <div class="status" id="bk-status" role="status" aria-live="polite"></div>\n' +
@@ -408,7 +433,7 @@ const WORKSPACES = {
       '</div>\n</section>';
   },
 
-  /* 03 — Handwriting to Font (scoped sampler + preview) */
+  /* 03 — Handwriting to Font (scoped sampler + styled preview) */
   'handwriting-to-font': function () {
     return '<section class="container workspace engine-workspace" data-engine="handwriting-to-font">\n' +
       '<div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>\n' +
@@ -424,14 +449,171 @@ const WORKSPACES = {
       '    <p class="hint">Tip: use ← and → to move between characters. Draw one glyph per character; keep it inside the guide box and sit letters on the baseline.</p>\n' +
       '  </div>\n' +
       '  <div class="engine-output">\n' +
-      '    <div class="workspace-head"><h2>Preview</h2></div>\n' +
+      '    <div class="workspace-head"><h2>Preview</h2><span class="pill" id="hf-loading" hidden>Building…</span></div>\n' +
       '    ' + field('Text to preview', '<textarea id="hf-text" rows="3" placeholder="Type something to see your glyphs…">Hello</textarea>') + '\n' +
       '    <div class="chip-row"><button type="button" class="chip" data-hf-phrase="The quick brown fox jumps over the lazy dog.">Pangram</button><button type="button" class="chip" data-hf-phrase="ABCDEFGHIJKLM NOPQRSTUVWXYZ 0123456789">Alphabet</button></div>\n' +
       '    <div class="two-cols">' + field('Preview size', '<input type="range" id="hf-size" min="18" max="110" step="1" value="44">') + field('Letter gap', '<input type="range" id="hf-gap" min="0" max="60" step="1" value="10">') + '</div>\n' +
+      '    <div class="two-cols">' + field('Font family', '<select id="hf-font"><option value="sans">Sans-serif</option><option value="serif">Serif</option><option value="mono">Monospace</option><option value="script">Handwriting-style</option></select>') +
+      field('Font style', '<select id="hf-style"><option value="regular">Regular</option><option value="bold">Bold</option><option value="italic">Italic</option><option value="bold-italic">Bold italic</option></select>') + '</div>\n' +
+      '    <div class="two-cols">' + field('Text colour', '<input type="color" id="hf-color" value="#0f172a">') + field('Background', '<input type="color" id="hf-bg" value="#ffffff">') + '</div>\n' +
+      '    <div class="two-cols">' + field('Line spacing <small id="hf-line-height-label">1.2</small>', '<input type="range" id="hf-line-height" min="0.8" max="2.4" step="0.1" value="1.2">') + field('Zoom <small id="hf-zoom-label">100%</small>', '<input type="range" id="hf-zoom" min="50" max="200" step="10" value="100">') + '</div>\n' +
+      '    <div class="opt-group">' + checkbox('hf-live', 'Live preview while options change', false) + '</div>\n' +
       '    <div class="output-actions"><button type="button" class="btn" id="hf-build">Build preview</button><button type="button" class="btn btn-secondary btn-small" id="hf-download">Download PNG</button></div>\n' +
       '    <canvas id="hf-preview" width="760" height="240" class="preview-pad"></canvas>\n' +
       '    <div class="status" id="hf-status" role="status" aria-live="polite"></div>\n' +
-      '    <p class="hint warning">Scope: this build lets you draw glyphs and export a <strong>picture preview</strong>. It does not generate an installable OpenType (.otf) font. For handwritten pages and PDF/PNG export, use the separate <a href="/tools/text-to-handwriting/index.html">Text to Handwriting</a> tool.</p>\n' +
+      '    <p class="hint warning">Scope: this build lets you draw glyphs and export a <strong>picture preview</strong>. It does not generate an installable OpenType (.otf) font. Font family, style and colour affect fallback characters and preview styling; your drawn glyphs remain the images you drew. For handwritten pages and PDF/PNG export, use the separate <a href="/tools/text-to-handwriting/index.html">Text to Handwriting</a> tool.</p>\n' +
+      '  </div>\n' +
+      '</div>\n</section>';
+  },
+
+  /* 15 — Remove Empty Lines (document-aware engine) */
+  'remove-empty-lines': function () {
+    return '<section class="container workspace engine-workspace" data-engine="remove-empty-lines">\n' +
+      '<div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>\n' +
+      '<div class="engine-grid engine-simple">\n' +
+      '  <div class="engine-controls">\n' +
+      '    ' + field('Upload TXT, CSV, MD or DOCX', '<input type="file" id="rel-upload" accept=".txt,.csv,.tsv,.md,.markdown,.json,.log,.xml,.html,.htm,.docx,text/plain,text/csv">') + '\n' +
+      '    ' + field('Or paste text', '<textarea id="tool-input" rows="9" placeholder="Paste text with blank lines…"></textarea>') + '\n' +
+      '    <div class="opt-group"><span class="opt-title">Blank lines</span>\n' +
+      '      ' + checkbox('rel-preserve', 'Keep one blank line between paragraphs', false) + '\n' +
+      '    </div>\n' +
+      '    <p class="hint">Only empty and whitespace-only lines are removed. Tabs, indentation, punctuation and all other characters on real lines stay exactly as they are.</p>\n' +
+      '    <div class="output-actions"><button type="button" class="btn" id="rel-apply">Remove empty lines</button><button type="button" class="btn btn-secondary btn-small" id="clear-input">Clear input</button></div>\n' +
+      '  </div>\n' +
+      '  <div class="engine-output">\n' +
+      '    <div class="workspace-head"><h2>Output</h2><div class="output-actions">\n' +
+      '      <button type="button" class="btn btn-secondary btn-small" id="copy-output">Copy</button>\n' +
+      '      <button type="button" class="btn btn-secondary btn-small" id="download-output">Download</button>\n' +
+      '    </div></div>\n' +
+      '    <pre id="tool-output" class="output-box"></pre>\n' +
+      '    <div class="status" id="tool-status" role="status" aria-live="polite"></div>\n' +
+      '    <p class="hint warning">DOCX support extracts text only; columns, tables and styling are not preserved. PDF and legacy .doc files are rejected with an explanation rather than silently mangled.</p>\n' +
+      '  </div>\n' +
+      '</div>\n</section>';
+  },
+
+  /* 16 — Remove Punctuation (document-aware engine) */
+  'remove-punctuation': function () {
+    return '<section class="container workspace engine-workspace" data-engine="remove-punctuation">\n' +
+      '<div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>\n' +
+      '<div class="engine-grid engine-simple">\n' +
+      '  <div class="engine-controls">\n' +
+      '    ' + field('Upload TXT, CSV, MD or DOCX', '<input type="file" id="rp-upload" accept=".txt,.csv,.tsv,.md,.markdown,.json,.log,.xml,.html,.htm,.docx,text/plain,text/csv">') + '\n' +
+      '    ' + field('Or paste text', '<textarea id="tool-input" rows="8" placeholder="Paste text containing punctuation…"></textarea>') + '\n' +
+      '    <div class="two-cols">' + field('Punctuation to remove', '<select id="rp-types"><option value="all">All Unicode punctuation</option><option value="common">Common English marks</option><option value="custom">Custom characters</option></select>') +
+      field('Custom characters', '<input type="text" id="rp-chars" placeholder="e.g. ,!?;:" disabled>') + '</div>\n' +
+      '    <p class="hint">Letters, numbers, emoji, symbols, spaces and line breaks are preserved. Custom mode removes only the characters you type.</p>\n' +
+      '    <div class="output-actions"><button type="button" class="btn" id="rp-apply">Remove punctuation</button><button type="button" class="btn btn-secondary btn-small" id="clear-input">Clear input</button></div>\n' +
+      '  </div>\n' +
+      '  <div class="engine-output">\n' +
+      '    <div class="workspace-head"><h2>Output</h2><div class="output-actions">\n' +
+      '      <button type="button" class="btn btn-secondary btn-small" id="copy-output">Copy</button>\n' +
+      '      <button type="button" class="btn btn-secondary btn-small" id="download-output">Download</button>\n' +
+      '    </div></div>\n' +
+      '    <pre id="tool-output" class="output-box"></pre>\n' +
+      '    <div class="status" id="tool-status" role="status" aria-live="polite"></div>\n' +
+      '    <p class="hint warning">DOCX support extracts text only; PDF and legacy .doc files are rejected with an explanation. Only the text is cleaned, never the document layout.</p>\n' +
+      '  </div>\n' +
+      '</div>\n</section>';
+  },
+
+  /* 17 — Text Comparer (two-document engine) */
+  'text-comparer': function () {
+    return '<section class="container workspace engine-workspace" data-engine="text-comparer">\n' +
+      '<div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>\n' +
+      '<div class="engine-grid engine-simple">\n' +
+      '  <div class="engine-controls">\n' +
+      '    <div class="two-cols">\n' +
+      '      <div class="field"><label for="tool-input-left">Original text</label><textarea id="tool-input-left" rows="6" placeholder="Paste the original version here…"></textarea><input type="file" id="cmp-upload-left" accept=".txt,.csv,.tsv,.md,.markdown,.json,.log,.xml,.html,.htm,.docx,text/plain,text/csv" aria-label="Open original text file"></div>\n' +
+      '      <div class="field"><label for="tool-input-right">Changed text</label><textarea id="tool-input-right" rows="6" placeholder="Paste the changed version here…"></textarea><input type="file" id="cmp-upload-right" accept=".txt,.csv,.tsv,.md,.markdown,.json,.log,.xml,.html,.htm,.docx,text/plain,text/csv" aria-label="Open changed text file"></div>\n' +
+      '    </div>\n' +
+      '    <div class="opt-group"><span class="opt-title">Compare by</span>' + radios('cmp-unit', [
+        { value: 'lines', label: 'Lines' }, { value: 'words', label: 'Words' }
+      ], 'lines') + '</div>\n' +
+      '    <div class="output-actions"><button type="button" class="btn" id="cmp-compare">Compare text</button><button type="button" class="btn btn-secondary btn-small" id="cmp-swap">Swap sides</button><button type="button" class="btn btn-secondary btn-small" id="cmp-clear">Clear both</button></div>\n' +
+      '    <p class="hint warning">Only extracted text is compared, not formatting. DOCX uploads provide paragraph text; PDF and legacy .doc files are rejected rather than guessed.</p>\n' +
+      '  </div>\n' +
+      '  <div class="engine-output">\n' +
+      '    <div class="workspace-head"><h2>Differences</h2><span class="pill" id="cmp-summary">0 added · 0 removed</span></div>\n' +
+      '    <div id="tool-output" class="output-box diff-output"></div>\n' +
+      '    <div class="status" id="tool-status" role="status" aria-live="polite"></div>\n' +
+      '  </div>\n' +
+      '</div>\n</section>';
+  },
+
+  /* 18 — HTML to Markdown (pure local converter) */
+  'html-to-markdown': function () {
+    return '<section class="container workspace engine-workspace" data-engine="html-to-markdown">\n' +
+      '<div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>\n' +
+      '<div class="engine-grid engine-simple">\n' +
+      '  <div class="engine-controls">\n' +
+      '    ' + field('Upload HTML, TXT or DOCX text', '<input type="file" id="h2m-upload" accept=".html,.htm,.txt,.md,.markdown,.csv,.json,.docx,text/html,text/plain">') + '\n' +
+      '    ' + field('HTML to convert', '<textarea id="h2m-input" rows="9" placeholder="Paste HTML or rich text here…"></textarea>') + '\n' +
+      '    <div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="h2m-clear">Clear</button></div>\n' +
+      '    <p class="hint">Headings, links, lists, tables, code, quotes and emphasis are handled by a local parser. Scripts, styles, SVG and unsafe attributes are removed from the preview.</p>\n' +
+      '  </div>\n' +
+      '  <div class="engine-output">\n' +
+      '    <div class="workspace-head"><h2>Markdown source</h2><div class="output-actions">\n' +
+      '      <button type="button" class="btn btn-secondary btn-small" id="h2m-copy">Copy</button>\n' +
+      '      <button type="button" class="btn btn-secondary btn-small" id="h2m-download">Download</button>\n' +
+      '    </div></div>\n' +
+      '    <pre id="h2m-source" class="output-box"></pre>\n' +
+      '    <p class="pill" id="h2m-count">0 Markdown characters</p>\n' +
+      '    <div class="workspace-head"><h2>Safe preview</h2><span class="card-tag">DOM nodes only</span></div>\n' +
+      '    <div id="h2m-preview" class="output-box"></div>\n' +
+      '    <div class="status" id="h2m-status" role="status" aria-live="polite"></div>\n' +
+      '  </div>\n' +
+      '</div>\n</section>';
+  },
+
+  /* 19 — Extract URLs (strict local extraction) */
+  'extract-urls': function () {
+    return '<section class="container workspace engine-workspace" data-engine="extract-urls">\n' +
+      '<div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>\n' +
+      '<div class="engine-grid engine-simple">\n' +
+      '  <div class="engine-controls">\n' +
+      '    ' + field('Upload TXT, CSV, MD or DOCX', '<input type="file" id="url-upload" accept=".txt,.csv,.tsv,.md,.markdown,.json,.log,.xml,.html,.htm,.docx,text/plain,text/csv">') + '\n' +
+      '    ' + field('Text containing links', '<textarea id="url-input" rows="9" placeholder="Paste text with http, https, www or bare-domain URLs…"></textarea>') + '\n' +
+      '    <div class="output-actions"><button type="button" class="btn btn-secondary btn-small" id="url-clear">Clear</button></div>\n' +
+      '    <p class="hint">URLs are validated as http or https web addresses and de-duplicated in first-seen order. Punctuation around a link is trimmed; mailto: and javascript: values are ignored.</p>\n' +
+      '  </div>\n' +
+      '  <div class="engine-output">\n' +
+      '    <div class="workspace-head"><h2>Unique URLs</h2><div class="output-actions">\n' +
+      '      <button type="button" class="btn btn-secondary btn-small" id="url-copy">Copy all</button>\n' +
+      '      <button type="button" class="btn btn-secondary btn-small" id="url-download">Download</button>\n' +
+      '    </div></div>\n' +
+      '    <p class="pill" id="url-count">0 unique URLs</p>\n' +
+      '    <div id="url-list" class="output-box"></div>\n' +
+      '    <div class="status" id="url-status" role="status" aria-live="polite"></div>\n' +
+      '  </div>\n' +
+      '</div>\n</section>';
+  },
+
+  /* 20 — Grammar & Spell Checker (rule-based, English only) */
+  'grammar-spell-checker': function () {
+    return '<section class="container workspace engine-workspace" data-engine="grammar-spell-checker">\n' +
+      '<div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>\n' +
+      '<div class="engine-grid engine-simple">\n' +
+      '  <div class="engine-controls">\n' +
+      '    ' + field('Upload TXT, CSV, MD or DOCX', '<input type="file" id="gs-upload" accept=".txt,.csv,.tsv,.md,.markdown,.json,.log,.xml,.html,.htm,.docx,text/plain,text/csv">') + '\n' +
+      '    ' + field('Text to check', '<textarea id="gs-input" rows="8" placeholder="Paste English text to check…"></textarea>') + '\n' +
+      '    <div class="two-cols">' + field('Style emphasis', '<select id="gs-style"><option value="Professional">Professional</option><option value="Academic">Academic</option><option value="Formal">Formal</option><option value="Casual">Casual</option><option value="Simple English">Simple English</option></select>') +
+      field('Status', '<span class="pill" id="gs-count">0 suggestions</span>') + '</div>\n' +
+      '    <div class="output-actions"><button type="button" class="btn" id="gs-apply">Apply selected</button><button type="button" class="btn btn-secondary btn-small" id="gs-select-all">Select all</button><button type="button" class="btn btn-secondary btn-small" id="gs-reject-all">Reject all</button><button type="button" class="btn btn-secondary btn-small" id="gs-clear">Clear</button></div>\n' +
+      '    <p class="hint warning">Honest scope: English only, local rules for common spelling, grammar, repeated words, spacing and clarity. It is not full NLP, an AI rewriting service, or a substitute for human proofreading; no external or paid API is used.</p>\n' +
+      '  </div>\n' +
+      '  <div class="engine-output">\n' +
+      '    <div class="workspace-head"><h2>Highlighted text</h2><span class="card-tag">Original is unchanged</span></div>\n' +
+      '    <div id="gs-highlight" class="output-box"></div>\n' +
+      '    <div class="workspace-head"><h2>Suggestions</h2></div>\n' +
+      '    <div id="gs-list" class="output-box"></div>\n' +
+      '    <div class="workspace-head"><h2>Corrected copy</h2><div class="output-actions">\n' +
+      '      <button type="button" class="btn btn-secondary btn-small" id="gs-copy">Copy</button>\n' +
+      '      <button type="button" class="btn btn-secondary btn-small" id="gs-download">Download</button>\n' +
+      '    </div></div>\n' +
+      '    <pre id="gs-original" class="output-box" hidden></pre>\n' +
+      '    <pre id="gs-corrected" class="output-box"></pre>\n' +
+      '    <div class="status" id="gs-status" role="status" aria-live="polite"></div>\n' +
       '  </div>\n' +
       '</div>\n</section>';
   }

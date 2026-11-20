@@ -27,15 +27,36 @@ function select(id, label, options) {
     options.map(o => '<option value="' + o[0] + '">' + o[1] + '</option>').join('') + '</select></div>';
 }
 
+function textInput(id, label, value, placeholder) {
+  return '<div class="field"><label for="' + id + '">' + label + '</label>' +
+    '<input type="text" id="' + id + '" value="' + (value || '') + '" placeholder="' + (placeholder || '') + '"></div>';
+}
+
+function textarea(id, label, rows, placeholder) {
+  return '<div class="field"><label for="' + id + '">' + label + '</label>' +
+    '<textarea id="' + id + '" rows="' + (rows || 3) + '" placeholder="' + (placeholder || '') + '"></textarea></div>';
+}
+
 function color(id, label, value) {
   return '<div class="field color-field"><label for="' + id + '">' + label + '</label>' +
     '<input type="color" id="' + id + '" value="' + value + '"></div>';
+}
+
+function check(id, label, checked) {
+  return '<label class="opt"><input type="checkbox" id="' + id + '"' + (checked ? ' checked' : '') +
+    '> <span>' + label + '</span></label>';
 }
 
 function buttons(items) {
   return '<div class="output-actions">' + items.map(item =>
     '<button type="button" class="' + (item[2] || 'btn btn-secondary btn-small') + '" id="' + item[0] + '">' + item[1] + '</button>'
   ).join('') + '</div>';
+}
+
+function chips(id, items) {
+  return '<div class="chip-row" id="' + id + '">' + items.map(item =>
+    '<button type="button" class="chip"' + (item[2] ? ' data-' + item[2][0] + '="' + item[2][1] + '"' : '') +
+    ' data-value="' + item[0] + '">' + item[1] + '</button>').join('') + '</div>';
 }
 
 function upload(accept, multiple, help) {
@@ -75,29 +96,86 @@ function workspace(engine, controls, outputBlock) {
 
 const WORKSPACES = {
   'image-editor': function () {
-    const controls = upload('image/png,image/jpeg,image/webp', false, 'JPG, PNG and WebP are supported. Very large files are rejected with a clear message.') +
-      group('Crop', range('ie-crop-x', 'Left', 0, 100, 0, 1, 'px') + range('ie-crop-y', 'Top', 0, 100, 0, 1, 'px') +
-        range('ie-crop-w', 'Width', 1, 100, 100, 1, 'px') + range('ie-crop-h', 'Height', 1, 100, 100, 1, 'px') +
-        buttons([['ie-crop-apply', 'Apply crop']])) +
-      group('Orientation', buttons([['ie-rot-left', '↶ Left'], ['ie-rot-right', '↷ Right'], ['ie-flip-h', '⇄ Flip H'], ['ie-flip-v', '⇅ Flip V']])) +
-      group('Adjustments', range('ie-brightness', 'Brightness', 0, 200, 100, 1, '%') + range('ie-contrast', 'Contrast', 0, 200, 100, 1, '%') +
-        range('ie-saturation', 'Saturation', 0, 200, 100, 1, '%') + range('ie-blur', 'Blur', 0, 20, 0, 0.5, 'px') +
-        range('ie-grayscale', 'Grayscale', 0, 100, 0, 1, '%') + range('ie-sepia', 'Sepia', 0, 100, 0, 1, '%') +
+    const controls = upload('image/png,image/jpeg,image/webp', false, 'JPG, PNG and WebP are supported. Everything stays in your browser.') +
+      group('Crop & aspect', '<div class="two-cols">' +
+        range('ie-crop-x', 'Left', 0, 100, 0, 1, 'px') + range('ie-crop-y', 'Top', 0, 100, 0, 1, 'px') +
+        range('ie-crop-w', 'Width', 1, 100, 100, 1, 'px') + range('ie-crop-h', 'Height', 1, 100, 100, 1, 'px') + '</div>' +
+        select('ie-aspect', 'Aspect ratio', [['free', 'Free form'], ['1', 'Square (1:1)'], ['1.333333', 'Photo (4:3)'],
+          ['1.5', 'Classic (3:2)'], ['1.777778', 'Widescreen (16:9)'], ['0.5625', 'Portrait (9:16)'], ['2', 'Panorama (2:1)']]) +
+        buttons([['ie-crop-apply', 'Apply crop'], ['ie-crop-full', 'Full image']])) +
+      group('Resize & canvas', '<div class="two-cols">' +
+        number('ie-out-w', 'Width (px)', 0, 1, 8000, 1) + number('ie-out-h', 'Height (px)', 0, 1, 8000, 1) + '</div>' +
+        check('ie-resize-lock', 'Lock aspect ratio', true) +
+        select('ie-resize-fit', 'When dimensions differ', [['fit', 'Fit inside box'], ['fill', 'Fill and crop'], ['stretch', 'Stretch exactly']]) +
+        buttons([['ie-resize-apply', 'Resize'], ['ie-resize-reset', 'Original size']]) +
+        '<div class="two-cols">' + number('ie-canvas-w', 'Canvas width', 0, 1, 8000, 1) + number('ie-canvas-h', 'Canvas height', 0, 1, 8000, 1) + '</div>' +
+        color('ie-canvas-color', 'Canvas colour', '#ffffff') +
+        select('ie-canvas-pos', 'Image placement', [['center', 'Centre'], ['top-left', 'Top left'], ['top-right', 'Top right'], ['bottom-left', 'Bottom left'], ['bottom-right', 'Bottom right']]) +
+        buttons([['ie-canvas-apply', 'Apply canvas']])) +
+      group('Rotation & orientation', buttons([['ie-rot-left', '↶ Left'], ['ie-rot-right', '↷ Right'], ['ie-flip-h', '⇄ Flip H'], ['ie-flip-v', '⇅ Flip V']]) +
+        range('ie-rotate-angle', 'Arbitrary rotation', -180, 180, 0, 1, '°') +
+        check('ie-rotate-expand', 'Expand canvas to fit corners', true) +
+        color('ie-rotate-bg', 'Corner fill', '#ffffff') +
+        buttons([['ie-rotate-apply', 'Apply rotation'], ['ie-rotate-reset', 'Reset angle']])) +
+      group('Adjustments', '<div class="two-cols">' +
+        range('ie-brightness', 'Brightness', 0, 200, 100, 1, '%') + range('ie-contrast', 'Contrast', 0, 200, 100, 1, '%') +
+        range('ie-saturation', 'Saturation', 0, 200, 100, 1, '%') + range('ie-exposure', 'Exposure', -100, 100, 0, 1, '') +
+        range('ie-temperature', 'Temperature', -100, 100, 0, 1, '') + range('ie-highlights', 'Highlights', -100, 100, 0, 1, '') +
+        range('ie-shadows', 'Shadows', -100, 100, 0, 1, '') + range('ie-sharpness', 'Sharpness', 0, 200, 100, 1, '%') +
+        range('ie-blur', 'Blur', 0, 20, 0, 0.5, 'px') + range('ie-vignette', 'Vignette', 0, 100, 0, 1, '%') +
+        range('ie-grayscale', 'Grayscale', 0, 100, 0, 1, '%') + range('ie-sepia', 'Sepia', 0, 100, 0, 1, '%') + '</div>' +
         buttons([['ie-adjust-reset', 'Reset adjustments']])) +
-      group('Text overlay', field('Caption', '<textarea id="ie-text" rows="2" placeholder="Optional caption. Press Enter for a new line."></textarea>') +
-        range('ie-text-size', 'Text size', 1, 20, 5, 1, '%') + color('ie-text-color', 'Text colour', '#ffffff') +
-        '<label class="opt"><input type="checkbox" id="ie-text-bg" checked> <span>Readable backing</span></label>' +
-        range('ie-text-x', 'Text position X', 0, 100, 50, 1, '%') + range('ie-text-y', 'Text position Y', 0, 100, 85, 1, '%')) +
-      group('Export', select('ie-format', 'Format', [['png', 'PNG'], ['jpeg', 'JPG'], ['webp', 'WebP']]) +
-        range('ie-quality', 'Quality (JPG/WebP)', 0.1, 1, 0.92, 0.01, ''));
-    return workspace('image-editor', controls, output('Crop, adjust and annotate locally'));
+      group('Filter presets', chips('ie-filters', [
+        ['none', 'Original', ['ie-filter', 'none']], ['vivid', 'Vivid'], ['mono', 'Mono'], ['warm', 'Warm'],
+        ['cool', 'Cool'], ['faded', 'Faded'], ['noir', 'High contrast']
+      ])) +
+      group('Text layers', textarea('ie-text', 'Text layer', 2, 'Optional caption. Press Enter for a new line.') +
+        '<div class="two-cols">' + select('ie-text-font', 'Font', [['system-ui, sans-serif', 'Sans serif'], ['Georgia, serif', 'Serif'],
+          ['ui-monospace, Consolas, monospace', 'Monospace'], ['Impact, sans-serif', 'Impact']]) +
+          number('ie-text-size', 'Text size (%)', 5, 1, 30, 1) + '</div>' +
+        color('ie-text-color', 'Text colour', '#ffffff') + color('ie-text-outline', 'Outline colour', '#0f172a') +
+        range('ie-text-outline-w', 'Outline width', 0, 20, 6, 1, '%') +
+        range('ie-text-x', 'Text position X', 0, 100, 50, 1, '%') + range('ie-text-y', 'Text position Y', 0, 100, 85, 1, '%') +
+        range('ie-text-rotation', 'Text rotation', -180, 180, 0, 1, '°') +
+        check('ie-text-bg', 'Readable backing', true) +
+        buttons([['ie-text-add', 'Add layer'], ['ie-text-update', 'Update layer']]) +
+        '<div id="ie-layers" class="pm-order"><p class="hint">Extra text layers appear here.</p></div>') +
+      group('Shapes, borders & background', select('ie-shape', 'Shape or sticker', [['none', 'None'], ['rectangle', 'Rectangle'],
+        ['circle', 'Circle'], ['triangle', 'Triangle'], ['star', 'Star'], ['heart', 'Heart'], ['arrow', 'Arrow'], ['★', 'Star emoji'], ['❤', 'Heart emoji']]) +
+        color('ie-shape-color', 'Shape colour', '#2563eb') + range('ie-shape-size', 'Shape size', 1, 60, 12, 1, '%') +
+        '<div class="two-cols">' + range('ie-shape-x', 'Shape X', 0, 100, 85, 1, '%') + range('ie-shape-y', 'Shape Y', 0, 100, 15, 1, '%') + '</div>' +
+        range('ie-border-width', 'Border width', 0, 100, 0, 1, 'px') + color('ie-border-color', 'Border colour', '#ffffff') +
+        select('ie-frame', 'Frame style', [['none', 'No frame'], ['rounded', 'Rounded corners'], ['polaroid', 'Polaroid'], ['shadow', 'Drop shadow']]) +
+        check('ie-bg-enable', 'Custom background colour', false) + color('ie-bg-color', 'Background', '#ffffff')) +
+      group('Watermark', textInput('ie-watermark-text', 'Watermark text', '', '© Your name') +
+        '<div class="two-cols">' + select('ie-watermark-pos', 'Position', [['bottom-right', 'Bottom right'], ['bottom-left', 'Bottom left'],
+          ['top-right', 'Top right'], ['top-left', 'Top left'], ['center', 'Centre']]) +
+          range('ie-watermark-size', 'Size', 1, 15, 4, 1, '%') + '</div>' +
+        range('ie-watermark-opacity', 'Opacity', 5, 100, 45, 1, '%') + color('ie-watermark-color', 'Colour', '#ffffff')) +
+      group('Background removal', '<p class="hint">Removes plain, evenly lit backgrounds connected to the image edges. It is a local colour-flood tool, not AI segmentation.</p>' +
+        check('ie-bgremove-enable', 'Remove plain background', false) + range('ie-bgremove-tol', 'Colour tolerance', 5, 160, 45, 1, '') +
+        buttons([['ie-bgremove-apply', 'Apply background removal']])) +
+      group('History & export', buttons([['ie-undo', '↶ Undo'], ['ie-redo', '↷ Redo']]) +
+        select('ie-format', 'Format', [['png', 'PNG'], ['jpeg', 'JPG'], ['webp', 'WebP']]) +
+        range('ie-quality', 'Quality (JPG/WebP)', 0.1, 1, 0.92, 0.01, '') +
+        check('ie-transparent', 'Keep PNG transparency', true) +
+        '<div class="two-cols">' + number('ie-export-w', 'Export width (optional)', 0, 0, 8000, 1) +
+          number('ie-export-h', 'Export height (optional)', 0, 0, 8000, 1) + '</div>');
+    return workspace('image-editor', controls, output('Crop, adjust, annotate and export locally.'));
   },
 
   'heic-viewer': function () {
-    const controls = upload('.heic,.heif,image/heic,image/heif', true, 'HEIC and HEIF files are decoded locally with a bundled libheif build. Unsupported files are reported, never faked.') +
-      group('Download format', select('heic-format', 'Format for previews and downloads', [['png', 'PNG'], ['jpeg', 'JPG']]) +
+    const controls = upload('.heic,.heif,image/heic,image/heif,image/heif-sequence', true, 'HEIC and HEIF files are identified by their ftyp brand and decoded locally with a bundled libheif build.') +
+      group('Source details', '<div class="stat-grid">' +
+        '<div class="stat-tile"><span>Original filename</span><strong id="heic-original-name">—</strong></div>' +
+        '<div class="stat-tile"><span>Detected format</span><strong id="heic-original-format">—</strong></div></div>' +
+        '<p class="hint" id="heic-output-name">Output: choose a format below. The original file is never modified.</p>') +
+      group('Download format', select('heic-format', 'Format for previews and downloads', [['png', 'PNG (lossless)'], ['jpeg', 'JPG (smaller)']]) +
+        range('heic-quality', 'JPG quality', 0.1, 1, 0.92, 0.01, '') +
+        check('heic-orientation', 'Apply EXIF orientation when present', true) +
+        check('heic-transparency', 'Keep alpha channel for PNG', true) +
         buttons([['heic-download-all', 'Download all decoded images']])) +
-      group('How it works', '<p class="hint">Each file is decoded with the local library. Collapsed or unsupported variants appear in the failure list. Choose a thumbnail to inspect a larger preview.</p>');
+      group('How it works', '<p class="hint">Every thumbnail is a decoded variant exposed by the local library. Files are validated by signature before decoding; unsupported brands are reported honestly, never relabelled as JPEG.</p>');
     const out = '<div class="image-output">' +
       '<div class="workspace-head"><h2>Decoded images</h2><span class="pill" id="image-meta">0 decoded</span></div>' +
       '<div class="image-preview-frame"><canvas id="image-preview" width="800" height="480" aria-label="Selected HEIC preview"></canvas></div>' +
@@ -122,13 +200,26 @@ const WORKSPACES = {
   },
 
   'photo-merger': function () {
-    const controls = upload('image/png,image/jpeg,image/webp', true, 'Up to six files are accepted. Order matters: the first image appears first.') +
-      group('Layout', '<div class="opt-row"><label class="opt"><input type="radio" name="pm-direction" value="horizontal" checked> <span>Horizontal row</span></label>' +
-        '<label class="opt"><input type="radio" name="pm-direction" value="vertical"> <span>Vertical stack</span></label></div>') +
-      group('Spacing and background', range('pm-spacing', 'Gap between images', 0, 100, 12, 1, 'px') + color('pm-bg', 'Canvas colour', '#ffffff')) +
+    const controls = upload('image/png,image/jpeg,image/webp', true, 'Up to six files are accepted. Drag the arrows in Image order to change the arrangement.') +
+      group('Layout', '<div class="opt-row">' +
+        '<label class="opt"><input type="radio" name="pm-direction" value="horizontal" checked> <span>Horizontal row</span></label>' +
+        '<label class="opt"><input type="radio" name="pm-direction" value="vertical"> <span>Vertical stack</span></label>' +
+        '<label class="opt"><input type="radio" name="pm-direction" value="grid"> <span>Grid</span></label>' +
+        '<label class="opt"><input type="radio" name="pm-direction" value="custom"> <span>Custom</span></label></div>') +
+      group('Frame size', select('pm-size-mode', 'Sizing', [['original', 'Original sizes'], ['equalWidth', 'Equal width'],
+        ['equalHeight', 'Equal height'], ['equalFrame', 'Equal frames'], ['custom', 'Custom cell size']]) +
+        check('pm-aspect', 'Maintain aspect ratio', true) +
+        select('pm-fit', 'When images differ', [['fit', 'Fit inside frame'], ['fill', 'Fill and crop']]) +
+        '<div class="two-cols">' + number('pm-cell-w', 'Cell width (px)', 0, 0, 8000, 1) +
+          number('pm-cell-h', 'Cell height (px)', 0, 0, 8000, 1) + '</div>' +
+        number('pm-cols', 'Grid columns', 2, 1, 12, 1) +
+        select('pm-align', 'Alignment inside frame', [['center', 'Centre'], ['start', 'Top / left'], ['end', 'Bottom / right']])) +
+      group('Spacing and background', range('pm-spacing', 'Gap between images', 0, 100, 12, 1, 'px') +
+        color('pm-bg', 'Canvas colour', '#ffffff') + range('pm-border-w', 'Border around frames', 0, 40, 0, 1, 'px') +
+        color('pm-border-color', 'Border colour', '#0f172a')) +
       group('Image order', '<div class="pm-order" id="pm-order"><p class="hint">Add images to see their order here.</p></div>') +
       group('Merge', buttons([['pm-merge', 'Merge images']]));
-    return workspace('photo-merger', controls, output('Merged canvas'));
+    return workspace('photo-merger', controls, output('Merged canvas · gaps use the selected canvas colour, not transparency.'));
   },
 
   'screenshot-beautifier': function () {
@@ -201,14 +292,30 @@ const WORKSPACES = {
 
   'image-to-text': function () {
     const controls = group('OCR engine', '<p class="hint" id="ocr-worker-status">Loading local OCR engine…</p>' +
-      '<p class="hint">The Tesseract.js worker and English data load with this page. Your image is recognised in the browser.</p>') +
+      '<p class="hint">The Tesseract.js worker and English data load with this page. Recognition never sends your image anywhere.</p>') +
+      group('Language', select('ocr-language', 'Recognition language', [['eng', 'English (bundled data)']]) +
+        '<p class="hint warning" id="ocr-lang-notice">Only English trained data is present locally. Other languages require their own Tesseract .traineddata file to be supplied and are not offered here.</p>') +
       upload('image/png,image/jpeg,image/webp', false, 'Printed English text works best: large, high-contrast characters on a plain background.') +
+      group('Preprocessing', '<div class="two-cols">' +
+        check('ocr-gray', 'Grayscale') + check('ocr-contrast', 'Boost contrast') +
+        check('ocr-threshold', 'Threshold') + check('ocr-denoise', 'Reduce noise') +
+        check('ocr-deskew', 'Deskew / rotate') + check('ocr-ink', 'Blue / dark ink enhancement') + '</div>' +
+        range('ocr-threshold-level', 'Threshold level', 0, 255, 150, 1, '') +
+        range('ocr-angle', 'Rotation correction', -20, 20, 0, 0.5, '°') +
+        '<p class="hint">These toggles really alter the pixels sent to Tesseract. The processed version is shown on the right.</p>') +
       group('Recognition', buttons([['ocr-extract', 'Extract text', 'btn']])) +
-      group('Result', '<textarea id="ocr-output" class="output-box" rows="9" readonly placeholder="Extracted text appears here after recognition."></textarea>' +
+      group('Result', '<textarea id="ocr-output" class="output-box" rows="9" placeholder="Extracted text appears here after recognition. You can edit it."></textarea>' +
+        '<p class="hint" id="ocr-confidence">Confidence: —</p>' +
+        '<p class="hint warning" id="ocr-warnings" hidden></p>' +
+        range('ocr-preview-size', 'Result preview font size', 12, 36, 18, 1, 'px') +
         buttons([['ocr-copy', 'Copy text'], ['ocr-download', 'Download .txt']]));
     const out = '<div class="image-output">' +
-      '<div class="workspace-head"><h2>Source preview</h2><span class="pill" id="image-meta">No image loaded</span></div>' +
-      '<div class="image-preview-frame"><canvas id="image-preview" width="800" height="480" aria-label="Image being recognised"></canvas></div>' +
+      '<div class="workspace-head"><h2>Source & processed preview</h2><span class="pill" id="image-meta">No image loaded</span></div>' +
+      '<div class="two-cols">' +
+        '<div><p class="hint">Original</p><div class="image-preview-frame"><canvas id="image-preview" width="600" height="300" aria-label="Image being recognised"></canvas></div></div>' +
+        '<div><p class="hint">After preprocessing</p><div class="image-preview-frame"><canvas id="ocr-preview-processed" width="600" height="300" aria-label="Processed OCR image"></canvas></div></div>' +
+      '</div>' +
+      '<pre class="output-box" id="ocr-text-preview" style="max-height:110px;font-size:18px">Extracted text will appear here.</pre>' +
       '<div class="status" id="image-status" role="status" aria-live="polite"></div>' +
       '<p class="hint">Recognition is never perfect. Compare the result with the source, especially punctuation and similar characters.</p>' +
     '</div>';
@@ -216,19 +323,111 @@ const WORKSPACES = {
   },
 
   'qr-code-generator': function () {
-    const controls = group('Content', '<div class="opt-row"><label class="opt"><input type="radio" name="qr-mode" value="text" checked> <span>Text or URL</span></label>' +
-      '<label class="opt"><input type="radio" name="qr-mode" value="image"> <span>Image data URL</span></label></div>' +
-      '<textarea id="qr-text" rows="4" placeholder="Paste a URL or the text you want to encode…"></textarea>' +
-      '<input type="file" id="qr-image-file" accept="image/png,image/jpeg,image/webp">' +
-      '<p class="hint">Image mode only embeds a data URL when it fits the QR capacity. Nothing is uploaded; use a hosted public URL for larger pictures.</p>') +
-      group('Encoding', select('qr-ecc', 'Error correction', [['L', 'Low (largest capacity)'], ['M', 'Medium'], ['Q', 'High'], ['H', 'Highest']]) +
-        range('qr-size', 'Module size', 2, 16, 8, 1, 'px')) +
-      group('Colours and spacing', color('qr-foreground', 'Modules', '#0f172a') + color('qr-background', 'Background', '#ffffff') +
-        range('qr-margin', 'Quiet zone', 2, 8, 4, 1, ' modules')) +
-      group('Generate', buttons([['qr-generate', 'Generate QR code', 'btn'], ['qr-reset', 'Reset QR code']]));
-    return workspace('qr-code-generator', controls, output('QR preview', [
+    const controls = group('Payload type', select('qr-type', 'What should the code contain?', [
+      ['text', 'Plain text'], ['url', 'Website URL'], ['email', 'Email address'], ['phone', 'Phone number'],
+      ['sms', 'SMS'], ['wifi', 'Wi-Fi network'], ['vcard', 'Contact (vCard)'], ['location', 'Map location'],
+      ['calendar', 'Calendar event'], ['whatsapp', 'WhatsApp message'], ['image', 'Image data URL']
+    ]) +
+      '<div class="opt-row" id="qr-mode-row"><label class="opt"><input type="radio" name="qr-mode" value="text" checked> <span>Simple text</span></label>' +
+      '<label class="opt"><input type="radio" name="qr-mode" value="image"> <span>Image data URL</span></label></div>') +
+      group('Payload details', '<div id="qr-fields-text">' + textarea('qr-text', 'Text', 3, 'Paste a URL or the text you want to encode…') + '</div>' +
+        '<div id="qr-fields-url" hidden>' + textInput('qr-url', 'URL', '', 'https://example.com/page') + '</div>' +
+        '<div id="qr-fields-email" hidden>' + textInput('qr-email', 'Email address', '', 'name@example.com') +
+          textInput('qr-subject', 'Subject (optional)', '', 'Hello') +
+          textarea('qr-body', 'Message (optional)', 2, 'Written message…') + '</div>' +
+        '<div id="qr-fields-phone" hidden>' + textInput('qr-phone', 'Phone number', '', '+1 555 0100') + '</div>' +
+        '<div id="qr-fields-sms" hidden>' + textInput('qr-sms-phone', 'Phone number', '', '+1 555 0100') +
+          textarea('qr-message', 'Message', 2, 'Hi, please call me.') + '</div>' +
+        '<div id="qr-fields-wifi" hidden>' + textInput('qr-ssid', 'Network name (SSID)', '', 'My Network') +
+          select('qr-encryption', 'Security', [['WPA', 'WPA / WPA2'], ['WEP', 'WEP'], ['nopass', 'Open network']]) +
+          textInput('qr-password', 'Password', '', 'Network password') + check('qr-hidden', 'Hidden network', false) + '</div>' +
+        '<div id="qr-fields-vcard" hidden>' + textInput('qr-name', 'Full name', '', 'Ada Lovelace') +
+          textInput('qr-org', 'Organisation (optional)', '', 'Example Ltd') +
+          textInput('qr-vcard-phone', 'Phone (optional)', '', '+1 555 0100') +
+          textInput('qr-vcard-email', 'Email (optional)', '', 'ada@example.com') +
+          textInput('qr-vcard-url', 'Website (optional)', '', 'https://example.com') + '</div>' +
+        '<div id="qr-fields-location" hidden>' + '<div class="two-cols">' +
+          number('qr-latitude', 'Latitude', 51.5, -90, 90, 0.000001) + number('qr-longitude', 'Longitude', -0.12, -180, 180, 0.000001) + '</div></div>' +
+        '<div id="qr-fields-calendar" hidden>' + textInput('qr-event-title', 'Event title', '', 'Team meeting') +
+          textInput('qr-event-location', 'Location (optional)', '', 'Meeting room') +
+          '<div class="two-cols">' + textInput('qr-start', 'Starts', '2026-12-01T09:00', 'YYYY-MM-DDTHH:mm') +
+            textInput('qr-end', 'Ends', '2026-12-01T10:00', 'YYYY-MM-DDTHH:mm') + '</div></div>' +
+        '<div id="qr-fields-whatsapp" hidden>' + textInput('qr-whatsapp-phone', 'Number with country code', '', '15550100') +
+          textarea('qr-whatsapp-message', 'Prefilled message (optional)', 2, 'Hello!') + '</div>' +
+        '<div id="qr-fields-image" hidden>' +
+          '<input type="file" id="qr-image-file" accept="image/png,image/jpeg,image/webp">' +
+          '<p class="hint">Small images only. Nothing is uploaded; a data URL is embedded locally.</p></div>' +
+        '<p class="hint warning" id="qr-validation" hidden></p>') +
+      group('Encoding', select('qr-kind', 'Code type', [['qr', 'QR code (2D)'], ['code128', 'Code 128'], ['code39', 'Code 39'],
+        ['ean13', 'EAN-13'], ['ean8', 'EAN-8'], ['upca', 'UPC-A'], ['itf', 'ITF / Interleaved 2 of 5']]) +
+        '<p class="hint" id="qr-kind-note">Barcodes encode short numeric or alphanumeric payloads; choose QR for links, Wi-Fi and contacts.</p>' +
+        check('qr-live', 'Live preview while typing', false) +
+        select('qr-ecc', 'QR error correction', [['L', 'Low (largest capacity)'], ['M', 'Medium'], ['Q', 'High'], ['H', 'Highest']]) +
+        range('qr-size', 'Module size', 2, 16, 8, 1, 'px') +
+        range('qr-bar-height', 'Barcode height', 40, 400, 120, 10, 'px')) +
+      group('Colours, logo & spacing', color('qr-foreground', 'Modules', '#0f172a') +
+        color('qr-background', 'Background', '#ffffff') +
+        range('qr-margin', 'Quiet zone', 2, 8, 4, 1, ' modules') +
+        '<input type="file" id="qr-logo-file" accept="image/png,image/jpeg,image/webp">' +
+        range('qr-logo-size', 'Logo size', 5, 28, 18, 1, '%') +
+        '<p class="hint">A centre logo uses QR error correction. Verify the result before printing.</p>') +
+      group('Generate & verify', buttons([['qr-generate', 'Generate code', 'btn'], ['qr-verify', 'Verify QR'], ['qr-print', 'Print'], ['qr-reset', 'Reset']]));
+    return workspace('qr-code-generator', controls, output('Live code preview', [
       '<button type="button" class="btn btn-secondary btn-small" id="qr-download-svg" disabled>Download SVG</button>'
     ]));
+  },
+
+  'thumbnail-generator': function () {
+    const presets = [
+      ['youtube', 'YouTube thumbnail — 1280×720'], ['shorts', 'YouTube Shorts — 1080×1920'],
+      ['instagram-post', 'Instagram post — 1080×1080'], ['instagram-reel', 'Instagram Reel — 1080×1920'],
+      ['instagram-story', 'Instagram Story — 1080×1920'], ['tiktok', 'TikTok — 1080×1920'],
+      ['facebook-post', 'Facebook post — 1200×630'], ['facebook-cover', 'Facebook cover — 851×315'],
+      ['facebook-video', 'Facebook video — 1280×720'], ['linkedin-post', 'LinkedIn post — 1200×627'],
+      ['linkedin-banner', 'LinkedIn banner — 1584×396'], ['x-post', 'X / Twitter — 1200×675'],
+      ['pinterest', 'Pinterest Pin — 1000×1500'], ['custom', 'Custom size']
+    ];
+    const controls = upload('image/png,image/jpeg,image/webp', true, 'Original or licensed artwork only. Upload one photo per image layer; drag directly on the preview to move layers.') +
+      group('Canvas preset', select('tg-preset', 'Verified size preset', presets) +
+        '<div class="two-cols">' + number('tg-width', 'Width (px)', 1280, 64, 8000, 1) + number('tg-height', 'Height (px)', 720, 64, 8000, 1) + '</div>' +
+        '<p class="hint" id="tg-preset-note">YouTube thumbnails are 1280×720 px.</p>' +
+        chips('tg-preset-chips', [['youtube', 'YouTube'], ['instagram-post', 'Instagram'], ['tiktok', 'TikTok'], ['linkedin-post', 'LinkedIn']])) +
+      group('Background & layout', select('tg-bg-type', 'Background', [['gradient', 'Gradient'], ['solid', 'Solid colour'], ['transparent', 'Transparent']]) +
+        color('tg-color1', 'First / solid colour', '#0f172a') + color('tg-color2', 'Second colour', '#2563eb') +
+        range('tg-padding', 'Image padding', 0, 200, 40, 1, 'px') + range('tg-radius', 'Corner radius', 0, 120, 18, 1, 'px') +
+        range('tg-shadow', 'Shadow strength', 0, 100, 35, 1, '%') +
+        check('tg-remove-bg', 'Remove plain photo background', false) +
+        range('tg-bg-tolerance', 'Background colour tolerance', 5, 160, 45, 1, '')) +
+      group('Layers', textInput('tg-layer-name', 'Layer name', 'Title', 'Text, sticker or photo') +
+        select('tg-layer-type', 'Layer type', [['text', 'Text'], ['shape', 'Shape'], ['sticker', 'Emoji / sticker'], ['image', 'Uploaded image']]) +
+        textarea('tg-text', 'Text or emoji', 2, 'Add a headline, label or emoji…') +
+        '<div class="two-cols">' + select('tg-font', 'Font', [['700 system-ui, sans-serif', 'Sans bold'], ['800 Georgia, serif', 'Serif bold'],
+          ['900 Impact, sans-serif', 'Impact'], ['ui-monospace, Consolas, monospace', 'Monospace']]) +
+          number('tg-font-size', 'Font size (px)', 92, 8, 500, 1) + '</div>' +
+        color('tg-text-color', 'Colour', '#ffffff') + color('tg-outline-color', 'Outline colour', '#0f172a') +
+        range('tg-outline-width', 'Outline width', 0, 20, 5, 1, 'px') +
+        check('tg-text-shadow', 'Text shadow', true) +
+        select('tg-align', 'Text alignment', [['left', 'Left'], ['center', 'Centre'], ['right', 'Right']]) +
+        range('tg-layer-rotation', 'Layer rotation', -180, 180, 0, 1, '°') +
+        '<div class="two-cols">' + range('tg-layer-x', 'X position', 0, 100, 50, 1, '%') + range('tg-layer-y', 'Y position', 0, 100, 50, 1, '%') + '</div>' +
+        '<div class="two-cols">' + range('tg-layer-w', 'Width', 2, 100, 70, 1, '%') + range('tg-layer-h', 'Height', 2, 100, 30, 1, '%') + '</div>' +
+        buttons([['tg-layer-add', 'Add layer'], ['tg-layer-update', 'Update'], ['tg-layer-duplicate', 'Duplicate'], ['tg-layer-delete', 'Delete']]) +
+        '<div class="pm-order" id="tg-layers"><p class="hint">No extra layers yet.</p></div>') +
+      group('Templates & stickers', '<p class="hint">All templates are original layouts built from shapes, text and system emoji.</p>' +
+        chips('tg-templates', [['bold', 'Bold headline'], ['quote', 'Quote card'], ['badge', 'Sale badge'], ['split', 'Split photo']]) +
+        chips('tg-stickers', [['★', '★'], ['❤', '❤'], ['✓', '✓'], ['→', '→'], ['●', '●'], ['◆', '◆'], ['🎉', '🎉'], ['🔥', '🔥']])) +
+      group('Photo adjustments', '<div class="two-cols">' +
+        range('tg-brightness', 'Brightness', 0, 200, 100, 1, '%') + range('tg-contrast', 'Contrast', 0, 200, 100, 1, '%') +
+        range('tg-saturation', 'Saturation', 0, 200, 100, 1, '%') + range('tg-blur', 'Blur', 0, 12, 0, 0.5, 'px') + '</div>' +
+        select('tg-filter', 'Filter', [['none', 'None'], ['vivid', 'Vivid'], ['mono', 'Mono'], ['warm', 'Warm'], ['cool', 'Cool']])) +
+      group('Alignment & history', check('tg-guides', 'Show alignment guides', true) +
+        buttons([['tg-align-left', '⇤ Left'], ['tg-align-center', '↔ Centre'], ['tg-align-right', '⇥ Right'],
+          ['tg-align-top', '↑ Top'], ['tg-align-middle', '↕ Middle'], ['tg-align-bottom', '↓ Bottom']]) +
+        buttons([['tg-undo', '↶ Undo'], ['tg-redo', '↷ Redo']])) +
+      group('Export', select('tg-format', 'Format', [['png', 'PNG'], ['jpeg', 'JPG'], ['webp', 'WebP']]) +
+        range('tg-quality', 'Quality (JPG/WebP)', 0.1, 1, 0.92, 0.01, '') +
+        '<p class="hint">Drag a layer on the preview to reposition it. Use the layer sliders for precise size and rotation. Touch dragging works too.</p>');
+    return workspace('thumbnail-generator', controls, output('Thumbnail canvas · drag layers to edit'));
   },
 
   'image-compressor': function () {
@@ -245,7 +444,7 @@ const WORKSPACES = {
 const VENDOR_SCRIPTS = {
   'heic-viewer': ['js/vendor/libheif-bundle.js'],
   'image-to-text': ['js/vendor/tesseract.min.js'],
-  'qr-code-generator': ['js/vendor/qrcode-generator.js']
+  'qr-code-generator': ['js/vendor/qrcode-generator.js', 'js/vendor/jsQR.js']
 };
 
 function has(engine) {

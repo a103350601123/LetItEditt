@@ -822,12 +822,7 @@
       if (row.balance !== null) { row.check = running === null ? null : (Math.abs((running + row.amount) - row.balance) < 0.005 ? 'ok' : 'bad'); running = row.balance; }
       else row.check = null;
     });
-    const bad = rows.filter(function (r) { return r.check === 'bad'; }).length;
-    return {
-      rows: rows, totalIn: moneyIn, totalOut: moneyOut,
-      check: !rows.length ? 'none' : (bad ? 'rows' : (running !== null ? 'ok' : 'none')),
-      badRows: bad
-    };
+    return finalizeStatement(rows, opts);
   }
 
   function csvEscape(value) {
@@ -855,6 +850,848 @@
       out.push('^');
     });
     return out.join('\n');
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 15 — Safe find & replace with ranges, counting and highlighting
+   * ------------------------------------------------------------------ */
+  function literalPattern(value) { return str(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+  function compileFind(options) {
+    const opts = options || {};
+    const find = str(opts.find);
+    if (!find) return { error: 'empty', message: 'Enter text to find.' };
+    const caseSensitive = opts.caseSensitive === true;
+    // Legacy behaviour: dropping case sensitivity used to switch on live regex.
+    // An explicit `regex` option now lets callers separate the two ideas.
+    const regex = opts.regex === true ? true : (caseSensitive ? false : (opts.regex === undefined ? true : false));
+    let pattern = regex ? find : literalPattern(find);
+    if (opts.wholeWord === true) {
+      const boundary = /^\w/.test(pattern) ? '\\b' : '(?<!\\w)';
+      const tail = /\w$/.test(pattern) ? '\\b' : '(?!\\w)';
+      pattern = boundary + '(?:' + pattern + ')' + tail;
+    }
+    if (regex && /(\([^()]*[+*][^()]*\))[+*{]/.test(find)) {
+      return { error: 'unsafe', message: 'This pattern has nested repetition and could slow the browser. Simplify it before running.', pattern: find, regex: true };
+    }
+    let re;
+    try { re = new RegExp(pattern, caseSensitive ? 'g' : 'gi'); }
+    catch (e) { return { error: 'invalid', message: e && e.message ? e.message : 'Invalid pattern.', pattern: find, regex: regex }; }
+    return { error: null, re: re, pattern: find, regex: regex, caseSensitive: caseSensitive };
+  }
+
+  function findMatches(text, options) {
+    const src = str(text);
+    const compiled = compileFind(options);
+    if (compiled.error) {
+      return { matches: [], error: compiled.error, message: compiled.message, pattern: compiled.pattern, regex: compiled.regex === true };
+    }
+    const matches = [];
+    let match;
+    while ((match = compiled.re.exec(src)) !== null) {
+      matches.push({ index: match.index, end: match.index + match[0].length, text: match[0] });
+      if (match[0].length === 0) compiled.re.lastIndex++;
+      if (matches.length >= 10000) break;
+    }
+    return { matches: matches, error: null, message: '', pattern: compiled.pattern, regex: compiled.regex, count: matches.length };
+  }
+
+  function replaceText(text, options) {
+    const src = str(text);
+    const opts = options || {};
+    const found = findMatches(src, opts);
+    if (found.error) return { text: src, count: 0, matches: [], error: found.error, message: found.message };
+    if (!found.matches.length) return { text: src, count: 0, matches: [], error: null, message: 'No matches.' };
+    const replacement = str(opts.replace);
+    let out = src;
+    let count = 0;
+    if (opts.onlyIndex !== undefined && opts.onlyIndex !== null) {
+      const target = found.matches[Number(opts.onlyIndex)];
+      if (target) {
+        const insert = found.regex ? replacement : replacement.replace(/\$/g, '$$$$');
+        out = src.slice(0, target.index) + insert + src.slice(target.end);
+        count = 1;
+      }
+    } else if (found.regex) {
+      const compiled = compileFind(opts);
+      out = src.replace(compiled.re, replacement);
+      count = found.matches.length;
+    } else {
+      const insert = replacement.replace(/\$/g, '$$$$');
+      // Rebuild from ranges so literal `$` stays literal and whole-word
+      // boundaries never leak into the output.
+      found.matches.slice().reverse().forEach(function (match) {
+        out = out.slice(0, match.index) + insert + out.slice(match.end);
+      });
+      count = found.matches.length;
+    }
+    return { text: out, count: count, matches: found.matches, error: null, message: '' };
+  }
+
+  function highlightSegments(text, matches, activeIndex) {
+    const src = str(text);
+    const segments = [];
+    let cursor = 0;
+    (matches || []).forEach(function (match, index) {
+      if (match.index < cursor) return;
+      if (match.index > cursor) segments.push({ text: src.slice(cursor, match.index), hit: false, active: false, start: cursor, end: match.index });
+      segments.push({ text: src.slice(match.index, match.end), hit: true, active: index === Number(activeIndex), start: match.index, end: match.end });
+      cursor = match.end;
+    });
+    if (cursor < src.length) segments.push({ text: src.slice(cursor), hit: false, active: false, start: cursor, end: src.length });
+    return segments;
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 16 — Format-preserving line and punctuation helpers
+   * ------------------------------------------------------------------ */
+  function normalizeNewlines(value) { return str(value).replace(/\r\n?/g, '\n'); }
+
+  function removeEmptyLines(text, options) {
+    const opts = options || {};
+    const lines = normalizeNewlines(text).split('\n');
+    if (opts.preserveParagraphs !== true) return lines.filter(function (line) { return line.trim() !== ''; }).join('\n');
+    const out = [];
+    let previousEmpty = false;
+    lines.forEach(function (line) {
+      const empty = line.trim() === '';
+      if (empty) {
+        if (out.length && !previousEmpty) out.push('');
+        previousEmpty = true;
+      } else {
+        out.push(line);
+        previousEmpty = false;
+      }
+    });
+    while (out.length && out[out.length - 1] === '') out.pop();
+    return out.join('\n');
+  }
+
+  function removePunctuation(text, options) {
+    const opts = options || {};
+    const mode = opts.types || 'all';
+    if (mode === 'custom') {
+      const chars = str(opts.chars).replace(/[\\\]^-]/g, '\\$&');
+      return chars ? str(text).replace(new RegExp('[' + chars + ']', 'gu'), '') : str(text);
+    }
+    if (mode === 'common') return str(text).replace(/[.,!?;:'"()\[\]{}]/g, '');
+    return str(text).replace(/[\p{P}]/gu, '');
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 17 — Line/word diff (safe DOM rendering happens in the runtime)
+   * ------------------------------------------------------------------ */
+  function compareTexts(left, right, options) {
+    const opts = options || {};
+    const split = function (value) {
+      const text = normalizeNewlines(value);
+      return opts.unit === 'words' ? (text.match(/\S+/g) || []) : text.split('\n');
+    };
+    const a = split(left), b = split(right);
+    const max = 1200;
+    if (a.length > max || b.length > max) {
+      return { ok: false, error: 'Comparison is limited to ' + max + ' ' + (opts.unit === 'words' ? 'words' : 'lines') + ' per side to keep your browser fast.', ops: [], added: 0, removed: 0 };
+    }
+    const n = a.length, m = b.length;
+    const dp = [];
+    for (let i = 0; i <= n; i++) dp.push(new Uint16Array(m + 1));
+    for (let i = n - 1; i >= 0; i--) {
+      for (let j = m - 1; j >= 0; j--) dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    }
+    const ops = [];
+    let i = 0, j = 0, added = 0, removed = 0;
+    while (i < n && j < m) {
+      if (a[i] === b[j]) { ops.push({ type: 'equal', value: a[i] }); i++; j++; }
+      else if (dp[i + 1][j] >= dp[i][j + 1]) { ops.push({ type: 'remove', value: a[i] }); removed++; i++; }
+      else { ops.push({ type: 'add', value: b[j] }); added++; j++; }
+    }
+    while (i < n) { ops.push({ type: 'remove', value: a[i++] }); removed++; }
+    while (j < m) { ops.push({ type: 'add', value: b[j++] }); added++; }
+    return { ok: true, error: '', ops: ops, added: added, removed: removed };
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 18 — HTML to Markdown (pure parser, no DOM dependency)
+   * ------------------------------------------------------------------ */
+  const HTML_VOID = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']);
+  const HTML_SKIP = new Set(['script', 'style', 'noscript', 'template', 'head', 'svg', 'canvas']);
+  const HTML_ENTITIES = {
+    amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: '\u00a0', copy: '\u00a9', reg: '\u00ae',
+    trade: '\u2122', hellip: '\u2026', mdash: '\u2014', ndash: '\u2013', laquo: '\u00ab', raquo: '\u00bb',
+    lsquo: '\u2018', rsquo: '\u2019', ldquo: '\u201c', rdquo: '\u201d', bull: '\u2022', middot: '\u00b7',
+    times: '\u00d7', divide: '\u00f7', euro: '\u20ac', pound: '\u00a3', yen: '\u00a5', cent: '\u00a2',
+    deg: '\u00b0', plusmn: '\u00b1', frac12: '\u00bd', frac14: '\u00bc', frac34: '\u00be', shy: '\u00ad'
+  };
+
+  function decodeHtmlEntities(text) {
+    return str(text).replace(/&(#x[0-9a-f]+|#\d+|[a-z][a-z0-9]+);/gi, function (whole, name) {
+      if (name.charAt(0) === '#') {
+        const hex = /^#x/i.test(name);
+        const code = parseInt(name.slice(hex ? 2 : 1), hex ? 16 : 10);
+        if (!Number.isFinite(code) || code < 0 || code > 0x10ffff) return whole;
+        try { return String.fromCodePoint(code); } catch (e) { return whole; }
+      }
+      const key = name.toLowerCase();
+      return Object.prototype.hasOwnProperty.call(HTML_ENTITIES, key) ? HTML_ENTITIES[key] : whole;
+    });
+  }
+
+  function parseHtmlAttributes(raw) {
+    const attrs = {};
+    const re = /([^\s=/>]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'`=<>]+)))?/g;
+    let match;
+    while ((match = re.exec(str(raw))) !== null) {
+      const key = match[1].toLowerCase();
+      if (!Object.prototype.hasOwnProperty.call(attrs, key)) {
+        attrs[key] = decodeHtmlEntities(match[2] !== undefined ? match[2] : (match[3] !== undefined ? match[3] : (match[4] !== undefined ? match[4] : '')));
+      }
+    }
+    return attrs;
+  }
+
+  function tokenizeHtml(source) {
+    const src = str(source);
+    const tokens = [];
+    let i = 0;
+    while (i < src.length) {
+      if (src.charAt(i) !== '<') {
+        const next = src.indexOf('<', i);
+        const end = next < 0 ? src.length : next;
+        tokens.push({ type: 'text', value: decodeHtmlEntities(src.slice(i, end)) });
+        i = end;
+        continue;
+      }
+      if (src.slice(i, i + 4) === '<!--') {
+        const end = src.indexOf('-->', i + 4);
+        i = end < 0 ? src.length : end + 3;
+        continue;
+      }
+      if (/^<(?:!|\?)/.test(src.slice(i))) {
+        const end = src.indexOf('>', i + 1);
+        i = end < 0 ? src.length : end + 1;
+        continue;
+      }
+      let j = i + 1, quote = '';
+      while (j < src.length) {
+        const ch = src.charAt(j);
+        if (quote) { if (ch === quote) quote = ''; }
+        else if (ch === '"' || ch === "'") quote = ch;
+        else if (ch === '>') break;
+        j++;
+      }
+      if (j >= src.length) { tokens.push({ type: 'text', value: decodeHtmlEntities(src.slice(i)) }); break; }
+      const raw = src.slice(i, j + 1);
+      i = j + 1;
+      const parsed = raw.match(/^<\s*(\/)?\s*([a-zA-Z][\w:-]*)\s*([\s\S]*?)\s*(\/)?>$/);
+      if (!parsed) { tokens.push({ type: 'text', value: decodeHtmlEntities(raw) }); continue; }
+      const name = parsed[2].toLowerCase();
+      if (!parsed[1] && HTML_SKIP.has(name)) {
+        const relative = src.slice(i).search(new RegExp('</\\s*' + name + '\\s*>', 'i'));
+        if (relative >= 0) {
+          const close = src.indexOf('>', i + relative);
+          i = close < 0 ? src.length : close + 1;
+        }
+        continue;
+      }
+      tokens.push({
+        type: 'tag', name: name, closing: !!parsed[1],
+        selfClosing: !!parsed[4] || HTML_VOID.has(name),
+        attrs: parseHtmlAttributes(parsed[3])
+      });
+    }
+    return tokens;
+  }
+
+  function buildHtmlTree(tokens) {
+    const root = { name: '#root', attrs: {}, children: [] };
+    const stack = [root];
+    function top() { return stack[stack.length - 1]; }
+    function close(name) {
+      for (let k = stack.length - 1; k > 0; k--) {
+        if (stack[k].name === name) { stack.length = k; return; }
+      }
+    }
+    tokens.forEach(function (token) {
+      if (token.type === 'text') { top().children.push(token); return; }
+      if (token.closing) { close(token.name); return; }
+      if (token.name === 'li') close('li');
+      if (token.name === 'p' || /^h[1-6]$/.test(token.name)) close('p');
+      if (token.name === 'tr') { close('td'); close('th'); close('tr'); }
+      if (token.name === 'td' || token.name === 'th') { close('td'); close('th'); }
+      const node = { name: token.name, attrs: token.attrs, children: [] };
+      top().children.push(node);
+      if (!token.selfClosing) stack.push(node);
+    });
+    return root;
+  }
+
+  function escapeMarkdownText(text) {
+    return str(text)
+      .replace(/\\/g, '\\\\').replace(/([*_\[\]<>])/g, '\\$1')
+      .replace(/\u00a0/g, ' ');
+  }
+
+  function nodeText(node) {
+    if (!node) return '';
+    if (node.type === 'text') return node.value;
+    return (node.children || []).map(nodeText).join('');
+  }
+
+  function inlineCode(value) {
+    const text = str(value).replace(/\r?\n/g, ' ');
+    const longest = (text.match(/`+/g) || ['']).reduce(function (a, b) { return b.length > a.length ? b : a; }, '');
+    const fence = '`'.repeat(longest.length + 1);
+    const padded = (text.charAt(0) === '`' || text.charAt(text.length - 1) === '`') ? ' ' + text + ' ' : text;
+    return fence + padded + fence;
+  }
+
+  function stripTaskInputs(nodes) {
+    const kept = [];
+    let checked = null;
+    function walk(list) {
+      return list.filter(function (node) {
+        if (node.name === 'input' && String(node.attrs.type || '').toLowerCase() === 'checkbox') {
+          if (checked === null) checked = node.attrs.checked !== undefined || String(node.attrs.checked || '').toLowerCase() === 'true';
+          return false;
+        }
+        if (node.children) node.children = walk(node.children);
+        return true;
+      });
+    }
+    walk(nodes.slice());
+    kept.push.apply(kept, nodes);
+    return { nodes: kept, checked: checked };
+  }
+
+  function renderMarkdownList(node, ctx) {
+    const ordered = node.name === 'ol';
+    const depth = Math.min(ctx.depth || 0, 8);
+    const indent = '  '.repeat(depth);
+    let counter = parseInt(node.attrs.start, 10);
+    if (!Number.isFinite(counter)) counter = 1;
+    const lines = [];
+    node.children.forEach(function (child) {
+      if (child.name !== 'li') return;
+      const nested = child.children.filter(function (n) { return n.name === 'ul' || n.name === 'ol'; });
+      const content = child.children.filter(function (n) { return n.name !== 'ul' && n.name !== 'ol'; });
+      const task = stripTaskInputs(content);
+      const body = renderMarkdownNodes(task.nodes, ctx).replace(/\s*\n+\s*$/, '').trim();
+      const marker = ordered ? (counter++) + '. ' : '- ';
+      const prefix = task.checked === null ? '' : (task.checked ? '[x] ' : '[ ] ');
+      lines.push(indent + marker + prefix + body);
+      nested.forEach(function (sub) {
+        const rendered = renderMarkdownList(sub, { depth: depth + 1 });
+        lines.push(rendered.replace(/\n+$/, ''));
+      });
+    });
+    return lines.length ? lines.join('\n') + '\n\n' : '';
+  }
+
+  function renderMarkdownTable(node, ctx) {
+    const rows = [];
+    function collect(current) {
+      (current.children || []).forEach(function (child) {
+        if (child.name === 'tr') rows.push(child);
+        else if (child.name === 'thead' || child.name === 'tbody' || child.name === 'tfoot' || child.name === 'table') collect(child);
+      });
+    }
+    collect(node);
+    if (!rows.length) return '';
+    const cells = rows.map(function (row) {
+      return row.children.filter(function (cell) { return cell.name === 'td' || cell.name === 'th'; }).map(function (cell) {
+        return renderMarkdownNodes(cell.children, ctx).replace(/\s*\n+\s*/g, ' ').replace(/\|/g, '\\|').trim();
+      });
+    }).filter(function (row) { return row.length; });
+    if (!cells.length) return '';
+    const width = cells.reduce(function (max, row) { return Math.max(max, row.length); }, 0);
+    const normalized = cells.map(function (row) { return row.concat(Array(width - row.length).fill('')); });
+    const header = normalized.shift();
+    const line = function (row) { return '| ' + row.join(' | ') + ' |'; };
+    return line(header) + '\n' + '| ' + header.map(function () { return '---'; }).join(' | ') + ' |' +
+      (normalized.length ? '\n' + normalized.map(line).join('\n') : '') + '\n\n';
+  }
+
+  function renderMarkdownNodes(nodes, ctx) {
+    const context = ctx || {};
+    return (nodes || []).map(function (node) {
+      if (node.type === 'text') return escapeMarkdownText(node.value);
+      const name = node.name;
+      const children = function () { return renderMarkdownNodes(node.children, context); };
+      const inline = function () { return children().replace(/\s*\n+\s*/g, ' ').trim(); };
+      if (/^h[1-6]$/.test(name)) return '#'.repeat(Number(name.charAt(1))) + ' ' + inline() + '\n\n';
+      if (name === 'p' || name === 'div' || name === 'section' || name === 'article' || name === 'main' || name === 'aside' || name === 'header' || name === 'footer') {
+        const text = children().trim();
+        return text ? text + '\n\n' : '';
+      }
+      if (name === 'br') return '  \n';
+      if (name === 'hr') return '---\n\n';
+      if (name === 'blockquote') {
+        const lines = children().trim().split('\n').map(function (line) { return '> ' + line.replace(/^\s+/, ''); });
+        return lines.join('\n') + '\n\n';
+      }
+      if (name === 'pre') {
+        const raw = nodeText(node).replace(/^\n+|\n+$/g, '');
+        const fence = raw.indexOf('```') !== -1 ? '````' : '```';
+        const language = /^language-([\w-]+)/.exec(String(node.attrs.class || ''));
+        return fence + (language ? language[1] : '') + '\n' + raw + '\n' + fence + '\n\n';
+      }
+      if (name === 'code') return inlineCode(nodeText(node)) + (context.inBlock ? '' : '');
+      if (name === 'ul' || name === 'ol') return renderMarkdownList(node, context);
+      if (name === 'table') return renderMarkdownTable(node, context);
+      if (name === 'a') {
+        const label = inline();
+        const href = str(node.attrs.href || '');
+        if (!href) return label;
+        const safe = href.replace(/[()]/g, function (ch) { return '\\' + ch; }).replace(/[<>]/g, '');
+        const title = node.attrs.title ? ' "' + str(node.attrs.title).replace(/"/g, '\\"') + '"' : '';
+        return '[' + label + '](' + safe + title + ')';
+      }
+      if (name === 'img') {
+        const alt = str(node.attrs.alt || '').replace(/[\[\]]/g, '\\$&');
+        const src = str(node.attrs.src || '').replace(/[()]/g, function (ch) { return '\\' + ch; });
+        if (!src) return alt ? '![' + alt + ']()' : '';
+        const title = node.attrs.title ? ' "' + str(node.attrs.title).replace(/"/g, '\\"') + '"' : '';
+        return '![' + alt + '](' + src + title + ')';
+      }
+      if (name === 'strong' || name === 'b') { const text = inline(); return text ? '**' + text + '**' : ''; }
+      if (name === 'em' || name === 'i') { const text = inline(); return text ? '*' + text + '*' : ''; }
+      if (name === 'del' || name === 's' || name === 'strike') { const text = inline(); return text ? '~~' + text + '~~' : ''; }
+      if (name === 'input') {
+        if (String(node.attrs.type || '').toLowerCase() === 'checkbox') return node.attrs.checked !== undefined ? '[x]' : '[ ]';
+        return '';
+      }
+      if (name === 'li') { const text = children().trim(); return text ? '- ' + text + '\n' : ''; }
+      if (name === 'dt') return '**' + inline() + '**\n';
+      if (name === 'dd') return ': ' + inline() + '\n\n';
+      return children();
+    }).join('');
+  }
+
+  function htmlToMarkdown(html) {
+    const tree = buildHtmlTree(tokenizeHtml(html));
+    const body = documentBody(tree);
+    return renderMarkdownNodes(body.children, {}).replace(/\n{3,}/g, '\n\n').trim();
+  }
+
+  function documentBody(tree) {
+    function find(node) {
+      if (node.name === 'body') return node;
+      const children = node.children || [];
+      for (let i = 0; i < children.length; i++) {
+        if (children[i].name === 'body') return children[i];
+        const nested = find(children[i]);
+        if (nested) return nested;
+      }
+      return null;
+    }
+    return find(tree) || tree;
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 19 — URL extraction with strict validation and stable de-duplication
+   * ------------------------------------------------------------------ */
+  const URL_CANDIDATE_RE = /(?:https?:\/\/|www\.)[^\s<>"'`]+|(?<![\w@./:-])(?:[a-z0-9-]+\.)+[a-z]{2,}(?::\d{1,5})?(?:\/[^\s<>"'`]*)?/gi;
+
+  function trimUrlEdges(raw) {
+    let value = str(raw).trim();
+    value = value.replace(/^[([{"'<]+/, '');
+    while (value.length) {
+      const last = value.charAt(value.length - 1);
+      if ('.,;:!?\'"'.indexOf(last) !== -1) { value = value.slice(0, -1); continue; }
+      if (last === ')' && (value.split('(').length - 1) < (value.split(')').length - 1)) { value = value.slice(0, -1); continue; }
+      if (last === ']' && (value.split('[').length - 1) < (value.split(']').length - 1)) { value = value.slice(0, -1); continue; }
+      if (last === '}' && (value.split('{').length - 1) < (value.split('}').length - 1)) { value = value.slice(0, -1); continue; }
+      break;
+    }
+    return value;
+  }
+
+  function normalizedUrl(value) {
+    if (/^https?:\/\//i.test(value)) return value.replace(/^HTTP/i, 'http');
+    if (/^www\./i.test(value)) return 'https://' + value;
+    return 'https://' + value;
+  }
+
+  function isValidUrl(value) {
+    try {
+      const parsed = new URL(value);
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return false;
+      const host = parsed.hostname;
+      if (!host || host.indexOf('.') === -1) return false;
+      return host.split('.').every(function (label) { return /^[a-z0-9-]+$/i.test(label) && label.charAt(0) !== '-' && label.charAt(label.length - 1) !== '-'; }) &&
+        /^[a-z]{2,}$/i.test(host.split('.').pop());
+    } catch (e) { return false; }
+  }
+
+  function extractUrls(text) {
+    const src = str(text);
+    const urls = [];
+    const seen = Object.create(null);
+    const re = new RegExp(URL_CANDIDATE_RE.source, 'gi');
+    let match;
+    while ((match = re.exec(src)) !== null) {
+      const raw = trimUrlEdges(match[0]);
+      if (!raw) continue;
+      const value = normalizedUrl(raw);
+      if (!isValidUrl(value)) continue;
+      const key = value.toLowerCase();
+      if (seen[key]) continue;
+      seen[key] = true;
+      urls.push({ value: value, original: raw, start: match.index, end: match.index + match[0].length });
+    }
+    return { urls: urls, count: urls.length, unique: urls.length, text: urls.map(function (item) { return item.value; }).join('\n') };
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 20 — Local rule-based English grammar and spelling checker
+   * ------------------------------------------------------------------ */
+  const SPELLING_MAP = {
+    teh: 'the', recieve: 'receive', recieved: 'received', seperate: 'separate', definately: 'definitely',
+    occured: 'occurred', occuring: 'occurring', becuase: 'because', adress: 'address', 'alot': 'a lot',
+    alotof: 'a lot of', thier: 'their', freind: 'friend', freinds: 'friends', wich: 'which',
+    untill: 'until', untillnow: 'until now', begining: 'beginning', comming: 'coming', runing: 'running',
+    writting: 'writing', usefull: 'useful', carefull: 'careful', helpfull: 'helpful', sucess: 'success',
+    sucessful: 'successful', publically: 'publicly', acadmic: 'academic', enviroment: 'environment',
+    goverment: 'government', independant: 'independent', neccessary: 'necessary', ocurrance: 'occurrence',
+    persistant: 'persistent', preceed: 'precede', priviledge: 'privilege', recomend: 'recommend',
+    reccommend: 'recommend', responsability: 'responsibility', similiar: 'similar', suprise: 'surprise',
+    tommorow: 'tomorrow', tuesday: 'Tuesday', wednesday: 'Wednesday', thursday: 'Thursday',
+    wendsday: 'Wednesday', febuary: 'February', calender: 'calendar', concious: 'conscious',
+    embarass: 'embarrass', existance: 'existence', foriegn: 'foreign', fourty: 'forty',
+    guage: 'gauge', harrass: 'harass', hierachy: 'hierarchy', irresistable: 'irresistible',
+    liason: 'liaison', maintenence: 'maintenance', millenium: 'millennium', noticable: 'noticeable',
+    occassion: 'occasion', posession: 'possession', questionaire: 'questionnaire', reffered: 'referred',
+    relavant: 'relevant', restarant: 'restaurant', schedual: 'schedule', speach: 'speech',
+    temperary: 'temporary', tendancy: 'tendency', travell: 'travel', truely: 'truly',
+    unfortunatly: 'unfortunately', wether: 'whether', wichone: 'which one', writen: 'written'
+  };
+  const GRAMMAR_PHRASES = [
+    ['i are', ['I am'], 'Use “I am” with the subject I.'],
+    ['he do', ['he does'], 'Third-person singular takes “does”.'],
+    ['she do', ['she does'], 'Third-person singular takes “does”.'],
+    ['it do', ['it does'], 'Third-person singular takes “does”.'],
+    ['they was', ['they were'], 'Use the plural verb “were” with they.'],
+    ['we was', ['we were'], 'Use the plural verb “were” with we.'],
+    ['you was', ['you were'], 'Use “you were” in standard English.'],
+    ['would of', ['would have'], '“Would have” is the correct written form.'],
+    ['could of', ['could have'], '“Could have” is the correct written form.'],
+    ['should of', ['should have'], '“Should have” is the correct written form.'],
+    ['must of', ['must have'], '“Must have” is the correct written form.'],
+    ['irregardless', ['regardless'], '“Irregardless” is nonstandard; use “regardless”.'],
+    ['more better', ['better'], '“Better” is already comparative.'],
+    ['most best', ['best'], '“Best” is already superlative.'],
+    ['different than', ['different from'], 'Standard written English prefers “different from”.'],
+    ['a apple', ['an apple'], 'Use “an” before a vowel sound.'],
+    ['a hour', ['an hour'], 'Use “an” before a vowel sound.']
+  ];
+  const CLARITY_PHRASES = [
+    ['in order to', ['to'], 'A shorter way to express purpose.'],
+    ['due to the fact that', ['because'], '“Because” is more direct.'],
+    ['at this point in time', ['now'], 'A more concise wording.'],
+    ['make a decision', ['decide'], 'Prefer the direct verb.'],
+    ['conduct an investigation', ['investigate'], 'Prefer the direct verb.'],
+    ['give consideration to', ['consider'], 'Prefer the direct verb.'],
+    ['as a matter of fact', ['in fact'], 'A more concise transition.'],
+    ['in the event that', ['if'], 'A more concise condition.'],
+    ['for the purpose of', ['for'], 'A more concise phrasing.'],
+    ['very unique', ['unique'], '“Unique” is already absolute.'],
+    ['completely finished', ['finished'], 'Avoid redundant intensifiers.'],
+    ['end result', ['result'], 'Avoid redundant wording.']
+  ];
+  const STYLE_RULES = [
+    { styles: ['Professional', 'Casual'], pattern: /\b(kinda|sorta|gonna|wanna)\b/gi, keys: ['kinda', 'sorta', 'gonna', 'wanna'], replacements: ['somewhat', 'somewhat', 'going to', 'want to'], explanation: 'A more professional wording is available.' },
+    { styles: ['Professional', 'Academic'], pattern: /\bstuff\b/gi, keys: [''], replacements: ['material'], explanation: 'Consider a more specific noun in formal writing.' },
+    { styles: ['Formal'], pattern: /\b(can't|cannot|don't|doesn't|won't|isn't|aren't|it's|I'm|we're|they're)\b/gi, keys: ["can't", 'cannot', "don't", "doesn't", "won't", "isn't", "aren't", "it's", "i'm", "we're", "they're"], replacements: ['cannot', 'cannot', 'do not', 'does not', 'will not', 'is not', 'are not', 'it is', 'I am', 'we are', 'they are'], explanation: 'Formal writing usually avoids contractions.' },
+    { styles: ['Casual', 'Simple English'], pattern: /\b(utilize|commence|terminate|facilitate)\b/gi, keys: ['utilize', 'commence', 'terminate', 'facilitate'], replacements: ['use', 'start', 'end', 'help'], explanation: 'A plainer word is available.' },
+    { styles: ['Simple English'], pattern: /\b(aforementioned|nevertheless|subsequently)\b/gi, keys: ['aforementioned', 'nevertheless', 'subsequently'], replacements: ['previously mentioned', 'however', 'later'], explanation: 'A simpler wording is available.' },
+    { styles: ['Academic'], pattern: /\b(get|show)\b/gi, keys: ['get', 'show'], replacements: ['obtain', 'demonstrate'], explanation: 'A more academic verb is available.' }
+  ];
+  const GRAMMAR_CATEGORIES = ['spelling', 'grammar', 'punctuation', 'repeated', 'clarity', 'style'];
+
+  function matchCase(original, replacement) {
+    if (!original || !replacement) return replacement;
+    if (original === original.toUpperCase() && /[A-Z]/.test(original)) return replacement.toUpperCase();
+    if (original.charAt(0) === original.charAt(0).toUpperCase() && /[A-Z]/.test(original.charAt(0))) {
+      return replacement.charAt(0).toUpperCase() + replacement.slice(1);
+    }
+    return replacement;
+  }
+
+  function grammarSuggestion(base, original, start, end) {
+    const replacements = (base.replacements || []).map(function (item) { return matchCase(original, item); });
+    return {
+      id: base.id, start: start, end: end,
+      original: original, category: base.category,
+      replacements: replacements, replacement: replacements[0],
+      explanation: base.explanation, confidence: base.confidence,
+      styleOnly: base.category === 'style'
+    };
+  }
+
+  function analyzeGrammar(text, options) {
+    const opts = options || {};
+    const src = str(text).replace(/\r\n?/g, '\n');
+    const style = ['Professional', 'Academic', 'Formal', 'Casual', 'Simple English'].indexOf(opts.style) !== -1 ? opts.style : 'Professional';
+    const raw = [];
+
+    Object.keys(SPELLING_MAP).forEach(function (word) {
+      const re = new RegExp('\\b' + literalPattern(word) + '\\b', 'gi');
+      let match;
+      while ((match = re.exec(src)) !== null) {
+        raw.push(grammarSuggestion({
+          id: 'spelling-' + word + '-' + match.index, category: 'spelling',
+          replacements: [SPELLING_MAP[word]], explanation: 'Possible spelling mistake.', confidence: 0.92
+        }, match[0], match.index, match.index + match[0].length));
+      }
+    });
+
+    GRAMMAR_PHRASES.forEach(function (rule, index) {
+      const re = new RegExp('\\b' + rule[0].split(' ').map(literalPattern).join('\\s+') + '\\b', 'gi');
+      let match;
+      while ((match = re.exec(src)) !== null) {
+        raw.push(grammarSuggestion({
+          id: 'grammar-' + index + '-' + match.index, category: 'grammar',
+          replacements: rule[1], explanation: rule[2], confidence: 0.88
+        }, match[0], match.index, match.index + match[0].length));
+      }
+    });
+
+    CLARITY_PHRASES.forEach(function (rule, index) {
+      const re = new RegExp('\\b' + rule[0].split(' ').map(literalPattern).join('\\s+') + '\\b', 'gi');
+      let match;
+      while ((match = re.exec(src)) !== null) {
+        raw.push(grammarSuggestion({
+          id: 'clarity-' + index + '-' + match.index, category: 'clarity',
+          replacements: rule[1], explanation: rule[2], confidence: 0.72
+        }, match[0], match.index, match.index + match[0].length));
+      }
+    });
+
+    STYLE_RULES.filter(function (rule) { return rule.styles.indexOf(style) !== -1; }).forEach(function (rule, index) {
+      const re = new RegExp(rule.pattern.source, 'gi');
+      let match;
+      while ((match = re.exec(src)) !== null) {
+        const keyIndex = rule.keys.indexOf((match[1] || match[0]).toLowerCase());
+        const replacement = rule.replacements[keyIndex >= 0 ? keyIndex : 0];
+        raw.push(grammarSuggestion({
+          id: 'style-' + style + '-' + index + '-' + match.index, category: 'style',
+          replacements: [replacement], explanation: rule.explanation, confidence: 0.6
+        }, match[0], match.index, match.index + match[0].length));
+      }
+    });
+
+    const repeated = /\b([\p{L}][\p{L}'’-]*)\s+\1\b/giu;
+    let repeatMatch;
+    while ((repeatMatch = repeated.exec(src)) !== null) {
+      const word = repeatMatch[1];
+      raw.push(grammarSuggestion({
+        id: 'repeated-' + repeatMatch.index, category: 'repeated',
+        replacements: [word], explanation: 'The same word appears twice in a row.', confidence: 0.86
+      }, repeatMatch[0], repeatMatch.index, repeatMatch.index + repeatMatch[0].length));
+    }
+
+    const spaceBefore = /[ \t]+([,.;:!?])/g;
+    let spaceMatch;
+    while ((spaceMatch = spaceBefore.exec(src)) !== null) {
+      raw.push(grammarSuggestion({
+        id: 'punctuation-space-' + spaceMatch.index, category: 'punctuation',
+        replacements: [spaceMatch[1]], explanation: 'Remove the space before punctuation.', confidence: 0.9
+      }, spaceMatch[0], spaceMatch.index, spaceMatch.index + spaceMatch[0].length));
+    }
+    const afterPunctuation = /[,;](?=[^\s\n])/g;
+    let punctMatch;
+    while ((punctMatch = afterPunctuation.exec(src)) !== null) {
+      raw.push(grammarSuggestion({
+        id: 'punctuation-after-' + punctMatch.index, category: 'punctuation',
+        replacements: [punctMatch[0] + ' '], explanation: 'Add a space after this mark.', confidence: 0.85
+      }, punctMatch[0], punctMatch.index, punctMatch.index + punctMatch[0].length));
+    }
+    const doubleSpaces = /[ \t]{2,}/g;
+    let doubleMatch;
+    while ((doubleMatch = doubleSpaces.exec(src)) !== null) {
+      raw.push(grammarSuggestion({
+        id: 'punctuation-double-' + doubleMatch.index, category: 'punctuation',
+        replacements: [' '], explanation: 'Use a single space between words.', confidence: 0.8
+      }, doubleMatch[0], doubleMatch.index, doubleMatch.index + doubleMatch[0].length));
+    }
+    const sentenceStart = /(^|[.!?]\s+)([a-z])/g;
+    let sentenceMatch;
+    const ABBREVIATIONS = /^(?:e|i|mr|mrs|ms|dr|prof|sr|jr|st|vs|etc|inc|ltd|co|u|u\.s|u\.k)$/i;
+    while ((sentenceMatch = sentenceStart.exec(src)) !== null) {
+      const before = src.slice(0, sentenceMatch.index + sentenceMatch[1].length - 1);
+      const lastWord = (before.match(/[\p{L}.]+$/u) || [''])[0].replace(/\./g, '');
+      if (ABBREVIATIONS.test(lastWord)) continue;
+      const start = sentenceMatch.index + sentenceMatch[1].length;
+      raw.push(grammarSuggestion({
+        id: 'punctuation-capital-' + start, category: 'punctuation',
+        replacements: [sentenceMatch[2].toUpperCase()], explanation: 'Capitalise the first word of a sentence.', confidence: 0.82
+      }, sentenceMatch[2], start, start + 1));
+    }
+
+    const priority = { spelling: 5, grammar: 5, punctuation: 4, repeated: 4, clarity: 3, style: 2 };
+    raw.sort(function (a, b) {
+      return a.start - b.start || b.end - a.end || (priority[b.category] || 0) - (priority[a.category] || 0) || b.confidence - a.confidence;
+    });
+    const suggestions = [];
+    let occupiedUntil = -1;
+    raw.forEach(function (item) {
+      if (item.start < occupiedUntil) return;
+      if (item.category === 'punctuation' && item.replacement === item.original) return;
+      suggestions.push(item);
+      occupiedUntil = item.end;
+    });
+    const counts = {};
+    GRAMMAR_CATEGORIES.forEach(function (category) { counts[category] = suggestions.filter(function (s) { return s.category === category; }).length; });
+    const selectedIds = suggestions.filter(function (s) { return !s.styleOnly && s.confidence >= 0.8; }).map(function (s) { return s.id; });
+    return {
+      original: src, style: style, suggestions: suggestions, counts: counts, selectedIds: selectedIds,
+      wordCount: countWords(src), corrected: applyGrammarSuggestions(src, suggestions, selectedIds)
+    };
+  }
+
+  function applyGrammarSuggestions(text, suggestions, ids) {
+    const chosen = (suggestions || []).filter(function (s) { return (ids || []).indexOf(s.id) !== -1; });
+    let out = str(text).replace(/\r\n?/g, '\n');
+    chosen.slice().sort(function (a, b) { return b.start - a.start; }).forEach(function (suggestion) {
+      if (suggestion.start < 0 || suggestion.end > out.length) return;
+      out = out.slice(0, suggestion.start) + str(suggestion.replacement) + out.slice(suggestion.end);
+    });
+    return out;
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 21 — Statement review: confidence, duplicates and CSV column mapping
+   * ------------------------------------------------------------------ */
+  function finalizeStatement(rows, options) {
+    const opts = options || {};
+    let moneyIn = 0, moneyOut = 0, running = null;
+    const warnings = [];
+    const seen = Object.create(null);
+    const duplicates = [];
+    rows.forEach(function (row) {
+      if (row.amount > 0) moneyIn += row.amount; else moneyOut += Math.abs(row.amount);
+      if (row.balance !== null) {
+        row.check = running === null ? null : (Math.abs((running + row.amount) - row.balance) < 0.005 ? 'ok' : 'bad');
+        running = row.balance;
+      } else row.check = null;
+      const key = [row.date, String(row.description).toLowerCase().replace(/\s+/g, ' ').trim(), row.amount.toFixed(2)].join('|');
+      if (seen[key]) { row.duplicate = true; duplicates.push(row.id); }
+      else seen[key] = true;
+      let confidence = 0.45;
+      if (row.date && /^\d{4}-\d{2}-\d{2}$/.test(row.date)) confidence += 0.2;
+      if (row.description && row.description !== 'Transaction') confidence += 0.1;
+      if (Number.isFinite(row.amount)) confidence += 0.2;
+      if (row.balance !== null) confidence += 0.1;
+      if (row.check === 'bad') confidence -= 0.25;
+      if (row.duplicate) confidence -= 0.15;
+      row.confidence = Math.round(Math.min(1, Math.max(0, confidence)) * 100) / 100;
+    });
+    const bad = rows.filter(function (r) { return r.check === 'bad'; }).length;
+    if (duplicates.length) warnings.push(duplicates.length + ' possible duplicate row(s) flagged. Compare them with the original statement before removing anything.');
+    if (bad) warnings.push(bad + ' row(s) do not reconcile with the previous balance.');
+    if (rows.length && running === null) warnings.push('No running balances were found, so the arithmetic could not be checked.');
+    if (opts.mappingWarnings) warnings.push.apply(warnings, opts.mappingWarnings);
+    return {
+      rows: rows, totalIn: moneyIn, totalOut: moneyOut,
+      check: !rows.length ? 'none' : (bad ? 'rows' : (running !== null ? 'ok' : 'none')),
+      badRows: bad, duplicates: duplicates.length, warnings: warnings,
+      format: opts.format || 'text'
+    };
+  }
+
+  function splitDelimitedLine(line, delimiter) {
+    const out = [];
+    let cell = '', quoted = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line.charAt(i);
+      if (ch === '"') {
+        if (quoted && line.charAt(i + 1) === '"') { cell += '"'; i++; }
+        else quoted = !quoted;
+      } else if (ch === delimiter && !quoted) { out.push(cell); cell = ''; }
+      else cell += ch;
+    }
+    out.push(cell);
+    return out.map(function (value) { return value.trim(); });
+  }
+
+  function detectStatementFormat(text) {
+    const first = normalizeNewlines(text).split('\n').find(function (line) { return line.trim() !== ''; }) || '';
+    if (!first.trim()) return 'text';
+    const tabs = (first.match(/\t/g) || []).length;
+    const commas = (first.match(/,/g) || []).length;
+    const semis = (first.match(/;/g) || []).length;
+    const delimiter = tabs >= commas && tabs >= semis ? '\t' : (semis > commas ? ';' : ',');
+    const cells = splitDelimitedLine(first, delimiter).map(function (cell) { return cell.toLowerCase(); });
+    const headerWords = cells.filter(function (cell) { return /date|description|amount|balance|debit|credit|transaction|details|withdrawal|deposit/.test(cell); }).length;
+    return headerWords >= 2 ? 'csv' : 'text';
+  }
+
+  const CSV_COLUMN_ALIASES = {
+    date: ['date', 'txn date', 'transaction date', 'posted', 'posting date', 'value date'],
+    description: ['description', 'details', 'narrative', 'memo', 'payee', 'particulars', 'transaction'],
+    amount: ['amount', 'value', 'sum', 'total'],
+    balance: ['balance', 'running balance', 'closing balance'],
+    debit: ['debit', 'withdrawal', 'money out', 'out'],
+    credit: ['credit', 'deposit', 'money in', 'in']
+  };
+
+  function parseCsvStatement(text, options) {
+    const opts = options || {};
+    const lines = normalizeNewlines(text).split('\n').filter(function (line) { return line.trim() !== ''; });
+    if (!lines.length) return finalizeStatement([], { format: 'csv' });
+    const first = lines[0];
+    const tabs = (first.match(/\t/g) || []).length;
+    const commas = (first.match(/,/g) || []).length;
+    const semis = (first.match(/;/g) || []).length;
+    const delimiter = tabs >= commas && tabs >= semis ? '\t' : (semis > commas ? ';' : ',');
+    const header = splitDelimitedLine(first, delimiter).map(function (cell) { return cell.toLowerCase().replace(/^\uFEFF/, ''); });
+    const hasHeader = header.filter(function (cell) { return /date|description|amount|balance|debit|credit|narrative|details|withdrawal|deposit/.test(cell); }).length >= 2;
+    const mappingWarnings = [];
+    const mapping = { date: -1, description: -1, amount: -1, balance: -1, debit: -1, credit: -1 };
+    Object.keys(CSV_COLUMN_ALIASES).forEach(function (key) {
+      const requested = opts.columns && opts.columns[key];
+      if (requested !== undefined && requested !== '' && requested !== 'auto') {
+        const index = Number(requested);
+        if (Number.isInteger(index) && index >= 0) mapping[key] = index;
+        else mappingWarnings.push('Column mapping for ' + key + ' was not a valid column number; using automatic detection.');
+        return;
+      }
+      const index = header.findIndex(function (name) { return CSV_COLUMN_ALIASES[key].indexOf(name) !== -1 || CSV_COLUMN_ALIASES[key].some(function (alias) { return name.indexOf(alias) !== -1; }); });
+      if (index !== -1) mapping[key] = index;
+    });
+    if (hasHeader && mapping.date === -1) mappingWarnings.push('No date column was recognised; choose one manually if rows do not parse.');
+    if (!hasHeader) {
+      mapping.date = 0; mapping.description = 1; mapping.amount = 2; mapping.balance = 3;
+      mappingWarnings.push('No header row was found; columns were mapped by position: Date, Description, Amount, Balance.');
+    }
+    const rows = [];
+    (hasHeader ? lines.slice(1) : lines).forEach(function (line, index) {
+      const cells = splitDelimitedLine(line, delimiter);
+      const dateRaw = mapping.date >= 0 ? cells[mapping.date] : '';
+      const date = parseDateParts(dateRaw, opts.dateOrder || 'auto');
+      if (!date) return;
+      const description = mapping.description >= 0 ? (cells[mapping.description] || 'Transaction') : 'Transaction';
+      let amount = null;
+      if (mapping.amount >= 0 && cells[mapping.amount]) amount = parseMoney(cells[mapping.amount]);
+      if (mapping.debit >= 0 && cells[mapping.debit]) {
+        const debit = parseMoney(cells[mapping.debit]);
+        if (debit !== null) amount = -Math.abs(debit);
+      }
+      if (mapping.credit >= 0 && cells[mapping.credit]) {
+        const credit = parseMoney(cells[mapping.credit]);
+        if (credit !== null) amount = Math.abs(credit);
+      }
+      if (amount === null) return;
+      const balance = mapping.balance >= 0 && cells[mapping.balance] ? parseMoney(cells[mapping.balance]) : null;
+      rows.push({ id: rows.length + 1, date: date, description: description || 'Transaction', amount: amount, balance: balance, page: 1 });
+    });
+    return finalizeStatement(rows, { format: 'csv', mappingWarnings: mappingWarnings });
+  }
+
+  function parseStatementDocument(text, options) {
+    const opts = options || {};
+    const format = opts.format && opts.format !== 'auto' ? opts.format : detectStatementFormat(text);
+    return format === 'csv' ? parseCsvStatement(text, opts) : parseStatement(text, opts);
   }
 
   return {
@@ -889,6 +1726,11 @@
     removeExtraSpaces: removeExtraSpaces,
     // 11
     findAndReplace: findAndReplace,
+    compileFind: compileFind,
+    findMatches: findMatches,
+    replaceText: replaceText,
+    highlightSegments: highlightSegments,
+    literalPattern: literalPattern,
     // 12
     EMOJI_RE: EMOJI_RE,
     removeEmojis: removeEmojis,
@@ -896,6 +1738,22 @@
     textToList: textToList,
     // 14
     applyFilter: applyFilter,
+    // 15-17 format-preserving helpers and diff
+    normalizeNewlines: normalizeNewlines,
+    removeEmptyLines: removeEmptyLines,
+    removePunctuation: removePunctuation,
+    compareTexts: compareTexts,
+    // 18 HTML to Markdown
+    htmlToMarkdown: htmlToMarkdown,
+    decodeHtmlEntities: decodeHtmlEntities,
+    // 19 URL extraction
+    extractUrls: extractUrls,
+    trimUrlEdges: trimUrlEdges,
+    // 20 grammar and spelling
+    SPELLING_MAP: SPELLING_MAP,
+    GRAMMAR_CATEGORIES: GRAMMAR_CATEGORIES,
+    analyzeGrammar: analyzeGrammar,
+    applyGrammarSuggestions: applyGrammarSuggestions,
     // 06 word counter
     STOP: STOP,
     graphemeCount: graphemeCount,
@@ -914,6 +1772,11 @@
     parseDateParts: parseDateParts,
     parseMoney: parseMoney,
     statementToCsv: statementToCsv,
-    statementToQif: statementToQif
+    statementToQif: statementToQif,
+    splitDelimitedLine: splitDelimitedLine,
+    detectStatementFormat: detectStatementFormat,
+    parseCsvStatement: parseCsvStatement,
+    parseStatementDocument: parseStatementDocument,
+    finalizeStatement: finalizeStatement
   };
 });

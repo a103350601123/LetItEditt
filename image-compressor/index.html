@@ -11,14 +11,17 @@
 <meta property="og:title" content="Image Compressor — Reduce JPG, WebP and PNG Size">
 <meta property="og:description" content="Re-encode images through a canvas with selectable JPEG or WebP quality and an optional maximum dimension, comparing original and resulting byte sizes before download.">
 <meta property="og:url" content="https://letitedit.com/image-compressor/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="/css/site.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","name":"Image Compressor","mainEntity":[{"@type":"Question","name":"Is my image uploaded for compression?","acceptedAnswer":{"@type":"Answer","text":"No. The file is decoded, drawn to a canvas and encoded again in your browser. Nothing is sent to LetitEdit or to an external compression service."}},{"@type":"Question","name":"Why does the quality setting not change my PNG?","acceptedAnswer":{"@type":"Answer","text":"PNG is lossless, so quality does not apply. The setting affects JPEG and WebP output only. To reduce a PNG, try the maximum dimension control or switch to WebP when that format is acceptable."}},{"@type":"Question","name":"Why was my file rejected?","acceptedAnswer":{"@type":"Answer","text":"Very large files are refused so the page stays responsive and your browser does not run out of memory. The page states the size limit clearly. Resize or trim the original before choosing it again."}},{"@type":"Question","name":"Will a lower quality always produce a smaller file?","acceptedAnswer":{"@type":"Answer","text":"Usually for JPEG and WebP, but not always. An image that is already heavily compressed may enlarge slightly when re-encoded, and some detailed pictures resist compression. Compare the two byte sizes shown before downloading."}},{"@type":"Question","name":"Which output format should I pick?","acceptedAnswer":{"@type":"Answer","text":"JPEG suits photographs where tiny colour changes are acceptable. WebP often gives smaller files and can keep transparency. PNG preserves exact pixels and alpha but may stay large, especially for photos."}}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Image Compressor","description":"Re-encode images through a canvas with selectable JPEG or WebP quality and an optional maximum dimension, comparing original and resulting byte sizes before download.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/image-compressor/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Image \u0026 Photo Tools","item":"https://letitedit.com/tools/image-photo/"},{"@type":"ListItem","position":3,"name":"Image Compressor","item":"https://letitedit.com/image-compressor/"}]},{"@type":"FAQPage","name":"Image Compressor","mainEntity":[{"@type":"Question","name":"Is my image uploaded for compression?","acceptedAnswer":{"@type":"Answer","text":"No. The file is decoded, drawn to a canvas and encoded again in your browser. Nothing is sent to LetitEdit or to an external compression service."}},{"@type":"Question","name":"Why does the quality setting not change my PNG?","acceptedAnswer":{"@type":"Answer","text":"PNG is lossless, so quality does not apply. The setting affects JPEG and WebP output only. To reduce a PNG, try the maximum dimension control or switch to WebP when that format is acceptable."}},{"@type":"Question","name":"Why was my file rejected?","acceptedAnswer":{"@type":"Answer","text":"Very large files are refused so the page stays responsive and your browser does not run out of memory. The page states the size limit clearly. Resize or trim the original before choosing it again."}},{"@type":"Question","name":"Will a lower quality always produce a smaller file?","acceptedAnswer":{"@type":"Answer","text":"Usually for JPEG and WebP, but not always. An image that is already heavily compressed may enlarge slightly when re-encoded, and some detailed pictures resist compression. Compare the two byte sizes shown before downloading."}},{"@type":"Question","name":"Which output format should I pick?","acceptedAnswer":{"@type":"Answer","text":"JPEG suits photographs where tiny colour changes are acceptable. WebP often gives smaller files and can keep transparency. PNG preserves exact pixels and alpha but may stay large, especially for photos."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-image">
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
@@ -30,19 +33,21 @@
       <a href="/blog/">Blog</a>
       <a href="/tools/">All Tools</a>
       <a href="/faq/">FAQ</a>
-      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" aria-controls="search-strip" aria-expanded="false" title="Search tools"><span aria-hidden="true">🔍</span></button>
     </div>
   </nav>
 </header>
-<div class="site-search-strip" id="search-strip">
+<div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
+      <label class="sr-only" for="site-search">Search all 61 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
-      <div class="search-results" id="search-results" role="listbox" hidden></div>
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
+<div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="/">Home</a><span>/</span>
   <a href="/tools/image-photo/">Image &amp; Photo Tools</a><span>/</span>
@@ -128,6 +133,7 @@
     </div>
   </div>
 </section>
+</div>
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">

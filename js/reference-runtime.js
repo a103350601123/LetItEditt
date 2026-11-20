@@ -76,6 +76,159 @@
     reader.readAsText(file);
   }
 
+  const TEXT_EXTENSIONS = /\.(txt|csv|tsv|md|markdown|json|log|xml|eml|yaml|yml|html|htm|ini|cfg|conf|properties|toml|sql|js|ts|py|rb|php|java|go|sh)$/i;
+
+  function readArrayBuffer(file) {
+    return new Promise(function (resolve, reject) {
+      const reader = new FileReader();
+      reader.onerror = function () { reject(new Error('The file could not be read. Please try another file.')); };
+      reader.onload = function (event) { resolve(event.target.result); };
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  function readTextFile(file, maxBytes) {
+    return new Promise(function (resolve, reject) {
+      if (file.size > maxBytes) { reject(new Error('File is too large. Choose a file under ' + Math.round(maxBytes / (1024 * 1024)) + ' MB.')); return; }
+      const reader = new FileReader();
+      reader.onerror = function () { reject(new Error('The file could not be read. Please try another file.')); };
+      reader.onload = function (event) {
+        const text = String(event.target.result || '').replace(/^\uFEFF/, '');
+        resolve({ name: file.name, kind: 'text', text: text, warning: '' });
+      };
+      reader.readAsText(file);
+    });
+  }
+
+  function zipEntry(buffer, wanted) {
+    const view = new DataView(buffer);
+    const bytes = new Uint8Array(buffer);
+    let eocd = -1;
+    const floor = Math.max(0, bytes.length - 66000);
+    for (let i = bytes.length - 22; i >= floor; i--) {
+      if (view.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+    }
+    if (eocd < 0) throw new Error('This .docx file could not be opened as a ZIP archive.');
+    const count = view.getUint16(eocd + 10, true);
+    let offset = view.getUint32(eocd + 16, true);
+    for (let n = 0; n < count && offset + 46 <= bytes.length; n++) {
+      if (view.getUint32(offset, true) !== 0x02014b50) break;
+      const method = view.getUint16(offset + 10, true);
+      const compressedSize = view.getUint32(offset + 20, true);
+      const nameLength = view.getUint16(offset + 28, true);
+      const extraLength = view.getUint16(offset + 30, true);
+      const commentLength = view.getUint16(offset + 32, true);
+      const localOffset = view.getUint32(offset + 42, true);
+      const name = new TextDecoder().decode(bytes.subarray(offset + 46, offset + 46 + nameLength));
+      if (name === wanted) {
+        if (view.getUint32(localOffset, true) !== 0x04034b50) throw new Error('The .docx archive has an invalid local header.');
+        const localName = view.getUint16(localOffset + 26, true);
+        const localExtra = view.getUint16(localOffset + 28, true);
+        const start = localOffset + 30 + localName + localExtra;
+        return { bytes: bytes.subarray(start, start + compressedSize), method: method };
+      }
+      offset += 46 + nameLength + extraLength + commentLength;
+    }
+    throw new Error('The .docx archive does not contain ' + wanted + '.');
+  }
+
+  async function inflateEntry(entry) {
+    if (entry.method === 0) return entry.bytes;
+    if (entry.method !== 8) throw new Error('This .docx uses a compression method this browser cannot read locally.');
+    if (typeof DecompressionStream === 'undefined') {
+      throw new Error('This browser cannot decompress .docx files locally. Save the document as .txt or .md instead.');
+    }
+    const stream = new Blob([entry.bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  }
+
+  function docxXmlToText(xml) {
+    const parsed = new DOMParser().parseFromString(xml, 'application/xml');
+    if (parsed.getElementsByTagName('parsererror').length) throw new Error('The .docx document.xml could not be parsed.');
+    const paragraphs = parsed.getElementsByTagNameNS('*', 'p');
+    if (!paragraphs.length) return '';
+    function collect(node) {
+      let out = '';
+      Array.prototype.forEach.call(node.childNodes || [], function (child) {
+        const local = child.localName || '';
+        if (child.nodeType === 3) out += child.nodeValue || '';
+        else if (local === 'tab') out += '\t';
+        else if (local === 'br' || local === 'cr') out += '\n';
+        else out += collect(child);
+      });
+      return out;
+    }
+    return Array.prototype.map.call(paragraphs, collect).join('\n');
+  }
+
+  async function readDocumentFile(file, statusNode, options) {
+    if (!file) return null;
+    const opts = options || {};
+    const name = String(file.name || '');
+    const lower = name.toLowerCase();
+    const maxBytes = opts.maxBytes || 5 * 1024 * 1024;
+    if (/\.pdf$/i.test(lower)) {
+      throw new Error('PDF files cannot be parsed reliably in this browser tool. Export the pages as .txt, .csv or .docx first; no formatting would be preserved by a local guess.');
+    }
+    if (/\.doc$/i.test(lower)) {
+      throw new Error('Legacy .doc files are not supported. Save the file as .docx, .txt, .csv or .md first.');
+    }
+    if (/\.docx$/i.test(lower)) {
+      if (file.size > (opts.docxMaxBytes || 20 * 1024 * 1024)) throw new Error('DOCX files must be under 20 MB.');
+      announce(statusNode, 'Reading DOCX text in your browser…');
+      const buffer = await readArrayBuffer(file);
+      const entry = zipEntry(buffer, 'word/document.xml');
+      const data = await inflateEntry(entry);
+      const xml = new TextDecoder().decode(data);
+      const text = docxXmlToText(xml);
+      if (!text.trim()) throw new Error('No readable text was found in this .docx file. It may contain only images or tables drawn as shapes.');
+      return { name: name, kind: 'docx', text: text, warning: 'Only the text in the DOCX was extracted; tables, columns and styling are not preserved.' };
+    }
+    if (!TEXT_EXTENSIONS.test(lower)) {
+      throw new Error('Unsupported file type. Use .txt, .csv, .md, .json or .docx; PDF and legacy .doc are not supported.');
+    }
+    return readTextFile(file, maxBytes);
+  }
+
+  const SAFE_PREVIEW_TAGS = new Set(['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'P', 'BR', 'HR', 'STRONG', 'B', 'EM', 'I', 'DEL', 'S', 'UL', 'OL', 'LI', 'A', 'IMG', 'BLOCKQUOTE', 'PRE', 'CODE', 'TABLE', 'THEAD', 'TBODY', 'TFOOT', 'TR', 'TH', 'TD', 'DIV', 'SPAN']);
+  function safeUrl(value) {
+    const text = String(value || '').trim();
+    return /^(https?:|mailto:)/i.test(text) ? text : '';
+  }
+  function appendSafeHtml(source, target) {
+    Array.prototype.forEach.call(source.childNodes || [], function (node) {
+      if (node.nodeType === 3) { target.appendChild(document.createTextNode(node.nodeValue || '')); return; }
+      if (node.nodeType !== 1) return;
+      const tag = node.nodeName.toUpperCase();
+      if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'IFRAME' || tag === 'OBJECT' || tag === 'EMBED' || tag === 'SVG' || tag === 'FORM') return;
+      if (tag === 'INPUT') {
+        const type = String(node.getAttribute('type') || '').toLowerCase();
+        if (type === 'checkbox') target.appendChild(document.createTextNode(node.hasAttribute('checked') ? '[x] ' : '[ ] '));
+        return;
+      }
+      if (!SAFE_PREVIEW_TAGS.has(tag)) { appendSafeHtml(node, target); return; }
+      const copy = document.createElement(tag.toLowerCase());
+      if (tag === 'A') {
+        const href = safeUrl(node.getAttribute('href'));
+        if (href) { copy.setAttribute('href', href); copy.setAttribute('rel', 'noopener noreferrer'); }
+      } else if (tag === 'IMG') {
+        const src = safeUrl(node.getAttribute('src'));
+        if (src) copy.setAttribute('src', src);
+        copy.setAttribute('alt', String(node.getAttribute('alt') || ''));
+      }
+      appendSafeHtml(node, copy);
+      target.appendChild(copy);
+    });
+  }
+  function renderSafeHtml(container, html) {
+    container.textContent = '';
+    if (!html || !html.trim()) return;
+    const parsed = new DOMParser().parseFromString('<div id="safe-root">' + html + '</div>', 'text/html');
+    const root = parsed.getElementById('safe-root');
+    if (root) appendSafeHtml(root, container);
+    else container.appendChild(document.createTextNode(html));
+  }
+
   ready(function () {
     const configNode = $('tool-config');
     if (!configNode || !window.ReferenceCore) return;
@@ -318,7 +471,11 @@
       const result = $('spaces-result');
       $('spaces-upload').addEventListener('change', function (event) {
         const file = event.target.files && event.target.files[0];
-        readFile(file, function (text) { input.value = text; announce(status, 'File loaded. Click “Remove Extra Spaces” to process.'); }, status);
+        if (!file) return;
+        readDocumentFile(file, status).then(function (loaded) {
+          input.value = loaded.text;
+          announce(status, 'File loaded. Click “Remove Extra Spaces” to process.' + (loaded.warning ? ' ' + loaded.warning : ''));
+        }).catch(function (error) { announce(status, error.message); });
       });
       $('spaces-apply').addEventListener('click', function () {
         result.value = R.removeExtraSpaces(input.value);
@@ -330,15 +487,464 @@
     /* 11 — Find and Replace */
     if (slug === 'find-and-replace') {
       const status = $('fr-status');
-      $('fr-apply').addEventListener('click', function () {
-        try {
-          $('fr-result').value = R.findAndReplace(value('fr-input'), value('fr-find'), value('fr-replace'), checked('fr-case'));
-          announce(status, 'Replacement applied.');
-        } catch (e) {
-          announce(status, 'Invalid regular expression: ' + (e && e.message ? e.message : 'check the Find pattern.'));
+      const input = $('fr-input');
+      const result = $('fr-result');
+      const preview = $('fr-preview');
+      const countNode = $('fr-count');
+      let original = '';
+      let matches = [];
+      let active = 0;
+
+      function options() {
+        return {
+          find: value('fr-find'), replace: value('fr-replace'),
+          caseSensitive: checked('fr-case'), wholeWord: checked('fr-whole'),
+          // Legacy behaviour stays intact: case-insensitive means live regex.
+          // The explicit checkbox can also opt into regex while case-sensitive.
+          regex: checked('fr-regex') || !checked('fr-case')
+        };
+      }
+      function refresh(message) {
+        const found = R.findMatches(input.value, options());
+        matches = found.matches;
+        if (active >= matches.length) active = 0;
+        if (countNode) countNode.textContent = matches.length + ' match' + (matches.length === 1 ? '' : 'es');
+        if (preview) {
+          preview.textContent = '';
+          R.highlightSegments(input.value, matches, active).forEach(function (segment) {
+            if (!segment.hit) { preview.appendChild(document.createTextNode(segment.text)); return; }
+            const span = document.createElement('span');
+            span.className = 'fr-hit' + (segment.active ? ' is-active' : '');
+            span.style.background = segment.active ? '#fde68a' : '#fef3c7';
+            span.style.borderBottom = (segment.active ? '2px solid #b45309' : '1px solid #d97706');
+            span.style.borderRadius = '3px';
+            span.textContent = segment.text;
+            preview.appendChild(span);
+          });
         }
+        if (found.error === 'unsafe') announce(status, found.message);
+        else if (found.error === 'invalid') announce(status, 'Invalid regular expression: ' + found.message);
+        else if (message) announce(status, message);
+        else if (found.error === 'empty') announce(status, 'Enter text to find.');
+        else announce(status, matches.length + ' match(es) highlighted in the source text.');
+      }
+      function replaceAll() {
+        const outcome = R.replaceText(input.value, options());
+        if (outcome.error === 'unsafe') { announce(status, outcome.message); return; }
+        if (outcome.error === 'invalid') { announce(status, 'Invalid regular expression: ' + outcome.message); return; }
+        if (!original) original = input.value;
+        result.value = outcome.text;
+        refresh();
+        announce(status, 'Replacement applied. ' + outcome.count + ' occurrence(s) replaced.');
+      }
+      function selectMatch(delta) {
+        if (!matches.length) { announce(status, 'No matches to move through yet.'); return; }
+        active = (active + delta + matches.length) % matches.length;
+        refresh();
+        announce(status, 'Match ' + (active + 1) + ' of ' + matches.length + '.');
+        const span = preview && preview.querySelector('.fr-hit.is-active');
+        if (span && span.scrollIntoView) span.scrollIntoView({ block: 'nearest' });
+      }
+      function replaceOne() {
+        if (!matches.length) { announce(status, 'No matches to replace yet.'); return; }
+        const outcome = R.replaceText(input.value, Object.assign(options(), { onlyIndex: active }));
+        if (original !== input.value) original = input.value;
+        result.value = outcome.text;
+        input.value = outcome.text;
+        refresh();
+        announce(status, 'Replaced match ' + (active + 1) + '. ' + Math.max(0, matches.length - 1) + ' match(es) remain.');
+      }
+      function restore() {
+        input.value = original;
+        result.value = '';
+        active = 0;
+        refresh();
+        announce(status, 'Original text restored.');
+      }
+
+      $('fr-apply').addEventListener('click', replaceAll);
+      if ($('fr-replace-one')) $('fr-replace-one').addEventListener('click', replaceOne);
+      if ($('fr-prev')) $('fr-prev').addEventListener('click', function () { selectMatch(-1); });
+      if ($('fr-next')) $('fr-next').addEventListener('click', function () { selectMatch(1); });
+      if ($('fr-undo')) $('fr-undo').addEventListener('click', restore);
+      if ($('fr-restore')) $('fr-restore').addEventListener('click', restore);
+      if ($('fr-copy')) $('fr-copy').addEventListener('click', function () { copyText(result.value, status, 'Output copied to clipboard.'); });
+      if ($('fr-download')) $('fr-download').addEventListener('click', function () { downloadFile(result.value, 'find-replace-result.txt', 'text/plain;charset=utf-8', status); });
+      if ($('fr-upload')) $('fr-upload').addEventListener('change', function (event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        readDocumentFile(file, status).then(function (loaded) {
+          original = loaded.text;
+          input.value = loaded.text;
+          result.value = '';
+          active = 0;
+          refresh('File loaded. Matches highlighted.' + (loaded.warning ? ' ' + loaded.warning : ''));
+        }).catch(function (error) { announce(status, error.message); });
       });
-      $('fr-copy').addEventListener('click', function () { copyText($('fr-result').value, status, 'Result copied to clipboard.'); });
+      [input, $('fr-find'), $('fr-replace'), $('fr-case'), $('fr-whole'), $('fr-regex')].forEach(function (el) {
+        if (el) el.addEventListener(el.type === 'checkbox' ? 'change' : 'input', function () { refresh(); });
+      });
+      original = input.value;
+      refresh();
+    }
+
+    /* 15 — Remove Empty Lines (document-aware engine) */
+    if (slug === 'remove-empty-lines') {
+      const status = $('tool-status');
+      const input = $('tool-input');
+      const output = $('tool-output');
+      function process(message) {
+        output.textContent = R.removeEmptyLines(input.value, { preserveParagraphs: checked('rel-preserve') });
+        announce(status, message || 'Empty lines removed. Other formatting on real lines is preserved.');
+        return output.textContent;
+      }
+      if ($('rel-apply')) $('rel-apply').addEventListener('click', function () { process('Empty lines removed.'); });
+      if ($('rel-preserve')) $('rel-preserve').addEventListener('change', function () { process(); });
+      if ($('clear-input')) $('clear-input').addEventListener('click', function () {
+        input.value = ''; process('Input cleared.');
+      });
+      if ($('copy-output')) $('copy-output').addEventListener('click', function () { copyText(output.textContent, status, 'Output copied to clipboard.'); });
+      if ($('download-output')) $('download-output').addEventListener('click', function () {
+        downloadFile(output.textContent, 'lines-cleaned.txt', 'text/plain;charset=utf-8', status);
+      });
+      if ($('rel-upload')) $('rel-upload').addEventListener('change', function (event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        readDocumentFile(file, status).then(function (loaded) {
+          input.value = loaded.text;
+          process('File loaded and cleaned.' + (loaded.warning ? ' ' + loaded.warning : ''));
+        }).catch(function (error) { announce(status, error.message); });
+      });
+      process('Paste text or load a file to remove empty lines.');
+    }
+
+    /* 16 — Remove Punctuation (document-aware engine) */
+    if (slug === 'remove-punctuation') {
+      const status = $('tool-status');
+      const input = $('tool-input');
+      const output = $('tool-output');
+      const types = $('rp-types');
+      const chars = $('rp-chars');
+      function options() { return { types: types ? types.value : 'all', chars: chars ? chars.value : '' }; }
+      function process(message) {
+        output.textContent = R.removePunctuation(input.value, options());
+        announce(status, message || 'Punctuation removed. Letters, numbers and Unicode characters are preserved.');
+        return output.textContent;
+      }
+      function syncCustom() {
+        if (chars) chars.disabled = !types || types.value !== 'custom';
+      }
+      input.addEventListener('input', function () { process(); });
+      if ($('rp-apply')) $('rp-apply').addEventListener('click', function () { process('Punctuation removed.'); });
+      if (types) types.addEventListener('change', function () { syncCustom(); process('Punctuation mode changed.'); });
+      if (chars) chars.addEventListener('input', function () { process(); });
+      if ($('clear-input')) $('clear-input').addEventListener('click', function () { input.value = ''; process('Input cleared.'); });
+      if ($('copy-output')) $('copy-output').addEventListener('click', function () { copyText(output.textContent, status, 'Output copied to clipboard.'); });
+      if ($('download-output')) $('download-output').addEventListener('click', function () {
+        downloadFile(output.textContent, 'punctuation-removed.txt', 'text/plain;charset=utf-8', status);
+      });
+      if ($('rp-upload')) $('rp-upload').addEventListener('change', function (event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        readDocumentFile(file, status).then(function (loaded) {
+          input.value = loaded.text;
+          process('File loaded and cleaned.' + (loaded.warning ? ' ' + loaded.warning : ''));
+        }).catch(function (error) { announce(status, error.message); });
+      });
+      syncCustom();
+      process('Paste text or load a file to remove punctuation.');
+    }
+
+    /* 17 — Text Comparer (two-document engine) */
+    if (slug === 'text-comparer') {
+      const status = $('tool-status');
+      const output = $('tool-output');
+      const summary = $('cmp-summary');
+      const left = $('tool-input-left');
+      const right = $('tool-input-right');
+      function compare(message) {
+        const result = R.compareTexts(left.value, right.value, { unit: radioValue('cmp-unit') || 'lines' });
+        output.textContent = '';
+        if (!result.ok) {
+          if (summary) summary.textContent = 'Limit reached';
+          announce(status, result.error);
+          return;
+        }
+        result.ops.forEach(function (op) {
+          const line = document.createElement('span');
+          const prefix = op.type === 'add' ? '+' : op.type === 'remove' ? '-' : ' ';
+          line.className = 'diff-line diff-' + op.type;
+          line.textContent = prefix + ' ' + op.value;
+          output.appendChild(line);
+        });
+        if (!result.ops.length) {
+          const empty = document.createElement('span');
+          empty.className = 'diff-line diff-equal';
+          empty.textContent = ' No differences';
+          output.appendChild(empty);
+        }
+        if (summary) summary.textContent = result.added + ' added · ' + result.removed + ' removed';
+        announce(status, message || (result.added + ' added · ' + result.removed + ' removed. Only extracted text was compared, not formatting.'));
+      }
+      left.addEventListener('input', function () { compare(); });
+      right.addEventListener('input', function () { compare(); });
+      if ($('cmp-compare')) $('cmp-compare').addEventListener('click', function () { compare('Text compared. Only extracted text was compared, not formatting.'); });
+      if ($('cmp-swap')) $('cmp-swap').addEventListener('click', function () {
+        const previous = left.value;
+        left.value = right.value;
+        right.value = previous;
+        compare('Sides swapped and compared.');
+      });
+      if ($('cmp-clear')) $('cmp-clear').addEventListener('click', function () {
+        left.value = ''; right.value = ''; compare('Both sides cleared.');
+      });
+      all('input[name="cmp-unit"]').forEach(function (el) { el.addEventListener('change', function () { compare(); }); });
+      [['cmp-upload-left', left], ['cmp-upload-right', right]].forEach(function (pair) {
+        const node = $(pair[0]);
+        if (!node) return;
+        node.addEventListener('change', function (event) {
+          const file = event.target.files && event.target.files[0];
+          if (!file) return;
+          readDocumentFile(file, status).then(function (loaded) {
+            pair[1].value = loaded.text;
+            compare('File loaded for the ' + (pair[0] === 'cmp-upload-left' ? 'original' : 'changed') + ' side.' + (loaded.warning ? ' ' + loaded.warning : ''));
+          }).catch(function (error) { announce(status, error.message); });
+        });
+      });
+      compare('Paste text on both sides or load text files to compare them.');
+    }
+
+    /* 18 — HTML to Markdown */
+    if (slug === 'html-to-markdown') {
+      const status = $('h2m-status');
+      const input = $('h2m-input');
+      const source = $('h2m-source');
+      const preview = $('h2m-preview');
+      const count = $('h2m-count');
+      function update(message) {
+        const markdown = R.htmlToMarkdown(input.value);
+        source.textContent = markdown;
+        renderSafeHtml(preview, input.value);
+        if (count) count.textContent = markdown.length + ' Markdown character' + (markdown.length === 1 ? '' : 's');
+        announce(status, message || (input.value.trim() ? 'Converted to Markdown. Preview uses safe DOM nodes only.' : 'Paste HTML to see Markdown and a rendered preview.'));
+        return markdown;
+      }
+      input.addEventListener('input', function () { update(); });
+      if ($('h2m-clear')) $('h2m-clear').addEventListener('click', function () { input.value = ''; update('Cleared.'); });
+      if ($('h2m-copy')) $('h2m-copy').addEventListener('click', function () { copyText(source.textContent, status, 'Markdown copied to clipboard.'); });
+      if ($('h2m-download')) $('h2m-download').addEventListener('click', function () { downloadFile(source.textContent, 'converted.md', 'text/markdown;charset=utf-8', status); });
+      if ($('h2m-upload')) $('h2m-upload').addEventListener('change', function (event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        readDocumentFile(file, status).then(function (loaded) {
+          input.value = loaded.text;
+          update('File loaded and converted.' + (loaded.warning ? ' ' + loaded.warning : ''));
+        }).catch(function (error) { announce(status, error.message); });
+      });
+      update();
+    }
+
+    /* 19 — Extract URLs */
+    if (slug === 'extract-urls') {
+      const status = $('url-status');
+      const input = $('url-input');
+      const list = $('url-list');
+      const count = $('url-count');
+      let urls = [];
+      function update(message) {
+        const result = R.extractUrls(input.value);
+        urls = result.urls;
+        if (count) count.textContent = result.count + ' unique URL' + (result.count === 1 ? '' : 's');
+        list.textContent = '';
+        if (!urls.length) {
+          const empty = document.createElement('p');
+          empty.className = 'hint';
+          empty.textContent = 'No valid http, https, www or bare-domain URLs found yet.';
+          list.appendChild(empty);
+        } else {
+          urls.forEach(function (item, index) {
+            const row = document.createElement('div');
+            row.className = 'url-row';
+            const link = document.createElement('a');
+            link.textContent = item.value;
+            link.href = item.value;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            row.appendChild(document.createTextNode(String(index + 1) + '. '));
+            row.appendChild(link);
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'btn btn-secondary btn-small';
+            button.textContent = 'Copy';
+            button.setAttribute('aria-label', 'Copy URL ' + (index + 1));
+            button.addEventListener('click', function () { copyText(item.value, status, 'URL copied to clipboard.'); });
+            row.appendChild(button);
+            list.appendChild(row);
+          });
+        }
+        announce(status, message || (urls.length ? result.count + ' unique URL(s) extracted in first-seen order.' : 'Paste text containing links.'));
+        return result;
+      }
+      input.addEventListener('input', function () { update(); });
+      if ($('url-copy')) $('url-copy').addEventListener('click', function () {
+        copyText(urls.map(function (u) { return u.value; }).join('\n'), status, 'All URLs copied to clipboard.');
+      });
+      if ($('url-download')) $('url-download').addEventListener('click', function () {
+        if (!urls.length) { announce(status, 'No URLs to download yet.'); return; }
+        downloadFile(urls.map(function (u) { return u.value; }).join('\n'), 'extracted-urls.txt', 'text/plain;charset=utf-8', status);
+      });
+      if ($('url-clear')) $('url-clear').addEventListener('click', function () { input.value = ''; update('Cleared.'); });
+      if ($('url-upload')) $('url-upload').addEventListener('change', function (event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        readDocumentFile(file, status).then(function (loaded) {
+          input.value = loaded.text;
+          update('File loaded and links extracted.' + (loaded.warning ? ' ' + loaded.warning : ''));
+        }).catch(function (error) { announce(status, error.message); });
+      });
+      update();
+    }
+
+    /* 20 — Grammar and Spell Checker */
+    if (slug === 'grammar-spell-checker') {
+      const status = $('gs-status');
+      const input = $('gs-input');
+      const highlight = $('gs-highlight');
+      const list = $('gs-list');
+      const count = $('gs-count');
+      const corrected = $('gs-corrected');
+      const originalView = $('gs-original');
+      let analysis = null;
+      let accepted = new Set();
+      let lastText = '';
+      const colours = { spelling: '#fecaca', grammar: '#bfdbfe', punctuation: '#fde68a', repeated: '#fbcfe8', clarity: '#c7d2fe', style: '#d9f99d' };
+
+      function renderHighlight() {
+        highlight.textContent = '';
+        if (!analysis) return;
+        const spans = R.highlightSegments(analysis.original, analysis.suggestions.map(function (s) {
+          return { index: s.start, end: s.end, text: s.original };
+        }), -1);
+        spans.forEach(function (segment) {
+          if (!segment.hit) { highlight.appendChild(document.createTextNode(segment.text)); return; }
+          const hit = analysis.suggestions.find(function (s) { return s.start === segment.start; });
+          const span = document.createElement('span');
+          span.className = 'gs-hit';
+          span.style.background = colours[hit ? hit.category : 'style'] || '#fef3c7';
+          span.style.borderBottom = '2px solid #92400e';
+          span.style.borderRadius = '3px';
+          span.title = hit ? hit.category + ': ' + hit.explanation : '';
+          span.textContent = segment.text;
+          highlight.appendChild(span);
+        });
+      }
+
+      function renderList() {
+        list.textContent = '';
+        if (!analysis || !analysis.suggestions.length) {
+          const empty = document.createElement('p');
+          empty.className = 'hint';
+          empty.textContent = 'No rule-based suggestions for this text. This checker is English-only and not a full rewrite service.';
+          list.appendChild(empty);
+          return;
+        }
+        analysis.suggestions.forEach(function (suggestion) {
+          const row = document.createElement('div');
+          row.className = 'gs-suggestion';
+          row.style.borderBottom = '1px solid var(--border)';
+          row.style.padding = '8px 0';
+          const head = document.createElement('div');
+          const badge = document.createElement('span');
+          badge.className = 'pill';
+          badge.textContent = suggestion.category;
+          head.appendChild(badge);
+          const original = document.createElement('strong');
+          original.textContent = ' “' + suggestion.original + '”';
+          head.appendChild(original);
+          row.appendChild(head);
+          const explanation = document.createElement('p');
+          explanation.className = 'hint';
+          explanation.textContent = suggestion.explanation + ' Confidence: ' + Math.round(suggestion.confidence * 100) + '%.';
+          row.appendChild(explanation);
+          const actions = document.createElement('div');
+          actions.className = 'output-actions';
+          suggestion.replacements.forEach(function (replacement) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'btn btn-secondary btn-small';
+            button.textContent = 'Use “' + replacement + '”';
+            button.addEventListener('click', function () {
+              suggestion.replacement = replacement;
+              accepted.add(suggestion.id);
+              renderList();
+              renderCorrected();
+              announce(status, 'Suggestion accepted. Apply all selected to update the corrected text.');
+            });
+            actions.appendChild(button);
+          });
+          const reject = document.createElement('button');
+          reject.type = 'button';
+          reject.className = 'btn btn-secondary btn-small';
+          reject.textContent = accepted.has(suggestion.id) ? 'Reject selected' : 'Rejected';
+          reject.addEventListener('click', function () { accepted.delete(suggestion.id); renderList(); renderCorrected(); });
+          actions.appendChild(reject);
+          row.appendChild(actions);
+          list.appendChild(row);
+        });
+      }
+
+      function renderCorrected() {
+        if (!analysis) { corrected.textContent = ''; if (originalView) originalView.textContent = ''; return; }
+        if (originalView) originalView.textContent = analysis.original;
+        corrected.textContent = R.applyGrammarSuggestions(analysis.original, analysis.suggestions, Array.from(accepted));
+      }
+
+      function update(message) {
+        analysis = R.analyzeGrammar(input.value, { style: value('gs-style') });
+        accepted = new Set(analysis.selectedIds);
+        lastText = R.applyGrammarSuggestions(analysis.original, analysis.suggestions, Array.from(accepted));
+        if (count) {
+          const total = analysis.suggestions.length;
+          count.textContent = total + ' suggestion' + (total === 1 ? '' : 's') + ' · ' + analysis.wordCount + ' words';
+        }
+        renderHighlight();
+        renderList();
+        renderCorrected();
+        announce(status, message || (analysis.suggestions.length
+          ? analysis.suggestions.length + ' local rule-based suggestion(s). Review each one before accepting.'
+          : 'No suggestions. This English-only checker uses local rules, not a full NLP or AI rewriting service.'));
+      }
+
+      input.addEventListener('input', function () { update(); });
+      if ($('gs-style')) $('gs-style').addEventListener('change', function () { update('Style emphasis changed; suggestions refreshed.'); });
+      if ($('gs-apply')) $('gs-apply').addEventListener('click', function () {
+        if (!analysis) return;
+        const result = R.applyGrammarSuggestions(analysis.original, analysis.suggestions, Array.from(accepted));
+        corrected.textContent = result;
+        lastText = result;
+        announce(status, 'Applied ' + accepted.size + ' selected suggestion(s) to the corrected copy. Your original text is unchanged.');
+      });
+      if ($('gs-select-all')) $('gs-select-all').addEventListener('click', function () {
+        accepted = new Set((analysis ? analysis.suggestions : []).map(function (s) { return s.id; }));
+        renderList(); renderCorrected(); announce(status, 'All suggestions selected for the corrected copy.');
+      });
+      if ($('gs-reject-all')) $('gs-reject-all').addEventListener('click', function () {
+        accepted = new Set(); renderList(); renderCorrected(); announce(status, 'All suggestions rejected. The corrected copy matches your original.');
+      });
+      if ($('gs-copy')) $('gs-copy').addEventListener('click', function () { copyText(corrected.textContent || lastText, status, 'Corrected text copied to clipboard.'); });
+      if ($('gs-download')) $('gs-download').addEventListener('click', function () {
+        downloadFile(corrected.textContent || lastText, 'grammar-corrected.txt', 'text/plain;charset=utf-8', status);
+      });
+      if ($('gs-clear')) $('gs-clear').addEventListener('click', function () { input.value = ''; update('Cleared.'); });
+      if ($('gs-upload')) $('gs-upload').addEventListener('change', function (event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        readDocumentFile(file, status).then(function (loaded) {
+          input.value = loaded.text;
+          update('File loaded and checked.' + (loaded.warning ? ' ' + loaded.warning : ''));
+        }).catch(function (error) { announce(status, error.message); });
+      });
+      update();
     }
 
     /* 12 — Remove Emojis */
@@ -571,11 +1177,12 @@
       $('wc-file').addEventListener('click', function () { $('wc-upload').click(); });
       $('wc-upload').addEventListener('change', function (event) {
         const file = event.target.files && event.target.files[0];
-        readFile(file, function (text) {
-          input.value = text.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
+        if (!file) return;
+        readDocumentFile(file, status).then(function (loaded) {
+          input.value = loaded.text;
           render(input.value);
-          announce(status, 'File loaded.');
-        }, status);
+          announce(status, 'File loaded.' + (loaded.warning ? ' ' + loaded.warning : ''));
+        }).catch(function (error) { announce(status, error.message); });
       });
       input.addEventListener('select', function () {
         const selected = input.value.substring(input.selectionStart, input.selectionEnd);
@@ -654,6 +1261,10 @@
         readFile(file, function (text) { input.value = text; apply(); announce(status, 'File loaded and redacted.'); }, status);
       });
       $('rdx-copy').addEventListener('click', function () { copyText(output.value, status, 'Redacted text copied.'); });
+      if ($('rdx-download')) $('rdx-download').addEventListener('click', function () {
+        if (!output.value) { announce(status, 'Nothing to download yet.'); return; }
+        downloadFile(output.value, 'redacted-text.txt', 'text/plain;charset=utf-8', status);
+      });
       $('rdx-save-key').addEventListener('click', saveKey);
       $('rdx-restore').addEventListener('click', restore);
       $('rdx-copy-restored').addEventListener('click', function () { copyText($('rdx-restored').value, status, 'Restored text copied.'); });
@@ -676,6 +1287,18 @@
       const status = $('bk-status');
       const SAMPLE = '01/15/2026 Coffee Shop 4.50 995.50\n01/16/2026 Salary 1,000.00 1,995.50\n01/17/2026 Rent -650.00 1,345.50\n01/18/2026 Groceries -52.25 1,293.25';
       let parsed = null;
+      let editing = false;
+      function options() {
+        const columns = {};
+        ['date', 'description', 'amount', 'balance', 'debit', 'credit'].forEach(function (key) {
+          const node = $('bk-col-' + key);
+          if (node && node.value !== 'auto') columns[key] = node.value;
+        });
+        return {
+          dateOrder: value('bk-date-order'), kind: value('bk-kind'),
+          format: value('bk-format') || 'auto', columns: columns
+        };
+      }
       function render(result) {
         parsed = result;
         $('bk-sum-transactions').textContent = result.rows.length;
@@ -683,6 +1306,7 @@
         $('bk-sum-out').textContent = result.totalOut.toFixed(2);
         const labels = { ok: 'Balances match', off: 'Balances differ', rows: 'Some rows need a look', none: 'No balances to check' };
         $('bk-sum-check').textContent = labels[result.check] || 'No balances to check';
+        if ($('bk-warnings')) $('bk-warnings').textContent = result.warnings.length ? result.warnings.join(' ') : 'No automatic warnings; review every row against the original statement.';
         const wrap = $('bk-table');
         wrap.textContent = '';
         if (!result.rows.length) {
@@ -697,7 +1321,7 @@
         table.className = 'statement-table';
         const thead = document.createElement('thead');
         const headRow = document.createElement('tr');
-        ['Date', 'Description', 'Amount', 'Balance', 'Check'].forEach(function (label) {
+        ['Date', 'Description', 'Amount', 'Balance', 'Check', 'Confidence'].forEach(function (label) {
           const th = document.createElement('th'); th.textContent = label; headRow.appendChild(th);
         });
         thead.appendChild(headRow); table.appendChild(thead);
@@ -705,24 +1329,67 @@
         result.rows.forEach(function (row) {
           const tr = document.createElement('tr');
           if (row.check === 'bad') tr.className = 'row-bad';
-          [row.date, row.description, row.amount.toFixed(2), row.balance === null ? '—' : row.balance.toFixed(2), row.check === 'bad' ? 'Check' : (row.check === 'ok' ? 'OK' : '—')].forEach(function (text) {
-            const td = document.createElement('td'); td.textContent = text; tr.appendChild(td);
+          else if (row.duplicate) tr.className = 'row-warn';
+          const values = [row.date, row.description, row.amount.toFixed(2), row.balance === null ? '—' : row.balance.toFixed(2), row.check === 'bad' ? 'Check' : (row.check === 'ok' ? 'OK' : '—'), Math.round((row.confidence === undefined ? 0 : row.confidence) * 100) + '%'];
+          values.forEach(function (text, index) {
+            const td = document.createElement('td');
+            if (editing && index < 4) {
+              const field = document.createElement('input');
+              field.type = 'text';
+              field.value = text === '—' ? '' : text;
+              field.setAttribute('aria-label', 'Edit ' + ['date', 'description', 'amount', 'balance'][index] + ' for row ' + row.id);
+              field.dataset.row = String(row.id);
+              field.dataset.field = ['date', 'description', 'amount', 'balance'][index];
+              td.appendChild(field);
+            } else td.textContent = text;
+            tr.appendChild(td);
           });
           tbody.appendChild(tr);
         });
         table.appendChild(tbody); wrap.appendChild(table);
-        announce(status, result.rows.length + ' transaction(s) parsed. Always compare them with the original statement.');
+        announce(status, result.rows.length + ' transaction(s) parsed. Always compare them with the original statement.' + (result.duplicates ? ' ' + result.duplicates + ' possible duplicate(s) flagged.' : ''));
+      }
+      function applyEdits() {
+        if (!parsed) { announce(status, 'Parse a statement first.'); return; }
+        let changed = 0;
+        all('#bk-table input[data-row]').forEach(function (field) {
+          const row = parsed.rows.find(function (item) { return String(item.id) === field.dataset.row; });
+          if (!row) return;
+          const raw = field.value.trim();
+          if (field.dataset.field === 'date') {
+            const date = R.parseDateParts(raw, value('bk-date-order'));
+            if (date && date !== row.date) { row.date = date; changed++; }
+          } else if (field.dataset.field === 'amount' || field.dataset.field === 'balance') {
+            const amount = raw === '' ? null : R.parseMoney(raw);
+            if (amount !== null && amount !== undefined) { row[field.dataset.field] = amount; changed++; }
+          } else if (raw !== row.description) { row.description = raw || 'Transaction'; changed++; }
+        });
+        editing = false;
+        render(R.finalizeStatement(parsed.rows, { format: parsed.format }));
+        announce(status, changed ? 'Applied ' + changed + ' edited value(s). Values were not rounded.' : 'No edits were applied.');
       }
       $('bk-parse').addEventListener('click', function () {
         if (!input.value.trim()) { announce(status, 'Paste statement text first.'); return; }
-        render(R.parseStatement(input.value, { dateOrder: value('bk-date-order'), kind: value('bk-kind') }));
+        editing = false;
+        render(R.parseStatementDocument(input.value, options()));
       });
-      $('bk-sample').addEventListener('click', function () { input.value = SAMPLE; render(R.parseStatement(SAMPLE)); });
-      $('bk-clear').addEventListener('click', function () { input.value = ''; parsed = null; $('bk-table').textContent = 'Parse a statement to see its transactions.'; $('bk-sum-transactions').textContent = '0'; $('bk-sum-in').textContent = '0.00'; $('bk-sum-out').textContent = '0.00'; $('bk-sum-check').textContent = 'No balances to check'; announce(status, 'Cleared.'); });
+      $('bk-sample').addEventListener('click', function () { input.value = SAMPLE; editing = false; render(R.parseStatement(SAMPLE)); });
+      $('bk-clear').addEventListener('click', function () { input.value = ''; parsed = null; editing = false; $('bk-table').textContent = 'Parse a statement to see its transactions.'; $('bk-sum-transactions').textContent = '0'; $('bk-sum-in').textContent = '0.00'; $('bk-sum-out').textContent = '0.00'; $('bk-sum-check').textContent = 'No balances to check'; if ($('bk-warnings')) $('bk-warnings').textContent = ''; announce(status, 'Cleared.'); });
+      if ($('bk-edit')) $('bk-edit').addEventListener('click', function () {
+        if (!parsed || !parsed.rows.length) { announce(status, 'Parse a statement first.'); return; }
+        editing = true; render(parsed); announce(status, 'Values are editable. Choose Apply edits when finished.');
+      });
+      if ($('bk-apply-edits')) $('bk-apply-edits').addEventListener('click', applyEdits);
       $('bk-upload-btn').addEventListener('click', function () { $('bk-upload').click(); });
       $('bk-upload').addEventListener('change', function (event) {
         const file = event.target.files && event.target.files[0];
-        readFile(file, function (text) { input.value = text; render(R.parseStatement(text, { dateOrder: value('bk-date-order') })); }, status);
+        if (!file) return;
+        readDocumentFile(file, status).then(function (loaded) {
+          input.value = loaded.text;
+          editing = false;
+          render(R.parseStatementDocument(loaded.text, options()));
+          if (loaded.warning) announce(status, loaded.warning);
+        }).catch(function (error) { announce(status, error.message); });
       });
       $('bk-csv').addEventListener('click', function () {
         if (!parsed || !parsed.rows.length) { announce(status, 'Parse a statement first.'); return; }
@@ -736,12 +1403,15 @@
       render(R.parseStatement(SAMPLE));
     }
 
-    /* 03 — Handwriting to Font (scoped sampler) */
+    /* 03 — Handwriting to Font (scoped sampler + styled picture preview) */
     if (slug === 'handwriting-to-font-converter') {
       const pad = $('hf-pad');
       const preview = $('hf-preview');
       const status = $('hf-status');
+      const loading = $('hf-loading');
       const ctx = pad.getContext('2d');
+      const pctx = preview.getContext('2d');
+      const scratch = document.createElement('canvas');
       const sets = {
         upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
         lower: 'abcdefghijklmnopqrstuvwxyz'.split(''),
@@ -754,7 +1424,25 @@
       let tool = 'pen';
       let drawing = false;
       let last = null;
+      let padToken = 0;
+      let buildId = 0;
+      let liveTimer = null;
+      let lastSuccessful = null;
 
+      function setLoading(on) { if (loading) loading.hidden = !on; }
+      function guide(context, char) {
+        context.save();
+        context.strokeStyle = '#cbd5e1';
+        context.setLineDash([6, 6]);
+        context.strokeRect(90, 40, 340, 260);
+        context.beginPath(); context.moveTo(90, 275); context.lineTo(430, 275); context.stroke();
+        context.setLineDash([]);
+        context.fillStyle = '#94a3b8';
+        context.font = '14px system-ui, sans-serif';
+        context.fillText('baseline', 20, 279);
+        context.fillText(char === ' ' ? 'space' : char, 20, 60);
+        context.restore();
+      }
       function setGroup(group) {
         const chars = sets[group] || sets.upper;
         current = chars[0];
@@ -776,21 +1464,12 @@
         drawCurrent();
       }
       function drawCurrent() {
+        const token = ++padToken;
         ctx.clearRect(0, 0, pad.width, pad.height);
-        ctx.save();
-        ctx.strokeStyle = '#cbd5e1';
-        ctx.setLineDash([6, 6]);
-        ctx.strokeRect(90, 40, 340, 260);
-        ctx.beginPath(); ctx.moveTo(90, 275); ctx.lineTo(430, 275); ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = '14px system-ui, sans-serif';
-        ctx.fillText('baseline', 20, 279);
-        ctx.fillText(current === ' ' ? 'space' : current, 20, 60);
-        ctx.restore();
+        guide(ctx, current);
         if (glyphs[current]) {
           const img = new Image();
-          img.onload = function () { ctx.drawImage(img, 0, 0); };
+          img.onload = function () { if (token === padToken) ctx.drawImage(img, 0, 0); };
           img.src = glyphs[current];
         }
       }
@@ -832,14 +1511,23 @@
         if (!stack || !stack.length) { announce(status, 'Nothing to undo for this character.'); return; }
         const previous = stack.pop();
         const img = new Image();
-        img.onload = function () { ctx.clearRect(0, 0, pad.width, pad.height); ctx.drawImage(img, 0, 0); glyphs[current] = pad.toDataURL(); };
+        const token = ++padToken;
+        img.onload = function () {
+          if (token !== padToken) return;
+          ctx.clearRect(0, 0, pad.width, pad.height);
+          ctx.drawImage(img, 0, 0);
+          glyphs[current] = pad.toDataURL();
+        };
         img.src = previous;
       });
-      $('hf-clear').addEventListener('click', function () { saveUndo(); drawCurrent(); delete glyphs[current]; announce(status, 'Character cleared.'); });
+      $('hf-clear').addEventListener('click', function () {
+        saveUndo(); delete glyphs[current]; drawCurrent(); announce(status, 'Character cleared.');
+        if (checked('hf-live')) scheduleLive();
+      });
       $('hf-pen-size').addEventListener('input', function () { $('hf-pen-size-label').textContent = value('hf-pen-size') + 'px'; });
       all('input[name="hf-group"]').forEach(function (el) { el.addEventListener('change', function () { setGroup(radioValue('hf-group')); }); });
       document.addEventListener('keydown', function (event) {
-        if (event.target && /INPUT|TEXTAREA/.test(event.target.tagName)) return;
+        if (event.target && /INPUT|TEXTAREA|SELECT/.test(event.target.tagName)) return;
         const groups = radioValue('hf-group') || 'upper';
         const chars = sets[groups] || sets.upper;
         const index = chars.indexOf(current);
@@ -847,44 +1535,155 @@
         if (event.key === 'ArrowLeft' && index > 0) { select(chars[index - 1]); }
       });
       all('[data-hf-phrase]').forEach(function (button) {
-        button.addEventListener('click', function () { $('hf-text').value = button.getAttribute('data-hf-phrase'); });
+        button.addEventListener('click', function () {
+          $('hf-text').value = button.getAttribute('data-hf-phrase');
+          if (checked('hf-live')) scheduleLive();
+        });
       });
-      function buildPreview() {
-        const pctx = preview.getContext('2d');
-        pctx.fillStyle = '#ffffff'; pctx.fillRect(0, 0, preview.width, preview.height);
-        const text = value('hf-text');
-        const size = Number(value('hf-size')) || 44;
-        const gap = Number(value('hf-gap')) || 10;
-        let x = 24, y = 40, drawn = 0, missing = 0;
-        for (let i = 0; i < text.length; i++) {
-          const char = text.charAt(i);
-          if (char === '\n') { x = 24; y += size + 20; continue; }
-          if (char === ' ') { x += size * 0.45 + gap; continue; }
-          const data = glyphs[char];
-          if (!data) { missing++; x += size * 0.6 + gap; continue; }
-          const img = new Image();
-          img.src = data;
-          // draw lazily when the image is decoded; capture current x/y/size
-          img.onload = (function (ix, iy, isz) {
-            return function () { pctx.drawImage(img, ix, iy, isz, isz); };
-          })(x, y, size);
-          x += size + gap; drawn++;
-          if (x > preview.width - size) { x = 24; y += size + 20; }
-        }
-        announce(status, drawn + ' glyph(s) previewed' + (missing ? ', ' + missing + ' not drawn yet' : '') + '. This is a picture preview, not a font file.');
+
+      function viewOptions() {
+        return {
+          size: Number(value('hf-size')) || 44,
+          gap: Number(value('hf-gap')) || 10,
+          lineHeight: Number(value('hf-line-height')) || 1.2,
+          zoom: Number(value('hf-zoom')) || 100,
+          font: value('hf-font') || 'sans',
+          style: value('hf-style') || 'regular',
+          color: value('hf-color') || '#0f172a',
+          bg: value('hf-bg') || '#ffffff'
+        };
       }
-      $('hf-build').addEventListener('click', buildPreview);
-      $('hf-download').addEventListener('click', function () {
-        buildPreview();
+      function fontStack(font) {
+        if (font === 'serif') return 'Georgia, "Times New Roman", serif';
+        if (font === 'mono') return 'ui-monospace, Consolas, monospace';
+        if (font === 'script') return '"Segoe Script", "Bradley Hand", "Comic Sans MS", cursive';
+        return 'system-ui, -apple-system, sans-serif';
+      }
+      function loadImage(src) {
+        return new Promise(function (resolve, reject) {
+          const img = new Image();
+          img.onload = function () { resolve(img); };
+          img.onerror = function () { reject(new Error('One of the drawn glyphs could not be decoded.')); };
+          img.src = src;
+        });
+      }
+      function restoreLast() {
+        pctx.clearRect(0, 0, preview.width, preview.height);
+        if (!lastSuccessful) {
+          pctx.fillStyle = '#ffffff';
+          pctx.fillRect(0, 0, preview.width, preview.height);
+          pctx.fillStyle = '#64748b';
+          pctx.font = '16px system-ui, sans-serif';
+          pctx.fillText('Draw a glyph, then build a preview.', 20, 32);
+        }
+      }
+      async function buildPreview(options) {
+        const opts = options || {};
+        const id = ++buildId;
+        setLoading(true);
         try {
-          const link = document.createElement('a');
-          link.download = 'handwriting-preview.png';
-          link.href = preview.toDataURL('image/png');
-          document.body.appendChild(link); link.click(); document.body.removeChild(link);
-          announce(status, 'Preview image downloaded.');
-        } catch (e) { announce(status, 'Download is not supported in this browser.'); }
+          const view = viewOptions();
+          const scale = view.zoom / 100;
+          const size = view.size * scale;
+          const gap = view.gap * scale;
+          const lineHeight = view.lineHeight;
+          if (scratch.width !== preview.width || scratch.height !== preview.height) {
+            scratch.width = preview.width; scratch.height = preview.height;
+          }
+          const sctx = scratch.getContext('2d');
+          sctx.setTransform(1, 0, 0, 1, 0, 0);
+          sctx.globalCompositeOperation = 'source-over';
+          sctx.globalAlpha = 1;
+          sctx.fillStyle = view.bg;
+          sctx.fillRect(0, 0, scratch.width, scratch.height);
+          sctx.fillStyle = view.color;
+          sctx.textBaseline = 'top';
+          const weight = /bold/.test(view.style) ? '700' : '400';
+          const italic = /italic/.test(view.style);
+          sctx.font = weight + ' ' + Math.max(10, Math.round(size * 0.55)) + 'px ' + fontStack(view.font);
+          const text = value('hf-text');
+          const sources = {};
+          for (let i = 0; i < text.length; i++) {
+            const char = text.charAt(i);
+            if (glyphs[char] && !sources[char]) sources[char] = glyphs[char];
+          }
+          const keys = Object.keys(sources);
+          const loaded = await Promise.all(keys.map(function (key) {
+            return loadImage(sources[key]).then(function (img) { return { key: key, img: img }; })
+              .catch(function () { return { key: key, img: null }; });
+          }));
+          if (id !== buildId) return;
+          const images = {};
+          loaded.forEach(function (item) { images[item.key] = item.img; });
+          let x = 24 * scale, y = 40 * scale, drawn = 0, missing = 0;
+          for (let i = 0; i < text.length; i++) {
+            const char = text.charAt(i);
+            if (char === '\n') { x = 24 * scale; y += size * lineHeight + 20 * scale; continue; }
+            if (char === ' ') { x += size * 0.45 + gap; continue; }
+            const img = images[char];
+            if (!img) {
+              missing++;
+              sctx.fillText(char, x, y + size * 0.18);
+              x += Math.max(size * 0.6, sctx.measureText(char).width) + gap;
+            } else {
+              sctx.save();
+              if (italic) sctx.transform(1, 0, -0.18, 1, 0, 0);
+              sctx.drawImage(img, x, y, size, size);
+              if (weight === '700') sctx.drawImage(img, x + 1.5 * scale, y, size, size);
+              sctx.restore();
+              drawn++;
+              x += size + gap;
+            }
+            if (x > preview.width - size * 0.6) { x = 24 * scale; y += size * lineHeight + 20 * scale; }
+          }
+          if (id !== buildId) return;
+          pctx.clearRect(0, 0, preview.width, preview.height);
+          pctx.drawImage(scratch, 0, 0);
+          lastSuccessful = scratch.toDataURL('image/png');
+          if (!opts.silent) {
+            announce(status, drawn + ' glyph(s) previewed' + (missing ? ', ' + missing + ' not drawn yet' : '') + '. This is a picture preview, not a font file.');
+          }
+        } catch (error) {
+          if (id !== buildId) return;
+          restoreLast();
+          announce(status, 'Preview could not be built: ' + (error && error.message ? error.message : 'check your options and try again.'));
+        } finally {
+          if (id === buildId) setLoading(false);
+        }
+      }
+      function scheduleLive() {
+        clearTimeout(liveTimer);
+        liveTimer = setTimeout(function () { buildPreview(); }, 140);
+      }
+      if ($('hf-build')) $('hf-build').addEventListener('click', function () { buildPreview(); });
+      $('hf-download').addEventListener('click', function () {
+        buildPreview({ silent: true }).then(function () {
+          try {
+            const link = document.createElement('a');
+            link.download = 'handwriting-preview.png';
+            link.href = lastSuccessful || preview.toDataURL('image/png');
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            announce(status, 'Preview image downloaded.');
+          } catch (e) { announce(status, 'Download is not supported in this browser.'); }
+        });
+      });
+      $('hf-text').addEventListener('input', function () { if (checked('hf-live')) scheduleLive(); });
+      if ($('hf-live')) $('hf-live').addEventListener('change', function () {
+        if (checked('hf-live')) { scheduleLive(); announce(status, 'Live preview enabled.'); }
+        else announce(status, 'Live preview disabled. Use Build preview to refresh.');
+      });
+      ['hf-size', 'hf-gap', 'hf-line-height', 'hf-zoom', 'hf-font', 'hf-style', 'hf-color', 'hf-bg'].forEach(function (id) {
+        const node = $(id);
+        if (!node) return;
+        node.addEventListener(node.type === 'range' ? 'input' : 'change', function () {
+          if (id === 'hf-line-height') $('hf-line-height-label').textContent = value(id);
+          if (id === 'hf-zoom') $('hf-zoom-label').textContent = value(id) + '%';
+          if (checked('hf-live')) scheduleLive();
+        });
       });
       setGroup('upper');
+      restoreLast();
+      buildPreview({ silent: true });
     }
   });
 
@@ -950,5 +1749,9 @@
     document.addEventListener('keydown', onKey);
     overlay.addEventListener('click', function (event) { if (event.target === overlay) close(); });
     $('br-rv-close').focus();
+  }
+
+  if (typeof window !== 'undefined') {
+    window.ReferenceRuntime = { readDocumentFile: readDocumentFile, renderSafeHtml: renderSafeHtml };
   }
 })();

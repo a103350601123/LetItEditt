@@ -750,7 +750,9 @@
         ]
       }
     ],
-    "url": "image-flip-rotate/index.html"
+    "url": "image-flip-rotate/index.html",
+    "published": false,
+    "redirectTo": "/image-editor/"
   },
   {
     "slug": "image-resizer",
@@ -1410,5 +1412,116 @@
       }
     ],
     "url": "image-compressor/index.html"
+  },
+  {
+    "slug": "thumbnail-generator",
+    "name": "Thumbnail Generator",
+    "engine": "thumbnail-generator",
+    "title": "Thumbnail Generator — Verified Social Sizes, Free & Local",
+    "description": "Create thumbnails at verified YouTube, Shorts, Instagram, TikTok, Facebook, LinkedIn, X and Pinterest dimensions. Edit text, shapes and photos locally; no upload.",
+    "h1": "Thumbnail Generator",
+    "icon": "🖼️",
+    "layout": "engine",
+    "outputType": "image",
+    "intro": "Design click-worthy thumbnails and social graphics at exact, verified platform dimensions. Build original templates from your own photos, shapes, stickers and text, then export a crisp PNG, JPG or WebP entirely in your browser.",
+    "instructions": [
+      "Choose a verified preset such as YouTube 1280×720 or Instagram post 1080×1080, or enter a custom canvas size.",
+      "Add your own images through the upload area, then drag a layer on the preview to position it. Use the sliders for exact size, position and rotation.",
+      "Add text, shapes or emoji stickers, pick a background and adjust brightness, contrast and saturation.",
+      "Undo or redo mistakes, duplicate useful layers, then choose PNG, JPG or WebP and download the finished thumbnail."
+    ],
+    "example": {
+      "input": "One 1600×900 photo, a YouTube 1280×720 preset, one headline layer and a star sticker.",
+      "output": "A 1280×720 PNG thumbnail with a cropped photo, bold outlined headline and star sticker, downloaded locally."
+    },
+    "faqs": [
+      {
+        "q": "Are the social media dimensions accurate?",
+        "a": "Yes. Each preset stores the documented pixel size for that placement, for example 1280×720 for a YouTube thumbnail, 1080×1920 for Reels and Stories, 1200×630 for a Facebook post and 1000×1500 for a Pinterest Pin. The canvas is never silently resized on export."
+      },
+      {
+        "q": "Can I use trending templates or characters?",
+        "a": "No copyrighted artwork is bundled. The included templates are original arrangements of text, borders, gradients, simple shapes and standard system emoji. Use your own licensed images or artwork you have permission to reuse."
+      },
+      {
+        "q": "Can I move and resize text on a phone?",
+        "a": "Yes. Layer dragging uses pointer events, which work with a finger or a mouse. The numeric sliders give precise positioning when a touch screen is less convenient, and every layer stores its own font, colour, outline, shadow, alignment and rotation."
+      },
+      {
+        "q": "Does background removal use AI?",
+        "a": "No. The optional removal tool is a local colour-flood filter that clears plain backgrounds connected to the image edges. It works well on studio backdrops and flat colours, but detailed scenes need manual masking in a dedicated editor."
+      },
+      {
+        "q": "Is anything uploaded?",
+        "a": "Nothing is uploaded. Image decoding, drawing and encoding all happen in your browser with temporary object URLs that are released when you reset or leave the page."
+      }
+    ],
+    "related": [
+      "image-editor",
+      "screenshot-beautifier",
+      "add-border-to-image",
+      "image-resizer"
+    ],
+    "aliases": [
+      "social thumbnail maker",
+      "youtube thumbnail creator",
+      "social media graphic"
+    ],
+    "keywords": [
+      "thumbnail generator",
+      "youtube thumbnail",
+      "instagram post size",
+      "social media design",
+      "tiktok cover",
+      "thumbnail maker"
+    ],
+    "isNew": true,
+    "added": "2026-11-20",
+    "featured": false,
+    "article": [
+      {
+        "heading": "Why exact dimensions matter",
+        "paragraphs": [
+          "A thumbnail is the first thing a viewer sees, and a canvas that is even slightly off the platform size can be cropped, padded or softened before it appears in a feed. This generator starts from the published pixel dimensions for each supported placement, so the file you download matches the frame you designed. YouTube thumbnails use 1280 by 720 pixels. Shorts, Reels, Stories and TikTok use a vertical 1080 by 1920 frame. A Facebook link post is 1200 by 630, a Facebook cover is 851 by 315, a LinkedIn banner is 1584 by 396, a standard X card is 1200 by 675 and a Pinterest Pin is 1000 by 1500. Each option shows its size in the selector before you choose it.",
+          "Working at the target size also avoids surprise interpolation. If you design at a smaller size and let a platform scale the result upward, text edges become blurred. Here the preview canvas is the export canvas, and PNG, JPG or WebP encoding preserves the exact pixel grid. You can still pick a custom size for a platform that changes its requirements later."
+        ]
+      },
+      {
+        "heading": "Layering without a heavyweight design app",
+        "paragraphs": [
+          "The editor treats every headline, shape, sticker and uploaded photo as a separate layer. Add a layer from the current controls, give it a name, and it appears in the layer list where you can select, duplicate or delete it. Each layer keeps its own position, size, rotation, font, colour, outline, shadow and alignment. Dragging on the preview moves the selected layer with a pointer, so the same gesture works with a mouse, pen or finger.",
+          "Alignment guides appear while dragging and the alignment buttons snap the active layer to the left, centre, right, top, middle or bottom of the canvas. This makes it straightforward to build a repeatable layout: place a photo, centre a headline, add a small badge in a corner, then duplicate the file and swap only the photograph for the next video."
+        ]
+      },
+      {
+        "heading": "Original templates and safe artwork",
+        "paragraphs": [
+          "Four starter templates are included: a bold headline, a quote card, a sale badge and a split-photo composition. They are built from ordinary canvas rectangles, gradients, strokes and text, so nothing is licensed from a third party. The sticker row uses standard emoji characters provided by your device font. You remain responsible for the images you upload, but the tool never supplies a copyrighted character, logo or trending graphic on your behalf.",
+          "Background choices include a two-colour gradient, a solid colour and transparency for layouts that will be composited later. A plain-background removal option is available for studio-style photos. It compares edge pixels with the corner colour and clears matching regions to transparent. Because it is deterministic and local rather than a neural network, flat backdrops work well and textured scenes may need a different source image."
+        ]
+      },
+      {
+        "heading": "Readable text at small sizes",
+        "paragraphs": [
+          "Thumbnails are usually viewed at a fraction of their native size. A headline that looks elegant at full scale can disappear in a recommendation row. Use the font size, outline and shadow controls to preserve contrast, and keep important words away from the very edge of the frame because feeds may round or overlay the corners. The live preview uses the selected font stack, so what you see matches the downloaded file on the same device.",
+          "The text layer supports single-line labels and short multi-line captions. Left, centre and right alignment apply within the layer box, while rotation lets you create angled badges. If a font is unavailable on another device, the browser falls back to the generic family named in the stack; exporting as PNG freezes the rendered pixels so the design remains stable when shared."
+        ]
+      },
+      {
+        "heading": "Undo, history and careful export",
+        "paragraphs": [
+          "Design work is iterative, so every structural action stores a snapshot. Adding, updating, duplicating or deleting a layer, changing the canvas size and applying background removal can all be stepped back with Undo and forward with Redo. This encourages experimentation without the fear of losing a carefully placed headline. Reset releases all temporary image URLs and clears the canvas.",
+          "Before downloading, choose the format that fits the destination. PNG keeps transparency and sharp edges for text-heavy designs. JPG produces smaller files for photo-led thumbnails, and WebP offers a modern compromise where the browser supports it. The quality slider only affects lossy formats. A downloaded thumbnail is a new file; your original photographs are never overwritten or sent anywhere."
+        ]
+      },
+      {
+        "heading": "Privacy and honest limitations",
+        "paragraphs": [
+          "Everything runs in the browser. Uploaded images live only in memory and in short-lived object URLs that are revoked when you change or reset them. There is no account, no remote rendering service and no paid API. That design keeps private or unreleased artwork on your device, but it also means the editor cannot fetch stock photos, recognise faces or invent imagery for you.",
+          "This is a layout tool, not an AI image generator. It will not fabricate a scene from a text prompt, and no fake generation feature is presented. If you need illustrative artwork, create or license it yourself and bring it in as an image layer. What the generator does provide is precise sizing, movable layers, real adjustments and a predictable export so your own material looks its best."
+        ]
+      }
+    ],
+    "url": "thumbnail-generator/index.html"
   }
 ]

@@ -3,22 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Remove Punctuation — Strip Punctuation Marks Online</title>
-<meta name="description" content="Remove Unicode punctuation marks from text while keeping letters, numbers, emoji and symbols intact.">
+<title>Remove Punctuation — Strip Punctuation Marks in Text and Documents</title>
+<meta name="description" content="Remove all Unicode punctuation, common English marks or your own chosen characters from pasted text, TXT, CSV, Markdown or DOCX while keeping letters and numbers.">
 <meta name="theme-color" content="#2563eb">
 <link rel="canonical" href="https://letitedit.com/tools/writing-text/remove-punctuation/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Remove Punctuation — Strip Punctuation Marks Online">
-<meta property="og:description" content="Remove Unicode punctuation marks from text while keeping letters, numbers, emoji and symbols intact.">
+<meta property="og:title" content="Remove Punctuation — Strip Punctuation Marks in Text and Documents">
+<meta property="og:description" content="Remove all Unicode punctuation, common English marks or your own chosen characters from pasted text, TXT, CSV, Markdown or DOCX while keeping letters and numbers.">
 <meta property="og:url" content="https://letitedit.com/tools/writing-text/remove-punctuation/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../../../css/site.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","name":"Remove Punctuation","mainEntity":[{"@type":"Question","name":"Are emoji kept?","acceptedAnswer":{"@type":"Answer","text":"Yes. This tool removes punctuation marks only. Use Remove Emojis for pictographic symbols."}}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Remove Punctuation","description":"Remove all Unicode punctuation, common English marks or your own chosen characters from pasted text, TXT, CSV, Markdown or DOCX while keeping letters and numbers.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/writing-text/remove-punctuation/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Writing \u0026 Text Tools","item":"https://letitedit.com/tools/writing-text/"},{"@type":"ListItem","position":3,"name":"Remove Punctuation","item":"https://letitedit.com/tools/writing-text/remove-punctuation/"}]},{"@type":"FAQPage","name":"Remove Punctuation","mainEntity":[{"@type":"Question","name":"Are emoji and non-Latin scripts kept?","acceptedAnswer":{"@type":"Answer","text":"Yes. Only punctuation characters are removed. Letters from every script, numbers, emoji, symbols, spaces and line breaks are kept."}},{"@type":"Question","name":"What is the difference between all and common punctuation?","acceptedAnswer":{"@type":"Answer","text":"All uses the Unicode punctuation property and also removes marks such as curly quotes, em dashes and CJK punctuation. Common removes only the familiar English marks: . , ! ? ; : ' \" ( ) [ ] { } - – — _ / \\ @ # \u0026 * and the quotation variants."}},{"@type":"Question","name":"Can I open a Word document?","acceptedAnswer":{"@type":"Answer","text":"DOCX files are read locally where the browser supports decompression and only their text is cleaned. Layout, tables and styling are not kept. PDF and legacy .doc files are rejected with an explanation instead of being silently mangled."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-text">
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
@@ -30,19 +33,21 @@
       <a href="/blog/">Blog</a>
       <a href="/tools/">All Tools</a>
       <a href="/faq/">FAQ</a>
-      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" aria-controls="search-strip" aria-expanded="false" title="Search tools"><span aria-hidden="true">🔍</span></button>
     </div>
   </nav>
 </header>
-<div class="site-search-strip" id="search-strip">
+<div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
+      <label class="sr-only" for="site-search">Search all 61 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
-      <div class="search-results" id="search-results" role="listbox" hidden></div>
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
+<div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="../../../">Home</a><span>/</span>
   <a href="../../../tools/writing-text/">Writing &amp; Text Tools</a><span>/</span>
@@ -52,32 +57,33 @@
   <div class="tool-head-copy">
     <span class="eyebrow">Writing &amp; Text Tools</span>
     <h1>Remove Punctuation</h1>
-    <p>Use Unicode punctuation properties rather than a short English-only list, so accented and multilingual text is handled correctly.</p>
+    <p>Choose between all Unicode punctuation, a smaller common-English set, or a custom list of characters. Accented letters, numbers, emoji and line breaks are preserved.</p>
   </div>
   <div class="tool-trust" aria-label="How this tool handles your files">
     <span class="trust-pill"><span aria-hidden="true">✓</span> Local processing</span>
     <span class="trust-pill"><span aria-hidden="true">✓</span> No upload</span>
   </div>
 </section>
-<section class="container workspace">
-  <div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>
-  <div class="panel-grid">
-    <div class="workspace-panel"><div class="field"><label for="tool-input">Input text</label><textarea id="tool-input" placeholder="Paste or type your text here…"></textarea></div>
-         <div id="controls"></div>
-         <div class="output-actions"><button class="btn btn-secondary btn-small" id="clear-input" type="button">Clear input</button></div></div>
-    <div class="workspace-panel workspace-panel-output">
-      <div class="workspace-head">
-        <h2>Output</h2>
-        <div class="output-actions">
-          <button class="btn btn-secondary btn-small" id="copy-output" type="button">Copy output</button>
-          <button class="btn btn-secondary btn-small" id="download-output" type="button">Download</button>
-          <button class="btn btn-secondary btn-small" id="restore-output" type="button" hidden>Restore original values</button>
-        </div>
-      </div>
-      <div class="output-box" id="tool-output"></div>
-      <div class="status" id="tool-status" role="status" aria-live="polite"></div>
-    </div>
+<section class="container workspace engine-workspace" data-engine="remove-punctuation">
+<div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>
+<div class="engine-grid engine-simple">
+  <div class="engine-controls">
+    <div class="field"><label>Upload TXT, CSV, MD or DOCX</label><input type="file" id="rp-upload" accept=".txt,.csv,.tsv,.md,.markdown,.json,.log,.xml,.html,.htm,.docx,text/plain,text/csv"></div>
+    <div class="field"><label>Or paste text</label><textarea id="tool-input" rows="8" placeholder="Paste text containing punctuation…"></textarea></div>
+    <div class="two-cols"><div class="field"><label>Punctuation to remove</label><select id="rp-types"><option value="all">All Unicode punctuation</option><option value="common">Common English marks</option><option value="custom">Custom characters</option></select></div><div class="field"><label>Custom characters</label><input type="text" id="rp-chars" placeholder="e.g. ,!?;:" disabled></div></div>
+    <p class="hint">Letters, numbers, emoji, symbols, spaces and line breaks are preserved. Custom mode removes only the characters you type.</p>
+    <div class="output-actions"><button type="button" class="btn" id="rp-apply">Remove punctuation</button><button type="button" class="btn btn-secondary btn-small" id="clear-input">Clear input</button></div>
   </div>
+  <div class="engine-output">
+    <div class="workspace-head"><h2>Output</h2><div class="output-actions">
+      <button type="button" class="btn btn-secondary btn-small" id="copy-output">Copy</button>
+      <button type="button" class="btn btn-secondary btn-small" id="download-output">Download</button>
+    </div></div>
+    <pre id="tool-output" class="output-box"></pre>
+    <div class="status" id="tool-status" role="status" aria-live="polite"></div>
+    <p class="hint warning">DOCX support extracts text only; PDF and legacy .doc files are rejected with an explanation. Only the text is cleaned, never the document layout.</p>
+  </div>
+</div>
 </section>
 <section class="container tool-principles" aria-label="How this tool works">
   <div class="principle"><span class="principle-icon" aria-hidden="true">⚙️</span><div><strong>Real processing</strong><p>Every result is produced from your own input in this browser, not from a simulated preview.</p></div></div>
@@ -88,7 +94,7 @@
   <div class="container info-grid">
     <div class="info-card">
       <h2>How to use Remove Punctuation</h2>
-      <ol><li>Paste your text.</li><li>Punctuation marks are removed live.</li><li>Copy the result.</li></ol>
+      <ol><li>Paste text or load a TXT, CSV, Markdown or DOCX file.</li><li>Choose All Unicode punctuation, Common English marks, or Custom characters.</li><li>In Custom mode, type the exact characters to remove, then copy or download the result.</li></ol>
     </div>
     <div class="info-card">
       <h2>Example</h2>
@@ -98,14 +104,30 @@
     </div>
   </div>
 </section>
-
+<section class="section section-soft">
+  <div class="container"><article class="article-card">
+      <span class="eyebrow">In-depth guide</span>
+      <h2>Three ways to choose what gets removed</h2>
+      <p>The default All mode looks at the Unicode punctuation property, so it handles straight and curly quotes, em and en dashes, ellipses, and punctuation from scripts beyond Latin. Common mode uses a shorter list of marks that are familiar in English prose, which is useful when you want dashes or apostrophes left alone. Custom mode removes exactly the characters you type into the box and nothing else.</p>
+      <p>Whitespace is never treated as punctuation. Spaces, tabs and line breaks stay where they are, so the shape of your paragraphs and lists survives the operation. That makes the output safe to paste into a spreadsheet or a plain-text editor.</p>
+      <h2>Documents and honest scope</h2>
+      <p>Text-like files such as TXT, CSV, TSV, Markdown, JSON and HTML are read directly as text. DOCX files are opened as ZIP archives in the browser and the paragraph text is extracted from the document XML. If the browser cannot decompress the archive, the tool reports the problem and suggests saving the document as text instead.</p>
+      <p>Only text is processed. A DOCX file can contain tables, columns, text boxes, headers and character formatting; none of that layout is preserved. PDF files and legacy .doc files need parsers this browser tool does not include, so they are rejected clearly rather than guessed at.</p>
+  </article></div>
+</section>
 <section class="section">
   <div class="container info-grid">
     <div class="info-card">
       <h2>Frequently asked questions</h2>
       <details class="faq-item">
-  <summary>Are emoji kept?</summary>
-  <p>Yes. This tool removes punctuation marks only. Use Remove Emojis for pictographic symbols.</p>
+  <summary>Are emoji and non-Latin scripts kept?</summary>
+  <p>Yes. Only punctuation characters are removed. Letters from every script, numbers, emoji, symbols, spaces and line breaks are kept.</p>
+</details><details class="faq-item">
+  <summary>What is the difference between all and common punctuation?</summary>
+  <p>All uses the Unicode punctuation property and also removes marks such as curly quotes, em dashes and CJK punctuation. Common removes only the familiar English marks: . , ! ? ; : &#39; &quot; ( ) [ ] { } - – — _ / \ @ # &amp; * and the quotation variants.</p>
+</details><details class="faq-item">
+  <summary>Can I open a Word document?</summary>
+  <p>DOCX files are read locally where the browser supports decompression and only their text is cleaned. Layout, tables and styling are not kept. PDF and legacy .doc files are rejected with an explanation instead of being silently mangled.</p>
 </details>
     </div>
     <div class="info-card">
@@ -116,6 +138,7 @@
     </div>
   </div>
 </section>
+</div>
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">
@@ -169,8 +192,8 @@
 <script src="../../../js/sidebar-data.js"></script>
 <script src="../../../js/site.js"></script>
 <script src="../../../js/category-sidebar.js"></script>
-<script src="../../../js/text-core.js"></script>
-<script src="../../../js/tool-runtime.js"></script>
-<script id="tool-config" type="application/json">{"slug":"remove-punctuation","engine":null,"layout":"single","outputType":"text","controls":[],"example":{"input":"Hello, world! How's it going?","output":"Hello world Hows it going"}}</script>
+<script src="../../../js/reference-core.js"></script>
+<script src="../../../js/reference-runtime.js"></script>
+<script id="tool-config" type="application/json">{"slug":"remove-punctuation","engine":"remove-punctuation","layout":"single","outputType":"text","controls":[{"type":"select","key":"types","label":"Punctuation to remove","default":"all","options":[["all","All Unicode punctuation"],["common","Common English marks"],["custom","Custom characters"]]},{"type":"text","key":"chars","label":"Custom characters","default":""}],"example":{"input":"Hello, world! How's it going?","output":"Hello world Hows it going"}}</script>
 </body>
 </html>

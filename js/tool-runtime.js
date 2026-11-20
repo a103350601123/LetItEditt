@@ -152,11 +152,11 @@
         case 'remove-extra-spaces':
           return resultText(ToolCore.removeExtraSpaces(value));
         case 'remove-empty-lines':
-          return resultText(ToolCore.removeEmptyLines(value));
+          return resultText(ToolCore.removeEmptyLines(value, { preserveParagraphs: cfg.preserveParagraphs === true }));
         case 'remove-emojis':
           return resultText(ToolCore.removeEmojis(value));
         case 'remove-punctuation':
-          return resultText(ToolCore.removePunctuation(value));
+          return resultText(ToolCore.removePunctuation(value, { types: cfg.types, chars: cfg.chars }));
         case 'word-wrap':
           return resultText(ToolCore.wordWrap(value, cfg.width, { breakLongWords: cfg.breakLongWords === true }));
         case 'smart-quotes':
@@ -180,10 +180,12 @@
           return resultText(ToolCore.addAffix(value, cfg));
         case 'morse-code':
           return resultText(cfg.mode === 'decode' ? ToolCore.morseDecode(value) : ToolCore.morseEncode(value));
-        case 'text-to-binary':
-          return resultText(ToolCore.textToBinary(value));
+        case 'text-to-binary': {
+          var encoded = ToolCore.textToBinary(value, { encoding: cfg.encoding });
+          return encoded.ok ? resultText(encoded.text) : resultError(encoded.error);
+        }
         case 'binary-to-text': {
-          var decoded = ToolCore.binaryToText(value);
+          var decoded = ToolCore.binaryToText(value, { encoding: cfg.encoding });
           return decoded.ok ? resultText(decoded.text) : resultError(decoded.error);
         }
         case 'bionic-reading':
@@ -271,10 +273,15 @@
     }
 
     function copyOutput() {
+      var plain = latest.text || (latest.html ? stripMarkup(latest.html) : '');
+      if (!plain && !latest.html) {
+        setStatus('Nothing to copy yet.', false);
+        return;
+      }
       var useHtml = config.outputType === 'html' && latest.html && navigator.clipboard && window.ClipboardItem;
       var payload = useHtml
-        ? [new window.ClipboardItem({ 'text/html': new Blob([latest.html], { type: 'text/html' }), 'text/plain': new Blob([latest.text], { type: 'text/plain' }) })]
-        : [latest.html || latest.text];
+        ? [new window.ClipboardItem({ 'text/html': new Blob([latest.html], { type: 'text/html' }), 'text/plain': new Blob([plain], { type: 'text/plain' }) })]
+        : [plain];
       var promise = useHtml ? navigator.clipboard.write(payload) : copyText(payload[0]);
       Promise.resolve(promise).then(function () {
         setStatus(useHtml ? 'Rich HTML copied.' : 'Output copied.', false);
@@ -283,9 +290,21 @@
       });
     }
 
+    function stripMarkup(html) {
+      return String(html || '')
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<[^>]+>/g, '')
+        .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
+    }
+
     function downloadOutput() {
-      var content = config.outputType === 'html' && latest.html ? latest.html : latest.text;
-      var extension = config.outputType === 'html' ? 'html' : 'txt';
+      var asHtml = config.outputType === 'html' && !!latest.html;
+      var content = asHtml ? latest.html : (latest.text || stripMarkup(latest.html));
+      if (!content) {
+        setStatus('Nothing to download yet.', false);
+        return;
+      }
+      var extension = asHtml ? 'html' : 'txt';
       var blob = new Blob([content], { type: extension === 'html' ? 'text/html;charset=utf-8' : 'text/plain;charset=utf-8' });
       var url = URL.createObjectURL(blob);
       var link = document.createElement('a');

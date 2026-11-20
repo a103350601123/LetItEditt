@@ -1,7 +1,8 @@
 /* Timeline: ruler, tracks, clips, drag / trim / snapping / zoom */
 (function () {
   const VE = (window.VE = window.VE || {});
-  const HEAD = 168;
+  /* Must match --head-w in css/styles.css. */
+  const HEAD = 132;
 
   const TRACK_ICON = { video: 'film', overlay: 'layers', text: 'type', audio: 'music' };
 
@@ -89,7 +90,7 @@
       this.contentEl.style.setProperty('--lane-w', laneW + 'px');
 
       this.renderRuler(duration + 8, pps, laneW);
-      this.tracksEl.innerHTML = project.tracks.map(track => this.trackHtml(track, pps, laneW)).join('');
+      this.tracksEl.innerHTML = project.tracks.map((track, i) => this.trackHtml(track, i, pps, laneW)).join('');
       this.updateSelection();
       this.updatePlayhead();
       app.updateTransport();
@@ -121,32 +122,37 @@
       this.laneW = laneW;
     },
 
-    trackHtml(track, pps, laneW) {
+    trackHtml(track, trackIndex, pps, laneW) {
       const app = this.app;
-      const h = track.type === 'audio' ? 54 : 68;
+      const h = track.type === 'audio' ? 62 : 78;
       const iconName = TRACK_ICON[track.type] || 'layers';
+      const z = trackIndex + 1;
       const buttons = [];
       if (track.type !== 'audio') {
-        buttons.push(`<button data-act="hide" class="${track.hidden ? 'warn' : 'on'}" title="${track.hidden ? 'Show' : 'Hide'} track">${VE.icon(track.hidden ? 'eye-off' : 'eye')}</button>`);
+        buttons.push(`<button data-act="hide" class="${track.hidden ? 'warn' : 'on'}" title="${track.hidden ? 'Show' : 'Hide'} track${track.groupId ? ' (group)' : ''}">${VE.icon(track.hidden ? 'eye-off' : 'eye')}</button>`);
       }
       if (track.type !== 'text') {
-        buttons.push(`<button data-act="mute" class="${track.muted ? 'warn' : 'on'}" title="${track.muted ? 'Unmute' : 'Mute'} track">${VE.icon(track.muted ? 'volume-x' : 'volume')}</button>`);
+        buttons.push(`<button data-act="mute" class="${track.muted ? 'warn' : 'on'}" title="${track.muted ? 'Unmute' : 'Mute'} track${track.groupId ? ' (group)' : ''}">${VE.icon(track.muted ? 'volume-x' : 'volume')}</button>`);
       }
-      buttons.push(`<button data-act="lock" class="${track.locked ? 'on' : ''}" title="${track.locked ? 'Unlock' : 'Lock'} track">${VE.icon(track.locked ? 'lock' : 'unlock')}</button>`);
+      buttons.push(`<button data-act="lock" class="${track.locked ? 'warn' : ''}" title="${track.locked ? 'Unlock' : 'Lock'} track${track.groupId ? ' (group)' : ''}">${VE.icon(track.locked ? 'lock' : 'unlock')}</button>`);
+      buttons.push(`<button data-act="group" class="${track.groupId ? 'grouped' : ''}" title="${track.groupId ? 'Ungroup' : 'Group with adjacent track'}">${VE.icon(track.groupId ? 'ungroup' : 'group')}</button>`);
+      buttons.push(`<button data-act="up" title="Move track forward (higher Z)">${VE.icon('up')}</button>`);
+      buttons.push(`<button data-act="down" title="Move track backward (lower Z)">${VE.icon('down')}</button>`);
       buttons.push(`<button data-act="del" title="Delete track">${VE.icon('x')}</button>`);
 
       const head = `<div class="tl-head-cell" style="height:${h}px">
-        <div class="track-head">
+        <div class="track-head${track.groupId ? ' grouped' : ''}">
           <div class="th-top">
             <span class="th-icon">${VE.icon(iconName)}</span>
             <span class="th-name">${VE.escapeHtml(track.name)}</span>
+            <span class="th-z" title="Stack order">Z${z}</span>
           </div>
           <div class="th-btns">${buttons.join('')}</div>
         </div>
       </div>`;
 
       const clips = track.clips.slice().sort((a, b) => a.start - b.start).map(c => this.clipHtml(c, track, pps)).join('');
-      return `<div class="tl-row" data-track-row="${track.id}" style="height:${h}px">
+      return `<div class="tl-row${track.groupId ? ' grouped' : ''}" data-track-row="${track.id}" style="height:${h}px">
         ${head}
         <div class="tl-lane${track.locked ? ' locked' : ''}" data-track-id="${track.id}" style="height:${h}px">${clips}</div>
       </div>`;
@@ -159,15 +165,18 @@
       const width = Math.max(6, clip.duration * pps);
       const asset = clip.assetId ? app.state.assets.get(clip.assetId) : null;
       const thumb = asset && asset.thumb ? ` style="background-image:url('${asset.thumb}')"` : '';
-      const iconName = clip.type === 'text' ? 'type' : clip.type === 'audio' ? 'music' : clip.type === 'image' ? 'image' : 'film';
+      const iconName = clip.type === 'text' ? 'type' : clip.type === 'audio' ? 'music' : clip.type === 'image' ? 'image' : clip.type === 'shape' ? 'square' : 'film';
       let label = clip.name || 'Clip';
       if (clip.type === 'text') label = (clip.text || 'Text').split('\n')[0] || 'Text';
       label = label.length > 60 ? label.slice(0, 58) + '…' : label;
       const missing = asset && asset.missing ? ' missing' : '';
-      return `<div class="tl-clip type-${clip.type}${selected}${missing}" data-id="${clip.id}"
+      const flags = `${clip.locked ? VE.icon('lock') : ''}${clip.hidden ? VE.icon('eye-off') : ''}`;
+      const flagClass = clip.locked || clip.hidden ? ' flagged' : '';
+      return `<div class="tl-clip type-${clip.type}${selected}${missing}${flagClass}" data-id="${clip.id}"
         style="left:${left}px;width:${width}px" title="${VE.escapeAttr(label)}">
         <div class="clip-thumb"${thumb}></div>
         <div class="clip-label">${VE.icon(iconName)}<span>${VE.escapeHtml(label)}</span></div>
+        ${flags ? `<div class="clip-flags">${flags}</div>` : ''}
         <div class="trim trim-l" data-trim="l"></div>
         <div class="trim trim-r" data-trim="r"></div>
         <div class="clip-handle"></div>
@@ -259,10 +268,11 @@
       const track = app.state.project.tracks.find(t => t.id === row.dataset.trackRow);
       if (!track) return;
       const act = btn.dataset.act;
-      if (act === 'hide') { track.hidden = !track.hidden; app.commit({ history: true, timeline: true }); }
-      else if (act === 'mute') { track.muted = !track.muted; app.commit({ timeline: true }); }
-      else if (act === 'lock') { track.locked = !track.locked; app.commit({ history: true, timeline: true }); }
-      else if (act === 'del') { app.deleteTrack(track.id); }
+      if (act === 'hide' || act === 'mute' || act === 'lock') app.setTrackFlag(track.id, act);
+      else if (act === 'group') app.toggleTrackGroup(track.id);
+      else if (act === 'up') app.moveTrack(track.id, 1);
+      else if (act === 'down') app.moveTrack(track.id, -1);
+      else if (act === 'del') app.deleteTrack(track.id);
     },
 
     onScrubStart(e, el) {
@@ -293,8 +303,8 @@
       if (!found) return;
       const { clip, track } = found;
       app.selectClip(clip.id);
-      if (track.locked) {
-        VE.toast('This track is locked', 'warn');
+      if (track.locked || clip.locked) {
+        VE.toast('This layer or track is locked', 'warn');
         return;
       }
       e.preventDefault();

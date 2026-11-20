@@ -130,7 +130,7 @@ test('all generated tool pages expose unique SEO metadata', async ({ page }) => 
     await expect(page.locator('h1')).toHaveText(tool.h1);
     await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', tool.title);
   }
-  expect(seen.size).toBe(33);
+  expect(seen.size).toBe(generatedTools.length);
 });
 
 test('preserved standalone tools keep their original URLs and still load', async ({ page }) => {

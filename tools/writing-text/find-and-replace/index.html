@@ -11,14 +11,17 @@
 <meta property="og:title" content="Find and Replace — Literal or Regular Expression Mode">
 <meta property="og:description" content="Replace all occurrences of a literal string, or turn off case sensitivity to treat Find as a live regular expression with global and case-insensitive flags. Invalid patterns show a clear error.">
 <meta property="og:url" content="https://letitedit.com/tools/writing-text/find-and-replace/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../../../css/site.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","name":"Find and Replace","mainEntity":[{"@type":"Question","name":"Is whole-word search supported?","acceptedAnswer":{"@type":"Answer","text":"Not as a separate control. The reference tool advertises whole-word search but does not implement it. In regex mode you can add word boundaries such as \\b yourself."}},{"@type":"Question","name":"Can I export the result to Word or HTML?","acceptedAnswer":{"@type":"Answer","text":"No. Export to Word or HTML is advertised in the reference description but is not implemented there either. This tool provides a result box and a copy button."}},{"@type":"Question","name":"Why did my search match more than expected?","acceptedAnswer":{"@type":"Answer","text":"With case sensitivity off, Find is compiled as a regular expression. Characters such as . * + and ( ) are active pattern syntax. A literal mode is used when the checkbox is on."}}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Find and Replace","description":"Replace all occurrences of a literal string, or turn off case sensitivity to treat Find as a live regular expression with global and case-insensitive flags. Invalid patterns show a clear error.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/writing-text/find-and-replace/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Writing \u0026 Text Tools","item":"https://letitedit.com/tools/writing-text/"},{"@type":"ListItem","position":3,"name":"Find and Replace","item":"https://letitedit.com/tools/writing-text/find-and-replace/"}]},{"@type":"FAQPage","name":"Find and Replace","mainEntity":[{"@type":"Question","name":"Is whole-word search supported?","acceptedAnswer":{"@type":"Answer","text":"Not as a separate control. The reference tool advertises whole-word search but does not implement it. In regex mode you can add word boundaries such as \\b yourself."}},{"@type":"Question","name":"Can I export the result to Word or HTML?","acceptedAnswer":{"@type":"Answer","text":"No. Export to Word or HTML is advertised in the reference description but is not implemented there either. This tool provides a result box and a copy button."}},{"@type":"Question","name":"Why did my search match more than expected?","acceptedAnswer":{"@type":"Answer","text":"With case sensitivity off, Find is compiled as a regular expression. Characters such as . * + and ( ) are active pattern syntax. A literal mode is used when the checkbox is on."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-text">
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
@@ -30,19 +33,21 @@
       <a href="/blog/">Blog</a>
       <a href="/tools/">All Tools</a>
       <a href="/faq/">FAQ</a>
-      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" aria-controls="search-strip" aria-expanded="false" title="Search tools"><span aria-hidden="true">🔍</span></button>
     </div>
   </nav>
 </header>
-<div class="site-search-strip" id="search-strip">
+<div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
+      <label class="sr-only" for="site-search">Search all 61 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
-      <div class="search-results" id="search-results" role="listbox" hidden></div>
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
+<div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="../../../">Home</a><span>/</span>
   <a href="../../../tools/writing-text/">Writing &amp; Text Tools</a><span>/</span>
@@ -63,15 +68,32 @@
 <div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>
 <div class="engine-grid engine-simple">
   <div class="engine-controls">
-    <div class="two-cols"><div class="field"><label>Find</label><input type="text" id="fr-find" placeholder="Text to find"></div><div class="field"><label>Replace</label><input type="text" id="fr-replace" placeholder="Replacement text"></div></div>
-    <div class="opt-group"><label class="opt"><input type="checkbox" id="fr-case" checked> <span>Case-sensitive (literal match)</span></label></div>
-    <p class="hint">When case sensitivity is off, <strong>Find is treated as a regular expression</strong> with global and case-insensitive flags, matching the reference behaviour. Invalid patterns show a clear error.</p>
-    <div class="field"><label>Source text</label><textarea id="fr-input" rows="9" placeholder="Paste the source text here…"></textarea></div>
-    <div class="output-actions"><button type="button" class="btn" id="fr-apply">Replace all</button></div>
+    <div class="two-cols"><div class="field"><label>Find</label><input type="text" id="fr-find" placeholder="Text or pattern to find"></div><div class="field"><label>Replace</label><input type="text" id="fr-replace" placeholder="Replacement text"></div></div>
+    <div class="opt-group"><span class="opt-title">Matching</span>
+      <label class="opt"><input type="checkbox" id="fr-case" checked> <span>Case-sensitive literal match</span></label>
+      <label class="opt"><input type="checkbox" id="fr-regex"> <span>Force regular expression (even when case-sensitive)</span></label>
+      <label class="opt"><input type="checkbox" id="fr-whole"> <span>Whole word only</span></label>
+    </div>
+    <p class="hint">With Case-sensitive on, Find is literal. With it off, Find follows the reference behaviour and is compiled as a global, case-insensitive regular expression. Use Force regular expression to opt in explicitly.</p>
+    <div class="field"><label>Upload TXT, CSV, MD or DOCX</label><input type="file" id="fr-upload" accept=".txt,.csv,.tsv,.md,.markdown,.json,.log,.xml,.html,.htm,.docx,text/plain,text/csv"></div>
+    <div class="field"><label>Source text</label><textarea id="fr-input" rows="6" placeholder="Paste the source text here…"></textarea></div>
+    <p class="pill" id="fr-count">0 matches</p>
+    <div class="output-actions">
+      <button type="button" class="btn" id="fr-apply">Replace all</button>
+      <button type="button" class="btn btn-secondary btn-small" id="fr-replace-one">Replace one</button>
+      <button type="button" class="btn btn-secondary btn-small" id="fr-prev">Previous</button>
+      <button type="button" class="btn btn-secondary btn-small" id="fr-next">Next</button>
+      <button type="button" class="btn btn-secondary btn-small" id="fr-undo">Restore original</button>
+    </div>
   </div>
   <div class="engine-output">
-    <div class="workspace-head"><h2>Result</h2><button type="button" class="btn btn-secondary btn-small" id="fr-copy">Copy</button></div>
-    <textarea id="fr-result" class="output-box" rows="9" readonly></textarea>
+    <div class="workspace-head"><h2>Source with matches</h2><span class="card-tag">Safe DOM preview</span></div>
+    <div id="fr-preview" class="output-box"></div>
+    <div class="workspace-head"><h2>Result</h2><div class="output-actions">
+      <button type="button" class="btn btn-secondary btn-small" id="fr-copy">Copy</button>
+      <button type="button" class="btn btn-secondary btn-small" id="fr-download">Download</button>
+    </div></div>
+    <textarea id="fr-result" class="output-box" rows="6" readonly></textarea>
     <div class="status" id="fr-status" role="status" aria-live="polite"></div>
   </div>
 </div>
@@ -123,11 +145,12 @@
     <div class="info-card">
       <h2>Related tools</h2>
       <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
-        <a class="card tool-card" href="../../../tools/writing-text/text-filter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧽</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Text Filter</h3><p>Remove whole words and highlight others with safe DOM spans. Terms are comma separated, matched case-insensitively with word boundaries, and input HTML is never executed.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/text-redactor/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🛡️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Text Redactor</h3><p>Mask names, emails, phone numbers, card numbers and API keys with stable labels, copy the redacted text, then restore original values from a key. Detection is heuristic and key files contain the original data.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/extract-emails/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📧</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Extract Emails from Text</h3><p>Find and extract unique email addresses from pasted text, logs or documents. No uploads, no sign-up.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/extract-urls/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔗</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Extract URLs from Text</h3><p>Extract unique http and https links from pasted text, trimming trailing punctuation automatically.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a>
+        <a class="card tool-card" href="../../../tools/writing-text/text-filter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧽</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Text Filter</h3><p>Remove whole words and highlight others with safe DOM spans. Terms are comma separated, matched case-insensitively with word boundaries, and input HTML is never executed.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/text-redactor/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🛡️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Text Redactor</h3><p>Mask names, emails, phone numbers, card numbers and API keys with stable labels, copy the redacted text, then restore original values from a key. Detection is heuristic and key files contain the original data.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/extract-emails/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📧</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Extract Emails from Text</h3><p>Find and extract unique email addresses from pasted text, logs or documents. No uploads, no sign-up.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/extract-urls/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔗</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Extract URLs from Text</h3><p>Extract unique http, https, www and bare-domain links from pasted text, logs or DOCX files with trailing punctuation trimmed automatically.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a>
       </div>
     </div>
   </div>
 </section>
+</div>
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">

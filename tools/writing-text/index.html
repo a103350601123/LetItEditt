@@ -11,12 +11,15 @@
 <meta property="og:title" content="Text &amp; Writing Tools — Free Browser-Side Writing Utilities">
 <meta property="og:description" content="Browse free text and writing tools for counting words, cleaning text, formatting, bionic reading, redaction and placeholder generation. Everything runs in your browser.">
 <meta property="og:url" content="https://letitedit.com/tools/writing-text/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../../css/site.css">
 
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
@@ -28,19 +31,21 @@
       <a href="/blog/">Blog</a>
       <a href="/tools/">All Tools</a>
       <a href="/faq/">FAQ</a>
-      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" aria-controls="search-strip" aria-expanded="false" title="Search tools"><span aria-hidden="true">🔍</span></button>
     </div>
   </nav>
 </header>
-<div class="site-search-strip" id="search-strip">
+<div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
+      <label class="sr-only" for="site-search">Search all 61 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
-      <div class="search-results" id="search-results" role="listbox" hidden></div>
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
+<div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="../../">Home</a><span>/</span>
   <a href="../../categories/">Categories</a><span>/</span>
@@ -60,11 +65,11 @@
   </div>
   <nav class="sidebar-list" aria-label="Categories"><a class="sidebar-link" href="../../tools/" data-sidebar-key="all">
       <span class="sidebar-icon" style="--icon-bg:#dbeafe;--icon-color:#1d4ed8" aria-hidden="true">📚</span>
-      <span class="sidebar-name">All Tools</span><span class="sidebar-count">60</span>
+      <span class="sidebar-name">All Tools</span><span class="sidebar-count">61</span>
     </a>
     <a class="sidebar-link is-active" href="../../tools/writing-text/" data-sidebar-key="writing" aria-current="page">
       <span class="sidebar-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">✍️</span>
-      <span class="sidebar-name">Text &amp; Writing</span><span class="sidebar-count">35</span>
+      <span class="sidebar-name">Text &amp; Writing</span><span class="sidebar-count">36</span>
     </a>
     <a class="sidebar-link" href="../../tools/coding-developer/" data-sidebar-key="dev">
       <span class="sidebar-icon" style="--icon-bg:#0ea5e91a;--icon-color:#0ea5e9" aria-hidden="true">&lt;/&gt;</span>
@@ -109,7 +114,7 @@
       <div class="directory-bar">
         <div>
           <h2>Writing &amp; Text Tools</h2>
-          <p class="directory-count">35 tools</p>
+          <p class="directory-count">36 tools</p>
         </div>
         <div class="directory-filter">
           <label class="sr-only" for="tool-filter">Filter tools on this page</label>
@@ -147,7 +152,7 @@
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Remove Empty Lines</h3>
-  <p>Remove blank and whitespace-only lines from pasted text while preserving the order of every real line.</p>
+  <p>Remove blank and whitespace-only lines from pasted text, TXT, CSV, Markdown or DOCX while preserving every real line and its formatting.</p>
   <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="../../tools/writing-text/remove-emojis/">
   <span class="card-top">
@@ -163,7 +168,7 @@
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Remove Punctuation</h3>
-  <p>Remove Unicode punctuation marks from text while keeping letters, numbers, emoji and symbols intact.</p>
+  <p>Remove all Unicode punctuation, common English marks or your own chosen characters from pasted text, TXT, CSV, Markdown or DOCX while keeping letters and numbers.</p>
   <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="../../tools/writing-text/word-wrap/">
   <span class="card-top">
@@ -275,7 +280,7 @@
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Rich Text / HTML to Markdown</h3>
-  <p>Convert pasted HTML or rich text into clean Markdown with headings, links, lists, bold and italic preserved.</p>
+  <p>Convert pasted HTML, rich text, text files or DOCX text into clean Markdown with headings, links, lists, tables, code and emphasis preserved.</p>
   <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="../../tools/writing-text/remove-duplicate-lines/">
   <span class="card-top">
@@ -315,7 +320,7 @@
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Text Comparer / Diff</h3>
-  <p>Compare two texts line by line or word by word with added and removed content highlighted.</p>
+  <p>Compare two texts or documents line by line or word by word with additions and removals highlighted, using a real LCS diff.</p>
   <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="../../tools/writing-text/extract-emails/">
   <span class="card-top">
@@ -331,7 +336,7 @@
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Extract URLs from Text</h3>
-  <p>Extract unique http and https links from pasted text, trimming trailing punctuation automatically.</p>
+  <p>Extract unique http, https, www and bare-domain links from pasted text, logs or DOCX files with trailing punctuation trimmed automatically.</p>
   <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="../../tools/writing-text/text-filter/">
   <span class="card-top">
@@ -389,6 +394,14 @@
   <h3>Handwriting to Font Converter<span class="card-new">New</span></h3>
   <p>Draw handwriting glyphs on a canvas, preview them in a sentence and export a picture of the result. This scoped browser tool does not generate an installable OpenType font.</p>
   <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card" href="../../tools/writing-text/grammar-spell-checker/">
+  <span class="card-top">
+    <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧠</span>
+    <span class="card-arrow" aria-hidden="true">↗</span>
+  </span>
+  <h3>Grammar &amp; Spell Checker<span class="card-new">New</span></h3>
+  <p>Check English text with local rules for common spelling, grammar, repeated words, spacing and clarity. Review suggestions, apply the ones you accept and keep the original text unchanged. No AI rewriting and no external or paid API.</p>
+  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
 </a><a class="card tool-card" href="../../tools/resume-builder/index.html">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📄</span>
@@ -408,6 +421,7 @@
     <p>Every tool on this page is free, runs locally in your browser and links to its own guide with instructions, examples and FAQs.</p>
   </div>
 </section>
+</div>
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">

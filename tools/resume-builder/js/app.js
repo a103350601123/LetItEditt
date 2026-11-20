@@ -11,6 +11,7 @@ const STORAGE_KEY = 'toolbox.resumeBuilder.v1';
 const PAGE_W = 794;   // A4 width at 96 dpi
 const PAGE_H = 1123;  // A4 height at 96 dpi
 const MAX_PHOTO = 640;
+const PHOTO_STAGE = 360;   // internal resolution of the photo editor canvas
 
 /* ---------- template engine configuration ---------- */
 
@@ -60,6 +61,19 @@ const LAYOUTS = [
 
 const SECTION_TITLES = {
   summary: 'Profile',
+  experience: 'Experience',
+  education: 'Education',
+  projects: 'Projects',
+  skills: 'Skills',
+  certifications: 'Certifications',
+  languages: 'Languages',
+  contact: 'Contact'
+};
+
+const BLOCK_LABELS = {
+  header: 'Header · name & contact',
+  avatar: 'Profile photo',
+  summary: 'Profile / summary',
   experience: 'Experience',
   education: 'Education',
   projects: 'Projects',
@@ -211,6 +225,11 @@ const SAMPLE = {
 
 const state = normalizeData(deepClone(SAMPLE));
 
+/* Layout adjustment session state. Overrides live in state.layoutAdjust. */
+let adjustMode = false;
+let selectedBlock = '';
+let currentScale = 1;
+
 /* ---------- dom ---------- */
 
 const $ = id => document.getElementById(id);
@@ -234,7 +253,38 @@ const els = {
   photoInput: $('photoInput'),
   photoThumb: $('photoThumb'),
   photoInitials: $('photoInitials'),
+  btnPhotoEdit: $('btnPhotoEdit'),
   btnPhotoRemove: $('btnPhotoRemove'),
+  photoModal: $('photoModal'),
+  photoStage: $('photoStage'),
+  photoEditThumb: $('photoEditThumb'),
+  peZoom: $('peZoom'),
+  peRotate: $('peRotate'),
+  peCrop: $('peCrop'),
+  peBrightness: $('peBrightness'),
+  peContrast: $('peContrast'),
+  peBackground: $('peBackground'),
+  peSize: $('peSize'),
+  btnPeEdge: $('btnPeEdge'),
+  btnPeReset: $('btnPeReset'),
+  btnPeCancel: $('btnPeCancel'),
+  btnPeApply: $('btnPeApply'),
+  btnPhotoClose: $('btnPhotoClose'),
+  btnAdjust: $('btnAdjust'),
+  btnRestoreLayout: $('btnRestoreLayout'),
+  btnAdjustEditor: $('btnAdjustEditor'),
+  layoutAdjustHint: $('layoutAdjustHint'),
+  adjustControls: $('adjustControls'),
+  blockSelect: $('blockSelect'),
+  blockX: $('blockX'),
+  blockY: $('blockY'),
+  blockWidth: $('blockWidth'),
+  blockWidthNum: $('blockWidthNum'),
+  blockWidthValue: $('blockWidthValue'),
+  btnLayerUp: $('btnLayerUp'),
+  btnLayerDown: $('btnLayerDown'),
+  btnBlockReset: $('btnBlockReset'),
+  btnRestoreLayout2: $('btnRestoreLayout2'),
   summaryCount: $('summaryCount'),
   countExperience: $('countExperience'),
   countEducation: $('countEducation'),
@@ -259,6 +309,32 @@ const els = {
 
 function deepClone(value) {
   return JSON.parse(JSON.stringify(value));
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function finiteNumber(value, fallback) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : (fallback || 0);
+}
+
+function normalizeLayoutAdjust(raw) {
+  const source = raw && typeof raw === 'object' ? raw : {};
+  const rawBlocks = source.blocks && typeof source.blocks === 'object' ? source.blocks : {};
+  const blocks = {};
+  Object.keys(rawBlocks).forEach(id => {
+    if (!BLOCK_LABELS[id]) return;
+    const item = rawBlocks[id] && typeof rawBlocks[id] === 'object' ? rawBlocks[id] : {};
+    blocks[id] = {
+      dx: clamp(finiteNumber(item.dx, 0), -2000, 2000),
+      dy: clamp(finiteNumber(item.dy, 0), -2000, 2000),
+      w: item.w == null || item.w === '' ? 0 : clamp(finiteNumber(item.w, 0), 80, PAGE_W),
+      z: clamp(finiteNumber(item.z, 0), -20, 20)
+    };
+  });
+  return { enabled: Boolean(source.enabled), blocks };
 }
 
 function esc(value) {
@@ -342,6 +418,7 @@ function normalizeData(raw) {
         ? source.template.theme : 'indigo'
     },
     personal: {},
+    layoutAdjust: normalizeLayoutAdjust(source.layoutAdjust),
     summary: typeof source.summary === 'string' ? source.summary : '',
     skills: typeof source.skills === 'string' ? source.skills : '',
     experience: [],
@@ -373,6 +450,7 @@ function emptyData() {
   const empty = {
     template: { layout: 'classic', theme: 'indigo' },
     personal: { name: '', title: '', email: '', phone: '', location: '', website: '', photo: '' },
+    layoutAdjust: { enabled: false, blocks: {} },
     summary: '',
     skills: '',
     experience: [],
@@ -388,6 +466,9 @@ function applyData(data) {
   const next = normalizeData(data);
   state.template = next.template;
   state.personal = next.personal;
+  state.layoutAdjust = next.layoutAdjust;
+  adjustMode = state.layoutAdjust.enabled;
+  selectedBlock = '';
   state.summary = next.summary;
   state.skills = next.skills;
   Object.keys(LIST_DEFS).forEach(name => {
@@ -462,10 +543,10 @@ function contactHTML() {
 function avatarHTML() {
   const photo = state.personal.photo;
   if (photo) {
-    return '<div class="cv-avatar"><img class="cv-photo" src="' + esc(photo) + '" alt=""></div>';
+    return '<div class="cv-avatar" data-block-id="avatar"><img class="cv-photo" src="' + esc(photo) + '" alt=""></div>';
   }
   const initials = initialsOf(state.personal.name) || 'CV';
-  return '<div class="cv-avatar"><span class="cv-mono">' + esc(initials) + '</span></div>';
+  return '<div class="cv-avatar" data-block-id="avatar"><span class="cv-mono">' + esc(initials) + '</span></div>';
 }
 
 function headerHTML(layout) {
@@ -473,7 +554,7 @@ function headerHTML(layout) {
   const name = hasText(p.name) ? p.name.trim() : 'Your Name';
   const role = hasText(p.title) ? p.title.trim() : '';
   const single = layout.structure === 'single';
-  return '<header class="cv-header">' +
+  return '<header class="cv-header" data-block-id="header">' +
     (single ? avatarHTML() : '') +
     '<div class="cv-head-text">' +
       '<h1 class="cv-name' + (hasText(p.name) ? '' : ' is-placeholder') + '">' + esc(name) + '</h1>' +
@@ -660,7 +741,35 @@ function renderPreview() {
     '</div>';
   }
 
+  tagResumeBlocks();
+  applyBlockOverrides();
+  syncBlockSelect();
   fitPreview();
+}
+
+/* Give every rendered section a stable id so overrides survive re-renders. */
+function tagResumeBlocks() {
+  const byTitle = {};
+  Object.keys(SECTION_TITLES).forEach(id => { byTitle[SECTION_TITLES[id]] = id; });
+  els.cvPage.querySelectorAll('.cv-section').forEach(section => {
+    const heading = section.querySelector('h2');
+    const id = heading && byTitle[heading.textContent.trim()];
+    if (id) section.dataset.blockId = id;
+  });
+}
+
+function applyBlockOverrides() {
+  const blocks = state.layoutAdjust.blocks;
+  els.cvPage.classList.toggle('is-adjusting', adjustMode);
+  els.cvPage.querySelectorAll('[data-block-id]').forEach(block => {
+    const id = block.dataset.blockId;
+    const over = blocks[id];
+    block.style.transform = over && (over.dx || over.dy)
+      ? 'translate(' + over.dx + 'px,' + over.dy + 'px)' : '';
+    block.style.width = over && over.w ? over.w + 'px' : '';
+    block.style.zIndex = over && over.z ? String(over.z) : '';
+    block.classList.toggle('is-selected', adjustMode && id === selectedBlock);
+  });
 }
 
 /* ---------- preview scaling ---------- */
@@ -697,6 +806,7 @@ function applyFit() {
   let scale = Math.min(1, availW / PAGE_W);
   if (!isMobile && availH > 240) scale = Math.min(scale, availH / PAGE_H);
   scale = Math.max(0.16, scale);
+  currentScale = scale;
 
   const sheetH = els.cvPage.offsetHeight || PAGE_H;
   els.cvPage.style.transform = 'scale(' + scale.toFixed(4) + ')';
@@ -801,6 +911,7 @@ function updatePhotoUI() {
     els.photoInitials.textContent = initialsOf(state.personal.name) || 'CV';
   }
   els.btnPhotoRemove.disabled = !photo;
+  els.btnPhotoEdit.disabled = !photo;
 }
 
 function updateCounts() {
@@ -922,25 +1033,218 @@ function readFileAsDataURL(file) {
   });
 }
 
-function shrinkImage(dataUrl, maxSize) {
+function loadImage(src) {
   return new Promise((resolve, reject) => {
     const image = new Image();
-    image.onload = () => {
-      const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
-      const width = Math.max(1, Math.round(image.width * scale));
-      const height = Math.max(1, Math.round(image.height * scale));
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, width, height);
-      ctx.drawImage(image, 0, 0, width, height);
-      resolve(canvas.toDataURL('image/jpeg', 0.86));
-    };
+    image.onload = () => resolve(image);
     image.onerror = () => reject(new Error('Could not decode image'));
-    image.src = dataUrl;
+    image.src = src;
   });
+}
+
+function photoDefaults() {
+  return {
+    zoom: 100, rotate: 0, crop: 100, brightness: 0, contrast: 0,
+    offsetX: 0, offsetY: 0, background: '#ffffff', size: 320
+  };
+}
+
+/* The draft holds the untouched source image. state.personal.photo is only
+   changed when the user presses Apply. */
+const photoDraft = Object.assign({
+  image: null, source: null, sourceKey: '', thumb: null, dragging: false,
+  lastX: 0, lastY: 0, returnFocus: null
+}, photoDefaults());
+
+function refreshPhotoSource() {
+  if (!photoDraft.image) return;
+  const key = [photoDraft.brightness, photoDraft.contrast].join(':');
+  if (photoDraft.source && photoDraft.sourceKey === key) return;
+
+  const image = photoDraft.image;
+  const scale = Math.min(1, MAX_PHOTO / Math.max(image.naturalWidth, image.naturalHeight));
+  const width = Math.max(1, Math.round(image.naturalWidth * scale));
+  const height = Math.max(1, Math.round(image.naturalHeight * scale));
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(image, 0, 0, width, height);
+
+  if (photoDraft.brightness || photoDraft.contrast) {
+    const pixels = ctx.getImageData(0, 0, width, height);
+    const data = pixels.data;
+    const bright = 1 + photoDraft.brightness / 100;
+    const contrast = 1 + photoDraft.contrast / 100;
+    for (let i = 0; i < data.length; i += 4) {
+      data[i] = clamp((data[i] * bright - 128) * contrast + 128, 0, 255);
+      data[i + 1] = clamp((data[i + 1] * bright - 128) * contrast + 128, 0, 255);
+      data[i + 2] = clamp((data[i + 2] * bright - 128) * contrast + 128, 0, 255);
+    }
+    ctx.putImageData(pixels, 0, 0);
+  }
+
+  photoDraft.source = canvas;
+  photoDraft.sourceKey = key;
+}
+
+function photoGeometry() {
+  const source = photoDraft.source;
+  const crop = PHOTO_STAGE * clamp(photoDraft.crop, 45, 100) / 100;
+  return {
+    crop,
+    cropLeft: (PHOTO_STAGE - crop) / 2,
+    k: (crop / Math.min(source.width, source.height)) * (photoDraft.zoom / 100),
+    nw: source.width,
+    nh: source.height
+  };
+}
+
+/* Paints the adjusted source in stage coordinates (rotation around centre). */
+function paintPhotoSource(ctx, geometry) {
+  ctx.save();
+  ctx.translate(PHOTO_STAGE / 2 + photoDraft.offsetX, PHOTO_STAGE / 2 + photoDraft.offsetY);
+  ctx.rotate(photoDraft.rotate * Math.PI / 180);
+  ctx.scale(geometry.k, geometry.k);
+  ctx.drawImage(photoDraft.source, -geometry.nw / 2, -geometry.nh / 2);
+  ctx.restore();
+}
+
+/* Maps the crop square onto a square output canvas. */
+function paintPhotoCrop(ctx, size, geometry) {
+  ctx.save();
+  ctx.scale(size / geometry.crop, size / geometry.crop);
+  ctx.translate(-geometry.cropLeft, -geometry.cropLeft);
+  paintPhotoSource(ctx, geometry);
+  ctx.restore();
+}
+
+function drawCheckerboard(ctx, size) {
+  const tile = 12;
+  for (let y = 0; y < size; y += tile) {
+    for (let x = 0; x < size; x += tile) {
+      ctx.fillStyle = ((x / tile + y / tile) % 2 === 0) ? '#cfd4de' : '#f7f8fa';
+      ctx.fillRect(x, y, tile, tile);
+    }
+  }
+}
+
+let photoRenderFrame = 0;
+function schedulePhotoRender() {
+  if (photoRenderFrame) return;
+  photoRenderFrame = requestAnimationFrame(() => {
+    photoRenderFrame = 0;
+    renderPhotoStage();
+  });
+}
+
+function renderPhotoStage() {
+  if (!photoDraft.source || els.photoModal.hidden) return;
+  const ctx = els.photoStage.getContext('2d');
+  const g = photoGeometry();
+  const S = PHOTO_STAGE;
+
+  ctx.clearRect(0, 0, S, S);
+  drawCheckerboard(ctx, S);
+  ctx.globalAlpha = 0.82;
+  ctx.fillStyle = photoDraft.background;
+  ctx.fillRect(0, 0, S, S);
+  ctx.globalAlpha = 1;
+  paintPhotoSource(ctx, g);
+
+  // Dim everything outside the crop square.
+  const r = g.cropLeft;
+  ctx.fillStyle = 'rgba(5,7,12,.62)';
+  ctx.fillRect(0, 0, S, r);
+  ctx.fillRect(0, S - r, S, r);
+  ctx.fillRect(0, r, r, g.crop);
+  ctx.fillRect(S - r, r, r, g.crop);
+
+  ctx.strokeStyle = 'rgba(255,255,255,.95)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([7, 5]);
+  ctx.strokeRect(r + 1, r + 1, g.crop - 2, g.crop - 2);
+  ctx.setLineDash([]);
+  ctx.strokeStyle = 'rgba(255,255,255,.32)';
+  ctx.lineWidth = 1;
+  for (let i = 1; i < 3; i++) {
+    const p = r + g.crop * i / 3;
+    ctx.beginPath(); ctx.moveTo(p, r); ctx.lineTo(p, r + g.crop); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(r, p); ctx.lineTo(r + g.crop, p); ctx.stroke();
+  }
+
+  updatePhotoThumb();
+}
+
+function updatePhotoThumb() {
+  if (!photoDraft.source || !els.photoEditThumb) return;
+  if (!photoDraft.thumb) {
+    photoDraft.thumb = document.createElement('canvas');
+    photoDraft.thumb.width = photoDraft.thumb.height = 96;
+  }
+  const ctx = photoDraft.thumb.getContext('2d');
+  const g = photoGeometry();
+  ctx.fillStyle = photoDraft.background;
+  ctx.fillRect(0, 0, 96, 96);
+  paintPhotoCrop(ctx, 96, g);
+  els.photoEditThumb.src = photoDraft.thumb.toDataURL('image/jpeg', 0.9);
+}
+
+function exportPhoto() {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = photoDraft.size;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = photoDraft.background;
+  ctx.fillRect(0, 0, photoDraft.size, photoDraft.size);
+  paintPhotoCrop(ctx, photoDraft.size, photoGeometry());
+  return canvas.toDataURL('image/jpeg', 0.9);
+}
+
+function syncPhotoControls() {
+  const values = {
+    peZoom: [photoDraft.zoom, photoDraft.zoom + '%'],
+    peRotate: [photoDraft.rotate, photoDraft.rotate + '°'],
+    peCrop: [photoDraft.crop, photoDraft.crop + '%'],
+    peBrightness: [photoDraft.brightness, String(photoDraft.brightness)],
+    peContrast: [photoDraft.contrast, String(photoDraft.contrast)]
+  };
+  Object.keys(values).forEach(id => {
+    const input = els[id];
+    if (!input) return;
+    input.value = values[id][0];
+    const output = document.getElementById(id + 'Out');
+    if (output) output.textContent = values[id][1];
+  });
+  els.peBackground.value = photoDraft.background;
+  els.peSize.value = String(photoDraft.size);
+}
+
+async function openPhotoEditor(sourceUrl) {
+  try {
+    const image = await loadImage(sourceUrl);
+    photoDraft.returnFocus = document.activeElement;
+    Object.assign(photoDraft, photoDefaults(), {
+      image, source: null, sourceKey: '', dragging: false
+    });
+    refreshPhotoSource();
+    els.photoModal.hidden = false;
+    syncPhotoControls();
+    renderPhotoStage();
+    els.peZoom.focus();
+  } catch (err) {
+    toast('That image could not be opened. Try a JPG, PNG or WebP.', true);
+  }
+}
+
+function closePhotoEditor() {
+  els.photoModal.hidden = true;
+  photoDraft.image = null;
+  photoDraft.source = null;
+  photoDraft.dragging = false;
+  photoDraft.thumb = null;
+  els.photoStage.classList.remove('is-dragging');
+  if (photoDraft.returnFocus && photoDraft.returnFocus.focus) photoDraft.returnFocus.focus();
+  photoDraft.returnFocus = null;
 }
 
 async function handlePhoto(file) {
@@ -955,17 +1259,32 @@ async function handlePhoto(file) {
   }
   try {
     const raw = await readFileAsDataURL(file);
-    const shrunk = await shrinkImage(raw, MAX_PHOTO);
-    state.personal.photo = shrunk;
-    updatePhotoUI();
-    renderPreview();
-    saveNow();
-    toast('Photo added. It is stored in this browser only.');
+    await openPhotoEditor(raw);
   } catch (err) {
     toast('That image could not be read. Try a JPG or PNG.', true);
   } finally {
     els.photoInput.value = '';
   }
+}
+
+function sampleEdgeColor(image) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 4; canvas.height = 1;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  const w = image.naturalWidth;
+  const h = image.naturalHeight;
+  [[0, 0], [w - 1, 0], [0, h - 1], [w - 1, h - 1]].forEach((corner, i) => {
+    ctx.drawImage(image, corner[0], corner[1], 1, 1, i, 0, 1, 1);
+  });
+  const data = ctx.getImageData(0, 0, 4, 1).data;
+  let r = 0, g = 0, b = 0, weight = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    const a = data[i + 3] / 255;
+    r += data[i] * a; g += data[i + 1] * a; b += data[i + 2] * a; weight += a;
+  }
+  if (!weight) return '#ffffff';
+  const hex = value => clamp(Math.round(value / weight), 0, 255).toString(16).padStart(2, '0');
+  return '#' + hex(r) + hex(g) + hex(b);
 }
 
 /* ==================================================================
@@ -997,6 +1316,421 @@ function removeItem(listName, index) {
   renderPreview();
   saveNow();
   toast('Removed.');
+}
+
+/* ==================================================================
+   MOVABLE BLOCKS
+   ================================================================== */
+
+function getBlockOverride(id) {
+  if (!BLOCK_LABELS[id]) return null;
+  if (!state.layoutAdjust.blocks[id]) {
+    state.layoutAdjust.blocks[id] = { dx: 0, dy: 0, w: 0, z: 0 };
+  }
+  return state.layoutAdjust.blocks[id];
+}
+
+function syncAdjustUI() {
+  if (adjustMode) {
+    const panel = $('panelLayout');
+    if (panel) panel.open = true;
+  }
+  els.cvPage.classList.toggle('is-adjusting', adjustMode);
+  els.btnAdjust.setAttribute('aria-pressed', adjustMode ? 'true' : 'false');
+  els.btnAdjustEditor.setAttribute('aria-pressed', adjustMode ? 'true' : 'false');
+  els.btnAdjustEditor.textContent = adjustMode ? 'Disable block positioning' : 'Enable block positioning';
+  els.layoutAdjustHint.textContent = adjustMode ? 'On' : 'Off';
+  els.adjustControls.hidden = !adjustMode;
+  els.btnRestoreLayout.hidden = !adjustMode;
+  els.cvPage.tabIndex = adjustMode ? 0 : -1;
+}
+
+function setAdjustMode(on) {
+  const next = Boolean(on);
+  if (next === adjustMode && !els.btnAdjust) return;
+  adjustMode = next;
+  state.layoutAdjust.enabled = adjustMode;
+  if (!adjustMode) {
+    selectedBlock = '';
+    onBlockPointerUp(null);
+    clearGuides();
+  }
+  syncAdjustUI();
+  applyBlockOverrides();
+  syncBlockSelect();
+  updateSelectedControls();
+  saveNow();
+}
+
+function syncBlockSelect() {
+  if (!els.blockSelect) return;
+  const ids = Array.from(els.cvPage.querySelectorAll('[data-block-id]'))
+    .map(block => block.dataset.blockId)
+    .filter((id, index, all) => all.indexOf(id) === index);
+  if (selectedBlock && ids.indexOf(selectedBlock) < 0) selectedBlock = '';
+  els.blockSelect.innerHTML = '<option value="">No block selected</option>' + ids.map(id =>
+    '<option value="' + esc(id) + '">' + esc(BLOCK_LABELS[id] || id) + '</option>'
+  ).join('');
+  els.blockSelect.value = selectedBlock;
+}
+
+function selectBlock(id) {
+  selectedBlock = (id && BLOCK_LABELS[id]) ? id : '';
+  applyBlockOverrides();
+  if (els.blockSelect) els.blockSelect.value = selectedBlock;
+  updateSelectedControls();
+}
+
+function updateSelectedControls() {
+  if (!els.blockX) return;
+  const has = Boolean(selectedBlock);
+  const over = has ? state.layoutAdjust.blocks[selectedBlock] : null;
+  const width = over && over.w ? over.w : 0;
+  [els.blockX, els.blockY, els.blockWidth, els.blockWidthNum,
+    els.btnLayerUp, els.btnLayerDown, els.btnBlockReset].forEach(el => { if (el) el.disabled = !has; });
+  els.blockX.value = over ? over.dx : 0;
+  els.blockY.value = over ? over.dy : 0;
+  els.blockWidth.value = width || 400;
+  els.blockWidthNum.value = width || '';
+  els.blockWidthValue.textContent = width ? width + ' px' : 'auto';
+  const z = over ? over.z : 0;
+  els.btnLayerUp.title = 'Layer up (current ' + z + ')';
+  els.btnLayerDown.title = 'Layer down (current ' + z + ')';
+}
+
+/* Keep moved blocks on the sheet so the preview and the printed page agree. */
+function clampBlockOffset(id, key, value) {
+  const block = els.cvPage.querySelector('[data-block-id="' + id + '"]');
+  if (!block) return clamp(value, -2000, 2000);
+  const over = state.layoutAdjust.blocks[id] || {};
+  const cvRect = els.cvPage.getBoundingClientRect();
+  const rect = block.getBoundingClientRect();
+  const scale = currentScale || 1;
+  const baseX = (rect.left - cvRect.left) / scale - (over.dx || 0);
+  const baseY = (rect.top - cvRect.top) / scale - (over.dy || 0);
+  const width = rect.width / scale;
+  const height = rect.height / scale;
+  const pageHeight = els.cvPage.offsetHeight || PAGE_H;
+  const min = key === 'dx' ? -baseX : -baseY;
+  const max = key === 'dx' ? PAGE_W - baseX - width : pageHeight - baseY - height;
+  return min <= max ? clamp(value, min, max) : clamp(value, -2000, 2000);
+}
+
+function setBlockValue(key, rawValue) {
+  if (!selectedBlock) return;
+  const over = getBlockOverride(selectedBlock);
+  if (!over) return;
+  if (key === 'w') {
+    over.w = rawValue === '' ? 0 : clamp(Math.round(finiteNumber(rawValue, 0)), 80, PAGE_W);
+  } else if (key === 'z') {
+    over.z = clamp(Math.round(finiteNumber(rawValue, 0)), -20, 20);
+  } else {
+    const value = Math.round(finiteNumber(rawValue, 0));
+    over[key] = clampBlockOffset(selectedBlock, key, value);
+  }
+  applyBlockOverrides();
+  updateSelectedControls();
+  scheduleSave();
+}
+
+function resetSelectedBlock() {
+  if (!selectedBlock) return;
+  delete state.layoutAdjust.blocks[selectedBlock];
+  renderPreview();
+  updateSelectedControls();
+  saveNow();
+  toast('Block reset to its template position.');
+}
+
+function restoreOriginalLayout() {
+  onBlockPointerUp(null);
+  state.layoutAdjust.blocks = {};
+  selectedBlock = '';
+  clearGuides();
+  renderPreview();
+  updateSelectedControls();
+  saveNow();
+  toast('Original layout restored.');
+}
+
+let blockDrag = null;
+
+function clearGuides() {
+  if (!blockDrag) return;
+  if (blockDrag.guideXEl && blockDrag.guideXEl.parentNode) blockDrag.guideXEl.parentNode.removeChild(blockDrag.guideXEl);
+  if (blockDrag.guideYEl && blockDrag.guideYEl.parentNode) blockDrag.guideYEl.parentNode.removeChild(blockDrag.guideYEl);
+}
+
+function onBlockPointerDown(event) {
+  if (!adjustMode || (event.button != null && event.button > 0) || blockDrag) return;
+  const block = event.target.closest ? event.target.closest('[data-block-id]') : null;
+  if (!block || !els.cvPage.contains(block)) return;
+  event.preventDefault();
+  selectBlock(block.dataset.blockId);
+  if (els.cvPage.focus) {
+    try { els.cvPage.focus({ preventScroll: true }); } catch (err) { els.cvPage.focus(); }
+  }
+
+  const over = getBlockOverride(block.dataset.blockId);
+  if (!over) return;
+  const cvRect = els.cvPage.getBoundingClientRect();
+  const rect = block.getBoundingClientRect();
+  const guideX = document.createElement('div');
+  const guideY = document.createElement('div');
+  guideX.className = 'cv-guide cv-guide--v';
+  guideY.className = 'cv-guide cv-guide--h';
+  guideX.style.display = guideY.style.display = 'none';
+  els.cvPage.appendChild(guideX);
+  els.cvPage.appendChild(guideY);
+
+  blockDrag = {
+    id: block.dataset.blockId,
+    el: block,
+    pointerId: event.pointerId,
+    startX: event.clientX,
+    startY: event.clientY,
+    startDx: over.dx,
+    startDy: over.dy,
+    baseLeft: (rect.left - cvRect.left) / currentScale - over.dx,
+    baseTop: (rect.top - cvRect.top) / currentScale - over.dy,
+    width: rect.width / currentScale,
+    height: rect.height / currentScale,
+    guideXEl: guideX,
+    guideYEl: guideY
+  };
+  try { block.setPointerCapture(event.pointerId); } catch (err) { /* older browser */ }
+  block.classList.add('is-dragging');
+  document.body.classList.add('is-block-dragging');
+  block.addEventListener('pointermove', onBlockPointerMove);
+  block.addEventListener('pointerup', onBlockPointerUp);
+  block.addEventListener('pointercancel', onBlockPointerUp);
+  block.addEventListener('lostpointercapture', onBlockPointerUp);
+}
+
+function snapPosition(drag, dx, dy) {
+  const threshold = 7 / currentScale;
+  const left = drag.baseLeft + dx;
+  const top = drag.baseTop + dy;
+  const candidatesX = [left, left + drag.width / 2, left + drag.width];
+  const candidatesY = [top, top + drag.height / 2, top + drag.height];
+  const cvRect = els.cvPage.getBoundingClientRect();
+  const targetsX = [PAGE_W / 2];
+  const targetsY = [0, PAGE_H / 2];
+
+  Array.from(els.cvPage.querySelectorAll('[data-block-id]')).forEach(other => {
+    if (other === drag.el) return;
+    const rect = other.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const l = (rect.left - cvRect.left) / currentScale;
+    const t = (rect.top - cvRect.top) / currentScale;
+    targetsX.push(l, l + rect.width / currentScale / 2, l + rect.width / currentScale);
+    targetsY.push(t, t + rect.height / currentScale / 2, t + rect.height / currentScale);
+  });
+
+  let bestX = null;
+  let bestY = null;
+  targetsX.forEach(target => candidatesX.forEach(value => {
+    const diff = target - value;
+    if (Math.abs(diff) <= threshold && (!bestX || Math.abs(diff) < Math.abs(bestX.diff))) {
+      bestX = { diff, target };
+    }
+  }));
+  targetsY.forEach(target => candidatesY.forEach(value => {
+    const diff = target - value;
+    if (Math.abs(diff) <= threshold && (!bestY || Math.abs(diff) < Math.abs(bestY.diff))) {
+      bestY = { diff, target };
+    }
+  }));
+
+  return {
+    dx: dx + (bestX ? bestX.diff : 0),
+    dy: dy + (bestY ? bestY.diff : 0),
+    guideX: bestX ? bestX.target : null,
+    guideY: bestY ? bestY.target : null
+  };
+}
+
+function onBlockPointerMove(event) {
+  if (!blockDrag || event.pointerId !== blockDrag.pointerId) return;
+  event.preventDefault();
+  const dx = blockDrag.startDx + (event.clientX - blockDrag.startX) / currentScale;
+  const dy = blockDrag.startDy + (event.clientY - blockDrag.startY) / currentScale;
+  const snapped = snapPosition(blockDrag, dx, dy);
+  const over = getBlockOverride(blockDrag.id);
+  if (!over) return;
+  const pageHeight = els.cvPage.offsetHeight || PAGE_H;
+  const minDx = -blockDrag.baseLeft;
+  const maxDx = PAGE_W - blockDrag.baseLeft - blockDrag.width;
+  const minDy = -blockDrag.baseTop;
+  const maxDy = pageHeight - blockDrag.baseTop - blockDrag.height;
+  over.dx = minDx <= maxDx ? clamp(Math.round(snapped.dx), minDx, maxDx) : clamp(Math.round(snapped.dx), -2000, 2000);
+  over.dy = minDy <= maxDy ? clamp(Math.round(snapped.dy), minDy, maxDy) : clamp(Math.round(snapped.dy), -2000, 2000);
+  blockDrag.el.style.transform = 'translate(' + over.dx + 'px,' + over.dy + 'px)';
+  if (snapped.guideX != null) {
+    blockDrag.guideXEl.style.left = snapped.guideX + 'px';
+    blockDrag.guideXEl.style.display = 'block';
+  } else {
+    blockDrag.guideXEl.style.display = 'none';
+  }
+  if (snapped.guideY != null) {
+    blockDrag.guideYEl.style.top = snapped.guideY + 'px';
+    blockDrag.guideYEl.style.display = 'block';
+  } else {
+    blockDrag.guideYEl.style.display = 'none';
+  }
+  updateSelectedControls();
+}
+
+function onBlockPointerUp(event) {
+  if (!blockDrag || (event && event.pointerId !== blockDrag.pointerId)) return;
+  const drag = blockDrag;
+  blockDrag = null;
+  drag.el.classList.remove('is-dragging');
+  document.body.classList.remove('is-block-dragging');
+  drag.el.removeEventListener('pointermove', onBlockPointerMove);
+  drag.el.removeEventListener('pointerup', onBlockPointerUp);
+  drag.el.removeEventListener('pointercancel', onBlockPointerUp);
+  drag.el.removeEventListener('lostpointercapture', onBlockPointerUp);
+  if (drag.guideXEl && drag.guideXEl.parentNode) drag.guideXEl.parentNode.removeChild(drag.guideXEl);
+  if (drag.guideYEl && drag.guideYEl.parentNode) drag.guideYEl.parentNode.removeChild(drag.guideYEl);
+  applyBlockOverrides();
+  scheduleSave();
+}
+
+function onBlockKeyDown(event) {
+  if (!adjustMode || !selectedBlock || blockDrag) return;
+  if (event.target && /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName)) return;
+  const moves = {
+    ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1]
+  };
+  const move = moves[event.key];
+  if (!move) return;
+  event.preventDefault();
+  const over = getBlockOverride(selectedBlock);
+  if (!over) return;
+  const step = event.shiftKey ? 10 : 1;
+  over.dx = clampBlockOffset(selectedBlock, 'dx', over.dx + move[0] * step);
+  over.dy = clampBlockOffset(selectedBlock, 'dy', over.dy + move[1] * step);
+  applyBlockOverrides();
+  updateSelectedControls();
+  scheduleSave();
+}
+
+/* ---------- photo editor events ---------- */
+
+function bindPhotoEditorEvents() {
+  const sliders = ['peZoom', 'peRotate', 'peCrop', 'peBrightness', 'peContrast'];
+  sliders.forEach(id => {
+    els[id].addEventListener('input', () => {
+      const key = id.slice(2).replace(/^./, c => c.toLowerCase());
+      photoDraft[key] = Number(els[id].value);
+      const output = document.getElementById(id + 'Out');
+      if (output) {
+        output.textContent = (key === 'zoom' || key === 'crop') ? photoDraft[key] + '%'
+          : (key === 'rotate' ? photoDraft[key] + '°' : String(photoDraft[key]));
+      }
+      if (key === 'brightness' || key === 'contrast') {
+        refreshPhotoSource();
+      }
+      schedulePhotoRender();
+    });
+  });
+
+  els.peBackground.addEventListener('input', () => {
+    photoDraft.background = els.peBackground.value;
+    schedulePhotoRender();
+  });
+  els.peSize.addEventListener('change', () => {
+    photoDraft.size = Number(els.peSize.value);
+    updatePhotoThumb();
+  });
+
+  els.btnPeEdge.addEventListener('click', () => {
+    if (!photoDraft.image) return;
+    photoDraft.background = sampleEdgeColor(photoDraft.image);
+    els.peBackground.value = photoDraft.background;
+    schedulePhotoRender();
+  });
+
+  els.btnPeReset.addEventListener('click', () => {
+    Object.assign(photoDraft, photoDefaults(), { offsetX: 0, offsetY: 0 });
+    syncPhotoControls();
+    renderPhotoStage();
+  });
+
+  els.btnPeCancel.addEventListener('click', closePhotoEditor);
+  els.btnPhotoClose.addEventListener('click', closePhotoEditor);
+  els.photoModal.addEventListener('click', event => {
+    if (event.target === els.photoModal) closePhotoEditor();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !els.photoModal.hidden) closePhotoEditor();
+  });
+
+  const stage = els.photoStage;
+  stage.addEventListener('pointerdown', event => {
+    if (!photoDraft.source || (event.button != null && event.button > 0)) return;
+    event.preventDefault();
+    photoDraft.dragging = true;
+    photoDraft.lastX = event.clientX;
+    photoDraft.lastY = event.clientY;
+    stage.classList.add('is-dragging');
+    try { stage.setPointerCapture(event.pointerId); } catch (err) { /* older browser */ }
+  });
+  stage.addEventListener('pointermove', event => {
+    if (!photoDraft.dragging) return;
+    event.preventDefault();
+    const rect = stage.getBoundingClientRect();
+    const factor = PHOTO_STAGE / (rect.width || PHOTO_STAGE);
+    photoDraft.offsetX += (event.clientX - photoDraft.lastX) * factor;
+    photoDraft.offsetY += (event.clientY - photoDraft.lastY) * factor;
+    photoDraft.lastX = event.clientX;
+    photoDraft.lastY = event.clientY;
+    schedulePhotoRender();
+  });
+  const stopStageDrag = () => {
+    photoDraft.dragging = false;
+    stage.classList.remove('is-dragging');
+  };
+  stage.addEventListener('pointerup', stopStageDrag);
+  stage.addEventListener('pointercancel', stopStageDrag);
+  stage.addEventListener('lostpointercapture', stopStageDrag);
+
+  els.btnPeApply.addEventListener('click', () => {
+    if (!photoDraft.source) return;
+    state.personal.photo = exportPhoto();
+    closePhotoEditor();
+    updatePhotoUI();
+    renderPreview();
+    saveNow();
+    toast('Photo applied. It is stored in this browser only.');
+  });
+}
+
+/* ---------- block adjustment events ---------- */
+
+function bindAdjustEvents() {
+  els.btnAdjust.addEventListener('click', () => setAdjustMode(!adjustMode));
+  els.btnAdjustEditor.addEventListener('click', () => setAdjustMode(!adjustMode));
+  els.btnRestoreLayout.addEventListener('click', restoreOriginalLayout);
+  els.btnRestoreLayout2.addEventListener('click', restoreOriginalLayout);
+  els.btnBlockReset.addEventListener('click', resetSelectedBlock);
+  els.btnLayerUp.addEventListener('click', () => setBlockValue('z', ((state.layoutAdjust.blocks[selectedBlock] || {}).z || 0) + 1));
+  els.btnLayerDown.addEventListener('click', () => setBlockValue('z', ((state.layoutAdjust.blocks[selectedBlock] || {}).z || 0) - 1));
+
+  els.blockSelect.addEventListener('change', () => selectBlock(els.blockSelect.value));
+  els.blockX.addEventListener('input', () => setBlockValue('dx', els.blockX.value));
+  els.blockY.addEventListener('input', () => setBlockValue('dy', els.blockY.value));
+  els.blockWidth.addEventListener('input', () => setBlockValue('w', els.blockWidth.value));
+  els.blockWidthNum.addEventListener('change', () => setBlockValue('w', els.blockWidthNum.value));
+
+  els.cvPage.addEventListener('pointerdown', onBlockPointerDown);
+  els.cvPage.addEventListener('keydown', onBlockKeyDown);
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && adjustMode && !blockDrag && els.photoModal.hidden) {
+      selectBlock('');
+    }
+  });
 }
 
 /* ==================================================================
@@ -1055,6 +1789,13 @@ function bindEvents() {
     saveNow();
     toast('Photo removed.');
   });
+
+  els.btnPhotoEdit.addEventListener('click', () => {
+    if (state.personal.photo) openPhotoEditor(state.personal.photo);
+  });
+
+  bindPhotoEditorEvents();
+  bindAdjustEvents();
 
   els.layoutStrip.addEventListener('click', event => {
     const button = event.target.closest('[data-layout]');
@@ -1138,9 +1879,11 @@ function refreshEverything() {
   renderAllLists();
   syncStaticFields();
   syncDesignUI();
+  syncAdjustUI();
   updatePhotoUI();
   updateCounts();
   updateTitle();
+  updateSelectedControls();
   renderPreview();
 }
 

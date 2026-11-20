@@ -78,19 +78,20 @@ function nav(active) {
     <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
     <div class="nav-links" id="primary-links">
       ${links}
-      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" aria-controls="search-strip" aria-expanded="false" title="Search tools"><span aria-hidden="true">🔍</span></button>
     </div>
   </nav>
 </header>`;
 }
 
 function searchStrip() {
-  return `<div class="site-search-strip" id="search-strip">
+  return `<div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
+      <label class="sr-only" for="site-search">Search all ${publishedTools.length} tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" placeholder="Search ${publishedTools.length} free tools…" aria-label="Search all tools" autocomplete="off">
-      <div class="search-results" id="search-results" role="listbox" hidden></div>
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search ${publishedTools.length} free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>`;
@@ -165,15 +166,20 @@ function page(options) {
 <meta property="og:title" content="${esc(options.title)}">
 <meta property="og:description" content="${esc(options.description)}">
 <meta property="og:url" content="${site}${options.canonical}">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
 ${ogImage}
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="${assets}css/site.css">
 ${structured}
 </head>
 <body${bodyClass}>
+<a class="skip-link" href="#main-content">Skip to main content</a>
 ${nav(options.activeNav)}
 ${searchStrip()}
+<div id="main-content">
 ${options.body}
+</div>
 ${footer()}
 <script src="${assets}js/search-index.js"></script>
 <script src="${assets}js/sidebar-data.js"></script>
@@ -221,12 +227,25 @@ function breadcrumbs(assets, trail) {
   return `<nav class="container breadcrumbs" aria-label="Breadcrumb">\n  ${parts}\n</nav>`;
 }
 
+function breadcrumbStructured(trail) {
+  return {
+    '@type': 'BreadcrumbList',
+    itemListElement: trail.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.label,
+      item: item.href.charAt(0) === '/' ? `${site}${item.href}` : `${site}/${item.href}`
+    }))
+  };
+}
+
 function toolUrl(tool, assets) {
   return tool.url ? `${assets}${tool.url}` : `${assets}${tool.category.path.replace(/^\//, '')}${tool.slug}/`;
 }
 
-function toolCard(tool, assets) {
+function toolCard(tool, assets, options) {
   const badge = tool.isNew ? '<span class="card-new">New</span>' : '';
+  const featured = options && options.featured ? '<span class="card-featured" aria-label="Featured tool">★ Featured</span>' : '';
   return `<a class="card tool-card" href="${toolUrl(tool, assets)}">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:${tool.category.color}1a;--icon-color:${tool.category.color}" aria-hidden="true">${esc(tool.icon)}</span>
@@ -234,7 +253,7 @@ function toolCard(tool, assets) {
   </span>
   <h3>${esc(tool.name)}${badge}</h3>
   <p>${esc(tool.description)}</p>
-  <span class="card-foot"><span class="card-tag">${esc(tool.category.shortLabel)}</span><span class="card-local">On-device</span></span>
+  <span class="card-foot">${featured}<span class="card-tag">${esc(tool.category.shortLabel)}</span><span class="card-local">On-device</span></span>
 </a>`;
 }
 
@@ -421,21 +440,33 @@ function toolPage(tool, assetsOverride) {
    * their existing three-level relative asset paths. */
   const assets = assetsOverride || (tool.url ? '/' : '../../../');
   const category = tool.category;
-  const structured = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    name: tool.name,
-    mainEntity: (tool.faqs || []).map(faq => ({
-      '@type': 'Question',
-      name: faq.q,
-      acceptedAnswer: { '@type': 'Answer', text: faq.a }
-    }))
-  };
-  const body = `${breadcrumbs(assets, [
+  const trail = [
     { label: 'Home', href: '/' },
     { label: category.label, href: category.path },
     { label: tool.name, href: tool.pageUrl }
-  ])}
+  ];
+  const graph = [{
+    '@type': 'SoftwareApplication',
+    name: tool.name,
+    description: tool.description,
+    applicationCategory: 'Utilities',
+    operatingSystem: 'Web browser',
+    url: `${site}${tool.pageUrl}`,
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }
+  }, breadcrumbStructured(trail)];
+  if ((tool.faqs || []).length) {
+    graph.push({
+      '@type': 'FAQPage',
+      name: tool.name,
+      mainEntity: tool.faqs.map(faq => ({
+        '@type': 'Question',
+        name: faq.q,
+        acceptedAnswer: { '@type': 'Answer', text: faq.a }
+      }))
+    });
+  }
+  const structured = { '@context': 'https://schema.org', '@graph': graph };
+  const body = `${breadcrumbs(assets, trail)}
 <section class="container page-head tool-head">
   <div class="tool-head-copy">
     <span class="eyebrow">${esc(category.label)}</span>
@@ -561,11 +592,14 @@ function allToolsPage() {
 function categoriesPage() {
   const cards = categories.map(category => {
     const count = registry.publishedByCategory(category.key).length;
-    return `<a class="card category-card" href="${category.path}" style="--icon-bg:${category.color}1a;--icon-color:${category.color}">
-      <span class="card-icon" aria-hidden="true">${esc(category.icon)}</span>
+    return `<a class="card category-card" href="${category.path}" style="--icon-bg:${category.color}1a;--icon-color:${category.color};--category-accent:${category.color}">
+      <span class="card-top">
+        <span class="card-icon" aria-hidden="true">${esc(category.icon)}</span>
+        <span class="card-arrow" aria-hidden="true">↗</span>
+      </span>
       <h3>${esc(category.name)}</h3>
       <p>${esc(category.description)}</p>
-      <span class="card-tag">${count} tool${count === 1 ? '' : 's'}</span>
+      <span class="card-foot"><span class="card-tag">${count} tool${count === 1 ? '' : 's'}</span><span class="card-explore">Explore →</span></span>
     </a>`;
   }).join('');
   const assets = '../';
@@ -729,26 +763,42 @@ function faqPage() {
 
 function homepage() {
   const nextTools = registry.newTools(6);
+  const featured = registry.featuredTools(4);
   const cards = publishedTools.slice().sort((a, b) => a.name.localeCompare(b.name)).slice(0, 12);
   const body = `<main>
 <section class="hero">
+  <div class="hero-atmosphere" aria-hidden="true">
+    <span class="hero-glow hero-glow-a"></span>
+    <span class="hero-glow hero-glow-b"></span>
+    <span class="hero-beam"></span>
+  </div>
   <div class="container hero-inner">
-    <div>
+    <div class="hero-copy">
       <span class="eyebrow">Free tools · Private by default</span>
-      <h1>Practical tools that get <span class="gradient-text">straight to work</span></h1>
-      <p>LetitEdit brings ${publishedTools.length} focused browser-side utilities together under ten stable categories. Everything processes locally, with clear instructions and no uploads.</p>
+      <h1>Professional tools.<br><span class="gradient-text">Zero friction.</span></h1>
+      <p>LetitEdit brings ${publishedTools.length} focused browser-side utilities together under ${categories.length} stable categories. Everything processes locally, with clear instructions and no uploads.</p>
+      <form class="hero-search" role="search" action="/" method="get">
+        <label class="sr-only" for="hero-search">Search all ${publishedTools.length} tools</label>
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input class="search-input" id="hero-search" type="search" name="q" data-search-input placeholder="Search tools, e.g. resize image or JSON formatter…" aria-controls="hero-search-results" aria-expanded="false" autocomplete="off">
+        <button class="btn hero-search-button" type="submit">Search tools</button>
+        <div class="search-results" id="hero-search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
+      </form>
       <div class="hero-actions">
-        <a class="btn" href="/tools/">Browse all tools</a>
-        <a class="btn btn-secondary" href="/categories/">Explore categories</a>
-        <a class="btn btn-secondary" href="/faq/">Read the FAQ</a>
+        <a class="btn btn-hero-primary" href="/tools/">Browse all tools</a>
+        <a class="btn btn-hero-secondary" href="/categories/">Explore categories</a>
+        <a class="btn btn-hero-text" href="/faq/">How it works →</a>
       </div>
+      <ul class="hero-proof" aria-label="Site promises"><li>No sign-up</li><li>No uploads</li><li>Real output</li></ul>
     </div>
     <aside class="hero-visual" aria-label="Platform summary">
-      <div class="hero-float float-a" aria-hidden="true"><span>✍️</span> Word Counter</div>
-      <div class="hero-float float-b" aria-hidden="true"><span>🖼️</span> Image Compressor</div>
-      <div class="hero-float float-c" aria-hidden="true"><span>🎬</span> Video Trimmer</div>
+      <div class="hero-float-layer" aria-hidden="true">
+        <div class="hero-float float-a"><span class="float-icon">✍️</span><span class="float-copy"><strong>Word Counter</strong><small>Text tool</small></span></div>
+        <div class="hero-float float-b"><span class="float-icon">🖼️</span><span class="float-copy"><strong>Image Editor</strong><small>Photo tool</small></span></div>
+        <div class="hero-float float-c"><span class="float-icon">🎬</span><span class="float-copy"><strong>Video Trimmer</strong><small>Media tool</small></span></div>
+      </div>
       <div class="hero-card">
-        <div class="hero-card-head"><span class="hero-card-dot" aria-hidden="true"></span><span class="hero-card-title">Built for your browser</span></div>
+        <div class="hero-card-head"><span class="hero-card-dot" aria-hidden="true"></span><span class="hero-card-title">Built for your browser</span><span class="hero-card-live">LIVE</span></div>
         <p class="hero-card-sub">No queue, no upload, no waiting on a server.</p>
         <div class="hero-stat"><span>Processing</span><strong>On-device</strong></div>
         <div class="hero-stat"><span>Tools ready</span><strong>${publishedTools.length}</strong></div>
@@ -759,10 +809,20 @@ function homepage() {
   </div>
 </section>
 
+<section class="section featured-section">
+  <div class="container">
+    <div class="section-head section-head-split">
+      <div><span class="eyebrow">Editor's picks</span><h2>Featured tools</h2><p>A useful starting point across writing, developer, image and media work.</p></div>
+      <a class="text-link" href="/tools/">View all tools →</a>
+    </div>
+    <div class="grid tool-grid">${featured.map(tool => toolCard(tool, '', { featured: true })).join('')}</div>
+  </div>
+</section>
+
 <section class="section directory-section">
   <div class="container directory-layout">
     ${sidebar('', 'all')}
-    <main class="directory-main">
+    <div class="directory-main">
       <div class="directory-bar">
         <div><h2>Tool directory</h2><p class="directory-count">${publishedTools.length} published tools</p></div>
         <div class="directory-filter">
@@ -773,7 +833,7 @@ function homepage() {
       <p class="directory-matched" id="directory-matched" hidden></p>
       <div class="grid tool-grid" id="tool-grid">${cards.map(tool => toolCard(tool, '')).join('')}</div>
       <p class="directory-more"><a class="btn btn-secondary" href="/tools/">See all ${publishedTools.length} tools</a></p>
-    </main>
+    </div>
   </div>
 </section>
 
@@ -788,13 +848,20 @@ function homepage() {
 
 <section class="section">
   <div class="container">
-    <div class="section-head"><h2>Explore by category</h2><p>Every category has a working page now. Empty categories show an honest empty state until tools are added.</p></div>
+    <div class="section-head section-head-split">
+      <div><h2>Explore by category</h2><p>Every category has a working page now. Empty categories show an honest empty state until tools are added.</p></div>
+      <a class="text-link" href="/categories/">All categories →</a>
+    </div>
     <div class="grid category-grid">
       ${categories.map(category => {
         const count = registry.publishedByCategory(category.key).length;
-        return `<a class="card category-card" href="${category.path.replace(/^\//, '')}" style="--icon-bg:${category.color}1a;--icon-color:${category.color}">
-          <span class="card-icon" aria-hidden="true">${esc(category.icon)}</span>
-          <h3>${esc(category.name)}</h3><p>${esc(category.description)}</p><span class="card-tag">${count} tool${count === 1 ? '' : 's'}</span>
+        return `<a class="card category-card" href="${category.path}" style="--icon-bg:${category.color}1a;--icon-color:${category.color};--category-accent:${category.color}">
+          <span class="card-top">
+            <span class="card-icon" aria-hidden="true">${esc(category.icon)}</span>
+            <span class="card-arrow" aria-hidden="true">↗</span>
+          </span>
+          <h3>${esc(category.name)}</h3><p>${esc(category.description)}</p>
+          <span class="card-foot"><span class="card-tag">${count} tool${count === 1 ? '' : 's'}</span><span class="card-explore">Explore →</span></span>
         </a>`;
       }).join('')}
     </div>
@@ -852,6 +919,49 @@ function staticPage(options) {
   });
 }
 
+/* Tools with redirectTo keep their historical URL as a tiny, accessible stub.
+ * They are deliberately outside the main page template: no site navigation,
+ * search index, FAQ scripts or tool runtime is loaded on a redirect. */
+function toolOutputPath(tool) {
+  if (!tool.url) return `${tool.category.path.replace(/^\//, '')}${tool.slug}/index.html`;
+  return /index\.html$/.test(tool.url) ? tool.url : `${tool.url.replace(/\/$/, '')}/index.html`;
+}
+
+function redirectPage(tool) {
+  const target = esc(tool.redirectTo);
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${esc(tool.name)} has moved — LetitEdit</title>
+<meta name="description" content="${esc(tool.name)} has moved to a new LetitEdit page. You are being redirected to the current tool.">
+<link rel="canonical" href="${site}${esc(tool.redirectTo)}">
+<meta http-equiv="refresh" content="0; url=${target}">
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; background: #eff6ff; color: #0f172a; font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { width: min(520px, 100%); padding: 32px; border: 1px solid #bfdbfe; border-radius: 20px; background: #fff; box-shadow: 0 18px 48px rgba(37, 99, 235, .14); }
+  .tag { display: inline-block; margin-bottom: 14px; padding: 4px 10px; border-radius: 999px; background: #dbeafe; color: #1d4ed8; font-size: .75rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  h1 { margin: 0 0 10px; font-size: clamp(1.5rem, 5vw, 2rem); line-height: 1.2; }
+  p { margin: 0 0 22px; color: #475569; }
+  a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 18px; border-radius: 10px; background: #2563eb; color: #fff; font-weight: 700; text-decoration: none; }
+  a:hover { background: #1d4ed8; }
+</style>
+</head>
+<body>
+<main>
+  <span class="tag">Tool relocated</span>
+  <h1>${esc(tool.name)} has moved</h1>
+  <p>This page now redirects to the current ${esc(tool.category.name)} tool. If the automatic redirect does not happen, use the link below.</p>
+  <a href="${target}">Continue to the current tool →</a>
+</main>
+</body>
+</html>
+`;
+}
+
 /* ---------- Generate everything ---------- */
 
 write('index.html', homepage());
@@ -865,14 +975,15 @@ write('/faq/index.html', faqPage());
 categories.forEach(category => {
   write(`${category.path.replace(/^\//, '')}index.html`, categoryPage(category));
   category.tools.forEach(tool => {
-    if (tool.layout === 'existing') return;
-    if (tool.url) {
-      /* Generated short routes are written at their registered path. Existing
-       * standalone pages with a url and layout 'existing' are never touched. */
-      write(tool.url, toolPage(tool, '/'));
+    const file = toolOutputPath(tool);
+    if (tool.redirectTo) {
+      write(file, redirectPage(tool));
       return;
     }
-    write(`${category.path.replace(/^\//, '')}${tool.slug}/index.html`, toolPage(tool));
+    if (tool.layout === 'existing') return;
+    /* Generated short routes are written at their registered path. Existing
+     * standalone pages with a url and layout 'existing' are never touched. */
+    write(file, tool.url ? toolPage(tool, '/') : toolPage(tool));
   });
 });
 
@@ -883,6 +994,15 @@ categories.forEach(category => {
 
 write('js/search-index.js', `/* Generated by scripts/build.js */\nwindow.LETITEDIT_SEARCH = ${jsonForScript(registry.searchItems())};\n`);
 write('js/sidebar-data.js', `/* Generated by scripts/build.js */\nwindow.LETITEDIT_SIDEBAR = ${jsonForScript(registry.sidebarItems())};\n`);
+/* Snapshot the metadata used for this build so SEO checks stay consistent even
+ * if the source data changes while a test run is in progress. */
+write('js/seo-manifest.js', `/* Generated by scripts/build.js */\nwindow.LETITEDIT_SEO = ${jsonForScript(publishedTools.map(tool => ({
+  slug: tool.slug,
+  pageUrl: tool.pageUrl,
+  title: tool.title,
+  description: tool.description,
+  layout: tool.layout
+})))};\n`);
 
 const staticPages = {
   'about/index.html': staticPage({
@@ -936,4 +1056,4 @@ publishedTools.forEach(tool => sitemapUrls.push(tool.pageUrl));
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls.map(url => `  <url><loc>${xml(site + url)}</loc></url>`).join('\n')}\n</urlset>\n`;
 write('sitemap.xml', sitemap);
 
-console.log(`Built ${publishedTools.length} published tools across ${categories.length} categories, ${Object.keys(staticPages).length} static pages, 7 directory/content pages, search index, sidebar data and sitemap.`);
+console.log(`Built ${publishedTools.length} published tools across ${categories.length} categories, ${Object.keys(staticPages).length} static pages, 7 directory/content pages, ${registry.redirectTools.length} redirect stub${registry.redirectTools.length === 1 ? '' : 's'}, search index, sidebar data, SEO manifest and sitemap.`);

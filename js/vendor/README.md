@@ -30,6 +30,7 @@ LetitEdit keeps its generated tools local: the files below are served from this 
 | Model | Approximate size | Official URL | Used by |
 | --- | --- | --- | --- |
 | MediaPipe selfie segmenter (float16) | about 15 MB | `https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/1/selfie_segmenter.tflite` | Video Background Remover |
+| MediaPipe BlazeFace short-range face detector (float16) | roughly 200–250 KB for the model file | `https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/latest/blaze_face_short_range.tflite` | Video-to-Shorts subject-centred crop |
 | `onnx-community/whisper-tiny` | about 75–80 MB of model/tokenizer files, plus local ONNX WASM (~21.6 MB) | `https://huggingface.co/onnx-community/whisper-tiny` | Multilingual Subtitle Generator; optional Video-to-Shorts speech ranking |
 
 The tool pages disclose these downloads next to the checkbox. Media is decoded and processed in the browser and is never uploaded. Cancelling or leaving the page terminates the worker/segmenter and releases object URLs.

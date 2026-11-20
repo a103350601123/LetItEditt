@@ -215,11 +215,15 @@
       this.root.appendChild(this.section('Canvas', aspectGrid, stats, bg));
 
       const trackList = h('div');
-      project.tracks.forEach(t => {
-        const row = h('div', 'stat-row');
-        row.innerHTML = `<span style="display:flex;align-items:center;gap:6px">${VE.icon(TYPE_ICON[t.type] || 'layers')}${VE.escapeHtml(t.name)}</span><b>${t.clips.length}</b>`;
+      project.tracks.slice().reverse().forEach(t => {
+        const z = project.tracks.indexOf(t) + 1;
+        const row = h('div', 'stat-row track-z-row');
+        row.innerHTML = `<span style="display:flex;align-items:center;gap:6px">${VE.icon(TYPE_ICON[t.type] || 'layers')}${VE.escapeHtml(t.name)}${t.groupId ? VE.icon('group') : ''}</span><b>Z ${z} · ${t.clips.length}</b>`;
         trackList.appendChild(row);
       });
+      const trackNote = h('p', 'insp-note');
+      trackNote.textContent = `Stack order: Z ${project.tracks.length} is in front. The lowest row in the timeline is in front. Reorder with the ↑/↓ controls on each track. Limit: ${VE.MAX_TRACKS} tracks.`;
+      trackList.appendChild(trackNote);
       const addTrack = h('div', 'btn-row');
       addTrack.appendChild(this.iconButton('Add track', 'plus', () => {
         VE.openMenu(addTrack.querySelector('button'), [
@@ -295,6 +299,26 @@
       if (clip.type === 'video') actions.appendChild(this.iconButton('Detach audio', 'music', () => app.detachAudio(clip.id), 'btn tiny'));
       this.root.appendChild(this.section('Actions', actions));
 
+      /* layer order / visibility / lock */
+      const layer = h('div');
+      const layerInfoData = VE.layerInfo(project, clip.id);
+      const layerStat = h('div', 'stat-row');
+      layerStat.innerHTML = `<span>Layer position</span><b>${layerInfoData ? `Z ${layerInfoData.z} / ${layerInfoData.count}` : '—'}</b>`;
+      layer.appendChild(layerStat);
+      const layerBtns = h('div', 'btn-row');
+      layerBtns.appendChild(this.iconButton('Back', 'down', () => app.moveLayer(-1), 'btn tiny'));
+      layerBtns.appendChild(this.iconButton('Front', 'up', () => app.moveLayer(1), 'btn tiny'));
+      const lockBtn = this.iconButton(clip.locked ? 'Unlock' : 'Lock', clip.locked ? 'lock' : 'unlock', () => app.toggleClipFlag('locked'), 'btn tiny toggle');
+      lockBtn.classList.toggle('active', !!clip.locked);
+      const hideBtn = this.iconButton(clip.hidden ? 'Show' : 'Hide', clip.hidden ? 'eye-off' : 'eye', () => app.toggleClipFlag('hidden'), 'btn tiny toggle');
+      hideBtn.classList.toggle('active', !!clip.hidden);
+      layerBtns.append(lockBtn, hideBtn);
+      layer.appendChild(layerBtns);
+      const layerNote = h('p', 'insp-note');
+      layerNote.textContent = 'Z-order is shared across all tracks. Drag the selected layer on the preview to move it; drag a corner to resize or the top handle to rotate.';
+      layer.appendChild(layerNote);
+      this.root.appendChild(this.section('Layer', layer));
+
       /* timing */
       const maxDur = VE.assetDurationLimit(clip, asset);
       const timing = h('div');
@@ -338,6 +362,25 @@
         layout.appendChild(this.slider('Rotation', clip.rotation, -180, 180, 1, v => Math.round(v) + '°', v => { clip.rotation = v; }));
         layout.appendChild(this.slider('Opacity', clip.opacity, 0, 1, 0.01, v => Math.round(v * 100) + '%', v => { clip.opacity = v; }));
         this.root.appendChild(this.section('Layout', layout));
+      }
+
+      /* procedural shape */
+      if (clip.type === 'shape') {
+        const shape = h('div');
+        shape.appendChild(this.slider('Width', clip.shapeWidth, 0.02, 2, 0.01, v => Math.round(v * 100) + '%', v => { clip.shapeWidth = v; }));
+        shape.appendChild(this.slider('Height', clip.shapeHeight, 0.02, 2, 0.01, v => Math.round(v * 100) + '%', v => { clip.shapeHeight = v; }));
+        shape.appendChild(this.colorRow('Primary', clip.shapeColor || '#7c5cff',
+          (v) => { clip.shapeColor = v; },
+          (v) => { clip.shapeColor = v; app.commit({ history: true }); }
+        ));
+        shape.appendChild(this.colorRow('Secondary', clip.shapeColor2 || '#3ba0ff',
+          (v) => { clip.shapeColor2 = v; },
+          (v) => { clip.shapeColor2 = v; app.commit({ history: true }); }
+        ));
+        const shapeNote = h('p', 'insp-note');
+        shapeNote.textContent = 'This graphic is drawn procedurally on the canvas. Unlike imported media, it has no external file or licence dependency.';
+        shape.appendChild(shapeNote);
+        this.root.appendChild(this.section('Shape', shape));
       }
 
       /* look */
@@ -446,6 +489,59 @@
         sound.appendChild(this.slider('Fade in', clip.fadeIn || 0, 0, 5, 0.05, v => v.toFixed(1) + 's', v => { clip.fadeIn = v; }));
         sound.appendChild(this.slider('Fade out', clip.fadeOut || 0, 0, 5, 0.05, v => v.toFixed(1) + 's', v => { clip.fadeOut = v; }));
         this.root.appendChild(this.section('Sound', sound));
+      }
+
+      /* animation & effects */
+      if (isVisual) {
+        const anim = h('div');
+        anim.appendChild(this.selectRow('Animation', VE.ANIMATIONS.map(a => ({ id: a.id, name: `${a.group} · ${a.name}` })),
+          clip.animationId || 'none', (v) => {
+            clip.animationId = v;
+            const spec = VE.ANIM_MAP[v];
+            if (spec) {
+              clip.animDirection = spec.direction;
+              clip.animDuration = spec.duration;
+            }
+            app.commit({ history: true, inspector: true });
+          }));
+        const activeAnim = VE.ANIM_MAP[clip.animationId];
+        if (activeAnim && activeAnim.motion !== 'none') {
+          anim.appendChild(this.slider('Duration', clip.animDuration, 0.1, 8, 0.05, v => v.toFixed(2) + 's', v => { clip.animDuration = v; }, () => app.commit({ history: true })));
+          anim.appendChild(this.slider('Speed', clip.animSpeed, 0.1, 4, 0.05, v => v.toFixed(2) + '×', v => { clip.animSpeed = v; }, () => app.commit({ history: true })));
+          anim.appendChild(this.slider('Delay', clip.animDelay || 0, -2, 10, 0.05, v => v.toFixed(2) + 's', v => { clip.animDelay = v; }, () => app.commit({ history: true })));
+          anim.appendChild(this.segRow('Direction', [
+            { id: 'left', name: 'Left' }, { id: 'right', name: 'Right' }, { id: 'up', name: 'Up' }, { id: 'down', name: 'Down' }
+          ], clip.animDirection || 'left', (v) => { clip.animDirection = v; app.commit({ history: true }); }));
+          const animNote = h('p', 'insp-note');
+          animNote.textContent = `${activeAnim.name} · ${activeAnim.phase} phase. ${VE.ANIMATIONS.length} presets available. Timing applies to entrance, exit and loops.`;
+          anim.appendChild(animNote);
+        }
+        this.root.appendChild(this.section('Animation', anim));
+
+        const fx = h('div');
+        if (!Array.isArray(clip.effects)) clip.effects = [];
+        VE.EFFECTS.filter(e => e.kind !== 'none').forEach(spec => {
+          const entry = clip.effects.find(e => e.id === spec.id);
+          const row = h('div', 'effect-row');
+          const b = h('button', 'btn tiny' + (entry ? ' soft active' : ' ghost'), spec.name);
+          b.type = 'button';
+          b.title = entry ? 'Remove ' + spec.name : 'Apply ' + spec.name;
+          b.addEventListener('click', () => {
+            if (entry) clip.effects = clip.effects.filter(e => e.id !== spec.id);
+            else clip.effects.push({ id: spec.id, amount: spec.amount });
+            app.commit({ history: true, inspector: true });
+          });
+          row.appendChild(b);
+          if (entry) {
+            row.appendChild(this.slider('Amount', entry.amount, 0, 1, 0.05, v => Math.round(v * 100) + '%',
+              v => { entry.amount = v; }, () => app.commit({ history: true })));
+          }
+          fx.appendChild(row);
+        });
+        const fxNote = h('p', 'insp-note');
+        fxNote.textContent = 'Effects are rendered into the preview and the exported video. Pixel-level effects (sharpen, VHS, grade, pixelate) need more CPU at high resolutions.';
+        fx.appendChild(fxNote);
+        this.root.appendChild(this.section('Effects', fx));
       }
 
       /* transitions */

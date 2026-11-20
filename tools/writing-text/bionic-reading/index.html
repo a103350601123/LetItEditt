@@ -11,14 +11,17 @@
 <meta property="og:title" content="Bionic Reading Converter — Fixations, Saccades and Reading View">
 <meta property="og:description" content="Bold the first part of each word with adjustable fixation strength and saccade skipping. Preview the result, copy formatted text, HTML or Markdown, download an HTML file and open a distraction-free reading view.">
 <meta property="og:url" content="https://letitedit.com/tools/writing-text/bionic-reading/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../../../css/site.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","name":"Bionic Reading Converter","mainEntity":[{"@type":"Question","name":"Does it handle apostrophes and hyphens?","acceptedAnswer":{"@type":"Answer","text":"Apostrophes inside words are handled. Hyphens are not part of the word pattern in the reference source, so “well-known” is treated as two words and may be bolded unevenly when saccade skipping is on."}},{"@type":"Question","name":"Is my text uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. Processing is local. This build saves your text and settings in this browser’s local storage so the preview survives a refresh; clear the text to remove it from the saved state."}},{"@type":"Question","name":"What do fixation and saccade mean?","acceptedAnswer":{"@type":"Answer","text":"Fixation strength controls how much of each selected word is bold, from about 20% to about 70%. Saccade controls how often a word is selected: every word, every second word or every third word."}}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Bionic Reading Converter","description":"Bold the first part of each word with adjustable fixation strength and saccade skipping. Preview the result, copy formatted text, HTML or Markdown, download an HTML file and open a distraction-free reading view.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/writing-text/bionic-reading/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Writing \u0026 Text Tools","item":"https://letitedit.com/tools/writing-text/"},{"@type":"ListItem","position":3,"name":"Bionic Reading Converter","item":"https://letitedit.com/tools/writing-text/bionic-reading/"}]},{"@type":"FAQPage","name":"Bionic Reading Converter","mainEntity":[{"@type":"Question","name":"Does it handle apostrophes and hyphens?","acceptedAnswer":{"@type":"Answer","text":"Apostrophes inside words are handled. Hyphens are not part of the word pattern in the reference source, so “well-known” is treated as two words and may be bolded unevenly when saccade skipping is on."}},{"@type":"Question","name":"Is my text uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. Processing is local. This build saves your text and settings in this browser’s local storage so the preview survives a refresh; clear the text to remove it from the saved state."}},{"@type":"Question","name":"What do fixation and saccade mean?","acceptedAnswer":{"@type":"Answer","text":"Fixation strength controls how much of each selected word is bold, from about 20% to about 70%. Saccade controls how often a word is selected: every word, every second word or every third word."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-text">
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
@@ -30,19 +33,21 @@
       <a href="/blog/">Blog</a>
       <a href="/tools/">All Tools</a>
       <a href="/faq/">FAQ</a>
-      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" aria-controls="search-strip" aria-expanded="false" title="Search tools"><span aria-hidden="true">🔍</span></button>
     </div>
   </nav>
 </header>
-<div class="site-search-strip" id="search-strip">
+<div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
+      <label class="sr-only" for="site-search">Search all 61 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
-      <div class="search-results" id="search-results" role="listbox" hidden></div>
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
+<div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="../../../">Home</a><span>/</span>
   <a href="../../../tools/writing-text/">Writing &amp; Text Tools</a><span>/</span>
@@ -134,11 +139,12 @@
     <div class="info-card">
       <h2>Related tools</h2>
       <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
-        <a class="card tool-card" href="../../../tools/writing-text/smart-quotes/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">“</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Straight Quotes to Curly Quotes</h3><p>Convert straight quotes and apostrophes into proper typographic curly quotes for articles, books and polished copy.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/case-converter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">Aa</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Case Converter</h3><p>Convert text between lowercase, uppercase, title case, sentence case, alternating case and AP style.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/text-cleaner/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧹</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Text Cleaner</h3><p>Clean messy text in one ordered pass: trim whitespace, strip HTML tags and emoji, remove accents, unify quotes, fix punctuation and expand shorthand. Everything runs in your browser.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/html-to-markdown/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🅼</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Rich Text / HTML to Markdown</h3><p>Convert pasted HTML or rich text into clean Markdown with headings, links, lists, bold and italic preserved.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a>
+        <a class="card tool-card" href="../../../tools/writing-text/smart-quotes/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">“</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Straight Quotes to Curly Quotes</h3><p>Convert straight quotes and apostrophes into proper typographic curly quotes for articles, books and polished copy.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/case-converter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">Aa</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Case Converter</h3><p>Convert text between lowercase, uppercase, title case, sentence case, alternating case and AP style.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/text-cleaner/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧹</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Text Cleaner</h3><p>Clean messy text in one ordered pass: trim whitespace, strip HTML tags and emoji, remove accents, unify quotes, fix punctuation and expand shorthand. Everything runs in your browser.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/html-to-markdown/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🅼</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Rich Text / HTML to Markdown</h3><p>Convert pasted HTML, rich text, text files or DOCX text into clean Markdown with headings, links, lists, tables, code and emphasis preserved.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a>
       </div>
     </div>
   </div>
 </section>
+</div>
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">

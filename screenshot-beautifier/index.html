@@ -11,14 +11,17 @@
 <meta property="og:title" content="Screenshot Beautifier — Frames, Backgrounds and Shadows">
 <meta property="og:description" content="Dress up a screenshot with gradient, solid, transparent or patterned backgrounds, padding, rounded corners, shadow, filters and title bars. Export a polished PNG.">
 <meta property="og:url" content="https://letitedit.com/screenshot-beautifier/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="/css/site.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","name":"Screenshot Beautifier","mainEntity":[{"@type":"Question","name":"Is my screenshot uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. The composition is assembled in your browser, and the screenshot is never sent to LetitEdit or a third-party service."}},{"@type":"Question","name":"Can I make the background transparent?","acceptedAnswer":{"@type":"Answer","text":"Yes. Choose the transparent background option when you want the padding around the screenshot to stay see-through in the exported PNG."}},{"@type":"Question","name":"What do the Mac and Windows title bars do?","acceptedAnswer":{"@type":"Answer","text":"They add a decorative window bar above the capture with the familiar dot or button styling. They are visual framing only and do not change the screenshot content beneath."}},{"@type":"Question","name":"Will this fix a blurry or low-resolution screenshot?","acceptedAnswer":{"@type":"Answer","text":"No. Filters and framing can make a capture look tidier, but they cannot add detail that was not captured. Start with the sharpest original you have."}},{"@type":"Question","name":"My export has a hard edge or the shadow is cut off. Why?","acceptedAnswer":{"@type":"Answer","text":"Increase the padding so there is enough room around the screenshot for the shadow to render. Also check that a transparent background is not being viewed against a similarly coloured page."}}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Screenshot Beautifier","description":"Dress up a screenshot with gradient, solid, transparent or patterned backgrounds, padding, rounded corners, shadow, filters and title bars. Export a polished PNG.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/screenshot-beautifier/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Image \u0026 Photo Tools","item":"https://letitedit.com/tools/image-photo/"},{"@type":"ListItem","position":3,"name":"Screenshot Beautifier","item":"https://letitedit.com/screenshot-beautifier/"}]},{"@type":"FAQPage","name":"Screenshot Beautifier","mainEntity":[{"@type":"Question","name":"Is my screenshot uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. The composition is assembled in your browser, and the screenshot is never sent to LetitEdit or a third-party service."}},{"@type":"Question","name":"Can I make the background transparent?","acceptedAnswer":{"@type":"Answer","text":"Yes. Choose the transparent background option when you want the padding around the screenshot to stay see-through in the exported PNG."}},{"@type":"Question","name":"What do the Mac and Windows title bars do?","acceptedAnswer":{"@type":"Answer","text":"They add a decorative window bar above the capture with the familiar dot or button styling. They are visual framing only and do not change the screenshot content beneath."}},{"@type":"Question","name":"Will this fix a blurry or low-resolution screenshot?","acceptedAnswer":{"@type":"Answer","text":"No. Filters and framing can make a capture look tidier, but they cannot add detail that was not captured. Start with the sharpest original you have."}},{"@type":"Question","name":"My export has a hard edge or the shadow is cut off. Why?","acceptedAnswer":{"@type":"Answer","text":"Increase the padding so there is enough room around the screenshot for the shadow to render. Also check that a transparent background is not being viewed against a similarly coloured page."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-image">
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
@@ -30,19 +33,21 @@
       <a href="/blog/">Blog</a>
       <a href="/tools/">All Tools</a>
       <a href="/faq/">FAQ</a>
-      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" aria-controls="search-strip" aria-expanded="false" title="Search tools"><span aria-hidden="true">🔍</span></button>
     </div>
   </nav>
 </header>
-<div class="site-search-strip" id="search-strip">
+<div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
+      <label class="sr-only" for="site-search">Search all 61 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
-      <div class="search-results" id="search-results" role="listbox" hidden></div>
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
+<div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="/">Home</a><span>/</span>
   <a href="/tools/image-photo/">Image &amp; Photo Tools</a><span>/</span>
@@ -126,6 +131,7 @@
     </div>
   </div>
 </section>
+</div>
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">

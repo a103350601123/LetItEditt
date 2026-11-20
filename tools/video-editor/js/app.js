@@ -24,7 +24,9 @@
   let lastTs = 0;
   let rafId = 0;
   let lastSave = Promise.resolve();
-  const PREFS_KEY = 'clipforge:prefs';
+  const PREFS_KEY = 'letitedit:prefs';
+  /* Earlier builds used this key; read it once, then migrate. */
+  const LEGACY_PREFS_KEY = 'clipforge:prefs';
   const PLACEHOLDER = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="200"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#171b28"/><stop offset="1" stop-color="#0d1018"/></linearGradient></defs><rect width="320" height="200" fill="url(#g)"/><g fill="none" stroke="#3a425c" stroke-width="3" stroke-linecap="round"><rect x="126" y="82" width="68" height="44" rx="6"/><path d="M146 93v22l18-11z"/></g></svg>'
   );
@@ -39,7 +41,9 @@
       'btnFileMenu', 'btnExport', 'btnNewProject', 'btnSaveProject', 'btnOpenProject',
       'btnExportProject', 'btnHelp', 'btnImport', 'btnStageImport', 'btnDemo',
       'btnAddText', 'btnVoiceover', 'btnImportAudio', 'btnAddCaption', 'btnImportCaptions',
-      'btnExportCaptions', 'captionFileInput', 'btnRelink', 'btnSplit2'
+      'btnExportCaptions', 'captionFileInput', 'btnRelink', 'btnSplit2',
+      'libraryPanel', 'drawerBackdrop', 'btnMobileLibrary', 'btnMobileInspector',
+      'previewStack', 'overlayCanvas', 'libCategories', 'proceduralGrid', 'libTools'
     ];
     ids.forEach(id => { els[id] = document.getElementById(id); });
     els.pool = document.getElementById('mediaPool');
@@ -78,46 +82,7 @@
   /* ---------------- state helpers ---------------- */
 
   function sanitizeProject(raw) {
-    if (!raw || typeof raw !== 'object' || !Array.isArray(raw.tracks)) return null;
-    const p = Object.assign({}, raw);
-    p.aspect = VE.ASPECT_MAP[p.aspect] ? p.aspect : '16:9';
-    p.background = typeof p.background === 'string' ? p.background : '#000000';
-    p.name = typeof p.name === 'string' && p.name.trim() ? p.name : 'Untitled project';
-    p.fps = Number(p.fps) || 30;
-    p.createdAt = p.createdAt || Date.now();
-    p.updatedAt = p.updatedAt || Date.now();
-    p.tracks = raw.tracks.filter(t => t && typeof t === 'object').map(t => {
-      const track = {
-        id: t.id || VE.uid('trk'),
-        type: ['video', 'overlay', 'text', 'audio'].includes(t.type) ? t.type : 'overlay',
-        name: t.name || 'Track',
-        muted: !!t.muted,
-        hidden: !!t.hidden,
-        locked: !!t.locked,
-        clips: []
-      };
-      track.clips = (Array.isArray(t.clips) ? t.clips : []).filter(c => c && c.id).map(c => {
-        const base = VE.baseClip(['video', 'image', 'audio', 'text'].includes(c.type) ? c.type : 'video', c.name || 'Clip');
-        const clip = Object.assign(base, c);
-        clip.id = c.id;
-        clip.start = Math.max(0, Number(clip.start) || 0);
-        clip.duration = Math.max(0.1, Number(clip.duration) || 1);
-        clip.inPoint = Math.max(0, Number(clip.inPoint) || 0);
-        clip.speed = VE.clamp(clip.speed || 1, 0.05, 16);
-        clip.opacity = VE.clamp(clip.opacity == null ? 1 : clip.opacity, 0, 1);
-        clip.x = VE.clamp(clip.x == null ? 0.5 : clip.x, -1, 2);
-        clip.y = VE.clamp(clip.y == null ? 0.5 : clip.y, -1, 2);
-        clip.scale = VE.clamp(clip.scale == null ? 1 : clip.scale, 0.05, 10);
-        clip.volume = VE.clamp(clip.volume == null ? 1 : clip.volume, 0, 1);
-        clip.transitionIn = Object.assign({ type: 'none', duration: 0.4 }, clip.transitionIn || {});
-        clip.transitionOut = Object.assign({ type: 'none', duration: 0.4 }, clip.transitionOut || {});
-        clip.text = typeof clip.text === 'string' ? clip.text : '';
-        return clip;
-      });
-      return track;
-    });
-    if (!p.tracks.length) p.tracks = VE.createProject().tracks;
-    return p;
+    return VE.sanitizeProject(raw);
   }
 
   function loadAssets(records) {
@@ -388,10 +353,52 @@
     VE.toast('Audio detached to the audio track');
   }
 
+  /* ---------------- layers & shapes ---------------- */
+
+  function moveLayer(dir) {
+    if (!state.selection) { VE.toast('Select a layer first', 'warn'); return; }
+    const before = VE.layerInfo(state.project, state.selection);
+    if (!before) return;
+    const found = VE.findClip(state.project, state.selection);
+    if (found && (found.track.locked || found.clip.locked)) { VE.toast('This layer or track is locked', 'warn'); return; }
+    const moved = VE.moveLayer(state.project, state.selection, dir);
+    if (!moved) { VE.toast(dir > 0 ? 'Already at the front' : 'Already at the back', 'warn'); return; }
+    const after = VE.layerInfo(state.project, state.selection);
+    commit({ history: true, timeline: true, inspector: true });
+    VE.toast(`Layer ${after.z} of ${after.count}`);
+    void before;
+  }
+
+  function toggleClipFlag(flag) {
+    const found = state.selection ? VE.findClip(state.project, state.selection) : null;
+    if (!found) { VE.toast('Select a layer first', 'warn'); return; }
+    found.clip[flag] = !found.clip[flag];
+    commit({ history: true, timeline: true, inspector: true, renderer: true });
+    VE.toast(flag === 'locked' ? (found.clip.locked ? 'Layer locked' : 'Layer unlocked')
+      : (found.clip.hidden ? 'Layer hidden' : 'Layer shown'));
+  }
+
+  function addShape(procId) {
+    const item = VE.PROCEDURAL_MAP[procId];
+    if (!item) return;
+    const trackType = item.category === 'decorative' || item.category === 'animated' ? 'overlay' : 'overlay';
+    const track = VE.ensureTrack(state.project, trackType);
+    const clip = VE.createShapeClip(procId, { start: state.time });
+    clip.start = VE.findFreeStart(track, state.time, clip.duration);
+    track.clips.push(clip);
+    commit({ history: true, timeline: true, inspector: true });
+    selectClip(clip.id);
+    VE.toast(item.label + ' added — drag it on the preview to position it');
+  }
+
   /* ---------------- tracks ---------------- */
 
   function addTrack(kind) {
     if (!['video', 'overlay', 'text', 'audio'].includes(kind)) return;
+    if (state.project.tracks.length >= VE.MAX_TRACKS) {
+      VE.toast(`This editor supports up to ${VE.MAX_TRACKS} tracks per project`, 'warn');
+      return;
+    }
     const track = VE.createTrack(kind, state.project.tracks);
     const tracks = state.project.tracks;
     let index = tracks.length;
@@ -426,6 +433,56 @@
     if (state.selection && !VE.findClip(state.project, state.selection)) state.selection = null;
     commit({ history: true, timeline: true, inspector: true });
     VE.toast('Track deleted');
+  }
+
+  function moveTrack(trackId, dir) {
+    const tracks = state.project.tracks;
+    const index = tracks.findIndex(t => t.id === trackId);
+    if (index < 0) return;
+    const track = tracks[index];
+    const group = track.groupId ? tracks.filter(t => t.groupId === track.groupId) : [track];
+    const first = tracks.indexOf(group[0]);
+    const last = tracks.indexOf(group[group.length - 1]);
+    const target = dir > 0 ? last + 1 : first - 1;
+    if (target < 0 || target >= tracks.length) {
+      VE.toast(dir > 0 ? 'Group is already at the front' : 'Group is already at the back', 'warn');
+      return;
+    }
+    tracks.splice(first, group.length);
+    const insert = dir > 0 ? target - group.length + 1 : target;
+    tracks.splice(insert, 0, ...group);
+    commit({ history: true, timeline: true, inspector: true });
+    VE.toast(group.length > 1 ? 'Track group reordered' : 'Track reordered');
+  }
+
+  function toggleTrackGroup(trackId) {
+    const tracks = state.project.tracks;
+    const track = tracks.find(t => t.id === trackId);
+    if (!track) return;
+    if (track.groupId) {
+      const id = track.groupId;
+      tracks.forEach(t => { if (t.groupId === id) t.groupId = null; });
+      VE.toast('Tracks ungrouped');
+    } else {
+      const index = tracks.indexOf(track);
+      const neighbour = tracks[index - 1] || tracks[index + 1];
+      if (!neighbour) { VE.toast('Add a second track to make a group', 'warn'); return; }
+      const id = VE.uid('grp');
+      track.groupId = id;
+      neighbour.groupId = id;
+      VE.toast('Tracks grouped — lock, mute and hide now apply to the group');
+    }
+    commit({ history: true, timeline: true, inspector: true });
+  }
+
+  function setTrackFlag(trackId, flag) {
+    const tracks = state.project.tracks;
+    const track = tracks.find(t => t.id === trackId);
+    if (!track) return;
+    const next = !track[flag];
+    const group = track.groupId ? tracks.filter(t => t.groupId === track.groupId) : [track];
+    group.forEach(t => { t[flag] = next; });
+    commit({ history: true, timeline: true, inspector: true });
   }
 
   /* ---------------- media library ---------------- */
@@ -486,6 +543,7 @@
     });
     if (els.libEmpty) els.libEmpty.classList.toggle('show', assets.length === 0);
     if (els.relinkBar) els.relinkBar.classList.toggle('hidden', !assets.some(a => a.missing));
+    if (VE.AppUI && VE.AppUI.filterAssets) VE.AppUI.filterAssets();
   }
 
   async function removeAsset(assetId) {
@@ -512,7 +570,7 @@
     VE.toast('Media removed');
   }
 
-  async function importFiles(fileList) {
+  async function importFiles(fileList, opts = {}) {
     const files = Array.from(fileList || []).filter(f => f && typeof f.size === 'number');
     if (!files.length) return;
     renderer.ensureAudio();
@@ -520,6 +578,7 @@
     for (const file of files) {
       try {
         const asset = await VE.probeMedia(file);
+        asset.category = opts.category || asset.type;
         await VE.DB.putAsset(asset);
         state.assets.set(asset.id, asset);
         renderAssets();
@@ -616,12 +675,13 @@
 
   function projectFilePayload() {
     return {
-      app: 'ClipForge',
-      version: 1,
+      app: VE.APP_NAME,
+      appId: 'letitedit',
+      version: 2,
       savedAt: new Date().toISOString(),
       project: state.project,
       assets: Array.from(state.assets.values()).map(a => ({
-        id: a.id, name: a.name, type: a.type, mime: a.mime, size: a.size,
+        id: a.id, name: a.name, type: a.type, category: a.category || a.type, mime: a.mime, size: a.size,
         duration: a.duration, width: a.width, height: a.height, thumb: a.thumb, missing: !!a.missing
       }))
     };
@@ -630,7 +690,7 @@
   function saveProjectFile() {
     const payload = projectFilePayload();
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    VE.download(blob, `${VE.safeFilename(state.project.name)}.clipforge.json`);
+    VE.download(blob, `${VE.safeFilename(state.project.name)}${VE.PROJECT_EXT}`);
     VE.toast('Project file saved');
   }
 
@@ -640,7 +700,7 @@
       const text = await file.text();
       const data = JSON.parse(text);
       const incoming = data && data.project ? data.project : data;
-      if (!incoming || !Array.isArray(incoming.tracks)) throw new Error('This file is not a ClipForge project');
+      if (!incoming || !Array.isArray(incoming.tracks)) throw new Error('This file is not a LetitEdit project');
 
       const hasClips = state.project && state.project.tracks.some(t => t.clips.length);
       if (hasClips) {
@@ -660,6 +720,7 @@
         asset.id = meta.id;
         asset.name = meta.name || asset.name || 'Media';
         asset.type = meta.type || asset.type || 'video';
+        asset.category = meta.category || asset.category || asset.type;
         asset.duration = meta.duration || asset.duration || 0;
         asset.thumb = meta.thumb || asset.thumb || '';
         asset.blob = existing ? existing.blob : null;
@@ -728,7 +789,7 @@
   }
 
   async function resetAllData() {
-    const ok = await VE.confirm('Clear browser storage', 'Delete every ClipForge project and media file stored in this browser? This cannot be undone.', 'Delete everything');
+    const ok = await VE.confirm('Clear browser storage', 'Delete every LetitEdit project and media file stored in this browser? This cannot be undone.', 'Delete everything');
     if (!ok) return;
     state.clearing = true;
     setSaveState('saved');
@@ -736,7 +797,7 @@
     try { debouncedPrefs.cancel(); } catch (e) { /* noop */ }
     try { await lastSave; } catch (e) { /* noop */ }
     try { await VE.DB.clearAll(); } catch (e) { /* noop */ }
-    try { localStorage.removeItem(PREFS_KEY); } catch (e) { /* noop */ }
+    try { localStorage.removeItem(PREFS_KEY); localStorage.removeItem(LEGACY_PREFS_KEY); } catch (e) { /* noop */ }
     location.reload();
   }
 
@@ -753,7 +814,12 @@
 
   function restorePrefs() {
     try {
-      const raw = localStorage.getItem(PREFS_KEY);
+      let raw = localStorage.getItem(PREFS_KEY);
+      let migrated = false;
+      if (!raw) {
+        raw = localStorage.getItem(LEGACY_PREFS_KEY);
+        migrated = !!raw;
+      }
       if (!raw) return;
       const p = JSON.parse(raw);
       if (p && typeof p === 'object') {
@@ -761,6 +827,10 @@
         state.loop = !!p.loop;
         state.muted = !!p.muted;
         state.snap = p.snap !== false;
+      }
+      if (migrated) {
+        localStorage.setItem(PREFS_KEY, raw);
+        localStorage.removeItem(LEGACY_PREFS_KEY);
       }
     } catch (e) { /* noop */ }
   }
@@ -790,6 +860,22 @@
       });
     }
     if (els.aspectSelect) els.aspectSelect.value = state.project.aspect;
+  }
+
+  function toggleDrawer(name) {
+    const panel = name === 'library' ? els.libraryPanel : els.inspector;
+    if (!panel) return;
+    const open = !panel.classList.contains('open');
+    document.querySelectorAll('.panel.drawer.open').forEach(p => p.classList.remove('open'));
+    if (open) panel.classList.add('open');
+    if (els.drawerBackdrop) els.drawerBackdrop.classList.toggle('hidden', !open);
+    document.body.classList.toggle('drawer-open', open);
+  }
+
+  function closeDrawers() {
+    document.querySelectorAll('.panel.drawer.open').forEach(p => p.classList.remove('open'));
+    if (els.drawerBackdrop) els.drawerBackdrop.classList.add('hidden');
+    document.body.classList.remove('drawer-open');
   }
 
   const App = {
@@ -834,6 +920,7 @@
       App.invalidate();
 
       if (VE.AppUI) VE.AppUI.init(App);
+      if (VE.CanvasControls) VE.CanvasControls.init(App);
 
       if (document.fonts && document.fonts.ready) {
         document.fonts.ready.then(() => {
@@ -868,6 +955,14 @@
     setAspect,
     addTrack,
     deleteTrack,
+    moveTrack,
+    toggleTrackGroup,
+    setTrackFlag,
+    moveLayer,
+    toggleClipFlag,
+    addShape,
+    toggleDrawer,
+    closeDrawers,
     splitSelection,
     duplicateSelection,
     deleteSelection,
@@ -1008,8 +1103,15 @@
         VE.Timeline.zoomBy(0.12);
       } else if (e.key === '-') {
         VE.Timeline.zoomBy(-0.12);
+      } else if (e.key === '[' || e.key === ']') {
+        e.preventDefault();
+        moveLayer(e.key === ']' ? 1 : -1);
       }
     });
+
+    if (els.btnMobileLibrary) els.btnMobileLibrary.addEventListener('click', () => toggleDrawer('library'));
+    if (els.btnMobileInspector) els.btnMobileInspector.addEventListener('click', () => toggleDrawer('inspector'));
+    if (els.drawerBackdrop) els.drawerBackdrop.addEventListener('click', closeDrawers);
   }
 
   function closeFileMenu() {

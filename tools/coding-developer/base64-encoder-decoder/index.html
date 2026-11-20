@@ -11,14 +11,17 @@
 <meta property="og:title" content="Base64 Encoder &amp; Decoder — UTF-8 and URL-Safe">
 <meta property="og:description" content="Encode text to Base64 or decode Base64 to UTF-8 text. Supports accents, emoji, URL-safe characters and optional padding, entirely in your browser.">
 <meta property="og:url" content="https://letitedit.com/tools/coding-developer/base64-encoder-decoder/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../../../css/site.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","name":"Base64 Encoder \u0026 Decoder","mainEntity":[{"@type":"Question","name":"Is Base64 a form of encryption?","acceptedAnswer":{"@type":"Answer","text":"No. Base64 is a reversible text representation of bytes. Anyone with the string can decode it. Never use Base64 to protect passwords, API keys or private records; use proper encryption and key management instead."}},{"@type":"Question","name":"Why is the encoded output longer than the input?","acceptedAnswer":{"@type":"Answer","text":"Base64 represents every three bytes with four ASCII characters, so the encoded form is about one third larger. UTF-8 text can also use multiple bytes per character, which affects the final length."}},{"@type":"Question","name":"Does the tool support Unicode and emoji?","acceptedAnswer":{"@type":"Answer","text":"Yes. Text is converted to UTF-8 bytes before encoding, so accented letters, non-Latin scripts and emoji round-trip correctly. Decoding validates that the bytes are valid UTF-8 text."}},{"@type":"Question","name":"What is URL-safe Base64?","acceptedAnswer":{"@type":"Answer","text":"It replaces plus with a hyphen and slash with an underscore, and usually removes equals-sign padding. This makes the value safer inside URLs, filenames and JSON Web Tokens. The decoder accepts both standard and URL-safe alphabets."}},{"@type":"Question","name":"Why do I get an error when decoding?","acceptedAnswer":{"@type":"Answer","text":"The value may contain characters outside the Base64 alphabet, have an impossible length, or represent binary data that is not valid UTF-8 text. Check that you copied the complete value and that it is text rather than an image or encrypted file."}}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Base64 Encoder \u0026 Decoder","description":"Encode text to Base64 or decode Base64 to UTF-8 text. Supports accents, emoji, URL-safe characters and optional padding, entirely in your browser.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/coding-developer/base64-encoder-decoder/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Coding \u0026 Developer Tools","item":"https://letitedit.com/tools/coding-developer/"},{"@type":"ListItem","position":3,"name":"Base64 Encoder \u0026 Decoder","item":"https://letitedit.com/tools/coding-developer/base64-encoder-decoder/"}]},{"@type":"FAQPage","name":"Base64 Encoder \u0026 Decoder","mainEntity":[{"@type":"Question","name":"Is Base64 a form of encryption?","acceptedAnswer":{"@type":"Answer","text":"No. Base64 is a reversible text representation of bytes. Anyone with the string can decode it. Never use Base64 to protect passwords, API keys or private records; use proper encryption and key management instead."}},{"@type":"Question","name":"Why is the encoded output longer than the input?","acceptedAnswer":{"@type":"Answer","text":"Base64 represents every three bytes with four ASCII characters, so the encoded form is about one third larger. UTF-8 text can also use multiple bytes per character, which affects the final length."}},{"@type":"Question","name":"Does the tool support Unicode and emoji?","acceptedAnswer":{"@type":"Answer","text":"Yes. Text is converted to UTF-8 bytes before encoding, so accented letters, non-Latin scripts and emoji round-trip correctly. Decoding validates that the bytes are valid UTF-8 text."}},{"@type":"Question","name":"What is URL-safe Base64?","acceptedAnswer":{"@type":"Answer","text":"It replaces plus with a hyphen and slash with an underscore, and usually removes equals-sign padding. This makes the value safer inside URLs, filenames and JSON Web Tokens. The decoder accepts both standard and URL-safe alphabets."}},{"@type":"Question","name":"Why do I get an error when decoding?","acceptedAnswer":{"@type":"Answer","text":"The value may contain characters outside the Base64 alphabet, have an impossible length, or represent binary data that is not valid UTF-8 text. Check that you copied the complete value and that it is text rather than an image or encrypted file."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-dev">
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
@@ -30,19 +33,21 @@
       <a href="/blog/">Blog</a>
       <a href="/tools/">All Tools</a>
       <a href="/faq/">FAQ</a>
-      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" aria-controls="search-strip" aria-expanded="false" title="Search tools"><span aria-hidden="true">🔍</span></button>
     </div>
   </nav>
 </header>
-<div class="site-search-strip" id="search-strip">
+<div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
+      <label class="sr-only" for="site-search">Search all 61 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
-      <div class="search-results" id="search-results" role="listbox" hidden></div>
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
+<div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="../../../">Home</a><span>/</span>
   <a href="../../../tools/coding-developer/">Coding &amp; Developer Tools</a><span>/</span>
@@ -140,6 +145,7 @@
     </div>
   </div>
 </section>
+</div>
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">

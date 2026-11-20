@@ -58,6 +58,10 @@ describe('cleaning tools', () => {
     expect(TextCore.removeEmptyLines('one\n\n\ntwo\n   \nthree')).toBe('one\ntwo\nthree');
   });
 
+  it('can preserve paragraph breaks while removing extra empty lines', () => {
+    expect(TextCore.removeEmptyLines('one\n\n\ntwo\n   \nthree', { preserveParagraphs: true })).toBe('one\n\ntwo\n\nthree');
+  });
+
   it('removes emoji, modifiers and flags without removing letters', () => {
     expect(TextCore.removeEmojis('Hi 😀 🇺🇸!')).toBe('Hi  !');
     expect(TextCore.removeEmojis('Café')).toBe('Café');
@@ -66,6 +70,8 @@ describe('cleaning tools', () => {
   it('removes Unicode punctuation but keeps symbols', () => {
     expect(TextCore.removePunctuation("Hello, world! How's it going?")).toBe('Hello world Hows it going');
     expect(TextCore.removePunctuation('price €10')).toBe('price €10');
+    expect(TextCore.removePunctuation('Hello, world! — really?', { types: 'common' })).toBe('Hello world — really');
+    expect(TextCore.removePunctuation('a,b.c', { types: 'custom', chars: ',' })).toBe('ab.c');
   });
 
   it('wraps text at a width and can break long words', () => {
@@ -142,10 +148,33 @@ describe('encoding tools', () => {
     expect(result.error).toContain('8-bit');
   });
 
-  it('encodes and decodes Morse including punctuation', () => {
+  it('rejects invalid binary characters instead of treating them as separators', () => {
+    const result = TextCore.binaryToText('01000001X01000010');
+    expect(result.ok).toBe(false);
+    expect(result.error).toContain('Invalid binary group');
+  });
+
+  it('round-trips UTF-16 and validates ASCII', () => {
+    const encoded = TextCore.textToBinary('Café 😀', { encoding: 'utf-16' });
+    expect(encoded.ok).toBe(true);
+    expect(TextCore.binaryToText(encoded.text, { encoding: 'utf-16' }).text).toBe('Café 😀');
+    expect(TextCore.textToBinary('é', { encoding: 'ascii' }).ok).toBe(false);
+    expect(TextCore.binaryToText('11111111', { encoding: 'ascii' }).ok).toBe(false);
+  });
+
+  it('reports invalid UTF-8 byte sequences', () => {
+    const result = TextCore.binaryToText('11111111');
+    expect(result.ok).toBe(false);
+    expect(result.error).toContain('not valid UTF-8');
+  });
+
+  it('preserves Morse word separators', () => {
     expect(TextCore.morseEncode('SOS')).toBe('... --- ...');
     expect(TextCore.morseDecode('... --- ...')).toBe('SOS');
     expect(TextCore.morseEncode('Hi!')).toBe('.... .. -.-.--');
+    const encoded = TextCore.morseEncode('HELLO WORLD');
+    expect(encoded).toContain(' / ');
+    expect(TextCore.morseDecode(encoded)).toBe('HELLO WORLD');
   });
 
   it('escapes HTML and builds bionic reading markup', () => {
@@ -200,6 +229,21 @@ describe('comparison, extraction, filtering and generation', () => {
   it('extracts unique emails and URLs', () => {
     expect(TextCore.extractEmails('a@b.com; c@d.org; a@b.com')).toBe('a@b.com\nc@d.org');
     expect(TextCore.extractUrls('Visit https://example.com/a, and http://test.org/x.')).toBe('https://example.com/a\nhttp://test.org/x');
+  });
+
+  it('extracts realistic URL variants in order without duplicates', () => {
+    const input = [
+      'See (https://example.com/a/b?q=1&lang=en#top), then www.test.org:8080/path.',
+      'Plain example.net/docs and https://example.com/a/b?q=1&lang=en#top again.',
+      'Email me at hello@example.com, not a URL by itself.'
+    ].join('\n');
+    const result = TextCore.extractUrlsDetailed(input);
+    expect(result.count).toBe(3);
+    expect(result.urls).toEqual([
+      'https://example.com/a/b?q=1&lang=en#top',
+      'www.test.org:8080/path',
+      'example.net/docs'
+    ]);
   });
 
   it('keeps, removes and highlights matching lines safely', () => {

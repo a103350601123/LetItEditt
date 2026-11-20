@@ -3,24 +3,25 @@
     "slug": "audio-editor",
     "name": "Audio Editor",
     "engine": "audio-editor",
-    "title": "Audio Editor — Trim, Fade and Export Audio Locally",
-    "description": "Trim audio or a video soundtrack, adjust gain, add fades, reverse a clip and play it back locally, then download WAV or MP3 where your browser supports it. No upload.",
+    "title": "Audio Editor — Trim, EQ, Clean Up and Export Audio Locally",
+    "description": "Edit audio or a video soundtrack locally with a wave-form, real gains, fades, compression, EQ, filtering, pitch/speed, music mixing, A/B playback and undo. Export WAV, MP3 or M4A without uploading.",
     "h1": "Audio Editor",
     "icon": "🎧",
     "layout": "engine",
     "outputType": "audio",
-    "intro": "A small editor for the audio changes you need most: cut dead air, lift a quiet recording, soften an abrupt ending or reverse a short sound. Load an audio file or take the soundtrack from a video, work against a real waveform and play the result before you download it. Everything runs in your browser, with no upload queue or account.",
+    "intro": "A local audio workbench for real sample edits: cut dead air, lift a quiet recording, tame dynamics, shape tone, reduce steady noise, change speed or pitch and mix in background music. Load an audio file or a video soundtrack, work against a decoded waveform, compare original and processed playback, then undo or redo before exporting. Transcription is available only if you opt in to a local model. Nothing is uploaded.",
     "instructions": [
       "Choose an audio file or a video whose soundtrack you want to edit.",
-      "Wait for the browser to decode the file and draw the local waveform.",
-      "Drag the start and end handles to trim the part you want to keep.",
-      "Adjust gain, then add fade in and fade out times if the edges sound abrupt.",
-      "Use reverse for a creative effect, then play the clip back to check it.",
+      "Wait for the browser to decode the file and draw the waveform from its real samples.",
+      "Drag the waveform or use the range controls to choose the part you want to keep.",
+      "Apply gain, fades, compression, EQ, noise filtering, pitch/speed or cleanup as needed.",
+      "Use Play original and Play edited to compare, then Undo or Redo to revisit a setting.",
+      "Optionally load background tracks or opt in to the local Whisper model for a transcript.",
       "Download WAV or MP3, or M4A if your browser can encode AAC."
     ],
     "example": {
       "input": "Two-minute MP3 voice memo with silence at the start and a sudden ending",
-      "output": "Trimmed WAV with a short fade in, a gentle fade out and no leading silence"
+      "output": "Trimmed WAV with a short fade, gentle compression, reduced hiss and no leading silence"
     },
     "faqs": [
       {
@@ -40,8 +41,16 @@
         "a": "Gain raises or lowers the level of the whole selection. Fade in ramps from silence at the start, and fade out ramps down to silence at the end. Fades remove clicks and make edits sound smoother; they do not remove background noise."
       },
       {
+        "q": "Do pitch, speed and voice effects preserve the original voice?",
+        "a": "No. Pitch and speed use linear resampling, so duration and tone change together, like a tape-speed control. Telephone, radio, bright and dark options are filter or pitch-style effects, not voice or identity conversion."
+      },
+      {
+        "q": "How do playback and undo work?",
+        "a": "Play original and Play edited use the decoded buffers themselves, not a decorative preview. Each Apply edits operation pushes a real processed buffer onto the undo stack; Undo and Redo restore the earlier state."
+      },
+      {
         "q": "Can this remove noise or fix a distorted recording?",
-        "a": "No. There is no noise reduction, equaliser or clipping repair here. You can trim damaged sections and lower excessive gain, but information that was recorded badly cannot be restored by these controls."
+        "a": "It can reduce steady hiss, hum and rumble with high-pass, low-pass and notch filters plus an estimated noise-floor gate. It can also soften peaks with a compressor and soft limiter, but it cannot reconstruct words hidden by noise or recover detail that was never recorded. Compare with Play original before exporting."
       },
       {
         "q": "Why is a long recording slow to process?",
@@ -61,7 +70,11 @@
       "reverse audio clip",
       "audio cutter",
       "local audio editor",
-      "volume adjust tool"
+      "volume adjust tool",
+      "noise reduction",
+      "audio equalizer",
+      "audio compressor",
+      "background music mixer"
     ],
     "keywords": [
       "audio",
@@ -73,7 +86,14 @@
       "wav",
       "mp3",
       "playback",
-      "browser"
+      "browser",
+      "noise",
+      "equalizer",
+      "compressor",
+      "pitch",
+      "speed",
+      "music",
+      "undo"
     ],
     "isNew": true,
     "added": "2026-11-19",
@@ -82,7 +102,7 @@
       {
         "heading": "Edit audio in your browser without an upload",
         "paragraphs": [
-          "Audio edits are often small: remove a pause at the start, drop the level of a loud intro, fade the ending so it does not cut off abruptly. This editor keeps those jobs in one place and runs them in your browser. Load an audio file or the audio track of a video, watch the waveform draw locally, then set a trim range and apply gain, fades or reverse. You can play the result back before exporting, which makes it much easier to judge a fade or a cut than guessing from numbers alone. Nothing is uploaded to LetitEdit or to a conversion service, so a private recording stays on the device where it was made. The original file is never changed; every edit produces a new download. That means you can try a short fade, compare it with a longer one and keep whichever copy you prefer without damaging the source."
+          "Audio edits are often small: remove a pause at the start, drop the level of a loud intro, fade the ending so it does not cut off abruptly. This editor keeps those jobs in one place and runs them in your browser. Load an audio file or the audio track of a video, watch the waveform draw from decoded samples, then set a trim range and apply gain, fades, compression, EQ, filtering or speed and pitch changes. You can compare the original and processed buffers with A/B playback, undo a pass and export only when it sounds right. Nothing is uploaded to LetitEdit or to a conversion service, so a private recording stays on the device where it was made. The original file is never changed; every edit produces a new download. That means you can try a short fade, compare it with a longer one and keep whichever copy you prefer without damaging the source."
         ]
       },
       {
@@ -106,7 +126,7 @@
       {
         "heading": "Export formats and limits",
         "paragraphs": [
-          "You can download the edited clip as WAV or MP3. WAV is uncompressed and preserves the samples the browser produced, which is useful when you plan to edit the file again or need a clean master. MP3 is much smaller and convenient for sharing, but it is lossy, so quiet detail can soften slightly after saving. M4A is offered only when the browser can encode AAC; if the option is missing, that is a browser limitation, not a broken tool. This editor works on one clip at a time and does not provide multi-track mixing, noise reduction or pitch correction. Very long recordings use more memory and may be slow to decode and export. Keep the tab active during export, and reload the page if the preview stops responding. Closing or reloading clears the working copy, so download anything you want to keep."
+          "You can download the edited clip as WAV or MP3. WAV is uncompressed and preserves the samples the browser produced, which is useful when you plan to edit the file again or need a clean master. MP3 is much smaller and convenient for sharing, but it is lossy, so quiet detail can soften slightly after saving. M4A is offered only when the browser can encode AAC; if the option is missing, that is a browser limitation, not a broken tool. This editor works on one main clip with up to two locally decoded music layers; it is not a multi-track timeline, and pitch changes are honest resampling rather than voice conversion. Very long recordings use more memory and may be slow to decode and export. Keep the tab active during export, and close or reload the page only after downloading anything you want to keep."
         ]
       }
     ],
@@ -117,14 +137,14 @@
     "name": "Screen Recorder",
     "engine": "screen-recorder",
     "title": "Screen Recorder — Capture a Tab, Window or Screen Locally",
-    "description": "Record a tab, window or whole screen in your browser, add microphone audio if you want, pause and resume, then download a WebM file. All capture stays on your device.",
+    "description": "Use your browser's share picker to record a tab, window or whole screen, add microphone audio if you want, pause and resume, then download a WebM file. All capture stays on your device.",
     "h1": "Screen Recorder",
     "icon": "🖥️",
     "layout": "engine",
     "outputType": "video",
-    "intro": "Record a demo, a tutorial step or a bug you need to show someone. The recorder uses your browser's screen capture permission to grab a tab, window or full screen, shows a live preview while it runs, and saves a WebM file when you stop. Microphone audio is optional, and everything stays local. Some mobile browsers do not offer screen capture at all; the tool will say so rather than pretending to record.",
+    "intro": "Record a demo, a tutorial step or a bug you need to show someone. The recorder opens your browser's normal share prompt so you can choose a tab, window or full screen, shows a live preview while it runs, and saves a WebM file when you stop. Microphone audio is optional, and everything stays local. Some mobile browsers do not offer screen capture at all; the tool will say so rather than pretending to record.",
     "instructions": [
-      "Choose whether to capture a tab, a window or the whole screen when the browser asks.",
+      "Choose the browser picker, or ask it to prefer this tab; the share prompt decides the final surface.",
       "Turn on microphone audio if you want narration; leave it off for a silent recording.",
       "Confirm the live preview shows the right surface, then start recording.",
       "Use pause and resume to skip private moments or long waits.",
@@ -133,7 +153,7 @@
     ],
     "example": {
       "input": "A browser tab showing a three-step sign-up flow, with microphone narration",
-      "output": "A local WebM recording of the tab with narration and no unrelated desktop windows"
+      "output": "A local WebM recording of the chosen tab, window or screen with optional microphone narration"
     },
     "faqs": [
       {
@@ -146,7 +166,7 @@
       },
       {
         "q": "Can I record system audio or just my microphone?",
-        "a": "Microphone audio is supported. System audio depends entirely on the browser and operating system: some let you tick a box to share tab audio, others do not. The recorder cannot force audio that the browser refuses to provide."
+        "a": "This build captures microphone audio when you enable it. It does not request tab or system audio from the browser, so only your microphone is recorded in the download."
       },
       {
         "q": "Why does the browser show a permission prompt?",
@@ -194,19 +214,19 @@
       {
         "heading": "A recorder that keeps the capture local",
         "paragraphs": [
-          "Screen recordings are often the quickest way to explain something that is hard to describe in text: a confusing menu, a bug that only appears in one browser, or a short walkthrough for a colleague. This recorder starts with a browser permission prompt and then captures the tab, window or screen you choose. A live preview shows the same surface the encoder sees, so you can confirm the selection before you talk through your steps. Microphone audio can be included or left off. When you stop, the file is assembled and downloaded on your device; no copy is sent to LetitEdit. That makes the tool suitable for recordings that contain private information, provided you remember to pause or stop before anything sensitive appears on screen."
+          "Screen recordings are often the quickest way to explain something that is hard to describe in text: a confusing menu, a bug that only appears in one browser, or a short walkthrough for a colleague. This recorder starts with a browser permission prompt and then captures the surface you choose in that prompt. A live preview shows the same surface the encoder sees, so you can confirm the selection before you talk through your steps. Microphone audio can be included or left off. When you stop, the file is assembled and downloaded on your device; no copy is sent to LetitEdit. That makes the tool suitable for recordings that contain private information, provided you remember to pause or stop before anything sensitive appears on screen."
         ]
       },
       {
         "heading": "Choosing what to capture",
         "paragraphs": [
-          "The browser, not this page, decides which surfaces are available. In a typical desktop browser you can pick a single tab, an application window or the whole screen. A tab capture is usually the cleanest choice for a web demo because notifications and unrelated windows stay out of the frame. A window capture is useful for a desktop application, while full screen is best when you need to move between several programs. Whatever you choose, check the preview. Dark or empty preview areas are a sign that the surface is not being captured as expected. You can cancel the prompt and start again; there is no penalty for a false start. Also close or minimise anything you do not want in the recording before you begin, because the tool captures pixels rather than understanding which windows matter."
+          "The browser, not this page, decides which surfaces are available. In a typical desktop browser you can pick a single tab, an application window or the whole screen; this tool opens the normal picker and cannot force a particular window. A tab capture is usually the cleanest choice for a web demo because notifications and unrelated windows stay out of the frame. A window capture is useful for a desktop application, while full screen is best when you need to move between several programs. Whatever you choose, check the preview. Dark or empty preview areas are a sign that the surface is not being captured as expected. You can cancel the prompt and start again; there is no penalty for a false start. Also close or minimise anything you do not want in the recording before you begin, because the tool captures pixels rather than understanding which windows matter."
         ]
       },
       {
         "heading": "Audio, pause and live preview",
         "paragraphs": [
-          "Narration is optional. If you enable microphone audio, the browser asks for microphone permission separately from screen permission, and you should speak at a normal level while watching the preview meter if one is shown. System audio is a different matter: support varies by browser and platform, so tab audio may be shareable in one setup and unavailable in another. The pause control is worth using generously. It stops new frames being added while you wait for a page to load, check a message or find the next file, which keeps the final video shorter and easier to watch. Pausing is not editing and does not remove anything already recorded. The live preview remains the best quality check throughout: if the picture freezes, the wrong window is selected or audio is missing, stop and restart rather than hoping the final file will be different."
+          "Narration is optional. If you enable microphone audio, the browser asks for microphone permission separately from screen permission, and you should speak at a normal level while watching the preview meter if one is shown. This build does not capture tab or system audio; it records only the video track from the browser's share prompt plus the optional microphone track. The pause control is worth using generously. It stops new frames being added while you wait for a page to load, check a message or find the next file, which keeps the final video shorter and easier to watch. Pausing is not editing and does not remove anything already recorded. The live preview remains the best quality check throughout: if the picture freezes, the wrong window is selected or audio is missing, stop and restart rather than hoping the final file will be different."
         ]
       },
       {
@@ -677,18 +697,18 @@
     "name": "Multilingual Subtitle Generator",
     "engine": "subtitle-generator",
     "title": "Multilingual Subtitle Generator — Local Whisper Captions",
-    "description": "Generate editable captions from video or audio with opt-in local Whisper tiny speech recognition. Review word-level timestamps and export SRT, VTT or TXT. No media is uploaded.",
+    "description": "Generate editable captions from video or audio with opt-in local Whisper tiny speech recognition. Review editable timed lines and export SRT, VTT or TXT. No media is uploaded.",
     "h1": "Multilingual Subtitle Generator",
     "icon": "📝",
     "layout": "engine",
     "outputType": "text",
-    "intro": "Turn speech in a video or audio file into editable captions. With your permission, the page loads Whisper tiny through Transformers.js and runs speech recognition locally, producing word-level timestamps you can correct before exporting SRT, VTT or TXT. Nothing is uploaded; the model download, around 75 to 80 MB on first use, is disclosed before you start.",
+    "intro": "Turn speech in a video or audio file into editable captions. With your permission, the page loads Whisper tiny through Transformers.js and runs speech recognition locally, producing timed lines you can correct before exporting SRT, VTT or TXT. Nothing is uploaded; the model download, around 75 to 80 MB on first use, is disclosed before you start.",
     "instructions": [
       "Load a video or audio file with clear speech.",
       "Read the model notice and opt in to download and run local Whisper tiny recognition.",
       "Wait while the browser processes the audio; keep the tab active.",
       "Review the editable transcript and correct names, numbers or misheard words.",
-      "Adjust word-level timings where a caption appears too early or too late.",
+      "Adjust the start and end times where a caption appears too early or too late.",
       "Export SRT, VTT or plain TXT and keep the original media file."
     ],
     "example": {
@@ -713,8 +733,8 @@
         "a": "Whisper is multilingual, but performance varies by language and recording conditions. The tool does not promise perfect results for every language. Test a short sample first if the language is less commonly represented in speech models, and be ready to edit the output."
       },
       {
-        "q": "What are word-level timestamps for?",
-        "a": "They record when each word is spoken, so captions can be timed precisely and a transcript can be corrected in context. If a line appears too early, you can adjust its words rather than re-transcribing the whole file. They are also useful when building karaoke-style or highly synchronised subtitles."
+        "q": "How do I edit the timed lines?",
+        "a": "Recognition groups the transcript into short, timed lines. Each line has a start and end time you can edit in the text box, and you can correct misheard words there too. This build does not expose individual word timings, so very fine synchronisation needs manual adjustment or a dedicated subtitle editor."
       },
       {
         "q": "What happens to the model and my file afterwards?",
@@ -754,7 +774,7 @@
       {
         "heading": "Captions generated on your own device",
         "paragraphs": [
-          "Adding captions usually means either typing them by hand or sending a recording to a transcription service. This tool offers a third route: Whisper tiny speech recognition running locally through Transformers.js in your browser. Load a video or audio file, opt in to the model download and the page produces an editable transcript with word-level timestamps. You can then correct what it heard and export SRT, VTT or plain TXT. Your media is never uploaded. The trade-off is honest and visible before you start: the model and its support files are around 75 to 80 MB on first use, and running recognition takes time and processing power. There is no promise of studio-grade accuracy, because speech recognition depends heavily on the recording. What you get is a useful first draft that stays on your device and can be reviewed line by line."
+          "Adding captions usually means either typing them by hand or sending a recording to a transcription service. This tool offers a third route: Whisper tiny speech recognition running locally through Transformers.js in your browser. Load a video or audio file, opt in to the model download and the page produces an editable transcript with timed lines. You can then correct what it heard and export SRT, VTT or plain TXT. Your media is never uploaded. The trade-off is honest and visible before you start: the model and its support files are around 75 to 80 MB on first use, and running recognition takes time and processing power. There is no promise of studio-grade accuracy, because speech recognition depends heavily on the recording. What you get is a useful first draft that stays on your device and can be reviewed line by line."
         ]
       },
       {
@@ -770,9 +790,9 @@
         ]
       },
       {
-        "heading": "Editing with word-level timestamps",
+        "heading": "Editing the timed transcript",
         "paragraphs": [
-          "A transcript that looks right is not automatically good subtitles. Captions need to appear and disappear at sensible moments, stay short enough to read, and match what is actually on screen. Word-level timestamps make that job practical: each word carries its own time, so you can see where a line began to drift and adjust the relevant part. If the model placed a phrase half a second early, move those words rather than rewriting the whole file. Split long sentences into readable lines and avoid dumping a full paragraph on screen at once. The editor is deliberately straightforward: the goal is a clean subtitle file, not a full video editing interface. Use the playback in your media player as the final reference, because subtitle timing is judged against the finished picture, not against the transcription preview alone."
+          "A transcript that looks right is not automatically good subtitles. Captions need to appear and disappear at sensible moments, stay short enough to read, and match what is actually on screen. This tool groups recognition into timed lines and lets you edit each line's start, end and text. If a line appears half a second early, change its timing rather than re-transcribing the whole file. Split long sentences into readable lines and avoid dumping a full paragraph on screen at once. The editor is deliberately straightforward: it does not expose individual word timings, so very fine synchronisation needs manual adjustment. Use the playback in your media player as the final reference, because subtitle timing is judged against the finished picture, not against the transcription preview alone."
         ]
       },
       {
@@ -789,19 +809,19 @@
     "name": "Video Text & Watermark Remover",
     "engine": "watermark-remover",
     "title": "Video Text & Watermark Remover — Local Mask and Blur Tool",
-    "description": "Cover a selected region of a video with a local mask using blur, mosaic, solid fill or nearby colour. This hides text and marks without reconstructing pixels. Export MP4 or WebM.",
+    "description": "Cover a selected region of a video with a local mask using blur, mosaic, solid fill or nearby colour. This hides text and marks without reconstructing pixels. Export MP4.",
     "h1": "Video Text & Watermark Remover",
     "icon": "🧽",
     "layout": "engine",
     "outputType": "video",
-    "intro": "Hide unwanted text or a mark in a selected area of a video. Choose a region, then cover it with blur, a mosaic, a solid colour or colour sampled from nearby pixels, and download the result locally as MP4 or WebM. This is a masking tool, not restoration: it does not rebuild the original picture behind the covered area.",
+    "intro": "Hide unwanted text or a mark in a selected area of a video. Choose a region, then cover it with blur, a mosaic, a solid colour or colour sampled from nearby pixels, and download the result locally as MP4. This is a masking tool, not restoration: it does not rebuild the original picture behind the covered area.",
     "instructions": [
       "Load a short video with the text or mark you want to hide.",
       "Pause on a frame and mark the region that needs covering.",
       "Choose blur, mosaic, solid colour or neighbouring-colour fill.",
       "Adjust the strength or colour until the area is no longer readable.",
       "Check several later frames to see whether the region stays in the right place.",
-      "Download MP4 or WebM; the source video is never modified."
+      "Download the MP4; the source video is never modified."
     ],
     "example": {
       "input": "A demo video with a phone number burned into one corner of every frame",
@@ -829,8 +849,8 @@
         "a": "Only if you have the right to edit and share that video. Removing a mark from material you do not own can breach its terms or the owner's rights. The tool makes no judgement about your file; that responsibility rests with you."
       },
       {
-        "q": "Why can I not export a particular format?",
-        "a": "Available exports depend on the encoders in your browser. MP4 or WebM should be offered where support exists, but an unusual source codec or a browser without the right encoder can prevent processing. The tool reports the failure instead of downloading an empty file; try another browser or source copy."
+        "q": "Why did MP4 export fail?",
+        "a": "Export depends on the encoders in your browser. An unusual source codec or a browser without the required MP4 encoder can prevent processing. The tool reports the failure instead of downloading an empty file; try another browser or source copy."
       }
     ],
     "related": [
@@ -884,7 +904,7 @@
       {
         "heading": "Export quality and browser limits",
         "paragraphs": [
-          "When the mask looks right, the tool encodes a new video locally and offers MP4 or WebM where your browser supports those encoders. Encoding is real work, so give a longer clip time to finish and keep the tab active. The source is never modified; every export is a separate file, which means you can try blur on one pass and a mosaic on another without losing the original. Some browsers cannot decode a particular source codec or cannot encode a chosen output format. When that happens the tool reports an error instead of quietly producing a broken download. Trying a different browser or re-exporting the source from the application that created it usually resolves the problem. Always play the downloaded file once and check the masked region at normal viewing size before sharing it."
+          "When the mask looks right, the tool encodes a new MP4 locally where your browser supports the required encoder. Encoding is real work, so give a longer clip time to finish and keep the tab active. The source is never modified; every export is a separate file, which means you can try blur on one pass and a mosaic on another without losing the original. Some browsers cannot decode a particular source codec or cannot encode a chosen output format. When that happens the tool reports an error instead of quietly producing a broken download. Trying a different browser or re-exporting the source from the application that created it usually resolves the problem. Always play the downloaded file once and check the masked region at normal viewing size before sharing it."
         ]
       },
       {
@@ -901,23 +921,23 @@
     "name": "AI Video-to-Shorts",
     "engine": "video-to-shorts",
     "title": "AI Video-to-Shorts — Find Clips and Export Vertical Cuts",
-    "description": "Find candidate highlight windows from audio loudness and motion in your video, then export vertical 9:16 clips. Optional local Whisper transcript ranking adds SRT when enabled.",
+    "description": "Preview a real source video, add and retime clips, reorder them, choose crops and layouts, edit captions, then export locally rendered MP4 or WebM shorts. Optional local Whisper and face models require explicit opt-in.",
     "h1": "AI Video-to-Shorts",
     "icon": "📱",
     "layout": "engine",
     "outputType": "video",
-    "intro": "Turn a longer video into vertical clips without uploading it. The tool measures audio loudness and picture motion to suggest candidate highlight windows, then crops and exports 9:16 clips you can review. If you opt in, local Whisper transcript density can help rank those windows and produce SRT files. Without the model, the signal-based suggestions still work.",
+    "intro": "Turn a longer video into short clips without uploading it. Play the real source, preview a time range, add as many clips as you need and reorder or retime them before export. Choose from vertical, square, blurred-fill and split layouts, review rendered clip previews, and write captions yourself or from an optional local transcript. Loudness, motion and optional speech analysis can also suggest candidate windows. No media is uploaded and no paid API is used.",
     "instructions": [
-      "Load a video your browser can decode and keep the tab active.",
-      "Let the tool measure loudness and motion to suggest candidate highlight windows.",
-      "Optionally opt in to local Whisper to rank candidates by transcript density.",
-      "Review each suggested window and adjust its start or end if needed.",
-      "Choose the vertical framing and export a 9:16 clip for each selection.",
-      "Download the SRT file for a window when transcript ranking is enabled."
+      "Load a video your browser can decode and use the on-page player to inspect it.",
+      "Preview a range, then add it as a clip, or use Find candidates for signal-based suggestions.",
+      "Reorder, delete or retime clip rows and choose a layout and crop for the selected clip.",
+      "Optionally opt in to local Whisper for speech-aware ranking and caption drafts, or local face detection for subject-centred crops.",
+      "Edit captions and download a clip SRT when you have valid timed lines.",
+      "Generate all clips to render real local previews, then download each MP4 or WebM."
     ],
     "example": {
       "input": "A ten-minute interview with several energetic exchanges",
-      "output": "Two vertical 9:16 clips around the busiest exchanges, plus SRT files when Whisper is enabled"
+      "output": "Two reviewed vertical clips with rendered previews and SRT files when captions are provided"
     },
     "faqs": [
       {
@@ -933,16 +953,16 @@
         "a": "No. Analysis, cropping and encoding run in your browser. If you enable Whisper, its model files are downloaded to your device; your video is not sent anywhere. Model and media handling are disclosed before you opt in."
       },
       {
-        "q": "How large is the model download?",
-        "a": "The Whisper tiny model used for captions is roughly 75 to 80 MB with its support files, fetched on first use and usually cached afterwards. You can skip it entirely and still use the loudness and motion workflow."
+        "q": "How large are the optional model downloads?",
+        "a": "The Whisper tiny model used for speech-aware ranking and caption drafts is roughly 75 to 80 MB with its support files, fetched only after you opt in and usually cached afterwards. The optional face detector fetches a small MediaPipe model (roughly 200-250 KB) only when you choose the face-centred layout and check its consent box. Neither download is required for manual clips, crops, captions or export."
       },
       {
         "q": "Will the suggestions always pick the best moments?",
         "a": "No. Loud moments can be arguments or noise, and motion can come from a camera shake. Transcript density favours busy speech, which may not be the most interesting part. Treat every window as a candidate and watch it before exporting. Your judgement is the final filter."
       },
       {
-        "q": "How is vertical framing handled?",
-        "a": "The tool crops to a 9:16 frame. Composition is a trade-off: a wide shot may lose its edges, while a centred speaker usually crops well. Check each preview before export. Processing depends on browser encoders, so an unavailable format is reported rather than replaced with a fake download."
+        "q": "How is framing handled?",
+        "a": "Choose a 9:16, 4:5, 1:1 or 16:9 crop, a blurred contain fill, or split and presenter-style layouts that deliberately reuse the same source footage. You can set the crop centre and zoom by hand. Subject-centred cropping needs explicit face-detection opt-in and falls back to your chosen centre crop if no face is found. Active-speaker framing is only a stereo-balance or frame-motion crop hint; it does not identify who is talking. Check each generated preview before export."
       }
     ],
     "related": [
@@ -996,13 +1016,13 @@
       {
         "heading": "Cropping to a vertical frame",
         "paragraphs": [
-          "A 9:16 export is shaped for a phone held upright, which is a very different frame from most source footage. The tool crops the picture to that ratio, and what you lose matters. A centred speaker with a plain background usually survives the crop well. A wide scene with important detail at both edges will not, and you may decide that the moment is unsuitable rather than accept a broken composition. Preview the vertical result rather than trusting the landscape view. Text and overlays placed near the edges of the original may disappear completely. If a clip depends on a graph, a second person or a caption at the side, consider a different moment or prepare a purpose-built version in the full editor. Cropping is a geometric operation; the tool cannot invent picture content outside the original frame."
+          "A 9:16 export is shaped for a phone held upright, which is a very different frame from most source footage. The workspace offers several target ratios, manual crop centre and zoom, and a blurred-fill option that keeps the whole frame inside a vertical canvas. Split and presenter layouts place two crops of the same source side by side or in an inset; they do not invent a second camera angle. Subject-centred cropping can use a small local face detector after you opt in, and it falls back to your chosen crop if no face is found. Active-speaker framing is described honestly as a stereo-balance or frame-motion hint, not person identification. Preview the rendered clip rather than trusting the landscape source: text near the original edges may disappear, and cropping cannot create picture content outside the frame."
         ]
       },
       {
         "heading": "Privacy, performance and honest expectations",
         "paragraphs": [
-          "All analysis and encoding happen locally. Your video is not sent to LetitEdit, and enabling Whisper downloads a model to your device instead of uploading your media. That model is cached by the browser and can be removed through site data controls; the video itself stays in memory until you close or reload the page. Download every clip and subtitle file you want to keep before leaving. Short, clear sources work best. A long video takes time to analyse, and several vertical exports mean several encoding passes, so keep the tab active and close unrelated heavy tabs. Export options depend on the encoders in your browser, and unavailable formats are reported honestly. Finally, treat this as an assistant for finding possibilities. It can save you scrubbing through an hour of footage, but only you can judge whether a moment is interesting, coherent and appropriate to share."
+          "Analysis, crop processing and encoding happen locally. Your video is not sent to LetitEdit, and opting in to Whisper or face detection downloads a model to your device instead of uploading your media. Those files are cached by the browser and can be removed through site data controls; the video and generated clips stay in memory until you close or reload the page. Download every clip and subtitle file you want to keep before leaving. Short, clear sources work best. A long video takes time to analyse, and several exports mean several encoding passes, so keep the tab active and close unrelated heavy tabs. Export options depend on the encoders in your browser, and unavailable formats are reported honestly. Finally, treat this as an assistant for finding possibilities. It can save you scrubbing through an hour of footage, but only you can judge whether a moment is interesting, coherent and appropriate to share."
         ]
       }
     ],

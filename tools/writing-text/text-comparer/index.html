@@ -3,22 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Text Comparer — Compare Two Texts and See the Difference</title>
-<meta name="description" content="Compare two texts line by line or word by word with added and removed content highlighted.">
+<title>Text Comparer — Compare Two Texts or Documents and See the Difference</title>
+<meta name="description" content="Compare two texts or documents line by line or word by word with additions and removals highlighted, using a real LCS diff.">
 <meta name="theme-color" content="#2563eb">
 <link rel="canonical" href="https://letitedit.com/tools/writing-text/text-comparer/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Text Comparer — Compare Two Texts and See the Difference">
-<meta property="og:description" content="Compare two texts line by line or word by word with added and removed content highlighted.">
+<meta property="og:title" content="Text Comparer — Compare Two Texts or Documents and See the Difference">
+<meta property="og:description" content="Compare two texts or documents line by line or word by word with additions and removals highlighted, using a real LCS diff.">
 <meta property="og:url" content="https://letitedit.com/tools/writing-text/text-comparer/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../../../css/site.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","name":"Text Comparer / Diff","mainEntity":[{"@type":"Question","name":"How large a text can I compare?","acceptedAnswer":{"@type":"Answer","text":"Up to 1,200 lines or words per side. Larger inputs show a clear error instead of freezing your browser."}}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Text Comparer / Diff","description":"Compare two texts or documents line by line or word by word with additions and removals highlighted, using a real LCS diff.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/writing-text/text-comparer/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Writing \u0026 Text Tools","item":"https://letitedit.com/tools/writing-text/"},{"@type":"ListItem","position":3,"name":"Text Comparer / Diff","item":"https://letitedit.com/tools/writing-text/text-comparer/"}]},{"@type":"FAQPage","name":"Text Comparer / Diff","mainEntity":[{"@type":"Question","name":"How large a text can I compare?","acceptedAnswer":{"@type":"Answer","text":"Up to 1,200 lines or words per side. Larger inputs show a clear error instead of freezing your browser."}},{"@type":"Question","name":"Does it compare document formatting?","acceptedAnswer":{"@type":"Answer","text":"No. Only extracted text is compared. DOCX uploads provide paragraph text; tables, columns and styling are not part of the comparison."}},{"@type":"Question","name":"Can I compare a PDF?","acceptedAnswer":{"@type":"Answer","text":"No. PDF text extraction would require a layout-aware parser, so PDF and legacy .doc uploads are rejected with an explanation rather than guessed at."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-text">
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
@@ -30,19 +33,21 @@
       <a href="/blog/">Blog</a>
       <a href="/tools/">All Tools</a>
       <a href="/faq/">FAQ</a>
-      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" title="Search tools"><span aria-hidden="true">🔍</span></button>
+      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" aria-controls="search-strip" aria-expanded="false" title="Search tools"><span aria-hidden="true">🔍</span></button>
     </div>
   </nav>
 </header>
-<div class="site-search-strip" id="search-strip">
+<div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
+      <label class="sr-only" for="site-search">Search all 61 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" placeholder="Search 60 free tools…" aria-label="Search all tools" autocomplete="off">
-      <div class="search-results" id="search-results" role="listbox" hidden></div>
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
+<div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="../../../">Home</a><span>/</span>
   <a href="../../../tools/writing-text/">Writing &amp; Text Tools</a><span>/</span>
@@ -52,32 +57,31 @@
   <div class="tool-head-copy">
     <span class="eyebrow">Writing &amp; Text Tools</span>
     <h1>Text Comparer / Diff</h1>
-    <p>A real LCS-based diff, not a character-by-character guess. Comparison is capped at 1,200 units per side for browser performance.</p>
+    <p>A real LCS-based diff, not a character-by-character guess. Paste on both sides or load TXT, CSV, Markdown or DOCX files. Only extracted text is compared, never formatting. Comparison is capped at 1,200 units per side for browser performance.</p>
   </div>
   <div class="tool-trust" aria-label="How this tool handles your files">
     <span class="trust-pill"><span aria-hidden="true">✓</span> Local processing</span>
     <span class="trust-pill"><span aria-hidden="true">✓</span> No upload</span>
   </div>
 </section>
-<section class="container workspace">
-  <div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>
-  <div class="panel-grid">
-    <div class="workspace-panel"><div class="field"><label for="tool-input-left">Original text</label><textarea id="tool-input-left" placeholder="Paste the original version here…"></textarea></div>
-       <div class="field"><label for="tool-input-right">Changed text</label><textarea id="tool-input-right" placeholder="Paste the changed version here…"></textarea></div>
-       <div id="controls"></div></div>
-    <div class="workspace-panel workspace-panel-output">
-      <div class="workspace-head">
-        <h2>Output</h2>
-        <div class="output-actions">
-          <button class="btn btn-secondary btn-small" id="copy-output" type="button">Copy output</button>
-          <button class="btn btn-secondary btn-small" id="download-output" type="button">Download</button>
-          <button class="btn btn-secondary btn-small" id="restore-output" type="button" hidden>Restore original values</button>
-        </div>
-      </div>
-      <div class="diff-output" id="tool-output"></div>
-      <div class="status" id="tool-status" role="status" aria-live="polite"></div>
+<section class="container workspace engine-workspace" data-engine="text-comparer">
+<div class="workspace-head"><h2>Interactive tool</h2><span class="card-tag">Runs in your browser</span></div>
+<div class="engine-grid engine-simple">
+  <div class="engine-controls">
+    <div class="two-cols">
+      <div class="field"><label for="tool-input-left">Original text</label><textarea id="tool-input-left" rows="6" placeholder="Paste the original version here…"></textarea><input type="file" id="cmp-upload-left" accept=".txt,.csv,.tsv,.md,.markdown,.json,.log,.xml,.html,.htm,.docx,text/plain,text/csv" aria-label="Open original text file"></div>
+      <div class="field"><label for="tool-input-right">Changed text</label><textarea id="tool-input-right" rows="6" placeholder="Paste the changed version here…"></textarea><input type="file" id="cmp-upload-right" accept=".txt,.csv,.tsv,.md,.markdown,.json,.log,.xml,.html,.htm,.docx,text/plain,text/csv" aria-label="Open changed text file"></div>
     </div>
+    <div class="opt-group"><span class="opt-title">Compare by</span><label class="opt"><input type="radio" name="cmp-unit" value="lines" checked> <span>Lines</span></label><label class="opt"><input type="radio" name="cmp-unit" value="words"> <span>Words</span></label></div>
+    <div class="output-actions"><button type="button" class="btn" id="cmp-compare">Compare text</button><button type="button" class="btn btn-secondary btn-small" id="cmp-swap">Swap sides</button><button type="button" class="btn btn-secondary btn-small" id="cmp-clear">Clear both</button></div>
+    <p class="hint warning">Only extracted text is compared, not formatting. DOCX uploads provide paragraph text; PDF and legacy .doc files are rejected rather than guessed.</p>
   </div>
+  <div class="engine-output">
+    <div class="workspace-head"><h2>Differences</h2><span class="pill" id="cmp-summary">0 added · 0 removed</span></div>
+    <div id="tool-output" class="output-box diff-output"></div>
+    <div class="status" id="tool-status" role="status" aria-live="polite"></div>
+  </div>
+</div>
 </section>
 <section class="container tool-principles" aria-label="How this tool works">
   <div class="principle"><span class="principle-icon" aria-hidden="true">⚙️</span><div><strong>Real processing</strong><p>Every result is produced from your own input in this browser, not from a simulated preview.</p></div></div>
@@ -88,7 +92,7 @@
   <div class="container info-grid">
     <div class="info-card">
       <h2>How to use Text Comparer / Diff</h2>
-      <ol><li>Paste the original text on the left.</li><li>Paste the changed text on the right.</li><li>Review highlighted additions and removals.</li></ol>
+      <ol><li>Paste the original text on the left or open a text file for that side.</li><li>Paste the changed text on the right or open a second file.</li><li>Choose lines or words, then review highlighted additions and removals.</li></ol>
     </div>
     <div class="info-card">
       <h2>Example</h2>
@@ -100,7 +104,17 @@ Right: The dog sat</div></div>
     </div>
   </div>
 </section>
-
+<section class="section section-soft">
+  <div class="container"><article class="article-card">
+      <span class="eyebrow">In-depth guide</span>
+      <h2>How the diff is calculated</h2>
+      <p>Both sides are split into lines or words and compared with a longest-common-subsequence algorithm. Unchanged units are shown with a leading space, additions with a plus sign and removals with a minus sign. The summary counts added and removed units so you can see the size of the change at a glance.</p>
+      <p>The output is rendered with text nodes inside safe elements, so markup in either input is displayed as text and never executed. Each side can be swapped, cleared or filled from its own file input, which makes it practical to review two versions of a document without a separate editor.</p>
+      <h2>Text only, and a firm size limit</h2>
+      <p>This tool compares text, not formatting. A DOCX upload is opened as a ZIP archive in the browser and its paragraph text is extracted; tables, columns, headers and styling are outside the comparison. The status line states this explicitly so nobody mistakes the result for a visual track-changes view.</p>
+      <p>A full LCS comparison grows with the product of the two input sizes, so each side is capped at 1,200 units. Larger inputs return a clear error rather than freezing the page. PDF and legacy .doc files are rejected because reliable extraction would require a parser this local tool does not ship.</p>
+  </article></div>
+</section>
 <section class="section">
   <div class="container info-grid">
     <div class="info-card">
@@ -108,6 +122,12 @@ Right: The dog sat</div></div>
       <details class="faq-item">
   <summary>How large a text can I compare?</summary>
   <p>Up to 1,200 lines or words per side. Larger inputs show a clear error instead of freezing your browser.</p>
+</details><details class="faq-item">
+  <summary>Does it compare document formatting?</summary>
+  <p>No. Only extracted text is compared. DOCX uploads provide paragraph text; tables, columns and styling are not part of the comparison.</p>
+</details><details class="faq-item">
+  <summary>Can I compare a PDF?</summary>
+  <p>No. PDF text extraction would require a layout-aware parser, so PDF and legacy .doc uploads are rejected with an explanation rather than guessed at.</p>
 </details>
     </div>
     <div class="info-card">
@@ -118,6 +138,7 @@ Right: The dog sat</div></div>
     </div>
   </div>
 </section>
+</div>
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">
@@ -171,8 +192,8 @@ Right: The dog sat</div></div>
 <script src="../../../js/sidebar-data.js"></script>
 <script src="../../../js/site.js"></script>
 <script src="../../../js/category-sidebar.js"></script>
-<script src="../../../js/text-core.js"></script>
-<script src="../../../js/tool-runtime.js"></script>
-<script id="tool-config" type="application/json">{"slug":"text-comparer","engine":null,"layout":"diff","outputType":"diff","controls":[{"type":"select","key":"unit","label":"Compare by","default":"lines","options":[["lines","Lines"],["words","Words"]]}],"example":{"input":"Left: The cat sat\nRight: The dog sat","output":"- The cat sat\n+ The dog sat"}}</script>
+<script src="../../../js/reference-core.js"></script>
+<script src="../../../js/reference-runtime.js"></script>
+<script id="tool-config" type="application/json">{"slug":"text-comparer","engine":"text-comparer","layout":"diff","outputType":"diff","controls":[{"type":"select","key":"unit","label":"Compare by","default":"lines","options":[["lines","Lines"],["words","Words"]]}],"example":{"input":"Left: The cat sat\nRight: The dog sat","output":"- The cat sat\n+ The dog sat"}}</script>
 </body>
 </html>
