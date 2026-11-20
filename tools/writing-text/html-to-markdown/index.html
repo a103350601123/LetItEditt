@@ -16,6 +16,7 @@
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../../../css/site.css">
+<link rel="stylesheet" href="../../../css/mobile-workspace.css">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Rich Text / HTML to Markdown","description":"Convert pasted HTML, rich text, text files or DOCX text into clean Markdown with headings, links, lists, tables, code and emphasis preserved.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/writing-text/html-to-markdown/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Writing \u0026 Text Tools","item":"https://letitedit.com/tools/writing-text/"},{"@type":"ListItem","position":3,"name":"Rich Text / HTML to Markdown","item":"https://letitedit.com/tools/writing-text/html-to-markdown/"}]},{"@type":"FAQPage","name":"Rich Text / HTML to Markdown","mainEntity":[{"@type":"Question","name":"Which elements are supported?","acceptedAnswer":{"@type":"Answer","text":"Headings, paragraphs, links, bold, italic, inline code, fenced code, ordered and unordered lists, nested lists, blockquotes, tables, horizontal rules, line breaks and images."}},{"@type":"Question","name":"Is pasted script or styling executed?","acceptedAnswer":{"@type":"Answer","text":"No. Scripts, styles, SVG, iframes and unsafe attributes are discarded. The preview is built with text nodes and a small allow-list of safe elements, never with innerHTML containing your content."}},{"@type":"Question","name":"Can I convert a Word document?","acceptedAnswer":{"@type":"Answer","text":"You can load a DOCX, but only its text is extracted. Tables, columns and styling are not kept. For a fully faithful layout conversion, export the document as HTML first."}}]}]}
 </script>
@@ -195,6 +196,7 @@
 <script src="../../../js/sidebar-data.js"></script>
 <script src="../../../js/site.js"></script>
 <script src="../../../js/category-sidebar.js"></script>
+<script src="../../../js/mobile-workspace.js"></script>
 <script src="../../../js/reference-core.js"></script>
 <script src="../../../js/reference-runtime.js"></script>
 <script id="tool-config" type="application/json">{"slug":"html-to-markdown","engine":"html-to-markdown","layout":"single","outputType":"text","controls":[],"example":{"input":"\u003ch2\u003eHello\u003c/h2\u003e\u003cp\u003e\u003cstrong\u003eWorld\u003c/strong\u003e\u003c/p\u003e","output":"## Hello\n\n**World**"}}</script>

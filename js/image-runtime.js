@@ -3014,7 +3014,7 @@
     'image-inverter': inverter,
     'image-to-text': ocrTool,
     'qr-code-generator': qrGenerator,
-    'thumbnail-generator': thumbnailGenerator,
+    /* 'thumbnail-generator': thumbnailGenerator, — replaced by js/thumbnail-editor.js */
     'image-compressor': compressor
   };
 

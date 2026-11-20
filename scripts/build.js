@@ -22,7 +22,9 @@ global.workspaceForEngine = tool => {
 global.scriptsForEngine = tool => {
   if (!tool.engine) return null;
   if (imageWorkspaces.has(tool.engine)) {
-    return ['js/image-core.js'].concat(imageWorkspaces.vendorScripts(tool.engine), ['js/image-runtime.js']);
+    const scripts = ['js/image-core.js'].concat(imageWorkspaces.vendorScripts(tool.engine), ['js/image-runtime.js']);
+    if (tool.engine === 'thumbnail-generator') scripts.push('js/thumbnail-core.js', 'js/thumbnail-editor.js');
+    return scripts;
   }
   if (videoWorkspaces.has(tool.engine)) {
     return ['js/video-core.js', 'js/video-runtime.js'];
@@ -171,6 +173,7 @@ function page(options) {
 ${ogImage}
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="${assets}css/site.css">
+<link rel="stylesheet" href="${assets}css/mobile-workspace.css">
 ${structured}
 </head>
 <body${bodyClass}>
@@ -185,6 +188,7 @@ ${footer()}
 <script src="${assets}js/sidebar-data.js"></script>
 <script src="${assets}js/site.js"></script>
 <script src="${assets}js/category-sidebar.js"></script>
+<script src="${assets}js/mobile-workspace.js"></script>
 ${options.scripts ? options.scripts.map(src => `<script src="${assets}${src}"></script>`).join('\n') : ''}
 </body>
 </html>

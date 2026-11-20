@@ -16,6 +16,7 @@
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../../../css/site.css">
+<link rel="stylesheet" href="../../../css/mobile-workspace.css">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Remove Empty Lines","description":"Remove blank and whitespace-only lines from pasted text, TXT, CSV, Markdown or DOCX while preserving every real line and its formatting.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/writing-text/remove-empty-lines/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Writing \u0026 Text Tools","item":"https://letitedit.com/tools/writing-text/"},{"@type":"ListItem","position":3,"name":"Remove Empty Lines","item":"https://letitedit.com/tools/writing-text/remove-empty-lines/"}]},{"@type":"FAQPage","name":"Remove Empty Lines","mainEntity":[{"@type":"Question","name":"Will it change the order or formatting of real lines?","acceptedAnswer":{"@type":"Answer","text":"No. Only empty and whitespace-only lines are removed. Indentation, tabs, punctuation and all other characters on real lines stay exactly as they were."}},{"@type":"Question","name":"What does preserve paragraphs do?","acceptedAnswer":{"@type":"Answer","text":"It collapses each run of blank lines to a single empty line, so paragraphs stay visually separated without leaving stacks of empty lines."}},{"@type":"Question","name":"Can I open a Word document?","acceptedAnswer":{"@type":"Answer","text":"DOCX files are read locally where the browser supports decompression. Only paragraph text is extracted; tables, columns and styling are not preserved. PDF and legacy .doc files are rejected with an explanation instead of being silently mangled."}}]}]}
 </script>
@@ -201,6 +202,7 @@ three</div></div>
 <script src="../../../js/sidebar-data.js"></script>
 <script src="../../../js/site.js"></script>
 <script src="../../../js/category-sidebar.js"></script>
+<script src="../../../js/mobile-workspace.js"></script>
 <script src="../../../js/reference-core.js"></script>
 <script src="../../../js/reference-runtime.js"></script>
 <script id="tool-config" type="application/json">{"slug":"remove-empty-lines","engine":"remove-empty-lines","layout":"single","outputType":"text","controls":[{"type":"checkbox","key":"preserveParagraphs","label":"Keep one blank line between paragraphs","default":false}],"example":{"input":"one\n\n\ntwo\n   \nthree","output":"one\ntwo\nthree"}}</script>

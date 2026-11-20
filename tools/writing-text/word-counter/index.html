@@ -16,6 +16,7 @@
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../../../css/site.css">
+<link rel="stylesheet" href="../../../css/mobile-workspace.css">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Word Counter \u0026 Text Statistics","description":"Count words, grapheme-based characters, sentences and paragraphs. See reading and speaking time, keyword density for one-to-three-word phrases and an optional progress goal.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/writing-text/word-counter/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Writing \u0026 Text Tools","item":"https://letitedit.com/tools/writing-text/"},{"@type":"ListItem","position":3,"name":"Word Counter \u0026 Text Statistics","item":"https://letitedit.com/tools/writing-text/word-counter/"}]},{"@type":"FAQPage","name":"Word Counter \u0026 Text Statistics","mainEntity":[{"@type":"Question","name":"How do you count words?","acceptedAnswer":{"@type":"Answer","text":"Text is split into lines and tokens; punctuation at token edges is removed and tokens containing at least one letter or number count as words. Languages that do not use spaces are handled with browser word segmentation where available."}},{"@type":"Question","name":"Are emoji counted as one character?","acceptedAnswer":{"@type":"Answer","text":"Yes. Character counts use grapheme clusters via Intl.Segmenter when available, so a joined emoji sequence is counted as one visible character."}},{"@type":"Question","name":"Does it save my text?","acceptedAnswer":{"@type":"Answer","text":"No. This build keeps text in memory for the current page only. Closing or refreshing the page clears it."}},{"@type":"Question","name":"How accurate is sentence counting?","acceptedAnswer":{"@type":"Answer","text":"It is a heuristic. Common abbreviations are handled, but unusual punctuation can still be counted differently from a human reader."}}]}]}
 </script>
@@ -203,6 +204,7 @@
 <script src="../../../js/sidebar-data.js"></script>
 <script src="../../../js/site.js"></script>
 <script src="../../../js/category-sidebar.js"></script>
+<script src="../../../js/mobile-workspace.js"></script>
 <script src="../../../js/reference-core.js"></script>
 <script src="../../../js/reference-runtime.js"></script>
 <script id="tool-config" type="application/json">{"slug":"word-counter","engine":"word-counter","layout":"single","outputType":"stats","controls":[{"type":"checkbox","key":"ignoreStopWords","label":"Ignore common stop words in keyword density","default":false}],"example":{"input":"Hello world. This is a test.","output":"6 words · 28 characters · 2 sentences"}}</script>

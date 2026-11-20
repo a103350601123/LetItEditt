@@ -1,0 +1,370 @@
+/* LetitEdit global mobile preview workspace — additive progressive enhancement.
+   Loaded after CSS for generated pages and after each standalone app stylesheet. */
+
+:root {
+  --mw-vh: 100vh;
+  --mw-keyboard-offset: 0px;
+}
+
+.mw-toolbar,
+.mw-action-bar { display: none; }
+
+.mw-root .mw-preview,
+.mw-root .mw-controls { min-width: 0; max-width: 100%; }
+
+.mw-root .mw-preview { position: relative; overscroll-behavior: contain; }
+.mw-root .mw-touch-surface { touch-action: none; overscroll-behavior: contain; }
+.mw-root .mw-preview canvas,
+.mw-root .mw-preview video,
+.mw-root .mw-preview img,
+.mw-root .mw-preview svg { max-width: 100%; max-height: 100%; height: auto; object-fit: contain; }
+
+html.mw-is-fullscreen,
+html.mw-is-fullscreen body { overflow: hidden; }
+
+@media (max-width: 900px) {
+  body.tool-page .mw-root,
+  .mw-root {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 78px;
+  }
+
+  .mw-root > .mw-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    margin: 0;
+    padding: 7px;
+    border: 1px solid var(--border, #dbeafe);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .96);
+    box-shadow: 0 6px 18px rgba(15, 23, 42, .09);
+    backdrop-filter: blur(8px);
+  }
+
+  .mw-mode-switch,
+  .mw-view-tools {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+  }
+
+  .mw-mode-switch { flex: 1 1 180px; }
+  .mw-mode-switch .mw-mode { flex: 1 1 78px; }
+  .mw-view-tools { flex: 1 1 auto; justify-content: flex-end; }
+
+  .mw-mode,
+  .mw-icon-btn,
+  .mw-text-btn {
+    min-height: 38px;
+    padding: 6px 10px;
+    border: 1px solid #bfdbfe;
+    border-radius: 9px;
+    background: #f8fbff;
+    color: #1e3a8a;
+    font: inherit;
+    font-size: .82rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .mw-mode.is-active {
+    border-color: #2563eb;
+    background: #2563eb;
+    color: #fff;
+  }
+
+  .mw-icon-btn { min-width: 38px; padding: 4px 8px; font-size: 1.05rem; }
+  .mw-zoom { min-width: 44px; text-align: center; font-size: .78rem; font-weight: 800; color: #1e3a8a; }
+
+  /* Generated tool pages have their own compact-height rules. These
+   * selectors deliberately match that specificity so mobile preview wins. */
+  body.tool-page .mw-root .image-grid,
+  body.tool-page .mw-root .video-grid,
+  body.tool-page .mw-root .engine-grid,
+  body.tool-page .mw-root .panel-grid,
+  .mw-root .image-grid,
+  .mw-root .video-grid,
+  .mw-root .engine-grid,
+  .mw-root .panel-grid,
+  .mw-root .workspace-grid,
+  .mw-root .editor-grid {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    gap: 10px;
+  }
+
+  .mw-root[data-mw-mode="preview"] .mw-controls { display: none; }
+  .mw-root[data-mw-mode="controls"] .mw-preview { display: none; }
+
+  body.tool-page .mw-root .mw-preview,
+  .mw-root .mw-preview {
+    flex: 1 1 auto;
+    max-height: calc(var(--mw-vh) - 470px);
+    min-height: 180px;
+    overflow: auto;
+    padding: 10px;
+    border-radius: 14px;
+    background: #f8fbff;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body.tool-page .mw-root .mw-controls,
+  .mw-root .mw-controls {
+    flex: 1 1 auto;
+    max-height: calc(var(--mw-vh) - 190px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 12px;
+    border: 1px solid var(--border, #dbeafe);
+    border-radius: 14px;
+    background: #fff;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Controls mode gives the editor the whole remaining column. Keep each
+   * tool's action row visible, but drop the decorative heading and cap the
+   * editor so the workspace stays inside one screen. */
+  .mw-root[data-mw-mode="controls"] > .workspace-head {
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  .mw-root[data-mw-mode="controls"] > .workspace-head h2 { display: none; }
+  body.tool-page .mw-root[data-mw-mode="controls"] .mw-controls,
+  .mw-root[data-mw-mode="controls"] .mw-controls {
+    max-height: calc(var(--mw-vh) - 490px);
+    min-height: 180px;
+  }
+
+  .mw-root > .mw-action-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    bottom: calc(8px + var(--mw-keyboard-offset, 0px));
+    z-index: 70;
+    overflow-x: auto;
+    padding: 7px;
+    border: 1px solid #bfdbfe;
+    border-radius: 13px;
+    background: rgba(255, 255, 255, .97);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .16);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mw-action-btn {
+    flex: 0 0 auto;
+    min-height: 38px;
+    padding: 6px 11px;
+    border: 1px solid #2563eb;
+    border-radius: 9px;
+    background: #eff6ff;
+    color: #1e3a8a;
+    font: inherit;
+    font-size: .8rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .mw-action-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  .mw-root[data-mw-mode="preview"] .mw-preview .output-box,
+  .mw-root[data-mw-mode="preview"] .mw-preview .diff-output {
+    width: 100%;
+    max-width: none;
+    min-height: calc(var(--mw-vh) - 240px);
+    max-height: none;
+    overflow: auto;
+    font-size: .95rem;
+  }
+
+  .mw-root .mw-preview .draw-pad,
+  .mw-root .mw-preview .preview-pad,
+  .mw-root .mw-preview .video-canvas,
+  .mw-root .mw-preview .waveform { touch-action: none; }
+
+  .mw-root .mw-preview input[type="range"] { min-height: 42px; }
+}
+
+@media (pointer: coarse) {
+  .mw-root button,
+  .mw-root select,
+  .mw-root input[type="range"] { min-height: 44px; }
+}
+
+html.mw-keyboard-open .mw-root {
+  padding-bottom: calc(78px + var(--mw-keyboard-offset, 0px));
+}
+
+html.mw-keyboard-open .mw-root .mw-preview,
+html.mw-keyboard-open .mw-root .mw-controls {
+  max-height: calc(var(--mw-vh) - 230px);
+}
+
+html.mw-is-fullscreen .mw-toolbar {
+  position: fixed;
+  top: calc(6px + var(--mw-keyboard-offset, 0px));
+  left: 8px;
+  right: 8px;
+  z-index: 10001;
+}
+
+.mw-root.mw-is-fullscreen .mw-preview.mw-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  width: 100vw;
+  max-width: 100vw;
+  min-height: 0;
+  max-height: calc(var(--mw-vh) - 96px);
+  margin: 0;
+  padding: 62px 10px 66px;
+  border: 0;
+  border-radius: 0;
+  background: #071027;
+  box-shadow: none;
+}
+
+.mw-fullscreen canvas,
+.mw-fullscreen video,
+.mw-fullscreen img,
+.mw-fullscreen svg,
+.mw-fullscreen .tg-stage,
+.mw-fullscreen .cv-page,
+.mw-fullscreen .pdf-page {
+  max-width: 100%;
+  max-height: calc(var(--mw-vh) - 170px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 900px) and (orientation: landscape) and (max-height: 520px) {
+  .mw-root { padding-bottom: 60px; }
+  .mw-root > .mw-toolbar { padding: 4px; }
+  .mw-root .mw-preview,
+  .mw-root .mw-controls { max-height: calc(var(--mw-vh) - 120px); }
+  .mw-mode, .mw-icon-btn, .mw-text-btn, .mw-action-btn { min-height: 34px; }
+  .mw-fullscreen canvas,
+  .mw-fullscreen video,
+  .mw-fullscreen img,
+  .mw-fullscreen .tg-stage { max-height: calc(var(--mw-vh) - 120px); }
+}
+
+@media (max-width: 360px) {
+  .mw-mode-switch, .mw-view-tools { flex: 1 1 100%; justify-content: center; }
+  .mw-zoom { min-width: 40px; }
+  .mw-text-btn { padding: 5px 8px; }
+  .mw-root .mw-mode,
+  .mw-root .mw-icon-btn,
+  .mw-root .mw-text-btn { min-height: 38px; }
+  /* Keep the dashboard and pinned action bar from colliding on short phones
+   * without shrinking the output below a usable inspection size. */
+  body.tool-page .mw-root[data-mw-mode="preview"] .workspace-head { display: none; }
+  .mw-root .mw-preview .image-preview-frame,
+  .mw-root .mw-preview .thumbnail-preview-frame { min-height: 120px; }
+  .mw-root .mw-preview canvas { max-height: 120px; }
+  .mw-root .mw-preview .image-output-note,
+  .mw-root .mw-preview .tg-preview-note { font-size: .72rem; line-height: 1.3; }
+  .mw-root .mw-preview .output-actions { gap: 5px; }
+}
+
+/* ---------- Thumbnail Maker professional editor ---------- */
+
+.thumbnail-preview-frame {
+  min-height: 280px;
+  background:
+    linear-gradient(45deg, #eef2ff 25%, transparent 25%, transparent 75%, #eef2ff 75%),
+    linear-gradient(45deg, #eef2ff 25%, #fff 25%, #fff 75%, #eef2ff 75%);
+  background-position: 0 0, 10px 10px;
+  background-size: 20px 20px;
+}
+
+/* On desktop the tool shell otherwise clips the canvas while leaving later
+ * controls in place, so the download row can cover the lower layer area. */
+@media (min-width: 901px) {
+  body.tool-page .image-output.thumbnail-output { overflow: visible; }
+  body.tool-page .image-preview-frame.thumbnail-preview-frame { flex: 0 0 auto; }
+}
+
+.tg-stage {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  line-height: 0;
+  background: #0f172a;
+  box-shadow: 0 18px 46px rgba(15, 23, 42, .26);
+}
+
+.tg-stage canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.tg-stage #tg-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.tg-preview-toolbar,
+.tg-layer-actions,
+.tg-chip-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tg-preview-toolbar { margin-bottom: 8px; }
+.tg-chip-row .chip { min-height: 34px; }
+
+.tg-layer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  padding: 7px;
+  border: 1px solid var(--border, #dbeafe);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.tg-layer-row.is-active { border-color: #2563eb; background: #eff6ff; }
+.tg-layer-row > span { min-width: 0; overflow-wrap: anywhere; font-size: .82rem; }
+.tg-layer-actions { justify-content: flex-end; }
+.tg-layer-actions .btn { padding: 4px 7px; min-height: 32px; }
+.tg-layer-muted { opacity: .55; text-decoration: line-through; }
+.tg-lock-note { color: #b91c1c; }
+
+.tg-preview-note {
+  margin: 8px 0 0;
+  color: #475569;
+  font-size: .78rem;
+  line-height: 1.45;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mw-root .mw-preview,
+  .mw-root .mw-controls { transition: none !important; }
+}

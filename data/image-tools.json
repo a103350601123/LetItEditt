@@ -1418,17 +1418,17 @@
     "name": "Thumbnail Generator",
     "engine": "thumbnail-generator",
     "title": "Thumbnail Generator — Verified Social Sizes, Free & Local",
-    "description": "Create thumbnails at verified YouTube, Shorts, Instagram, TikTok, Facebook, LinkedIn, X and Pinterest dimensions. Edit text, shapes and photos locally; no upload.",
+    "description": "Design thumbnails at verified YouTube, Shorts, Instagram, TikTok and other social sizes. Edit multilingual RTL text and independent layers locally; no upload.",
     "h1": "Thumbnail Generator",
     "icon": "🖼️",
     "layout": "engine",
     "outputType": "image",
-    "intro": "Design click-worthy thumbnails and social graphics at exact, verified platform dimensions. Build original templates from your own photos, shapes, stickers and text, then export a crisp PNG, JPG or WebP entirely in your browser.",
+    "intro": "Design click-worthy thumbnails and social graphics at exact, verified platform dimensions. Build original templates from your own photos, editable multilingual text, shapes and stickers, then export a crisp PNG, JPG or WebP entirely in your browser.",
     "instructions": [
-      "Choose a verified preset such as YouTube 1280×720 or Instagram post 1080×1080, or enter a custom canvas size.",
-      "Add your own images through the upload area, then drag a layer on the preview to position it. Use the sliders for exact size, position and rotation.",
-      "Add text, shapes or emoji stickers, pick a background and adjust brightness, contrast and saturation.",
-      "Undo or redo mistakes, duplicate useful layers, then choose PNG, JPG or WebP and download the finished thumbnail."
+      "Choose a verified preset such as YouTube 1280×720 or Instagram post 1080×1080, or enter a custom canvas size. On a phone, use the Preview and Controls switch to move between the large canvas and the editing panels.",
+      "Upload up to eight photos; each stays a separate image layer. Drag a layer on the canvas to move it, pull a corner handle to resize, or use the rotate handle. The layer panel can reorder, hide, lock, duplicate and delete any element.",
+      "Type in any language: direction is detected from the first strong character, with Auto, LTR and RTL controls. Font options change to stacks with known coverage for the dominant script. Add shapes, emoji stickers and original templates, then adjust colours, outlines and shadows.",
+      "Use zoom, fit, fullscreen, safe-area and rule-of-thirds guides while designing; guides never appear in the export. Undo or redo, save or reopen a local project, then choose PNG, JPG or WebP and download at the exact canvas size."
     ],
     "example": {
       "input": "One 1600×900 photo, a YouTube 1280×720 preset, one headline layer and a star sticker.",
@@ -1444,8 +1444,16 @@
         "a": "No copyrighted artwork is bundled. The included templates are original arrangements of text, borders, gradients, simple shapes and standard system emoji. Use your own licensed images or artwork you have permission to reuse."
       },
       {
+        "q": "Can I use Urdu, Arabic, Chinese or other languages?",
+        "a": "Yes. Text is stored as Unicode and rendered with script-aware font stacks and automatic direction from the first strong character. You can override direction with Auto, LTR or RTL for Urdu, Arabic, Persian, Hebrew and mixed-language lines. We verify the requested scripts in automated tests, but coverage also depends on the fonts installed on your device; a missing Noto font falls back to a system family. Characters are never manually reversed."
+      },
+      {
+        "q": "Does the downloaded file match the preview?",
+        "a": "Yes. Export reuses the same painting routine at the native canvas size. Selection handles, alignment guides and safe-area guides are drawn on a separate overlay and are never encoded into the downloaded PNG, JPG or WebP. JPG flattens transparency onto white; PNG preserves it."
+      },
+      {
         "q": "Can I move and resize text on a phone?",
-        "a": "Yes. Layer dragging uses pointer events, which work with a finger or a mouse. The numeric sliders give precise positioning when a touch screen is less convenient, and every layer stores its own font, colour, outline, shadow, alignment and rotation."
+        "a": "Yes. The mobile workspace gives the canvas the largest area and puts controls behind a Preview/Controls switch. Layer dragging, corner resizing and rotation use pointer events, which work with a finger or a mouse, and the canvas keeps its exact output dimensions even when the on-screen preview is scaled. Numeric sliders and arrow-key nudging give precise positioning."
       },
       {
         "q": "Does background removal use AI?",
@@ -1489,14 +1497,14 @@
       {
         "heading": "Layering without a heavyweight design app",
         "paragraphs": [
-          "The editor treats every headline, shape, sticker and uploaded photo as a separate layer. Add a layer from the current controls, give it a name, and it appears in the layer list where you can select, duplicate or delete it. Each layer keeps its own position, size, rotation, font, colour, outline, shadow and alignment. Dragging on the preview moves the selected layer with a pointer, so the same gesture works with a mouse, pen or finger.",
-          "Alignment guides appear while dragging and the alignment buttons snap the active layer to the left, centre, right, top, middle or bottom of the canvas. This makes it straightforward to build a repeatable layout: place a photo, centre a headline, add a small badge in a corner, then duplicate the file and swap only the photograph for the next video."
+          "The editor treats every headline, shape, sticker and uploaded photo as a separate layer. Add a layer from the current controls, give it a name, and it appears in the layer list where you can select, reorder, hide, lock, duplicate or delete it. Each layer keeps its own position, size, rotation, opacity, blend mode, font, colour, outline, shadow and alignment. Dragging on the preview moves the selected layer, corner handles resize it and a rotation handle turns it; pointer events make the same gestures work with a mouse, pen or finger. Nothing is flattened while you edit, so text stays text and photos stay independent images.",
+          "Alignment guides appear while dragging and the alignment buttons snap the active layer to the left, centre, right, top, middle or bottom of the canvas. Optional platform safe-area guides show the region likely to stay visible in a feed. This makes it straightforward to build a repeatable layout: place a photo, centre a headline, add a small badge in a corner, then duplicate the file and swap only the photograph for the next video. On a phone, the canvas takes priority and the controls sit behind a Preview/Controls switch, with zoom, fit and expand actions so small details remain inspectable without shrinking the output."
         ]
       },
       {
         "heading": "Original templates and safe artwork",
         "paragraphs": [
-          "Four starter templates are included: a bold headline, a quote card, a sale badge and a split-photo composition. They are built from ordinary canvas rectangles, gradients, strokes and text, so nothing is licensed from a third party. The sticker row uses standard emoji characters provided by your device font. You remain responsible for the images you upload, but the tool never supplies a copyrighted character, logo or trending graphic on your behalf.",
+          "Five starter templates are included: a bold headline, a quote card, a sale badge, a split-photo composition and a multilingual example. They are built from ordinary canvas rectangles, gradients, strokes and text, so nothing is licensed from a third party. Applying a template replaces the layer composition but keeps your uploaded photos, and every text layer remains editable. The sticker row uses standard Unicode emoji characters provided by your device font. You remain responsible for the images you upload, but the tool never supplies a copyrighted character, logo or trending graphic on your behalf.",
           "Background choices include a two-colour gradient, a solid colour and transparency for layouts that will be composited later. A plain-background removal option is available for studio-style photos. It compares edge pixels with the corner colour and clears matching regions to transparent. Because it is deterministic and local rather than a neural network, flat backdrops work well and textured scenes may need a different source image."
         ]
       },
@@ -1504,14 +1512,14 @@
         "heading": "Readable text at small sizes",
         "paragraphs": [
           "Thumbnails are usually viewed at a fraction of their native size. A headline that looks elegant at full scale can disappear in a recommendation row. Use the font size, outline and shadow controls to preserve contrast, and keep important words away from the very edge of the frame because feeds may round or overlay the corners. The live preview uses the selected font stack, so what you see matches the downloaded file on the same device.",
-          "The text layer supports single-line labels and short multi-line captions. Left, centre and right alignment apply within the layer box, while rotation lets you create angled badges. If a font is unavailable on another device, the browser falls back to the generic family named in the stack; exporting as PNG freezes the rendered pixels so the design remains stable when shared."
+          "Text can be a single-line label or a multi-line caption with explicit line breaks. The editor detects the dominant script and offers font stacks with known coverage for Latin, Cyrillic, Greek, Arabic, Hebrew, Devanagari, Bengali, Gurmukhi, Tamil, Thai, Chinese, Japanese and Korean; an incompatible font is replaced with a suggested one and the status area says so. Direction follows Unicode first-strong rules, with an Auto, LTR or RTL override for Urdu, Arabic, Persian and mixed Latin script lines. Characters are never reversed by hand, and wrapping uses word and grapheme segmentation so CJK text and emoji sequences survive. Start, centre and end alignment apply within the layer box, while rotation lets you create angled badges. If a font is unavailable on another device, the browser falls back to the generic family named in the stack; exporting as PNG freezes the rendered pixels so the design remains stable when shared. Automated tests cover the major scripts, but no tool can guarantee identical rendering on every operating system."
         ]
       },
       {
         "heading": "Undo, history and careful export",
         "paragraphs": [
-          "Design work is iterative, so every structural action stores a snapshot. Adding, updating, duplicating or deleting a layer, changing the canvas size and applying background removal can all be stepped back with Undo and forward with Redo. This encourages experimentation without the fear of losing a carefully placed headline. Reset releases all temporary image URLs and clears the canvas.",
-          "Before downloading, choose the format that fits the destination. PNG keeps transparency and sharp edges for text-heavy designs. JPG produces smaller files for photo-led thumbnails, and WebP offers a modern compromise where the browser supports it. The quality slider only affects lossy formats. A downloaded thumbnail is a new file; your original photographs are never overwritten or sent anywhere."
+          "Design work is iterative, so every structural action stores one snapshot. Adding, updating, duplicating, reordering or deleting a layer, changing the canvas size or background, applying a template or changing adjustments can all be stepped back with Undo and forward with Redo. You can also save the whole composition as a local JSON project and reopen it later; images are embedded as data URLs in that file, so keep it private if the artwork is confidential. Reset releases all temporary image URLs and restores the default canvas.",
+          "Before downloading, choose the format that fits the destination. PNG keeps transparency and sharp edges for text-heavy designs. JPG produces smaller files for photo-led thumbnails, and WebP offers a modern compromise where the browser supports it. The quality slider only affects lossy formats, and JPG flattens transparency onto white. Guides and selection handles live on a separate overlay, so the exported file contains only your artwork at the exact canvas dimensions. A downloaded thumbnail is a new file; your original photographs are never overwritten or sent anywhere."
         ]
       },
       {

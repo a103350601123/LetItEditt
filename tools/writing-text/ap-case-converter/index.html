@@ -16,6 +16,7 @@
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../../../css/site.css">
+<link rel="stylesheet" href="../../../css/mobile-workspace.css">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"AP Case Converter","description":"Apply a regex-based AP-style pass to text: title case, short-word lowercasing, month and state abbreviations, sentence starts and single-digit numerals. Each rule can be switched off.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/writing-text/ap-case-converter/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Writing \u0026 Text Tools","item":"https://letitedit.com/tools/writing-text/"},{"@type":"ListItem","position":3,"name":"AP Case Converter","item":"https://letitedit.com/tools/writing-text/ap-case-converter/"}]},{"@type":"FAQPage","name":"AP Case Converter","mainEntity":[{"@type":"Question","name":"Is this a complete AP style checker?","acceptedAnswer":{"@type":"Answer","text":"No. It is a shallow regex pipeline covering title case, short words, sentence starts, month and state abbreviations and single-digit numerals. It does not handle titles, dates, times, currencies or Washington, D.C."}},{"@type":"Question","name":"Why does Lowercase short words stop working when title case is off?","acceptedAnswer":{"@type":"Answer","text":"In the reference source that rule is nested inside the title-case rule. This build preserves the behaviour. Turn title case on if you need short words lowercased."}},{"@type":"Question","name":"Does sentence capitalisation understand question marks?","acceptedAnswer":{"@type":"Answer","text":"No. The reference rule only looks for a period followed by whitespace, so question marks, exclamation marks and newlines do not start a new sentence."}}]}]}
 </script>
@@ -179,6 +180,7 @@
 <script src="../../../js/sidebar-data.js"></script>
 <script src="../../../js/site.js"></script>
 <script src="../../../js/category-sidebar.js"></script>
+<script src="../../../js/mobile-workspace.js"></script>
 <script src="../../../js/reference-core.js"></script>
 <script src="../../../js/reference-runtime.js"></script>
 <script id="tool-config" type="application/json">{"slug":"ap-case-converter","engine":"ap-case-converter","layout":"single","outputType":"text"}</script>

@@ -387,7 +387,19 @@ const WORKSPACES = {
       ['linkedin-banner', 'LinkedIn banner — 1584×396'], ['x-post', 'X / Twitter — 1200×675'],
       ['pinterest', 'Pinterest Pin — 1000×1500'], ['custom', 'Custom size']
     ];
-    const controls = upload('image/png,image/jpeg,image/webp', true, 'Original or licensed artwork only. Upload one photo per image layer; drag directly on the preview to move layers.') +
+    /* The script-specific font list is replaced by the editor at runtime. */
+    const basicFonts = [
+      ['700 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif', 'Sans'],
+      ['700 Georgia, "Times New Roman", serif', 'Serif'],
+      ['900 Impact, "Arial Black", sans-serif', 'Impact'],
+      ['700 ui-monospace, Consolas, monospace', 'Monospace']
+    ];
+    const textField = '<div class="field"><label for="tg-text">Text or emoji</label>' +
+      '<textarea id="tg-text" rows="2" dir="auto" placeholder="Add a headline, label or emoji…"></textarea>' +
+      '<p class="hint">Unicode is preserved exactly. Direction is detected from the first strong character.</p></div>';
+
+    const controls = upload('image/png,image/jpeg,image/webp', true,
+      'Upload up to eight photos. Each image stays an independent layer; no upload leaves your device.') +
       group('Canvas preset', select('tg-preset', 'Verified size preset', presets) +
         '<div class="two-cols">' + number('tg-width', 'Width (px)', 1280, 64, 8000, 1) + number('tg-height', 'Height (px)', 720, 64, 8000, 1) + '</div>' +
         '<p class="hint" id="tg-preset-note">YouTube thumbnails are 1280×720 px.</p>' +
@@ -397,24 +409,48 @@ const WORKSPACES = {
         range('tg-padding', 'Image padding', 0, 200, 40, 1, 'px') + range('tg-radius', 'Corner radius', 0, 120, 18, 1, 'px') +
         range('tg-shadow', 'Shadow strength', 0, 100, 35, 1, '%') +
         check('tg-remove-bg', 'Remove plain photo background', false) +
-        range('tg-bg-tolerance', 'Background colour tolerance', 5, 160, 45, 1, '')) +
+        range('tg-bg-tolerance', 'Background colour tolerance', 5, 160, 45, 1, '') +
+        check('tg-safe-guides', 'Show platform safe area', false)) +
       group('Layers', textInput('tg-layer-name', 'Layer name', 'Title', 'Text, sticker or photo') +
         select('tg-layer-type', 'Layer type', [['text', 'Text'], ['shape', 'Shape'], ['sticker', 'Emoji / sticker'], ['image', 'Uploaded image']]) +
-        textarea('tg-text', 'Text or emoji', 2, 'Add a headline, label or emoji…') +
-        '<div class="two-cols">' + select('tg-font', 'Font', [['700 system-ui, sans-serif', 'Sans bold'], ['800 Georgia, serif', 'Serif bold'],
-          ['900 Impact, sans-serif', 'Impact'], ['ui-monospace, Consolas, monospace', 'Monospace']]) +
-          number('tg-font-size', 'Font size (px)', 92, 8, 500, 1) + '</div>' +
-        color('tg-text-color', 'Colour', '#ffffff') + color('tg-outline-color', 'Outline colour', '#0f172a') +
+        textField +
+        select('tg-direction', 'Text direction', [['auto', 'Auto (Unicode)'], ['ltr', 'Left to right'], ['rtl', 'Right to left']]) +
+        '<div class="two-cols">' + select('tg-font', 'Font', basicFonts) +
+        select('tg-font-weight', 'Font weight', [['400', 'Regular'], ['500', 'Medium'], ['600', 'Semibold'], ['700', 'Bold'], ['800', 'Extra bold'], ['900', 'Black']]) + '</div>' +
+        '<div class="two-cols">' + number('tg-font-size', 'Font size (px)', 92, 8, 500, 1) +
+        range('tg-line-height', 'Line height', 0.8, 2.4, 1.15, 0.05, '') + '</div>' +
+        range('tg-letter-spacing', 'Letter spacing', -4, 20, 0, 0.5, 'px') +
+        color('tg-text-color', 'Colour', '#ffffff') + check('tg-gradient', 'Gradient text fill') +
+        color('tg-outline-color', 'Outline colour', '#0f172a') +
         range('tg-outline-width', 'Outline width', 0, 20, 5, 1, 'px') +
-        check('tg-text-shadow', 'Text shadow', true) +
-        select('tg-align', 'Text alignment', [['left', 'Left'], ['center', 'Centre'], ['right', 'Right']]) +
+        check('tg-text-shadow', 'Text shadow', true) + color('tg-shadow-color', 'Shadow colour', '#0f172a') +
+        range('tg-shadow-blur', 'Shadow blur', 0, 60, 12, 1, 'px') +
+        check('tg-text-bg', 'Readable text backing', false) +
+        select('tg-align', 'Text alignment', [['start', 'Start'], ['center', 'Centre'], ['end', 'End'], ['left', 'Left (legacy)'], ['right', 'Right (legacy)']]) +
         range('tg-layer-rotation', 'Layer rotation', -180, 180, 0, 1, '°') +
         '<div class="two-cols">' + range('tg-layer-x', 'X position', 0, 100, 50, 1, '%') + range('tg-layer-y', 'Y position', 0, 100, 50, 1, '%') + '</div>' +
         '<div class="two-cols">' + range('tg-layer-w', 'Width', 2, 100, 70, 1, '%') + range('tg-layer-h', 'Height', 2, 100, 30, 1, '%') + '</div>' +
+        range('tg-layer-opacity', 'Opacity', 0, 100, 100, 1, '%') +
+        select('tg-layer-blend', 'Blend mode', [['source-over', 'Normal'], ['multiply', 'Multiply'], ['screen', 'Screen'],
+          ['overlay', 'Overlay'], ['lighten', 'Lighten'], ['darken', 'Darken'], ['color-dodge', 'Colour dodge']]) +
+        '<div class="tg-layer-flags">' + check('tg-layer-visible', 'Visible', true) + check('tg-layer-locked', 'Locked', false) + '</div>' +
         buttons([['tg-layer-add', 'Add layer'], ['tg-layer-update', 'Update'], ['tg-layer-duplicate', 'Duplicate'], ['tg-layer-delete', 'Delete']]) +
+        buttons([['tg-layer-up', '↑ Bring forward'], ['tg-layer-down', '↓ Send back']]) +
         '<div class="pm-order" id="tg-layers"><p class="hint">No extra layers yet.</p></div>') +
-      group('Templates & stickers', '<p class="hint">All templates are original layouts built from shapes, text and system emoji.</p>' +
-        chips('tg-templates', [['bold', 'Bold headline'], ['quote', 'Quote card'], ['badge', 'Sale badge'], ['split', 'Split photo']]) +
+      group('Image layer', select('tg-image-src', 'Image on this layer', [['', 'No image uploaded']]) +
+        select('tg-image-fit', 'Fit', [['contain', 'Contain'], ['cover', 'Cover'], ['stretch', 'Stretch']]) +
+        '<div class="tg-layer-flags">' + check('tg-image-flip-x', 'Flip horizontally', false) + check('tg-image-flip-y', 'Flip vertically', false) + '</div>' +
+        '<div class="two-cols">' + range('tg-crop-left', 'Crop left', 0, 45, 0, 1, '%') + range('tg-crop-right', 'Crop right', 0, 45, 0, 1, '%') + '</div>' +
+        '<div class="two-cols">' + range('tg-crop-top', 'Crop top', 0, 45, 0, 1, '%') + range('tg-crop-bottom', 'Crop bottom', 0, 45, 0, 1, '%') + '</div>' +
+        range('tg-image-border', 'Border width', 0, 40, 0, 1, 'px') + color('tg-image-border-color', 'Border colour', '#ffffff') +
+        range('tg-image-radius', 'Corner radius', 0, 120, 16, 1, 'px') + check('tg-image-shadow', 'Drop shadow', false) +
+        check('tg-image-remove-bg', 'Remove plain background', false)) +
+      group('Shapes & stickers', select('tg-shape', 'Shape', [['none', 'None'], ['rect', 'Rectangle'], ['circle', 'Circle'],
+        ['triangle', 'Triangle'], ['star', 'Star'], ['heart', 'Heart'], ['arrow', 'Arrow'], ['line', 'Line']]) +
+        textInput('tg-sticker-glyph', 'Sticker glyph', '★', 'A Unicode emoji or symbol')) +
+      group('Templates & stickers', '<p class="hint">Templates are original layouts made from editable text, shapes and photos.</p>' +
+        chips('tg-templates', [['bold', 'Bold headline'], ['quote', 'Quote card'], ['badge', 'Sale badge'],
+          ['split', 'Split photo'], ['global', 'Global scripts']]) +
         chips('tg-stickers', [['★', '★'], ['❤', '❤'], ['✓', '✓'], ['→', '→'], ['●', '●'], ['◆', '◆'], ['🎉', '🎉'], ['🔥', '🔥']])) +
       group('Photo adjustments', '<div class="two-cols">' +
         range('tg-brightness', 'Brightness', 0, 200, 100, 1, '%') + range('tg-contrast', 'Contrast', 0, 200, 100, 1, '%') +
@@ -424,10 +460,35 @@ const WORKSPACES = {
         buttons([['tg-align-left', '⇤ Left'], ['tg-align-center', '↔ Centre'], ['tg-align-right', '⇥ Right'],
           ['tg-align-top', '↑ Top'], ['tg-align-middle', '↕ Middle'], ['tg-align-bottom', '↓ Bottom']]) +
         buttons([['tg-undo', '↶ Undo'], ['tg-redo', '↷ Redo']])) +
+      group('Project', buttons([['tg-project-save', 'Save project JSON'], ['tg-project-load', 'Load project'], ['tg-reset-project', 'Reset project']]) +
+        '<input type="file" id="tg-project-file" accept="application/json,.json">' +
+        '<p class="hint">Projects and uploaded images stay on this device. Nothing is uploaded.</p>') +
       group('Export', select('tg-format', 'Format', [['png', 'PNG'], ['jpeg', 'JPG'], ['webp', 'WebP']]) +
         range('tg-quality', 'Quality (JPG/WebP)', 0.1, 1, 0.92, 0.01, '') +
-        '<p class="hint">Drag a layer on the preview to reposition it. Use the layer sliders for precise size and rotation. Touch dragging works too.</p>');
-    return workspace('thumbnail-generator', controls, output('Thumbnail canvas · drag layers to edit'));
+        '<p class="hint">Drag a layer on the preview to move, pull a corner handle to resize, or use the rotate handle. Arrow keys nudge the selected layer.</p>');
+
+    const previewButton = function (id, glyph, label) {
+      return '<button type="button" class="btn btn-secondary btn-small" id="' + id + '" title="' + label + '" aria-label="' + label + '">' + glyph + '</button>';
+    };
+    const out = '<div class="image-output thumbnail-output">' +
+      '<div class="workspace-head"><h2>Thumbnail canvas</h2><span class="pill" id="image-meta">1280×720 · 1 layer</span></div>' +
+      '<div class="tg-preview-toolbar" role="toolbar" aria-label="Preview controls">' +
+        previewButton('tg-zoom-in', '+', 'Zoom in') + previewButton('tg-zoom-out', '−', 'Zoom out') +
+        previewButton('tg-zoom-fit', 'Fit', 'Fit preview to frame') + previewButton('tg-fullscreen', '⛶', 'Fullscreen preview') +
+        '<span class="tg-toolbar-divider" aria-hidden="true"></span>' +
+        previewButton('tg-mode-preview', 'Preview', 'Preview mode') + previewButton('tg-mode-controls', 'Controls', 'Editing controls mode') +
+      '</div>' +
+      '<div class="image-preview-frame thumbnail-preview-frame tg-stage" id="tg-stage">' +
+        '<div class="tg-stage-inner" id="tg-stage-inner" style="position:relative;display:inline-block;width:100%;transform-origin:center center;">' +
+          '<canvas id="image-preview" width="1280" height="720" tabindex="0" aria-label="Thumbnail preview" style="display:block;width:100%;height:auto;"></canvas>' +
+          '<canvas id="tg-overlay" width="1280" height="720" tabindex="0" aria-label="Thumbnail layer handles" style="position:absolute;inset:0;left:0;top:0;width:100%;height:100%;touch-action:none;"></canvas>' +
+        '</div>' +
+      '</div>' +
+      '<div class="status" id="image-status" role="status" aria-live="polite"></div>' +
+      '<div class="output-actions"><button type="button" class="btn" id="image-download" disabled>Download thumbnail</button></div>' +
+      '<div class="image-output-note">Thumbnail canvas · drag layers to edit · all processing is local.</div>' +
+    '</div>';
+    return workspace('thumbnail-generator', controls, out);
   },
 
   'image-compressor': function () {

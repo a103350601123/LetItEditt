@@ -316,7 +316,15 @@ for (const width of [320, 360, 375, 390, 430, 768, 1024, 1440]) {
       if (path === '/') await expect(page.locator('#hero-search'), `hero search at ${width}px`).toBeVisible();
       if (path.startsWith('/tools/') || /^\/[a-z-]+\/$/.test(path)) {
         const outputButton = page.locator('.output-actions .btn').first();
-        if (await outputButton.count()) await expect(outputButton, `output action on ${path}`).toBeVisible();
+        if (await outputButton.count()) {
+          /* Preview-first tools already show their actions. Text-first tools
+           * keep the input visible, so reveal the output actions on demand. */
+          if (!(await outputButton.isVisible())) {
+            const controlsTab = page.locator('.mw-root[data-mw-mode="preview"] [data-mw-mode="controls"]');
+            if (await controlsTab.count() && await controlsTab.isVisible()) await controlsTab.click();
+          }
+          await expect(outputButton, `output action on ${path}`).toBeVisible();
+        }
       }
     }
     expect(errors, `page errors at ${width}px`).toEqual([]);

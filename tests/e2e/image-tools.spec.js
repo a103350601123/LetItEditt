@@ -645,13 +645,16 @@ test('thumbnail generator creates layered canvases, applies presets and exports 
   await page.fill('#tg-text', 'SALE');
   await page.click('#tg-layer-add');
   await expect(page.locator('#tg-layers .pm-order-row')).toHaveCount(2);
+
+  /* Templates replace the composition with independent editable layers. */
   await page.click('#tg-templates [data-value="badge"]');
-  await expect(page.locator('#tg-layers .pm-order-row')).toHaveCount(4);
+  await expect(page.locator('#tg-layers .pm-order-row')).toHaveCount(2);
+  expect((await page.locator('#tg-layers .tg-layer-row span').allTextContents()).join(' ')).toContain('Badge circle');
 
   await page.click('#tg-undo');
-  await expect(page.locator('#tg-layers .pm-order-row')).toHaveCount(2);
+  expect((await page.locator('#tg-layers .tg-layer-row span').allTextContents()).join(' ')).toContain('Headline');
   await page.click('#tg-redo');
-  await expect(page.locator('#tg-layers .pm-order-row')).toHaveCount(4);
+  expect((await page.locator('#tg-layers .tg-layer-row span').allTextContents()).join(' ')).toContain('Badge value');
 
   const png = await downloadBuffer(page, '#image-download');
   expect(png.name).toMatch(/\.png$/);
@@ -718,8 +721,17 @@ test('image workspaces stay within the viewport from 320px through 1440px', asyn
         };
       });
       expect(fit.workspaceBottom, `${slug} workspace bottom at ${width}x${height}`).toBeLessThanOrEqual(fit.viewportHeight);
-      expect(fit.controlsHeight, `${slug} controls visible at ${width}x${height}`).toBeGreaterThan(120);
       expect(fit.outputHeight, `${slug} preview visible at ${width}x${height}`).toBeGreaterThan(120);
+      if (width <= 900) {
+        /* Mobile prioritises the preview; controls are one tap away. */
+        await page.locator('.mw-toolbar [data-mw-mode="controls"]').click();
+        const controls = await page.locator('.image-controls').boundingBox();
+        expect(controls && controls.height, `${slug} controls reachable at ${width}x${height}`).toBeGreaterThan(120);
+        expect(await page.locator('.image-output').isVisible(), `${slug} preview hides in controls mode`).toBe(false);
+        await page.locator('.mw-toolbar [data-mw-mode="preview"]').click();
+      } else {
+        expect(fit.controlsHeight, `${slug} controls visible at ${width}x${height}`).toBeGreaterThan(120);
+      }
       if (width === 320) {
         const layout = await page.locator('.image-grid').evaluate(element => {
           const style = getComputedStyle(element);
