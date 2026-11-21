@@ -125,7 +125,65 @@ function makeSvg() {
 `;
 }
 
+function makeMaliciousSvg() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="120" viewBox="0 0 200 120" onload="window.__svgXss = 'onload'">
+  <script>window.__svgXss = 'script';</script>
+  <a href="javascript:window.__svgXss='link'"><rect width="200" height="120" fill="#5c2ddd"/></a>
+  <foreignObject x="10" y="10" width="100" height="40"><div xmlns="http://www.w3.org/1999/xhtml">unsafe</div></foreignObject>
+</svg>
+`;
+}
+
+function makeTiff(width, height, compression) {  const raw = Buffer.alloc(width * height * 4);
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const [r, g, b, a] = pixel(x, y, width, height);
+      const offset = (y * width + x) * 4;
+      raw[offset] = r;
+      raw[offset + 1] = g;
+      raw[offset + 2] = b;
+      raw[offset + 3] = a;
+    }
+  }
+  const strip = compression === 8 ? zlib.deflateSync(raw) : raw;
+  const tags = 10;
+  const ifdOffset = 8;
+  const ifdSize = 2 + tags * 12 + 4;
+  const bitsOffset = ifdOffset + ifdSize;
+  const stripOffset = bitsOffset + 8;
+  const buffer = Buffer.alloc(stripOffset + strip.length);
+  buffer.write('II', 0, 'ascii');
+  buffer.writeUInt16LE(42, 2);
+  buffer.writeUInt32LE(ifdOffset, 4);
+  buffer.writeUInt16LE(tags, ifdOffset);
+  let entry = ifdOffset + 2;
+  const writeEntry = (tag, type, count, value) => {
+    buffer.writeUInt16LE(tag, entry);
+    buffer.writeUInt16LE(type, entry + 2);
+    buffer.writeUInt32LE(count, entry + 4);
+    if (type === 3 && count === 1) buffer.writeUInt16LE(value, entry + 8);
+    else buffer.writeUInt32LE(value, entry + 8);
+    entry += 12;
+  };
+  writeEntry(256, 4, 1, width);
+  writeEntry(257, 4, 1, height);
+  writeEntry(258, 3, 4, bitsOffset);
+  writeEntry(259, 3, 1, compression);
+  writeEntry(262, 3, 1, 2);
+  writeEntry(273, 4, 1, stripOffset);
+  writeEntry(277, 3, 1, 4);
+  writeEntry(278, 4, 1, height);
+  writeEntry(279, 4, 1, strip.length);
+  writeEntry(338, 3, 1, 2);
+  buffer.writeUInt32LE(0, entry);
+  [8, 8, 8, 8].forEach((value, index) => buffer.writeUInt16LE(value, bitsOffset + index * 2));
+  strip.copy(buffer, stripOffset);
+  return buffer;
+}
+
 fs.writeFileSync(path.join(outDir, 'sample.png'), makePng(320, 200));
 fs.writeFileSync(path.join(outDir, 'sample.bmp'), makeBmp(160, 100));
 fs.writeFileSync(path.join(outDir, 'sample.svg'), makeSvg());
-console.log('Wrote sample.png, sample.bmp and sample.svg to', outDir);
+fs.writeFileSync(path.join(outDir, 'sample.tiff'), makeTiff(320, 200, 8));
+fs.writeFileSync(path.join(outDir, 'sample-unsafe.svg'), makeMaliciousSvg());
+console.log('Wrote sample.png, sample.bmp, sample.svg, sample.tiff and sample-unsafe.svg to', outDir);

@@ -307,11 +307,12 @@
           <tr><td>GIF</td><td>Yes</td><td>No</td><td>First frame only; animation is not preserved.</td></tr>
           <tr><td>BMP</td><td>Yes</td><td>Yes</td><td>Large uncompressed output.</td></tr>
           <tr><td>SVG</td><td>Yes</td><td>No</td><td>Sanitised and rasterised on import.</td></tr>
-          <tr><td>TIFF</td><td>Yes</td><td>No</td><td>Decoded locally with UTIF.js.</td></tr>
+          <tr><td>TIFF</td><td>Yes</td><td>No</td><td>Decoded locally with UTIF.js and pako.</td></tr>
           <tr><td>HEIC / HEIF</td><td>Yes*</td><td>No</td><td>*Decoded locally with heic2any when the browser cannot open it.</td></tr>
           <tr><td>AVIF</td><td>Browser dependent</td><td>Browser dependent</td><td>The option is disabled when the browser has no encoder.</td></tr>
         </tbody>
       </table>
+      <p>TIFF and HEIC decoding use bundled open-source decoders: UTIF.js, pako and heic2any, all released under the MIT licence. They load only when you open a file that needs them.</p>
 
       <h2>Layers, text and shapes</h2>
       <p>Text, shapes, drawings and added images are separate layers. Move, resize, rotate, hide, lock, duplicate, rename or reorder them without flattening the original. The export is flattened only at the final step. Text uses the browser’s font shaping, including Unicode, Arabic and other RTL scripts; choose the direction in the Text panel when automatic detection is not enough.</p>

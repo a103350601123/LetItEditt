@@ -493,7 +493,8 @@ body.editor-sheet-open { overflow: hidden; }
   .editor-panel-head::before { content: ""; position: absolute; inset-inline: 50%; top: 4px; width: 38px; height: 3px; border-radius: 999px; background: #3b4262; transform: translateX(-50%); }
   .editor-sheet-backdrop { display: block; position: fixed; inset: 0; z-index: 80; background: rgba(4, 6, 14, .55); }
   .editor-statusbar { font-size: .62rem; }
-  .editor-toast, .editor-progress { bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .editor-toast { top: 62px; bottom: auto; }
+  .editor-progress { bottom: calc(96px + env(safe-area-inset-bottom)); }
   .tool-hero { padding: 22px 0 18px; }
   .tool-hero h1 { font-size: clamp(1.8rem, 8vw, 2.5rem); }
   .tool-hero p { font-size: .94rem; }

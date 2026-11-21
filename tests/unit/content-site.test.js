@@ -180,13 +180,18 @@ describe('image and photo editor tool', () => {
 
   it('ships every editor asset and the vendored decoders', () => {
     ['js/editor.js', 'js/image-processing.js', 'js/editor-worker.js', 'css/editor.css',
-      'vendor/UTIF.js', 'vendor/UTIF.LICENSE', 'vendor/heic2any.min.js'].forEach(asset => {
+      'vendor/UTIF.js', 'vendor/UTIF.LICENSE', 'vendor/pako.min.js', 'vendor/pako.LICENSE',
+      'vendor/heic2any.min.js', 'vendor/heic2any.LICENSE'].forEach(asset => {
       const file = path.join(root, asset);
       expect(fs.existsSync(file), asset).toBe(true);
       expect(fs.statSync(file).size, asset).toBeGreaterThan(0);
     });
     const licence = read('vendor/UTIF.LICENSE');
     expect(licence.toLowerCase()).toContain('mit');
+    const pakoLicence = read('vendor/pako.LICENSE');
+    expect(pakoLicence.toLowerCase()).toContain('mit');
+    const heicLicence = read('vendor/heic2any.LICENSE');
+    expect(heicLicence.toLowerCase()).toContain('mit');
   });
 
   it('documents real formats and honest limits instead of fake features', () => {
@@ -196,6 +201,7 @@ describe('image and photo editor tool', () => {
     expect(page).toContain('AVIF export appears only when the browser');
     expect(page).toContain('First frame only; animation is not preserved.');
     expect(page).toContain('No segmentation model is bundled');
+    expect(page).toContain('UTIF.js, pako and heic2any');
     expect(page).not.toContain('background removal works');
     expect(page).not.toContain('AI background removal');
   });

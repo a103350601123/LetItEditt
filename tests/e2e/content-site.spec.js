@@ -311,6 +311,35 @@ test.describe('image and photo editor', () => {
     await expect(page.locator('[data-layer-row]')).toHaveCount(1);
   });
 
+  test('imports a TIFF with the bundled decoder', async ({ page }) => {
+    await openFixture(page, 'sample.tiff');
+    await expect(page.locator('[data-status-left]')).toContainText('320 × 200');
+    await expect(page.locator('[data-status-left]')).toContainText('TIFF');
+  });
+
+  test('imports and sanitises SVG without running scripts', async ({ page }) => {
+    await page.goto(toolPath);
+    await page.locator('[data-file-input]').setInputFiles(fixture('sample-unsafe.svg'));
+    await expect(page.locator('[data-status-left]')).toContainText('200 × 120');
+    await expect(page.locator('[data-status-left]')).toContainText('SVG');
+    const xss = await page.evaluate(() => (window.__svgXss === undefined ? null : window.__svgXss));
+    expect(xss).toBeNull();
+    await expect(page.locator('[data-toast]')).toContainText('Opened sample-unsafe.svg');
+  });
+
+  test('arrow keys nudge the active layer and update the numeric fields', async ({ page }) => {
+    await openFixture(page, 'sample.png');
+    await page.locator('.editor-rail [data-tool="text"]').click();
+    await page.locator('[data-action="add-text"]').click();
+    await page.locator('.editor-rail [data-tool="layers"]').click();
+    const xInput = page.locator('[data-layer-field="x"]');
+    const before = Number(await xInput.inputValue());
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('Shift+ArrowRight');
+    await expect(xInput).toHaveValue(String(before + 12));
+  });
+
   test('applies a filter preset and a frame without losing the image', async ({ page }) => {
     await openFixture(page, 'sample.png');
     await page.locator('.editor-rail [data-tool="filters"]').click();

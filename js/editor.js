@@ -773,8 +773,12 @@
     return { width: rect.width, height: rect.height, dpr: dpr };
   }
 
+  function canvasPadding() {
+    return isMobile() ? 14 : 24;
+  }
+
   function computeView(imageW, imageH, rect) {
-    var padding = 24;
+    var padding = canvasPadding();
     var fit = Math.min((rect.width - padding * 2) / imageW, (rect.height - padding * 2) / imageH);
     fit = Math.max(0.01, fit);
     var scale = fit * state.zoom;
@@ -1053,10 +1057,11 @@
       return;
     }
     var finalSize = getFinalSize();
+    var shownSize = state.compare ? { width: state.source.width, height: state.source.height } : finalSize;
     if (els.fileName) els.fileName.textContent = state.source.name;
     els.statusLeft.textContent = state.source.width + ' × ' + state.source.height + ' · ' + mimeLabel(state.source.type) + ' · ' + formatBytes(state.source.size);
     var toolLabel = state.tool.charAt(0).toUpperCase() + state.tool.slice(1);
-    els.statusRight.textContent = (state.compare ? 'Before · ' : '') + finalSize.width + ' × ' + finalSize.height + ' · ' + Math.round(view.scale * 100) + '% · ' + toolLabel;
+    els.statusRight.textContent = (state.compare ? 'Before · ' : '') + shownSize.width + ' × ' + shownSize.height + ' · ' + Math.round(view.scale * 100) + '% · ' + toolLabel;
   }
 
   /* ---------- History ---------- */
@@ -1191,13 +1196,34 @@
     return output;
   }
 
+  function loadImageElement(url) {
+    return new Promise(function (resolve, reject) {
+      var image = new Image();
+      image.onload = function () { resolve(image); };
+      image.onerror = function () { reject(new Error('The image could not be decoded.')); };
+      image.src = url;
+    });
+  }
+
   async function bitmapFromBlob(blob, orientation) {
     var bitmap;
     try {
       bitmap = await createImageBitmap(blob, { imageOrientation: 'none' });
     } catch (error) {
-      bitmap = await createImageBitmap(blob);
-      orientation = 1;
+      try {
+        bitmap = await createImageBitmap(blob);
+        orientation = 1;
+      } catch (fallbackError) {
+        var url = URL.createObjectURL(blob);
+        try {
+          var image = await loadImageElement(url);
+          var canvas = createCanvas(image.naturalWidth || image.width, image.naturalHeight || image.height);
+          canvas.getContext('2d').drawImage(image, 0, 0);
+          return canvas;
+        } finally {
+          URL.revokeObjectURL(url);
+        }
+      }
     }
     var canvas = orientCanvas(bitmap, orientation || 1);
     if (bitmap.close) bitmap.close();
@@ -1238,6 +1264,7 @@
   }
 
   async function loadTiff(file) {
+    await loadScriptOnce('../../vendor/pako.min.js');
     await loadScriptOnce('../../vendor/UTIF.js');
     if (!window.UTIF) throw new Error('The TIFF decoder did not load.');
     var buffer = await file.arrayBuffer();
@@ -1289,6 +1316,22 @@
     throw new Error('Unsupported image format.');
   }
 
+  function mimeForFile(file) {
+    if (file.type && /^image\//.test(file.type)) return file.type;
+    var name = (file.name || '').toLowerCase();
+    if (/\.jpe?g$/.test(name)) return 'image/jpeg';
+    if (/\.png$/.test(name)) return 'image/png';
+    if (/\.webp$/.test(name)) return 'image/webp';
+    if (/\.gif$/.test(name)) return 'image/gif';
+    if (/\.bmp$/.test(name)) return 'image/bmp';
+    if (/\.tiff?$/.test(name)) return 'image/tiff';
+    if (/\.avif$/.test(name)) return 'image/avif';
+    if (/\.heic$/.test(name)) return 'image/heic';
+    if (/\.heif$/.test(name)) return 'image/heif';
+    if (/\.svg$/.test(name)) return 'image/svg+xml';
+    return 'image/png';
+  }
+
   async function loadFile(file) {
     if (!file) return;
     if (!/^image\//.test(file.type || '') && !/\.(jpe?g|png|webp|gif|bmp|tiff?|avif|hei[cf]|svg)$/i.test(file.name || '')) {
@@ -1304,7 +1347,7 @@
         state.source.canvas.width = 0;
         state.source.canvas.height = 0;
       }
-      var type = file.type || (file.name.toLowerCase().match(/\.svg$/) ? 'image/svg+xml' : 'image/png');
+      var type = mimeForFile(file);
       state.source = {
         canvas: canvasSource,
         width: canvasSource.width,
@@ -3183,7 +3226,8 @@
     var before = screenToLogical(clientX, clientY);
     state.zoom = clamp(newZoom, 0.1, 16);
     var logical = getLogicalSize();
-    var fit = Math.min((rect.width - 48) / logical.width, (rect.height - 48) / logical.height);
+    var pad = canvasPadding() * 2;
+    var fit = Math.min((rect.width - pad) / logical.width, (rect.height - pad) / logical.height);
     fit = Math.max(0.0001, fit);
     var scale = fit * state.zoom;
     var baseX = (rect.width - logical.width * scale) / 2;
@@ -3900,6 +3944,7 @@
         else if (event.key === 'ArrowDown') layer.y += step;
         pushHistory();
         invalidateExport();
+        syncLayerGeometryInputs();
         drawToScreen();
         schedulePreview(false);
       }
