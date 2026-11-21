@@ -54,13 +54,13 @@ function pixel(x, y, width, height) {
   return [r, g, b, 255];
 }
 
-function makePng(width, height) {
+function makeRgbaPng(width, height, sample) {
   const stride = width * 4 + 1;
   const raw = Buffer.alloc(stride * height);
   for (let y = 0; y < height; y += 1) {
     raw[y * stride] = 0;
     for (let x = 0; x < width; x += 1) {
-      const [r, g, b, a] = pixel(x, y, width, height);
+      const [r, g, b, a] = sample(x, y);
       const offset = y * stride + 1 + x * 4;
       raw[offset] = r;
       raw[offset + 1] = g;
@@ -79,6 +79,69 @@ function makePng(width, height) {
     chunk('IDAT', zlib.deflateSync(raw, { level: 9 })),
     chunk('IEND', Buffer.alloc(0))
   ]);
+}
+
+function makePng(width, height) {
+  return makeRgbaPng(width, height, (x, y) => pixel(x, y, width, height));
+}
+
+/* Opaque centre with fully transparent corners, for alpha export checks. */
+function makeAlphaPng(width, height) {
+  return makeRgbaPng(width, height, (x, y) => {
+    const inside = x >= width * 0.25 && x < width * 0.75 && y >= height * 0.25 && y < height * 0.75;
+    return inside ? [220, 40, 80, 255] : [0, 0, 0, 0];
+  });
+}
+
+/* Red on the left half, blue on the right half, for flip checks. */
+function makeCornersPng(width, height) {
+  return makeRgbaPng(width, height, (x) => (x < width / 2 ? [255, 0, 0, 255] : [0, 0, 255, 255]));
+}
+
+/* Minimal two-frame GIF: red frame first, blue frame second. */
+function makeGif(width, height) {
+  const parts = [];
+  parts.push(Buffer.from('GIF89a', 'ascii'));
+  const lsd = Buffer.alloc(7);
+  lsd.writeUInt16LE(width, 0);
+  lsd.writeUInt16LE(height, 2);
+  lsd[4] = 0x80; // global colour table, two entries
+  lsd[5] = 0;
+  lsd[6] = 0;
+  parts.push(lsd);
+  parts.push(Buffer.from([255, 0, 0, 0, 0, 255]));
+
+  const frame = (colourIndex) => {
+    const gce = Buffer.from([0x21, 0xF9, 0x04, 0x04, 0x0A, 0x00, 0x00, 0x00]);
+    const descriptor = Buffer.alloc(10);
+    descriptor[0] = 0x2C;
+    descriptor.writeUInt16LE(width, 5);
+    descriptor.writeUInt16LE(height, 7);
+    const codes = [];
+    for (let i = 0; i < width * height; i += 1) codes.push(4, colourIndex);
+    codes.push(5);
+    let bitBuffer = 0;
+    let bitCount = 0;
+    const bytes = [];
+    codes.forEach((code) => {
+      bitBuffer |= code << bitCount;
+      bitCount += 3;
+      while (bitCount >= 8) {
+        bytes.push(bitBuffer & 0xFF);
+        bitBuffer >>>= 8;
+        bitCount -= 8;
+      }
+    });
+    if (bitCount > 0) bytes.push(bitBuffer & 0xFF);
+    const data = Buffer.from(bytes);
+    const block = Buffer.concat([Buffer.from([0x02, data.length]), data, Buffer.from([0x00])]);
+    return Buffer.concat([gce, descriptor, block]);
+  };
+
+  parts.push(frame(0));
+  parts.push(frame(1));
+  parts.push(Buffer.from([0x3B]));
+  return Buffer.concat(parts);
 }
 
 function makeBmp(width, height) {
@@ -134,7 +197,21 @@ function makeMaliciousSvg() {
 `;
 }
 
-function makeTiff(width, height, compression) {  const raw = Buffer.alloc(width * height * 4);
+/* Adds an EXIF APP1 orientation tag to an existing JPEG. */
+function makeExifJpeg(jpeg) {
+  const app1 = Buffer.from([
+    0xFF, 0xE1, 0x00, 0x22,
+    0x45, 0x78, 0x69, 0x66, 0x00, 0x00,
+    0x49, 0x49, 0x2A, 0x00, 0x08, 0x00, 0x00, 0x00,
+    0x01, 0x00,
+    0x12, 0x01, 0x03, 0x00, 0x01, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00
+  ]);
+  return Buffer.concat([jpeg.subarray(0, 2), app1, jpeg.subarray(2)]);
+}
+
+function makeTiff(width, height, compression) {
+  const raw = Buffer.alloc(width * height * 4);
   for (let y = 0; y < height; y += 1) {
     for (let x = 0; x < width; x += 1) {
       const [r, g, b, a] = pixel(x, y, width, height);
@@ -186,4 +263,11 @@ fs.writeFileSync(path.join(outDir, 'sample.bmp'), makeBmp(160, 100));
 fs.writeFileSync(path.join(outDir, 'sample.svg'), makeSvg());
 fs.writeFileSync(path.join(outDir, 'sample.tiff'), makeTiff(320, 200, 8));
 fs.writeFileSync(path.join(outDir, 'sample-unsafe.svg'), makeMaliciousSvg());
-console.log('Wrote sample.png, sample.bmp, sample.svg, sample.tiff and sample-unsafe.svg to', outDir);
+fs.writeFileSync(path.join(outDir, 'sample-alpha.png'), makeAlphaPng(64, 64));
+fs.writeFileSync(path.join(outDir, 'sample-corners.png'), makeCornersPng(40, 20));
+fs.writeFileSync(path.join(outDir, 'sample.gif'), makeGif(8, 8));
+const jpegPath = path.join(outDir, 'sample.jpg');
+if (fs.existsSync(jpegPath)) {
+  fs.writeFileSync(path.join(outDir, 'sample-exif6.jpg'), makeExifJpeg(fs.readFileSync(jpegPath)));
+}
+console.log('Wrote sample fixtures to', outDir);

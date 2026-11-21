@@ -534,7 +534,7 @@ function toolPage(tool) {
     ['Which formats can I export?', 'JPG, PNG, WebP and BMP are always available. AVIF export appears only when the browser provides a working AVIF encoder.'],
     ['Can I keep transparency?', 'Yes, with PNG or WebP. JPG and BMP do not support transparency, so the editor fills transparent areas with white for those formats.'],
     ['Can I guarantee an exact file size?', 'No. The editor can target a size for JPG and WebP and will report the real output size, but encoders cannot guarantee an exact byte count.'],
-    ['Does it correct EXIF rotation?', 'Yes. The editor reads the JPEG EXIF orientation value and applies the correct rotation before editing.'],
+    ['Does it correct EXIF rotation?', 'Yes. The browser applies the JPEG EXIF orientation while decoding, so photos taken in portrait open the right way up.'],
     ['Does background removal use AI?', 'No segmentation model is bundled. Background removal is not advertised as working; the editor reports that limitation instead of showing a fake result.'],
     ['Can I edit on a phone?', 'Yes. The mobile workspace uses a large preview, a bottom tool bar and bottom-sheet controls. The editor is tested from 320px wide and in landscape.']
   ];

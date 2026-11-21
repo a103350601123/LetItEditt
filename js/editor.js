@@ -1145,57 +1145,6 @@
     return 'native';
   }
 
-  function getExifOrientation(buffer) {
-    try {
-      var view = new DataView(buffer);
-      if (view.byteLength < 4 || view.getUint16(0, false) !== 0xFFD8) return 1;
-      var offset = 2;
-      while (offset + 4 < view.byteLength) {
-        var marker = view.getUint16(offset, false);
-        if ((marker & 0xFF00) !== 0xFF00) break;
-        var length = view.getUint16(offset + 2, false);
-        if (marker === 0xFFE1 && offset + 10 < view.byteLength) {
-          if (view.getUint32(offset + 4, false) === 0x45786966) {
-            var tiff = offset + 10;
-            var little = view.getUint16(tiff, false) === 0x4949;
-            var ifdOffset = view.getUint32(tiff + 4, little);
-            var entries = view.getUint16(tiff + ifdOffset, little);
-            for (var i = 0; i < entries; i += 1) {
-              var entry = tiff + ifdOffset + 2 + i * 12;
-              if (entry + 10 > view.byteLength) break;
-              if (view.getUint16(entry, little) === 0x0112) {
-                return view.getUint16(entry + 8, little) || 1;
-              }
-            }
-          }
-        }
-        if (!length || length < 2) break;
-        offset += 2 + length;
-      }
-    } catch (error) { /* ignore malformed EXIF */ }
-    return 1;
-  }
-
-  function orientCanvas(source, orientation) {
-    var width = source.width || source.naturalWidth;
-    var height = source.height || source.naturalHeight;
-    var swap = orientation >= 5 && orientation <= 8;
-    var output = createCanvas(swap ? height : width, swap ? width : height);
-    var ctx = output.getContext('2d');
-    switch (orientation) {
-      case 2: ctx.transform(-1, 0, 0, 1, width, 0); break;
-      case 3: ctx.transform(-1, 0, 0, -1, width, height); break;
-      case 4: ctx.transform(1, 0, 0, -1, 0, height); break;
-      case 5: ctx.transform(0, 1, 1, 0, 0, 0); break;
-      case 6: ctx.transform(0, 1, -1, 0, height, 0); break;
-      case 7: ctx.transform(0, -1, -1, 0, height, width); break;
-      case 8: ctx.transform(0, -1, 1, 0, 0, width); break;
-      default: break;
-    }
-    ctx.drawImage(source, 0, 0, width, height);
-    return output;
-  }
-
   function loadImageElement(url) {
     return new Promise(function (resolve, reject) {
       var image = new Image();
@@ -1205,29 +1154,39 @@
     });
   }
 
-  async function bitmapFromBlob(blob, orientation) {
+  async function bitmapFromBlob(blob) {
     var bitmap;
     try {
-      bitmap = await createImageBitmap(blob, { imageOrientation: 'none' });
+      bitmap = await createImageBitmap(blob);
     } catch (error) {
+      var url = URL.createObjectURL(blob);
       try {
-        bitmap = await createImageBitmap(blob);
-        orientation = 1;
-      } catch (fallbackError) {
-        var url = URL.createObjectURL(blob);
-        try {
-          var image = await loadImageElement(url);
-          var canvas = createCanvas(image.naturalWidth || image.width, image.naturalHeight || image.height);
-          canvas.getContext('2d').drawImage(image, 0, 0);
-          return canvas;
-        } finally {
-          URL.revokeObjectURL(url);
-        }
+        var image = await loadImageElement(url);
+        var canvas = createCanvas(image.naturalWidth || image.width, image.naturalHeight || image.height);
+        canvas.getContext('2d').drawImage(image, 0, 0);
+        return canvas;
+      } finally {
+        URL.revokeObjectURL(url);
       }
     }
-    var canvas = orientCanvas(bitmap, orientation || 1);
+    var canvas = createCanvas(bitmap.width, bitmap.height);
+    canvas.getContext('2d').drawImage(bitmap, 0, 0);
     if (bitmap.close) bitmap.close();
     return canvas;
+  }
+
+  /* The <img> decoder applies EXIF orientation consistently in modern
+   * browsers, so JPEGs are decoded through it rather than rotating twice. */
+  async function loadJpeg(file) {
+    var url = URL.createObjectURL(file);
+    try {
+      var image = await loadImageElement(url);
+      var canvas = createCanvas(image.naturalWidth || image.width, image.naturalHeight || image.height);
+      canvas.getContext('2d').drawImage(image, 0, 0);
+      return canvas;
+    } finally {
+      URL.revokeObjectURL(url);
+    }
   }
 
   async function loadSvg(file) {
@@ -1260,7 +1219,7 @@
     }
     var serialized = new XMLSerializer().serializeToString(svg);
     var blob = new Blob([serialized], { type: 'image/svg+xml' });
-    return bitmapFromBlob(blob, 1);
+    return bitmapFromBlob(blob);
   }
 
   async function loadTiff(file) {
@@ -1287,13 +1246,13 @@
 
   async function loadHeic(file) {
     try {
-      return await bitmapFromBlob(file, 1);
+      return await bitmapFromBlob(file);
     } catch (nativeError) {
       await loadScriptOnce('../../vendor/heic2any.min.js');
       if (!window.heic2any) throw new Error('The HEIC decoder did not load.');
       var converted = await window.heic2any({ blob: file, toType: 'image/png', quality: 0.95 });
       var blob = Array.isArray(converted) ? converted[0] : converted;
-      return bitmapFromBlob(blob, 1);
+      return bitmapFromBlob(blob);
     }
   }
 
@@ -1303,11 +1262,17 @@
     if (kind === 'tiff') return loadTiff(file);
     if (kind === 'heic') return loadHeic(file);
     if (kind === 'native' || kind === 'avif') {
+      if (mimeForFile(file) === 'image/jpeg') {
+        try {
+          return await loadJpeg(file);
+        } catch (error) {
+          throw new Error('This JPEG could not be opened. The file may be corrupted.');
+        }
+      }
       var buffer = await file.arrayBuffer();
-      var orientation = (file.type === 'image/jpeg' || /\.jpe?g$/i.test(file.name)) ? getExifOrientation(buffer) : 1;
       var blob = new Blob([buffer], { type: file.type || 'application/octet-stream' });
       try {
-        return await bitmapFromBlob(blob, orientation);
+        return await bitmapFromBlob(blob);
       } catch (error) {
         if (kind === 'avif') throw new Error('This browser cannot open AVIF files. Try JPG, PNG or WebP.');
         throw new Error('This image could not be opened. The file may be corrupted or use an unsupported format.');

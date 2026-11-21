@@ -317,6 +317,59 @@ test.describe('image and photo editor', () => {
     await expect(page.locator('[data-status-left]')).toContainText('TIFF');
   });
 
+  test('imports WebP and the first frame of a GIF', async ({ page }) => {
+    await openFixture(page, 'sample.webp');
+    await expect(page.locator('[data-status-left]')).toContainText('40 × 20');
+    await expect(page.locator('[data-status-left]')).toContainText('WebP');
+    await page.locator('[data-file-input]').setInputFiles(fixture('sample.gif'));
+    await expect(page.locator('[data-status-left]')).toContainText('8 × 8');
+    await expect(page.locator('[data-status-left]')).toContainText('GIF');
+  });
+
+  test('applies EXIF orientation when a JPEG is imported', async ({ page }) => {
+    await openFixture(page, 'sample-exif6.jpg');
+    await expect(page.locator('[data-status-left]')).toContainText('200 × 320');
+    await expect(page.locator('[data-status-left]')).toContainText('JPG');
+  });
+
+  test('keeps transparent frame padding in PNG and fills it white in JPEG', async ({ page }) => {
+    await openFixture(page, 'sample.png');
+    await page.locator('.editor-rail [data-tool="frame"]').click();
+    await page.locator('[data-frame-padding]').evaluate(el => {
+      el.value = '40';
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    await page.locator('[data-frame-background]').selectOption('transparent');
+    await page.waitForTimeout(300);
+    await page.locator('.editor-topbar [data-action="export"]').click();
+
+    const sampleCorner = async (type, name) => {
+      await page.locator('[data-export-format]').selectOption(type);
+      await page.locator('[data-export-filename]').fill(name);
+      const pending = page.waitForEvent('download');
+      await page.locator('[data-action="download"]').click();
+      const download = await pending;
+      const buffer = fs.readFileSync(await download.path());
+      return page.evaluate(async ({ base64, mime }) => {
+        const image = new Image();
+        image.src = 'data:' + mime + ';base64,' + base64;
+        await image.decode();
+        const canvas = document.createElement('canvas');
+        canvas.width = image.naturalWidth;
+        canvas.height = image.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(image, 0, 0);
+        return Array.from(ctx.getImageData(2, 2, 1, 1).data);
+      }, { base64: buffer.toString('base64'), mime: type });
+    };
+
+    const png = await sampleCorner('image/png', 'transparent-padding');
+    expect(png[3]).toBe(0);
+    const jpg = await sampleCorner('image/jpeg', 'white-padding');
+    expect(jpg.slice(0, 3)).toEqual([255, 255, 255]);
+  });
+
   test('imports and sanitises SVG without running scripts', async ({ page }) => {
     await page.goto(toolPath);
     await page.locator('[data-file-input]').setInputFiles(fixture('sample-unsafe.svg'));
