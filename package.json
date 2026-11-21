@@ -2,7 +2,7 @@
   "name": "letitedit",
   "version": "1.0.0",
   "private": true,
-  "description": "LetitEdit — free browser-side online tools.",
+  "description": "LetitEdit — category pages, guides and site updates. The tool library is being rebuilt.",
   "scripts": {
     "build": "node scripts/build.js",
     "test": "vitest run",

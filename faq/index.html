@@ -4,21 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FAQ — LetitEdit Questions and Answers</title>
-<meta name="description" content="Answers about browser-side processing, privacy, accounts, mobile use and how new tools are added to LetitEdit.">
-<meta name="theme-color" content="#2563eb">
+<meta name="description" content="Answers about browser-side processing, privacy, accounts, mobile use and how new tools will be added to LetitEdit.">
+<meta name="theme-color" content="#2563EB">
 <link rel="canonical" href="https://letitedit.com/faq/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="FAQ — LetitEdit Questions and Answers">
-<meta property="og:description" content="Answers about browser-side processing, privacy, accounts, mobile use and how new tools are added to LetitEdit.">
+<meta property="og:description" content="Answers about browser-side processing, privacy, accounts, mobile use and how new tools will be added to LetitEdit.">
 <meta property="og:url" content="https://letitedit.com/faq/">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../css/site.css">
-<link rel="stylesheet" href="../css/mobile-workspace.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Do the tools upload my text or files?","acceptedAnswer":{"@type":"Answer","text":"No. Every published LetitEdit tool processes input locally in your browser. Text you paste and files you choose are not sent to a LetitEdit server for processing."}},{"@type":"Question","name":"Do I need an account?","acceptedAnswer":{"@type":"Answer","text":"No account, sign-up or subscription is required. Every tool is free to open and use."}},{"@type":"Question","name":"Can I use the tools on a phone?","acceptedAnswer":{"@type":"Answer","text":"Yes. The interface is responsive from small 320px screens through large desktops, and the same processing runs on mobile browsers."}},{"@type":"Question","name":"Is my input stored after I close the page?","acceptedAnswer":{"@type":"Answer","text":"Tool input is held in browser memory while the page is open. Copy, download and restoration actions only happen after you click them. Check the Privacy Policy for full details."}},{"@type":"Question","name":"Are the redaction tools guaranteed to find all sensitive information?","acceptedAnswer":{"@type":"Answer","text":"No. Detection uses conservative patterns for common formats. Always review redacted output manually before sharing it, and treat restoration keys as sensitive because they contain the original values."}},{"@type":"Question","name":"How are new tools added?","acceptedAnswer":{"@type":"Answer","text":"Tools are registered in a central data file with metadata such as name, category, slug, keywords and SEO fields. The navigation, counts, search, sitemap and category pages update automatically from that registry."}},{"@type":"Question","name":"Why are some categories empty?","acceptedAnswer":{"@type":"Answer","text":"All planned categories exist now so the navigation and routes are stable. Tools appear in a category only after they are implemented and tested; placeholder tools are never published."}}]}
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Are any tools available right now?","acceptedAnswer":{"@type":"Answer","text":"No. The tool library was removed so the site can be rebuilt around a smaller category structure. The category pages, blog, news and FAQ are the published content at the moment."}},{"@type":"Question","name":"Do I need an account?","acceptedAnswer":{"@type":"Answer","text":"No. The published pages are static content and do not ask for an account, sign-up or subscription."}},{"@type":"Question","name":"Do these pages upload my text or files?","acceptedAnswer":{"@type":"Answer","text":"The published category, blog, news, FAQ and policy pages do not provide an input for text or files, so nothing is uploaded from them. Future tool pages must explain exactly what happens to any input before you use them."}},{"@type":"Question","name":"Are you tracking visitors?","acceptedAnswer":{"@type":"Answer","text":"The content-only site uses local styles and system fonts. It does not load advertising cookies or cross-site tracking scripts. A hosting provider may keep ordinary server access logs for security and troubleshooting."}},{"@type":"Question","name":"Why are the category pages empty of tools?","acceptedAnswer":{"@type":"Answer","text":"The nine categories are the permanent taxonomy. They exist so future guides and tools have stable homes without presenting unfinished or unsupported functionality as available."}},{"@type":"Question","name":"How will new tools be added later?","acceptedAnswer":{"@type":"Answer","text":"A tool will be introduced only with a real page, documented behaviour, honest limits and working checks. The site generator will then add its listing, metadata and sitemap entry; no placeholder tool is published."}},{"@type":"Question","name":"Do you support mobile screens and non-English text?","acceptedAnswer":{"@type":"Answer","text":"The published pages are responsive and use system font fallbacks with Unicode-aware HTML. Each page declares its language and direction, so left-to-right and right-to-left content can be added without changing the theme."}}]}
 </script>
 </head>
 <body>
@@ -28,81 +27,56 @@
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
     <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
     <div class="nav-links" id="primary-links">
-      <div class="nav-category">
-        <a href="/categories/">Categories</a>
-        <button class="nav-category-toggle" type="button" aria-label="Show category menu" aria-controls="nav-category-list" aria-expanded="false" title="Browse categories">▾</button>
-        <div class="nav-category-panel" id="nav-category-list" hidden>
-          <span class="nav-category-title">All nine categories</span>
-          <a href="/tools/image-photo-editing/">Image &amp; Photo</a>
-        <a href="/tools/video-editing/">Video</a>
-        <a href="/tools/audio-music-editing/">Audio &amp; Music</a>
-        <a href="/tools/pdf-document-editing/">PDF &amp; Documents</a>
-        <a href="/tools/text-writing-editing/">Text &amp; Writing</a>
-        <a href="/tools/graphic-design-creative-editing/">Graphic Design</a>
-        <a href="/tools/web-code-editing/">Web &amp; Code</a>
-        <a href="/tools/diagram-presentation-productivity-design/">Diagrams &amp; Planning</a>
-        <a href="/tools/qr-barcode-utility-design/">QR &amp; Utilities</a>
-        </div>
-      </div>
-      <a href="/new-tools/">New Tools</a>
-      <a href="/news/">News</a>
+      <a href="/categories/">Categories</a>
       <a href="/blog/">Blog</a>
-      <a href="/tools/">All Tools</a>
+      <a href="/news/">News</a>
       <a href="/faq/" aria-current="page">FAQ</a>
-      <button class="nav-search" id="nav-search" type="button" aria-label="Open tool search" aria-controls="search-strip" aria-expanded="false" title="Search tools"><span aria-hidden="true">🔍</span></button>
     </div>
   </nav>
 </header>
-<div class="site-search-strip" id="search-strip" role="search">
-  <div class="container">
-    <div class="search-wrap">
-      <label class="sr-only" for="site-search">Search all 62 tools</label>
-      <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 62 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
-      <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
-    </div>
-  </div>
-</div>
 <div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
-  <a href="../">Home</a><span>/</span>
+  <a href="../">Home</a><span aria-hidden="true">/</span>
   <span aria-current="page">FAQ</span>
 </nav>
 <section class="container page-head">
   <span class="eyebrow">Help centre</span>
   <h1>Frequently Asked Questions</h1>
-  <p>Short answers about how LetitEdit works, how your data is handled and how the tool registry supports future expansion. Questions expand on click or with the keyboard.</p>
+  <p>Short answers about the category structure, privacy and how future browser-side tools will be added. Questions expand on click or with the keyboard.</p>
 </section>
 <section class="section"><div class="container faq-groups"><section class="info-card">
-    <h2>Using the tools</h2>
+    <h2>About this site</h2>
     <details class="faq-item">
-  <summary>Do the tools upload my text or files?</summary>
-  <p>No. Every published LetitEdit tool processes input locally in your browser. Text you paste and files you choose are not sent to a LetitEdit server for processing.</p>
-</details><details class="faq-item">
-  <summary>Do I need an account?</summary>
-  <p>No account, sign-up or subscription is required. Every tool is free to open and use.</p>
-</details><details class="faq-item">
-  <summary>Can I use the tools on a phone?</summary>
-  <p>Yes. The interface is responsive from small 320px screens through large desktops, and the same processing runs on mobile browsers.</p>
-</details>
+      <summary>Are any tools available right now?</summary>
+      <p>No. The tool library was removed so the site can be rebuilt around a smaller category structure. The category pages, blog, news and FAQ are the published content at the moment.</p>
+    </details><details class="faq-item">
+      <summary>Do I need an account?</summary>
+      <p>No. The published pages are static content and do not ask for an account, sign-up or subscription.</p>
+    </details>
   </section><section class="info-card">
     <h2>Privacy and safety</h2>
     <details class="faq-item">
-  <summary>Is my input stored after I close the page?</summary>
-  <p>Tool input is held in browser memory while the page is open. Copy, download and restoration actions only happen after you click them. Check the Privacy Policy for full details.</p>
-</details><details class="faq-item">
-  <summary>Are the redaction tools guaranteed to find all sensitive information?</summary>
-  <p>No. Detection uses conservative patterns for common formats. Always review redacted output manually before sharing it, and treat restoration keys as sensitive because they contain the original values.</p>
-</details>
+      <summary>Do these pages upload my text or files?</summary>
+      <p>The published category, blog, news, FAQ and policy pages do not provide an input for text or files, so nothing is uploaded from them. Future tool pages must explain exactly what happens to any input before you use them.</p>
+    </details><details class="faq-item">
+      <summary>Are you tracking visitors?</summary>
+      <p>The content-only site uses local styles and system fonts. It does not load advertising cookies or cross-site tracking scripts. A hosting provider may keep ordinary server access logs for security and troubleshooting.</p>
+    </details>
   </section><section class="info-card">
-    <h2>Adding tools</h2>
+    <h2>Site structure</h2>
     <details class="faq-item">
-  <summary>How are new tools added?</summary>
-  <p>Tools are registered in a central data file with metadata such as name, category, slug, keywords and SEO fields. The navigation, counts, search, sitemap and category pages update automatically from that registry.</p>
-</details><details class="faq-item">
-  <summary>Why are some categories empty?</summary>
-  <p>All planned categories exist now so the navigation and routes are stable. Tools appear in a category only after they are implemented and tested; placeholder tools are never published.</p>
-</details>
+      <summary>Why are the category pages empty of tools?</summary>
+      <p>The nine categories are the permanent taxonomy. They exist so future guides and tools have stable homes without presenting unfinished or unsupported functionality as available.</p>
+    </details><details class="faq-item">
+      <summary>How will new tools be added later?</summary>
+      <p>A tool will be introduced only with a real page, documented behaviour, honest limits and working checks. The site generator will then add its listing, metadata and sitemap entry; no placeholder tool is published.</p>
+    </details>
+  </section><section class="info-card">
+    <h2>Accessibility</h2>
+    <details class="faq-item">
+      <summary>Do you support mobile screens and non-English text?</summary>
+      <p>The published pages are responsive and use system font fallbacks with Unicode-aware HTML. Each page declares its language and direction, so left-to-right and right-to-left content can be added without changing the theme.</p>
+    </details>
   </section></div></section>
 </div>
 <footer class="site-footer">
@@ -110,32 +84,30 @@
     <div class="footer-grid">
       <div class="footer-brand">
         <a class="footer-logo" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
-        <p>Free, focused tools that run in your browser. Your files stay on your device, every result is real, and there are no accounts or deceptive downloads.</p>
+        <p>A category-led home for guides, updates and carefully built browser-side tools. The tool library is being rebuilt one focused release at a time.</p>
         <a class="footer-contact" href="mailto:info@letitedit.com">info@letitedit.com</a>
       </div>
       <div class="footer-column">
         <h3>Explore</h3>
         <ul>
-          <li><a href="/tools/">All Tools</a></li>
           <li><a href="/categories/">Categories</a></li>
-          <li><a href="/new-tools/">New Tools</a></li>
-          <li><a href="/news/">News</a></li>
           <li><a href="/blog/">Blog</a></li>
+          <li><a href="/news/">News</a></li>
           <li><a href="/faq/">FAQ</a></li>
         </ul>
       </div>
       <div class="footer-column">
         <h3>All categories</h3>
         <ul>
-          <li><a href="/tools/image-photo-editing/">Image &amp; Photo Editing</a></li>
-          <li><a href="/tools/video-editing/">Video Editing</a></li>
-          <li><a href="/tools/audio-music-editing/">Audio &amp; Music Editing</a></li>
-          <li><a href="/tools/pdf-document-editing/">PDF &amp; Document Editing</a></li>
-          <li><a href="/tools/text-writing-editing/">Text &amp; Writing Editing</a></li>
-          <li><a href="/tools/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
-          <li><a href="/tools/web-code-editing/">Web &amp; Code Editing</a></li>
-          <li><a href="/tools/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
-          <li><a href="/tools/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
+          <li><a href="/categories/image-photo-editing/">Image &amp; Photo Editing</a></li>
+          <li><a href="/categories/video-editing/">Video Editing</a></li>
+          <li><a href="/categories/audio-music-editing/">Audio &amp; Music Editing</a></li>
+          <li><a href="/categories/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+          <li><a href="/categories/text-writing-editing/">Text &amp; Writing Editing</a></li>
+          <li><a href="/categories/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+          <li><a href="/categories/web-code-editing/">Web &amp; Code Editing</a></li>
+          <li><a href="/categories/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+          <li><a href="/categories/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
         </ul>
       </div>
       <div class="footer-column">
@@ -150,7 +122,7 @@
     </div>
     <div class="footer-promise">
       <span aria-hidden="true">🔒</span>
-      <p><strong>Privacy by design.</strong> Files are processed in your browser. Optional AI models download only after you opt in, and are never sent your media.</p>
+      <p><strong>Privacy by design.</strong> Future tools will keep files in your browser, avoid accounts and explain exactly what each result does.</p>
     </div>
     <div class="footer-bottom">
       <span>© <span data-year>2026</span> LetitEdit.com</span>
@@ -158,11 +130,6 @@
     </div>
   </div>
 </footer>
-<script src="../js/search-index.js"></script>
-<script src="../js/sidebar-data.js"></script>
 <script src="../js/site.js"></script>
-<script src="../js/category-sidebar.js"></script>
-<script src="../js/mobile-workspace.js"></script>
-
 </body>
 </html>

@@ -1,85 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://letitedit.com/</loc></url>
-  <url><loc>https://letitedit.com/tools/</loc></url>
   <url><loc>https://letitedit.com/categories/</loc></url>
-  <url><loc>https://letitedit.com/new-tools/</loc></url>
   <url><loc>https://letitedit.com/news/</loc></url>
   <url><loc>https://letitedit.com/blog/</loc></url>
   <url><loc>https://letitedit.com/faq/</loc></url>
-  <url><loc>https://letitedit.com/tools/image-photo-editing/</loc></url>
-  <url><loc>https://letitedit.com/tools/video-editing/</loc></url>
-  <url><loc>https://letitedit.com/tools/audio-music-editing/</loc></url>
-  <url><loc>https://letitedit.com/tools/pdf-document-editing/</loc></url>
-  <url><loc>https://letitedit.com/tools/text-writing-editing/</loc></url>
-  <url><loc>https://letitedit.com/tools/graphic-design-creative-editing/</loc></url>
-  <url><loc>https://letitedit.com/tools/web-code-editing/</loc></url>
-  <url><loc>https://letitedit.com/tools/diagram-presentation-productivity-design/</loc></url>
-  <url><loc>https://letitedit.com/tools/qr-barcode-utility-design/</loc></url>
+  <url><loc>https://letitedit.com/categories/image-photo-editing/</loc></url>
+  <url><loc>https://letitedit.com/categories/video-editing/</loc></url>
+  <url><loc>https://letitedit.com/categories/audio-music-editing/</loc></url>
+  <url><loc>https://letitedit.com/categories/pdf-document-editing/</loc></url>
+  <url><loc>https://letitedit.com/categories/text-writing-editing/</loc></url>
+  <url><loc>https://letitedit.com/categories/graphic-design-creative-editing/</loc></url>
+  <url><loc>https://letitedit.com/categories/web-code-editing/</loc></url>
+  <url><loc>https://letitedit.com/categories/diagram-presentation-productivity-design/</loc></url>
+  <url><loc>https://letitedit.com/categories/qr-barcode-utility-design/</loc></url>
   <url><loc>https://letitedit.com/about/</loc></url>
   <url><loc>https://letitedit.com/contact/</loc></url>
   <url><loc>https://letitedit.com/privacy-policy/</loc></url>
   <url><loc>https://letitedit.com/terms-of-service/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/word-counter/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/text-cleaner/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/remove-extra-spaces/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/remove-empty-lines/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/remove-emojis/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/remove-punctuation/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/word-wrap/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/smart-quotes/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/text-repeater/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/case-converter/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/text-reverser/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/find-and-replace/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/text-to-slug/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/text-to-list/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/add-prefix-suffix/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/morse-code/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/text-to-binary/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/binary-to-text/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/bionic-reading/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/html-to-markdown/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/remove-duplicate-lines/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/duplicate-word-remover/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/text-sorter/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/text-splitter/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/text-comparer/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/extract-emails/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/extract-urls/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/text-filter/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/text-redactor/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/lorem-ipsum-generator/</loc></url>
-  <url><loc>https://letitedit.com/tools/text-to-handwriting/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/ap-case-converter/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/bank-statement-converter/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/handwriting-to-font-converter/</loc></url>
-  <url><loc>https://letitedit.com/tools/writing-text/grammar-spell-checker/</loc></url>
-  <url><loc>https://letitedit.com/tools/resume-builder/</loc></url>
-  <url><loc>https://letitedit.com/tools/coding-developer/json-formatter/</loc></url>
-  <url><loc>https://letitedit.com/tools/coding-developer/base64-encoder-decoder/</loc></url>
-  <url><loc>https://letitedit.com/tools/coding-developer/regex-tester/</loc></url>
-  <url><loc>https://letitedit.com/image-editor/</loc></url>
-  <url><loc>https://letitedit.com/heic-viewer/</loc></url>
-  <url><loc>https://letitedit.com/add-border-to-image/</loc></url>
-  <url><loc>https://letitedit.com/photo-merger/</loc></url>
-  <url><loc>https://letitedit.com/screenshot-beautifier/</loc></url>
-  <url><loc>https://letitedit.com/black-and-white-image-converter/</loc></url>
-  <url><loc>https://letitedit.com/image-resizer/</loc></url>
-  <url><loc>https://letitedit.com/image-to-svg/</loc></url>
-  <url><loc>https://letitedit.com/image-inverter/</loc></url>
-  <url><loc>https://letitedit.com/image-to-text/</loc></url>
-  <url><loc>https://letitedit.com/qr-code-generator/</loc></url>
-  <url><loc>https://letitedit.com/image-compressor/</loc></url>
-  <url><loc>https://letitedit.com/thumbnail-generator/</loc></url>
-  <url><loc>https://letitedit.com/audio-editor/</loc></url>
-  <url><loc>https://letitedit.com/screen-recorder/</loc></url>
-  <url><loc>https://letitedit.com/tools/video-editor/</loc></url>
-  <url><loc>https://letitedit.com/video-trimmer/</loc></url>
-  <url><loc>https://letitedit.com/mp4-to-gif/</loc></url>
-  <url><loc>https://letitedit.com/video-background-remover/</loc></url>
-  <url><loc>https://letitedit.com/subtitle-generator/</loc></url>
-  <url><loc>https://letitedit.com/watermark-remover/</loc></url>
-  <url><loc>https://letitedit.com/video-to-shorts/</loc></url>
-  <url><loc>https://letitedit.com/tools/pdf-editor/</loc></url>
+  <url><loc>https://letitedit.com/blog/a-smaller-category-first-letitedit/</loc></url>
 </urlset>

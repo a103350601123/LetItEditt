@@ -1,83 +1,84 @@
 /* LetitEdit editorial content data.
- * News and blog arrays are intentionally empty: nothing is published until a
- * real article is written. To add an article later, append one object with
- * the fields shown in the commented examples below; the build will create the
- * listing entry, article page, SEO metadata and sitemap entry automatically.
+ * Add an article here and the build creates its listing entry, article page,
+ * SEO metadata and sitemap entry automatically.
  */
 'use strict';
 
 module.exports = {
-  /*
-  news: [{
-    slug: 'example-news-item',
-    title: 'Example news item',
-    summary: 'One or two sentences describing the announcement.',
-    image: '/assets/news/example.png',        // optional, local path
-    date: '2026-11-19',                        // ISO date
-    author: 'LetitEdit',                       // optional
-    tags: ['announcement'],                    // optional
-    seoTitle: 'Example news item — LetitEdit',
-    seoDescription: 'Unique description for search engines.',
-    body: [
-      { heading: 'What changed', paragraphs: ['Real article text goes here.'] }
-    ]
-  }],
-  */
   news: [],
 
-  /*
-  blog: [{
-    slug: 'example-guide',
-    title: 'Example guide',
-    summary: 'Short description shown on the blog listing.',
-    image: '/assets/blog/example.png',        // optional, local path
-    date: '2026-11-19',
-    category: 'Guides',                       // also used as a tag
-    tags: ['text', 'guide'],
-    seoTitle: 'Example guide — LetitEdit Blog',
-    seoDescription: 'Unique description for search engines.',
-    body: [
-      { heading: 'Introduction', paragraphs: ['Real article text goes here.'] }
-    ]
-  }],
-  */
-  blog: [],
+  blog: [
+    {
+      slug: 'a-smaller-category-first-letitedit',
+      title: 'A smaller, category-first LetitEdit',
+      summary: 'The tool library has been removed while the site is rebuilt around nine clear categories.',
+      date: '2026-11-21',
+      author: 'LetitEdit',
+      category: 'Site update',
+      tags: ['site update', 'categories'],
+      seoTitle: 'A smaller, category-first LetitEdit — Blog',
+      seoDescription: 'Why the tool library was removed and what remains on the content-only LetitEdit site.',
+      body: [
+        {
+          heading: 'What changed',
+          paragraphs: [
+            'The previous tool library has been removed. That includes the tool pages, tool runtimes, generated tool data and the old tool URLs.',
+            'The removal is intentional. Keeping half-finished tools online made the site harder to understand and harder to maintain.'
+          ]
+        },
+        {
+          heading: 'What remains',
+          paragraphs: [
+            'The homepage, the nine category pages, this blog, the news listing, the FAQ and the policy pages remain. The category structure is now the main way to explore the site.',
+            'Each category page explains what belongs there and links to nearby categories. None of them present an unfinished tool as available.'
+          ]
+        },
+        {
+          heading: 'What comes next',
+          paragraphs: [
+            'Tools will return one at a time. A tool will only be published with a real workspace, documented behaviour, honest limits and checks that match what the page promises.',
+            'Until then, the published site is a content site. That is a smaller scope, but it is accurate.'
+          ]
+        }
+      ]
+    }
+  ],
 
   faq: [
     {
-      category: 'Using the tools',
-      q: 'Do the tools upload my text or files?',
-      a: 'No. Every published LetitEdit tool processes input locally in your browser. Text you paste and files you choose are not sent to a LetitEdit server for processing.'
+      category: 'About this site',
+      q: 'Are any tools available right now?',
+      a: 'No. The tool library was removed so the site can be rebuilt around a smaller category structure. The category pages, blog, news and FAQ are the published content at the moment.'
     },
     {
-      category: 'Using the tools',
+      category: 'About this site',
       q: 'Do I need an account?',
-      a: 'No account, sign-up or subscription is required. Every tool is free to open and use.'
-    },
-    {
-      category: 'Using the tools',
-      q: 'Can I use the tools on a phone?',
-      a: 'Yes. The interface is responsive from small 320px screens through large desktops, and the same processing runs on mobile browsers.'
+      a: 'No. The published pages are static content and do not ask for an account, sign-up or subscription.'
     },
     {
       category: 'Privacy and safety',
-      q: 'Is my input stored after I close the page?',
-      a: 'Tool input is held in browser memory while the page is open. Copy, download and restoration actions only happen after you click them. Check the Privacy Policy for full details.'
+      q: 'Do these pages upload my text or files?',
+      a: 'The published category, blog, news, FAQ and policy pages do not provide an input for text or files, so nothing is uploaded from them. Future tool pages must explain exactly what happens to any input before you use them.'
     },
     {
       category: 'Privacy and safety',
-      q: 'Are the redaction tools guaranteed to find all sensitive information?',
-      a: 'No. Detection uses conservative patterns for common formats. Always review redacted output manually before sharing it, and treat restoration keys as sensitive because they contain the original values.'
+      q: 'Are you tracking visitors?',
+      a: 'The content-only site uses local styles and system fonts. It does not load advertising cookies or cross-site tracking scripts. A hosting provider may keep ordinary server access logs for security and troubleshooting.'
     },
     {
-      category: 'Adding tools',
-      q: 'How are new tools added?',
-      a: 'Tools are registered in a central data file with metadata such as name, category, slug, keywords and SEO fields. The navigation, counts, search, sitemap and category pages update automatically from that registry.'
+      category: 'Site structure',
+      q: 'Why are the category pages empty of tools?',
+      a: 'The nine categories are the permanent taxonomy. They exist so future guides and tools have stable homes without presenting unfinished or unsupported functionality as available.'
     },
     {
-      category: 'Adding tools',
-      q: 'Why are some categories empty?',
-      a: 'All planned categories exist now so the navigation and routes are stable. Tools appear in a category only after they are implemented and tested; placeholder tools are never published.'
+      category: 'Site structure',
+      q: 'How will new tools be added later?',
+      a: 'A tool will be introduced only with a real page, documented behaviour, honest limits and working checks. The site generator will then add its listing, metadata and sitemap entry; no placeholder tool is published.'
+    },
+    {
+      category: 'Accessibility',
+      q: 'Do you support mobile screens and non-English text?',
+      a: 'The published pages are responsive and use system font fallbacks with Unicode-aware HTML. Each page declares its language and direction, so left-to-right and right-to-left content can be added without changing the theme.'
     }
   ]
 };
