@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>All Tools — Every Free LetitEdit Utility</title>
-<meta name="description" content="Browse all 61 published LetitEdit tools across 10 categories. Filter by name or category; every tool runs locally in your browser.">
+<meta name="description" content="Browse all 62 published LetitEdit tools across 9 canonical categories. Filter by name or category; every tool runs locally in your browser.">
 <meta name="theme-color" content="#2563eb">
 <link rel="canonical" href="https://letitedit.com/tools/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="All Tools — Every Free LetitEdit Utility">
-<meta property="og:description" content="Browse all 61 published LetitEdit tools across 10 categories. Filter by name or category; every tool runs locally in your browser.">
+<meta property="og:description" content="Browse all 62 published LetitEdit tools across 9 canonical categories. Filter by name or category; every tool runs locally in your browser.">
 <meta property="og:url" content="https://letitedit.com/tools/">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary">
@@ -26,7 +26,22 @@
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
     <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
     <div class="nav-links" id="primary-links">
-      <a href="/categories/">Categories</a>
+      <div class="nav-category">
+        <a href="/categories/">Categories</a>
+        <button class="nav-category-toggle" type="button" aria-label="Show category menu" aria-controls="nav-category-list" aria-expanded="false" title="Browse categories">▾</button>
+        <div class="nav-category-panel" id="nav-category-list" hidden>
+          <span class="nav-category-title">All nine categories</span>
+          <a href="/tools/image-photo-editing/">Image &amp; Photo</a>
+        <a href="/tools/video-editing/">Video</a>
+        <a href="/tools/audio-music-editing/">Audio &amp; Music</a>
+        <a href="/tools/pdf-document-editing/">PDF &amp; Documents</a>
+        <a href="/tools/text-writing-editing/">Text &amp; Writing</a>
+        <a href="/tools/graphic-design-creative-editing/">Graphic Design</a>
+        <a href="/tools/web-code-editing/">Web &amp; Code</a>
+        <a href="/tools/diagram-presentation-productivity-design/">Diagrams &amp; Planning</a>
+        <a href="/tools/qr-barcode-utility-design/">QR &amp; Utilities</a>
+        </div>
+      </div>
       <a href="/new-tools/">New Tools</a>
       <a href="/news/">News</a>
       <a href="/blog/">Blog</a>
@@ -39,9 +54,9 @@
 <div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
-      <label class="sr-only" for="site-search">Search all 61 tools</label>
+      <label class="sr-only" for="site-search">Search all 62 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 62 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
       <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
@@ -65,551 +80,679 @@
   </div>
   <nav class="sidebar-list" aria-label="Categories"><a class="sidebar-link is-active" href="../tools/" data-sidebar-key="all" aria-current="page">
       <span class="sidebar-icon" style="--icon-bg:#dbeafe;--icon-color:#1d4ed8" aria-hidden="true">📚</span>
-      <span class="sidebar-name">All Tools</span><span class="sidebar-count">61</span>
+      <span class="sidebar-name">All Tools</span><span class="sidebar-count">62</span>
     </a>
-    <a class="sidebar-link" href="../tools/writing-text/" data-sidebar-key="writing">
-      <span class="sidebar-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">✍️</span>
-      <span class="sidebar-name">Text &amp; Writing</span><span class="sidebar-count">36</span>
-    </a>
-    <a class="sidebar-link" href="../tools/coding-developer/" data-sidebar-key="dev">
-      <span class="sidebar-icon" style="--icon-bg:#0ea5e91a;--icon-color:#0ea5e9" aria-hidden="true">&lt;/&gt;</span>
-      <span class="sidebar-name">Developer Tools</span><span class="sidebar-count">3</span>
-    </a>
-    <a class="sidebar-link" href="../tools/image-photo/" data-sidebar-key="image">
+    <a class="sidebar-link" href="../tools/image-photo-editing/" data-sidebar-key="image">
       <span class="sidebar-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🖼️</span>
-      <span class="sidebar-name">Image &amp; Photo</span><span class="sidebar-count">13</span>
+      <span class="sidebar-name">Image &amp; Photo Editing</span><span class="sidebar-count">11</span>
     </a>
-    <a class="sidebar-link" href="../tools/video-audio/" data-sidebar-key="video">
-      <span class="sidebar-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">🎬</span>
-      <span class="sidebar-name">Video &amp; Audio</span><span class="sidebar-count">9</span>
+    <a class="sidebar-link" href="../tools/video-editing/" data-sidebar-key="video">
+      <span class="sidebar-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">🎬</span>
+      <span class="sidebar-name">Video Editing</span><span class="sidebar-count">8</span>
     </a>
-    <a class="sidebar-link" href="../tools/social-media/" data-sidebar-key="social">
-      <span class="sidebar-icon" style="--icon-bg:#f59e0b1a;--icon-color:#f59e0b" aria-hidden="true">📣</span>
-      <span class="sidebar-name">Social Media</span><span class="sidebar-count">0</span>
+    <a class="sidebar-link" href="../tools/audio-music-editing/" data-sidebar-key="audio">
+      <span class="sidebar-icon" style="--icon-bg:#0891b21a;--icon-color:#0891b2" aria-hidden="true">🎧</span>
+      <span class="sidebar-name">Audio &amp; Music Editing</span><span class="sidebar-count">1</span>
     </a>
-    <a class="sidebar-link" href="../tools/website-seo/" data-sidebar-key="seo">
-      <span class="sidebar-icon" style="--icon-bg:#10b9811a;--icon-color:#10b981" aria-hidden="true">📈</span>
-      <span class="sidebar-name">Website &amp; SEO</span><span class="sidebar-count">0</span>
+    <a class="sidebar-link" href="../tools/pdf-document-editing/" data-sidebar-key="document">
+      <span class="sidebar-icon" style="--icon-bg:#dc26261a;--icon-color:#dc2626" aria-hidden="true">📄</span>
+      <span class="sidebar-name">PDF &amp; Document Editing</span><span class="sidebar-count">1</span>
     </a>
-    <a class="sidebar-link" href="../tools/generators/" data-sidebar-key="generators">
-      <span class="sidebar-icon" style="--icon-bg:#6366f11a;--icon-color:#6366f1" aria-hidden="true">✨</span>
-      <span class="sidebar-name">Generators</span><span class="sidebar-count">0</span>
+    <a class="sidebar-link" href="../tools/text-writing-editing/" data-sidebar-key="writing">
+      <span class="sidebar-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">✍️</span>
+      <span class="sidebar-name">Text &amp; Writing Editing</span><span class="sidebar-count">35</span>
     </a>
-    <a class="sidebar-link" href="../tools/counters-calculators/" data-sidebar-key="counters">
-      <span class="sidebar-icon" style="--icon-bg:#14b8a61a;--icon-color:#14b8a6" aria-hidden="true">🧮</span>
-      <span class="sidebar-name">Counters &amp; Calculators</span><span class="sidebar-count">0</span>
+    <a class="sidebar-link" href="../tools/graphic-design-creative-editing/" data-sidebar-key="design">
+      <span class="sidebar-icon" style="--icon-bg:#db27771a;--icon-color:#db2777" aria-hidden="true">🎨</span>
+      <span class="sidebar-name">Graphic Design &amp; Creative Editing</span><span class="sidebar-count">2</span>
     </a>
-    <a class="sidebar-link" href="../tools/games-fun/" data-sidebar-key="games">
-      <span class="sidebar-icon" style="--icon-bg:#f43f5e1a;--icon-color:#f43f5e" aria-hidden="true">🎲</span>
-      <span class="sidebar-name">Games &amp; Fun</span><span class="sidebar-count">0</span>
+    <a class="sidebar-link" href="../tools/web-code-editing/" data-sidebar-key="code">
+      <span class="sidebar-icon" style="--icon-bg:#0f766e1a;--icon-color:#0f766e" aria-hidden="true">💻</span>
+      <span class="sidebar-name">Web &amp; Code Editing</span><span class="sidebar-count">3</span>
     </a>
-    <a class="sidebar-link" href="../tools/device-testers/" data-sidebar-key="device">
-      <span class="sidebar-icon" style="--icon-bg:#0284c71a;--icon-color:#0284c7" aria-hidden="true">📱</span>
-      <span class="sidebar-name">Device Testers</span><span class="sidebar-count">0</span>
+    <a class="sidebar-link" href="../tools/diagram-presentation-productivity-design/" data-sidebar-key="diagram">
+      <span class="sidebar-icon" style="--icon-bg:#ea580c1a;--icon-color:#ea580c" aria-hidden="true">🧩</span>
+      <span class="sidebar-name">Diagram, Presentation &amp; Productivity Design</span><span class="sidebar-count">0</span>
+    </a>
+    <a class="sidebar-link" href="../tools/qr-barcode-utility-design/" data-sidebar-key="utility">
+      <span class="sidebar-icon" style="--icon-bg:#1d4ed81a;--icon-color:#1d4ed8" aria-hidden="true">🔳</span>
+      <span class="sidebar-name">QR, Barcode &amp; Utility Design</span><span class="sidebar-count">1</span>
     </a></nav>
   <div class="sidebar-matches" id="sidebar-matches" hidden></div>
-  <p class="sidebar-note">Counts update automatically as tools are registered.</p>
+  <p class="sidebar-note">Counts show available tools. Planned slots are listed on each category page.</p>
 </aside>
     <main class="directory-main">
       <div class="directory-bar">
         <div>
           <h2>All Tools</h2>
-          <p class="directory-count">61 tools</p>
+          <p class="directory-count">62 tools</p>
         </div>
         <div class="directory-filter">
           <label class="sr-only" for="tool-filter">Filter tools on this page</label>
-          <input id="tool-filter" type="search" placeholder="Filter tools by name…" autocomplete="off">
+          <input id="tool-filter" type="search" placeholder="Filter available and planned tools…" autocomplete="off">
         </div>
       </div>
       <p class="directory-matched" id="directory-matched" hidden></p>
-      <div class="grid tool-grid" id="tool-grid"><a class="card tool-card" href="../add-border-to-image/index.html">
+      <div class="grid tool-grid" id="tool-grid"><a class="card tool-card available-card" href="/add-border-to-image/" data-status="Available — implemented and verified." data-slug="add-border-to-image" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔲</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Add Border to Image<span class="card-new">New</span></h3>
   <p>Wrap a photo in a solid colour border of any width and colour. Preview the frame live, keep the original image intact and download the bordered result as a PNG.</p>
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
   <span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/add-prefix-suffix/">
+</a><a class="card tool-card available-card" href="/tools/writing-text/add-prefix-suffix/" data-status="Available — implemented and verified." data-slug="add-prefix-suffix" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧩</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Add Prefix or Suffix</h3>
   <p>Add fixed text to the beginning or end of every line. Perfect for bulk list formatting and code generation.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../video-to-shorts/index.html">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/video-to-shorts/" data-status="Available — implemented and verified." data-slug="video-to-shorts" data-catalog-slots="Video-to-Shorts Converter">
   <span class="card-top">
-    <span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">📱</span>
+    <span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">📱</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>AI Video-to-Shorts<span class="card-new">New</span></h3>
   <p>Preview a real source video, add and retime clips, reorder them, choose crops and layouts, edit captions, then export locally rendered MP4 or WebM shorts. Optional local Whisper and face models require explicit opt-in.</p>
-  <span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/ap-case-converter/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  <span class="catalog-label">Catalog: Video-to-Shorts Converter</span>
+  <span class="card-foot"><span class="card-tag">Video</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/ap-case-converter/" data-status="Available — implemented and verified." data-slug="ap-case-converter" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔤</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>AP Case Converter<span class="card-new">New</span></h3>
   <p>Apply a regex-based AP-style pass to text: title case, short-word lowercasing, month and state abbreviations, sentence starts and single-digit numerals. Each rule can be switched off.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../audio-editor/index.html">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/audio-editor/" data-status="Available — implemented and verified." data-slug="audio-editor" data-catalog-slots="Advanced Multi-Track Audio Editor">
   <span class="card-top">
-    <span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">🎧</span>
+    <span class="card-icon" style="--icon-bg:#0891b21a;--icon-color:#0891b2" aria-hidden="true">🎧</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Audio Editor<span class="card-new">New</span></h3>
   <p>Edit audio or a video soundtrack locally with a wave-form, real gains, fades, compression, EQ, filtering, pitch/speed, music mixing, A/B playback and undo. Export WAV, MP3 or M4A without uploading.</p>
-  <span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/bank-statement-converter/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  <span class="catalog-label">Catalog: Advanced Multi-Track Audio Editor</span>
+  <span class="card-foot"><span class="card-tag">Audio &amp; Music</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/bank-statement-converter/" data-status="Available — implemented and verified." data-slug="bank-statement-converter" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🏦</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Bank Statement Converter<span class="card-new">New</span></h3>
   <p>Parse pasted statement text or a text/CSV file into transactions with amounts, balances and running checks, then download CSV or QIF. PDF extraction and OCR are not included in this build.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/coding-developer/base64-encoder-decoder/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/coding-developer/base64-encoder-decoder/" data-status="Available — implemented and verified." data-slug="base64-encoder-decoder" data-catalog-slots="">
   <span class="card-top">
-    <span class="card-icon" style="--icon-bg:#0ea5e91a;--icon-color:#0ea5e9" aria-hidden="true">B64</span>
+    <span class="card-icon" style="--icon-bg:#0f766e1a;--icon-color:#0f766e" aria-hidden="true">B64</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Base64 Encoder &amp; Decoder</h3>
   <p>Encode text to Base64 or decode Base64 to UTF-8 text. Supports accents, emoji, URL-safe characters and optional padding, entirely in your browser.</p>
-  <span class="card-foot"><span class="card-tag">Coding &amp; Developer</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/binary-to-text/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Web &amp; Code</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/binary-to-text/" data-status="Available — implemented and verified." data-slug="binary-to-text" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">1️⃣</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Binary to Text Converter</h3>
   <p>Decode space-separated 8-bit binary groups back into readable UTF-8 text with clear error messages.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/bionic-reading/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/bionic-reading/" data-status="Available — implemented and verified." data-slug="bionic-reading" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📖</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Bionic Reading Converter</h3>
   <p>Bold the first part of each word with adjustable fixation strength and saccade skipping. Preview the result, copy formatted text, HTML or Markdown, download an HTML file and open a distraction-free reading view.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../black-and-white-image-converter/index.html">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/black-and-white-image-converter/" data-status="Available — implemented and verified." data-slug="black-and-white-image-converter" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">⚫</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Black &amp; White Image Converter<span class="card-new">New</span></h3>
   <p>Convert photos to black and white in your browser. Pick smooth grayscale or an adjustable threshold for line art, keep transparency, and export PNG, JPG or WebP.</p>
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
   <span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/case-converter/">
+</a><a class="card tool-card available-card" href="/tools/writing-text/case-converter/" data-status="Available — implemented and verified." data-slug="case-converter" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">Aa</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Case Converter</h3>
   <p>Convert text between lowercase, uppercase, title case, sentence case, alternating case and AP style.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/duplicate-word-remover/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/duplicate-word-remover/" data-status="Available — implemented and verified." data-slug="duplicate-word-remover" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔤</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Duplicate Word Remover</h3>
   <p>Remove repeated words from a sentence while keeping the first occurrence and surrounding punctuation.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/extract-emails/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/extract-emails/" data-status="Available — implemented and verified." data-slug="extract-emails" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📧</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Extract Emails from Text</h3>
   <p>Find and extract unique email addresses from pasted text, logs or documents. No uploads, no sign-up.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/extract-urls/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/extract-urls/" data-status="Available — implemented and verified." data-slug="extract-urls" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔗</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Extract URLs from Text</h3>
   <p>Extract unique http, https, www and bare-domain links from pasted text, logs or DOCX files with trailing punctuation trimmed automatically.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/find-and-replace/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/find-and-replace/" data-status="Available — implemented and verified." data-slug="find-and-replace" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔎</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Find and Replace</h3>
   <p>Replace all occurrences of a literal string, or turn off case sensitivity to treat Find as a live regular expression with global and case-insensitive flags. Invalid patterns show a clear error.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/grammar-spell-checker/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/grammar-spell-checker/" data-status="Available — implemented and verified." data-slug="grammar-spell-checker" data-catalog-slots="Grammar Checker|Spell Checker">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧠</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Grammar &amp; Spell Checker<span class="card-new">New</span></h3>
   <p>Check English text with local rules for common spelling, grammar, repeated words, spacing and clarity. Review suggestions, apply the ones you accept and keep the original text unchanged. No AI rewriting and no external or paid API.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/handwriting-to-font-converter/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  <span class="catalog-label">Catalog: Grammar Checker, Spell Checker</span>
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/handwriting-to-font-converter/" data-status="Available — implemented and verified." data-slug="handwriting-to-font-converter" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">✍️</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Handwriting to Font Converter<span class="card-new">New</span></h3>
   <p>Draw handwriting glyphs on a canvas, preview them in a sentence and export a picture of the result. This scoped browser tool does not generate an installable OpenType font.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../heic-viewer/index.html">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/heic-viewer/" data-status="Available — implemented and verified." data-slug="heic-viewer" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📷</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>HEIC Viewer &amp; Converter<span class="card-new">New</span></h3>
   <p>Open .heic and .heif photos in your browser, preview one or many files and download PNG or JPG copies. Decoding uses a local library; no files are uploaded.</p>
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
   <span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../image-compressor/index.html">
+</a><a class="card tool-card available-card" href="/image-compressor/" data-status="Available — implemented and verified." data-slug="image-compressor" data-catalog-slots="Image Compressor">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🗜️</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Image Compressor<span class="card-new">New</span></h3>
   <p>Re-encode images through a canvas with selectable JPEG or WebP quality and an optional maximum dimension, comparing original and resulting byte sizes before download.</p>
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  <span class="catalog-label">Catalog: Image Compressor</span>
   <span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../image-editor/index.html">
+</a><a class="card tool-card available-card" href="/image-editor/" data-status="Available — implemented and verified." data-slug="image-editor" data-catalog-slots="Advanced Photo Editor|Image Rotator &amp; Flipper">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🖼️</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Image Editor<span class="card-new">New</span></h3>
   <p>Crop, rotate and flip photos, adjust brightness, contrast and colour, add a text overlay, then export PNG, JPG or WebP — all locally in your browser.</p>
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  <span class="catalog-label">Catalog: Advanced Photo Editor, Image Rotator &amp; Flipper</span>
   <span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../image-inverter/index.html">
+</a><a class="card tool-card available-card" href="/image-inverter/" data-status="Available — implemented and verified." data-slug="image-inverter" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🌗</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Image Inverter<span class="card-new">New</span></h3>
   <p>Reverse every RGB channel value directly in your browser to create negative artwork, then export the result as PNG, JPG or WebP with transparency preserved.</p>
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
   <span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../image-resizer/index.html">
+</a><a class="card tool-card available-card" href="/image-resizer/" data-status="Available — implemented and verified." data-slug="image-resizer" data-catalog-slots="Image Resizer">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📐</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Image Resizer<span class="card-new">New</span></h3>
   <p>Resize photos to exact pixel dimensions. Lock aspect ratio, use fit or stretch modes within a documented pixel cap, and export PNG, JPG or WebP.</p>
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  <span class="catalog-label">Catalog: Image Resizer</span>
   <span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../image-to-svg/index.html">
+</a><a class="card tool-card available-card" href="/image-to-svg/" data-status="Available — implemented and verified." data-slug="image-to-svg" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🖼️</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Image to SVG<span class="card-new">New</span></h3>
   <p>Wrap a PNG, JPG or WebP image in an SVG using a Base64 data URL. It includes width and height metadata and downloads as .svg, but does not vector-trace.</p>
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
   <span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../image-to-text/index.html">
+</a><a class="card tool-card available-card" href="/image-to-text/" data-status="Available — implemented and verified." data-slug="image-to-text" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔤</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Image to Text (OCR)<span class="card-new">New</span></h3>
   <p>Extract English text from images with a locally loaded Tesseract.js OCR engine and language data; nothing is uploaded, and you can copy or download the result.</p>
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
   <span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/coding-developer/json-formatter/">
+</a><a class="card tool-card available-card" href="/tools/coding-developer/json-formatter/" data-status="Available — implemented and verified." data-slug="json-formatter" data-catalog-slots="JSON Editor">
   <span class="card-top">
-    <span class="card-icon" style="--icon-bg:#0ea5e91a;--icon-color:#0ea5e9" aria-hidden="true">{ }</span>
+    <span class="card-icon" style="--icon-bg:#0f766e1a;--icon-color:#0f766e" aria-hidden="true">{ }</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>JSON Formatter &amp; Validator</h3>
   <p>Format, minify, validate and sort JSON in your browser. See clear parse errors, choose indentation and copy the result instantly.</p>
-  <span class="card-foot"><span class="card-tag">Coding &amp; Developer</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/lorem-ipsum-generator/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  <span class="catalog-label">Catalog: JSON Editor</span>
+  <span class="card-foot"><span class="card-tag">Web &amp; Code</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/lorem-ipsum-generator/" data-status="Available — implemented and verified." data-slug="lorem-ipsum-generator" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📝</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Lorem Ipsum Generator</h3>
   <p>Generate placeholder text by paragraphs, sentences, exact words or list items with classic or standard styles and plain text, HTML or Markdown output. Generation caps apply per unit.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/morse-code/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/morse-code/" data-status="Available — implemented and verified." data-slug="morse-code" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📡</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Morse Code Translator</h3>
   <p>Translate text to International Morse code and decode Morse back to text. Supports letters, numbers and punctuation.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../mp4-to-gif/index.html">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/mp4-to-gif/" data-status="Available — implemented and verified." data-slug="mp4-to-gif" data-catalog-slots="Video-to-GIF Converter">
   <span class="card-top">
-    <span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">🔁</span>
+    <span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">🔁</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>MP4 to GIF<span class="card-new">New</span></h3>
   <p>Turn a section of a video into an animated GIF in your browser. Choose the start, end, frame rate and width, then download a GIF made from real decoded frames. No upload is needed.</p>
-  <span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../subtitle-generator/index.html">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  <span class="catalog-label">Catalog: Video-to-GIF Converter</span>
+  <span class="card-foot"><span class="card-tag">Video</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/subtitle-generator/" data-status="Available — implemented and verified." data-slug="subtitle-generator" data-catalog-slots="Video Subtitle Generator">
   <span class="card-top">
-    <span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">📝</span>
+    <span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">📝</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Multilingual Subtitle Generator<span class="card-new">New</span></h3>
   <p>Generate editable captions from video or audio with opt-in local Whisper tiny speech recognition. Review editable timed lines and export SRT, VTT or TXT. No media is uploaded.</p>
-  <span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../photo-merger/index.html">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  <span class="catalog-label">Catalog: Video Subtitle Generator</span>
+  <span class="card-foot"><span class="card-tag">Video</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/pdf-editor/" data-status="Available — implemented but not fully verified." data-slug="pdf-editor" data-catalog-slots="Advanced PDF Editor">
+  <span class="card-top">
+    <span class="card-icon" style="--icon-bg:#dc26261a;--icon-color:#dc2626" aria-hidden="true">📄</span>
+    <span class="card-arrow" aria-hidden="true">↗</span>
+  </span>
+  <h3>PDF Editor</h3>
+  <p>Edit, annotate, sign, redact, number and organise PDF documents locally in your browser without uploading them.</p>
+  <span class="status-badge status-available-implemented-but-not-fully-verified" title="Available — implemented but not fully verified.">Available — implemented but not fully verified.</span>
+  <span class="catalog-label">Catalog: Advanced PDF Editor</span>
+  <span class="card-foot"><span class="card-tag">PDF &amp; Documents</span><span class="card-local">Standalone tool</span></span>
+</a><a class="card tool-card available-card" href="/photo-merger/" data-status="Available — implemented and verified." data-slug="photo-merger" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧩</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Photo Merger<span class="card-new">New</span></h3>
   <p>Join up to six images into one picture, side by side or stacked, with adjustable spacing and a single PNG download. The merge happens locally in your browser.</p>
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
   <span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/video-editor/">
+</a><a class="card tool-card available-card" href="/tools/video-editor/" data-status="Available — implemented but not fully verified." data-slug="video-editor" data-catalog-slots="Advanced Multi-Track Video Editor">
   <span class="card-top">
-    <span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">🎞️</span>
+    <span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">🎞️</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Professional Video Editor<span class="card-new">New</span></h3>
   <p>Open the existing dedicated video editor with a multi-track timeline, media library, text overlays, filters, transitions, voiceover and SRT support. Projects save in IndexedDB.</p>
-  <span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../qr-code-generator/index.html">
+  <span class="status-badge status-available-implemented-but-not-fully-verified" title="Available — implemented but not fully verified.">Available — implemented but not fully verified.</span>
+  <span class="catalog-label">Catalog: Advanced Multi-Track Video Editor</span>
+  <span class="card-foot"><span class="card-tag">Video</span><span class="card-local">Standalone tool</span></span>
+</a><a class="card tool-card available-card" href="/qr-code-generator/" data-status="Available — implemented and verified." data-slug="qr-code-generator" data-catalog-slots="QR Code Designer">
   <span class="card-top">
-    <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔳</span>
+    <span class="card-icon" style="--icon-bg:#1d4ed81a;--icon-color:#1d4ed8" aria-hidden="true">🔳</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>QR Code Generator<span class="card-new">New</span></h3>
   <p>Create QR codes for text or URLs in your browser, choose error correction, size and colours, then download PNG or SVG after a quick scan test.</p>
-  <span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/coding-developer/regex-tester/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  <span class="catalog-label">Catalog: QR Code Designer</span>
+  <span class="card-foot"><span class="card-tag">QR &amp; Utilities</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/coding-developer/regex-tester/" data-status="Available — implemented and verified." data-slug="regex-tester" data-catalog-slots="Regex Editor">
   <span class="card-top">
-    <span class="card-icon" style="--icon-bg:#0ea5e91a;--icon-color:#0ea5e9" aria-hidden="true">.*</span>
+    <span class="card-icon" style="--icon-bg:#0f766e1a;--icon-color:#0f766e" aria-hidden="true">.*</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Regex Tester &amp; Match Highlighter</h3>
   <p>Test JavaScript regular expressions against sample text. See highlighted matches, capture groups, flags and replacement output instantly in your browser.</p>
-  <span class="card-foot"><span class="card-tag">Coding &amp; Developer</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/remove-duplicate-lines/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  <span class="catalog-label">Catalog: Regex Editor</span>
+  <span class="card-foot"><span class="card-tag">Web &amp; Code</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/remove-duplicate-lines/" data-status="Available — implemented and verified." data-slug="remove-duplicate-lines" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📑</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Remove Duplicate Lines</h3>
   <p>Remove repeated lines from text while keeping the first occurrence and original order. Case and trim options.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/remove-emojis/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/remove-emojis/" data-status="Available — implemented and verified." data-slug="remove-emojis" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🚫</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Remove Emojis from Text</h3>
   <p>Strip emoji and pictographic symbols using the exact Unicode ranges of the reference tool. Upload a .txt file or paste text; a selected file takes priority over pasted input.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/remove-empty-lines/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/remove-empty-lines/" data-status="Available — implemented and verified." data-slug="remove-empty-lines" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📏</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Remove Empty Lines</h3>
   <p>Remove blank and whitespace-only lines from pasted text, TXT, CSV, Markdown or DOCX while preserving every real line and its formatting.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/remove-extra-spaces/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/remove-extra-spaces/" data-status="Available — implemented and verified." data-slug="remove-extra-spaces" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">↔️</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Remove Extra Spaces</h3>
   <p>Replace every run of whitespace, including tabs and line breaks, with a single space and trim the ends. Upload a .txt file or paste text and copy the cleaned result.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/remove-punctuation/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/remove-punctuation/" data-status="Available — implemented and verified." data-slug="remove-punctuation" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">✏️</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Remove Punctuation</h3>
   <p>Remove all Unicode punctuation, common English marks or your own chosen characters from pasted text, TXT, CSV, Markdown or DOCX while keeping letters and numbers.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/resume-builder/index.html">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/resume-builder/" data-status="Available — implemented but not fully verified." data-slug="resume-builder" data-catalog-slots="Resume &amp; CV Designer">
   <span class="card-top">
-    <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📄</span>
+    <span class="card-icon" style="--icon-bg:#db27771a;--icon-color:#db2777" aria-hidden="true">📄</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Resume / CV Builder</h3>
   <p>Build a professional resume or CV in the browser with 60 layout and colour combinations, local autosave and print-to-PDF export. This preserved standalone app keeps its original URL.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/html-to-markdown/">
+  <span class="status-badge status-available-implemented-but-not-fully-verified" title="Available — implemented but not fully verified.">Available — implemented but not fully verified.</span>
+  <span class="catalog-label">Catalog: Resume &amp; CV Designer</span>
+  <span class="card-foot"><span class="card-tag">Graphic Design</span><span class="card-local">Standalone tool</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/html-to-markdown/" data-status="Available — implemented and verified." data-slug="html-to-markdown" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🅼</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Rich Text / HTML to Markdown</h3>
   <p>Convert pasted HTML, rich text, text files or DOCX text into clean Markdown with headings, links, lists, tables, code and emphasis preserved.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../screen-recorder/index.html">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/screen-recorder/" data-status="Available — implemented and verified." data-slug="screen-recorder" data-catalog-slots="Video Screen Recorder">
   <span class="card-top">
-    <span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">🖥️</span>
+    <span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">🖥️</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Screen Recorder<span class="card-new">New</span></h3>
   <p>Use your browser&#39;s share picker to record a tab, window or whole screen, add microphone audio if you want, pause and resume, then download a WebM file. All capture stays on your device.</p>
-  <span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../screenshot-beautifier/index.html">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  <span class="catalog-label">Catalog: Video Screen Recorder</span>
+  <span class="card-foot"><span class="card-tag">Video</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/screenshot-beautifier/" data-status="Available — implemented and verified." data-slug="screenshot-beautifier" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">✨</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Screenshot Beautifier<span class="card-new">New</span></h3>
   <p>Dress up a screenshot with gradient, solid, transparent or patterned backgrounds, padding, rounded corners, shadow, filters and title bars. Export a polished PNG.</p>
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
   <span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/smart-quotes/">
+</a><a class="card tool-card available-card" href="/tools/writing-text/smart-quotes/" data-status="Available — implemented and verified." data-slug="smart-quotes" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">“</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Straight Quotes to Curly Quotes</h3>
   <p>Convert straight quotes and apostrophes into proper typographic curly quotes for articles, books and polished copy.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/text-cleaner/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/text-cleaner/" data-status="Available — implemented and verified." data-slug="text-cleaner" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧹</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Text Cleaner</h3>
   <p>Clean messy text in one ordered pass: trim whitespace, strip HTML tags and emoji, remove accents, unify quotes, fix punctuation and expand shorthand. Everything runs in your browser.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/text-comparer/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/text-comparer/" data-status="Available — implemented and verified." data-slug="text-comparer" data-catalog-slots="Text Comparison Editor">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">⚖️</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Text Comparer / Diff</h3>
   <p>Compare two texts or documents line by line or word by word with additions and removals highlighted, using a real LCS diff.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/text-filter/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  <span class="catalog-label">Catalog: Text Comparison Editor</span>
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/text-filter/" data-status="Available — implemented and verified." data-slug="text-filter" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧽</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Text Filter</h3>
   <p>Remove whole words and highlight others with safe DOM spans. Terms are comma separated, matched case-insensitively with word boundaries, and input HTML is never executed.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/text-redactor/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/text-redactor/" data-status="Available — implemented and verified." data-slug="text-redactor" data-catalog-slots="Text Redaction Editor">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🛡️</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Text Redactor</h3>
   <p>Mask names, emails, phone numbers, card numbers and API keys with stable labels, copy the redacted text, then restore original values from a key. Detection is heuristic and key files contain the original data.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/text-repeater/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  <span class="catalog-label">Catalog: Text Redaction Editor</span>
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/text-repeater/" data-status="Available — implemented and verified." data-slug="text-repeater" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔁</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Text Repeater</h3>
   <p>Repeat text instantly with your choice of separator. Useful for test data, patterns and bulk message drafts.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/text-reverser/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/text-reverser/" data-status="Available — implemented and verified." data-slug="text-reverser" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔄</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Text Reverser</h3>
   <p>Reverse text by character, word or line. Unicode-safe and instant, with no uploads.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/text-sorter/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/text-sorter/" data-status="Available — implemented and verified." data-slug="text-sorter" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔤</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Text Sorter / Alphabetical Sorter</h3>
   <p>Sort lines, words or characters alphabetically, naturally, reverse or by length. Case-sensitive options included.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/text-splitter/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/text-splitter/" data-status="Available — implemented and verified." data-slug="text-splitter" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">✂️</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Text Splitter</h3>
   <p>Split long text into equal parts or fixed-size chunks by characters, words or lines.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/text-to-binary/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/text-to-binary/" data-status="Available — implemented and verified." data-slug="text-to-binary" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">0️⃣</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Text to Binary Converter</h3>
   <p>Convert Unicode text to 8-bit binary using UTF-8 encoding. Accurate for emojis and every language.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/text-to-handwriting/index.html">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/text-to-handwriting/" data-status="Available — implemented but not fully verified." data-slug="text-to-handwriting" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">✍️</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Text to Handwriting</h3>
   <p>Turn typed text into realistic handwriting on notebook paper and export as PNG or multi-page PDF. Already built and preserved.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/text-to-list/">
+  <span class="status-badge status-available-implemented-but-not-fully-verified" title="Available — implemented but not fully verified.">Available — implemented but not fully verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">Standalone tool</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/text-to-list/" data-status="Available — implemented and verified." data-slug="text-to-list" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📋</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Text to List Converter</h3>
   <p>Split text by lines, commas or a custom separator, then format each item as a bullet, number, dash or custom prefix. Empty items are skipped and the result is safe to copy.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/text-to-slug/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/text-to-slug/" data-status="Available — implemented and verified." data-slug="text-to-slug" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔗</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Text to Slug Converter</h3>
   <p>Turn headlines into clean URL slugs. Unicode-aware, lowercase and hyphen-separated, with a length limit.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../thumbnail-generator/index.html">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/thumbnail-generator/" data-status="Available — implemented and verified." data-slug="thumbnail-generator" data-catalog-slots="Thumbnail Maker">
   <span class="card-top">
-    <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🖼️</span>
+    <span class="card-icon" style="--icon-bg:#db27771a;--icon-color:#db2777" aria-hidden="true">🖼️</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Thumbnail Generator<span class="card-new">New</span></h3>
   <p>Design thumbnails at verified YouTube, Shorts, Instagram, TikTok and other social sizes. Edit multilingual RTL text and independent layers locally; no upload.</p>
-  <span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../video-background-remover/index.html">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  <span class="catalog-label">Catalog: Thumbnail Maker</span>
+  <span class="card-foot"><span class="card-tag">Graphic Design</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/video-background-remover/" data-status="Available — implemented and verified." data-slug="video-background-remover" data-catalog-slots="Video Background Remover">
   <span class="card-top">
-    <span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">🎭</span>
+    <span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">🎭</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Video Background Remover<span class="card-new">New</span></h3>
   <p>Use opt-in local MediaPipe person segmentation to replace a video background with a colour or image. Download a video or transparent WebM where your browser supports alpha.</p>
-  <span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../watermark-remover/index.html">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  <span class="catalog-label">Catalog: Video Background Remover</span>
+  <span class="card-foot"><span class="card-tag">Video</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/watermark-remover/" data-status="Available — implemented and verified." data-slug="watermark-remover" data-catalog-slots="Video Watermark Remover">
   <span class="card-top">
-    <span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">🧽</span>
+    <span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">🧽</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Video Text &amp; Watermark Remover<span class="card-new">New</span></h3>
   <p>Cover a selected region of a video with a local mask using blur, mosaic, solid fill or nearby colour. This hides text and marks without reconstructing pixels. Export MP4.</p>
-  <span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../video-trimmer/index.html">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  <span class="catalog-label">Catalog: Video Watermark Remover</span>
+  <span class="card-foot"><span class="card-tag">Video</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/video-trimmer/" data-status="Available — implemented and verified." data-slug="video-trimmer" data-catalog-slots="Video Trimmer">
   <span class="card-top">
-    <span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">✂️</span>
+    <span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">✂️</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Video Trimmer<span class="card-new">New</span></h3>
   <p>Pick start and end points on a real preview, then cut a clip without an upload. The tool uses stream copy when it can and re-encodes only when a cut needs it. Export MP4 or WebM.</p>
-  <span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/word-counter/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  <span class="catalog-label">Catalog: Video Trimmer</span>
+  <span class="card-foot"><span class="card-tag">Video</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/word-counter/" data-status="Available — implemented and verified." data-slug="word-counter" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔢</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Word Counter &amp; Text Statistics</h3>
   <p>Count words, grapheme-based characters, sentences and paragraphs. See reading and speaking time, keyword density for one-to-three-word phrases and an optional progress goal.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
-</a><a class="card tool-card" href="../tools/writing-text/word-wrap/">
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
+</a><a class="card tool-card available-card" href="/tools/writing-text/word-wrap/" data-status="Available — implemented and verified." data-slug="word-wrap" data-catalog-slots="">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📐</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>Word Wrap</h3>
   <p>Wrap long lines of text at a chosen column width. Ideal for code comments, descriptions and plain-text emails.</p>
-  <span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span>
+  <span class="status-badge status-available-implemented-and-verified" title="Available — implemented and verified.">Available — implemented and verified.</span>
+  
+  <span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span>
 </a></div>
     </main>
   </div>
@@ -635,13 +778,17 @@
         </ul>
       </div>
       <div class="footer-column">
-        <h3>Popular categories</h3>
+        <h3>All categories</h3>
         <ul>
-          <li><a href="/tools/writing-text/">Text &amp; Writing</a></li>
-          <li><a href="/tools/coding-developer/">Developer Tools</a></li>
-          <li><a href="/tools/image-photo/">Image &amp; Photo</a></li>
-          <li><a href="/tools/video-audio/">Video &amp; Audio</a></li>
-          <li><a href="/tools/social-media/">Social Media</a></li>
+          <li><a href="/tools/image-photo-editing/">Image &amp; Photo Editing</a></li>
+          <li><a href="/tools/video-editing/">Video Editing</a></li>
+          <li><a href="/tools/audio-music-editing/">Audio &amp; Music Editing</a></li>
+          <li><a href="/tools/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+          <li><a href="/tools/text-writing-editing/">Text &amp; Writing Editing</a></li>
+          <li><a href="/tools/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+          <li><a href="/tools/web-code-editing/">Web &amp; Code Editing</a></li>
+          <li><a href="/tools/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+          <li><a href="/tools/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
         </ul>
       </div>
       <div class="footer-column">

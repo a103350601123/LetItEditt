@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,10 +15,10 @@
 <meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="../../../css/site.css">
-<link rel="stylesheet" href="../../../css/mobile-workspace.css">
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/mobile-workspace.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Bank Statement Converter","description":"Parse pasted statement text or a text/CSV file into transactions with amounts, balances and running checks, then download CSV or QIF. PDF extraction and OCR are not included in this build.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/writing-text/bank-statement-converter/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Writing \u0026 Text Tools","item":"https://letitedit.com/tools/writing-text/"},{"@type":"ListItem","position":3,"name":"Bank Statement Converter","item":"https://letitedit.com/tools/writing-text/bank-statement-converter/"}]},{"@type":"FAQPage","name":"Bank Statement Converter","mainEntity":[{"@type":"Question","name":"Can it read PDF statements?","acceptedAnswer":{"@type":"Answer","text":"Not in this build. The reference application loads PDF.js and Tesseract.js from content delivery networks to extract text and run OCR. Those dependencies are not bundled here, so this tool deliberately accepts text and CSV only."}},{"@type":"Question","name":"Are every balance checked?","acceptedAnswer":{"@type":"Answer","text":"Only when opening, closing or running balances are present in the text. If no balances are found, the summary says there is nothing to check."}},{"@type":"Question","name":"Are my statements uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. Parsing happens in your browser and no statement data is sent to a server."}},{"@type":"Question","name":"Which formats can I download?","acceptedAnswer":{"@type":"Answer","text":"This build exports CSV and QIF. The reference tool also offers XLSX, QuickBooks CSV, Xero CSV and OFX, which are not reproduced here."}}]}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Bank Statement Converter","description":"Parse pasted statement text or a text/CSV file into transactions with amounts, balances and running checks, then download CSV or QIF. PDF extraction and OCR are not included in this build.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/writing-text/bank-statement-converter/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Text \u0026 Writing Editing","item":"https://letitedit.com/tools/text-writing-editing/"},{"@type":"ListItem","position":3,"name":"Bank Statement Converter","item":"https://letitedit.com/tools/writing-text/bank-statement-converter/"}]},{"@type":"FAQPage","name":"Bank Statement Converter","mainEntity":[{"@type":"Question","name":"Can it read PDF statements?","acceptedAnswer":{"@type":"Answer","text":"Not in this build. The reference application loads PDF.js and Tesseract.js from content delivery networks to extract text and run OCR. Those dependencies are not bundled here, so this tool deliberately accepts text and CSV only."}},{"@type":"Question","name":"Are every balance checked?","acceptedAnswer":{"@type":"Answer","text":"Only when opening, closing or running balances are present in the text. If no balances are found, the summary says there is nothing to check."}},{"@type":"Question","name":"Are my statements uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. Parsing happens in your browser and no statement data is sent to a server."}},{"@type":"Question","name":"Which formats can I download?","acceptedAnswer":{"@type":"Answer","text":"This build exports CSV and QIF. The reference tool also offers XLSX, QuickBooks CSV, Xero CSV and OFX, which are not reproduced here."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-text">
@@ -28,7 +28,22 @@
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
     <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
     <div class="nav-links" id="primary-links">
-      <a href="/categories/">Categories</a>
+      <div class="nav-category">
+        <a href="/categories/">Categories</a>
+        <button class="nav-category-toggle" type="button" aria-label="Show category menu" aria-controls="nav-category-list" aria-expanded="false" title="Browse categories">▾</button>
+        <div class="nav-category-panel" id="nav-category-list" hidden>
+          <span class="nav-category-title">All nine categories</span>
+          <a href="/tools/image-photo-editing/">Image &amp; Photo</a>
+        <a href="/tools/video-editing/">Video</a>
+        <a href="/tools/audio-music-editing/">Audio &amp; Music</a>
+        <a href="/tools/pdf-document-editing/">PDF &amp; Documents</a>
+        <a href="/tools/text-writing-editing/">Text &amp; Writing</a>
+        <a href="/tools/graphic-design-creative-editing/">Graphic Design</a>
+        <a href="/tools/web-code-editing/">Web &amp; Code</a>
+        <a href="/tools/diagram-presentation-productivity-design/">Diagrams &amp; Planning</a>
+        <a href="/tools/qr-barcode-utility-design/">QR &amp; Utilities</a>
+        </div>
+      </div>
       <a href="/new-tools/">New Tools</a>
       <a href="/news/">News</a>
       <a href="/blog/">Blog</a>
@@ -41,22 +56,22 @@
 <div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
-      <label class="sr-only" for="site-search">Search all 61 tools</label>
+      <label class="sr-only" for="site-search">Search all 62 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 62 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
       <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
 <div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
-  <a href="../../../">Home</a><span>/</span>
-  <a href="../../../tools/writing-text/">Writing &amp; Text Tools</a><span>/</span>
+  <a href="/">Home</a><span>/</span>
+  <a href="/tools/text-writing-editing/">Text &amp; Writing Editing</a><span>/</span>
   <span aria-current="page">Bank Statement Converter</span>
 </nav>
 <section class="container page-head tool-head">
   <div class="tool-head-copy">
-    <span class="eyebrow">Writing &amp; Text Tools</span>
+    <span class="eyebrow">Text &amp; Writing Editing</span>
     <h1>Bank Statement Converter</h1>
     <p>A conservative, local-only statement parser. Paste lines containing a date, description and amount, or open a text file, then review every row before downloading a result.</p>
   </div>
@@ -128,7 +143,7 @@
     <div class="info-card">
       <h2>Related tools</h2>
       <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
-        <a class="card tool-card" href="../../../tools/writing-text/text-splitter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">✂️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Text Splitter</h3><p>Split long text into equal parts or fixed-size chunks by characters, words or lines.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/text-to-list/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📋</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Text to List Converter</h3><p>Split text by lines, commas or a custom separator, then format each item as a bullet, number, dash or custom prefix. Empty items are skipped and the result is safe to copy.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/word-counter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔢</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Word Counter &amp; Text Statistics</h3><p>Count words, grapheme-based characters, sentences and paragraphs. See reading and speaking time, keyword density for one-to-three-word phrases and an optional progress goal.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/find-and-replace/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔎</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Find and Replace</h3><p>Replace all occurrences of a literal string, or turn off case sensitivity to treat Find as a live regular expression with global and case-insensitive flags. Invalid patterns show a clear error.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a>
+        <a class="card tool-card" href="/tools/writing-text/text-splitter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">✂️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Text Splitter</h3><p>Split long text into equal parts or fixed-size chunks by characters, words or lines.</p><span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/tools/writing-text/text-to-list/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📋</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Text to List Converter</h3><p>Split text by lines, commas or a custom separator, then format each item as a bullet, number, dash or custom prefix. Empty items are skipped and the result is safe to copy.</p><span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/tools/writing-text/word-counter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔢</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Word Counter &amp; Text Statistics</h3><p>Count words, grapheme-based characters, sentences and paragraphs. See reading and speaking time, keyword density for one-to-three-word phrases and an optional progress goal.</p><span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/tools/writing-text/find-and-replace/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔎</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Find and Replace</h3><p>Replace all occurrences of a literal string, or turn off case sensitivity to treat Find as a live regular expression with global and case-insensitive flags. Invalid patterns show a clear error.</p><span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span></a>
       </div>
     </div>
   </div>
@@ -154,13 +169,17 @@
         </ul>
       </div>
       <div class="footer-column">
-        <h3>Popular categories</h3>
+        <h3>All categories</h3>
         <ul>
-          <li><a href="/tools/writing-text/">Text &amp; Writing</a></li>
-          <li><a href="/tools/coding-developer/">Developer Tools</a></li>
-          <li><a href="/tools/image-photo/">Image &amp; Photo</a></li>
-          <li><a href="/tools/video-audio/">Video &amp; Audio</a></li>
-          <li><a href="/tools/social-media/">Social Media</a></li>
+          <li><a href="/tools/image-photo-editing/">Image &amp; Photo Editing</a></li>
+          <li><a href="/tools/video-editing/">Video Editing</a></li>
+          <li><a href="/tools/audio-music-editing/">Audio &amp; Music Editing</a></li>
+          <li><a href="/tools/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+          <li><a href="/tools/text-writing-editing/">Text &amp; Writing Editing</a></li>
+          <li><a href="/tools/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+          <li><a href="/tools/web-code-editing/">Web &amp; Code Editing</a></li>
+          <li><a href="/tools/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+          <li><a href="/tools/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
         </ul>
       </div>
       <div class="footer-column">
@@ -183,13 +202,13 @@
     </div>
   </div>
 </footer>
-<script src="../../../js/search-index.js"></script>
-<script src="../../../js/sidebar-data.js"></script>
-<script src="../../../js/site.js"></script>
-<script src="../../../js/category-sidebar.js"></script>
-<script src="../../../js/mobile-workspace.js"></script>
-<script src="../../../js/reference-core.js"></script>
-<script src="../../../js/reference-runtime.js"></script>
+<script src="/js/search-index.js"></script>
+<script src="/js/sidebar-data.js"></script>
+<script src="/js/site.js"></script>
+<script src="/js/category-sidebar.js"></script>
+<script src="/js/mobile-workspace.js"></script>
+<script src="/js/reference-core.js"></script>
+<script src="/js/reference-runtime.js"></script>
 <script id="tool-config" type="application/json">{"slug":"bank-statement-converter","engine":"bank-statement-converter","layout":"single","outputType":"table"}</script>
 </body>
 </html>

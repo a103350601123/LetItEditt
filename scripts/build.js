@@ -38,8 +38,7 @@ const categories = registry.CATEGORIES;
 const allTools = registry.tools;
 const publishedTools = registry.publishedTools;
 const bySlug = registry.bySlug;
-const writingPath = categories[0].path;
-const devPath = categories[1].path;
+const catalogTotals = registry.catalogTotals();
 
 function write(relativePath, data) {
   const file = path.join(root, relativePath);
@@ -51,6 +50,14 @@ function esc(value) {
   return String(value == null ? '' : value)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function statusClass(status) {
+  return `status-${String(status).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
+}
+
+function statusBadge(status) {
+  return `<span class="status-badge ${statusClass(status)}" title="${esc(status)}">${esc(status)}</span>`;
 }
 
 function jsonForScript(value) {
@@ -71,9 +78,22 @@ const navSections = [
 ];
 
 function nav(active) {
-  const links = navSections.map(section =>
-    `<a href="${section.href}"${active === section.key ? ' aria-current="page"' : ''}>${esc(section.label)}</a>`
-  ).join('\n      ');
+  const categoryLinks = categories.map(category =>
+    `<a href="${category.path}">${esc(category.shortLabel)}</a>`
+  ).join('\n        ');
+  const links = navSections.map(section => {
+    if (section.key === 'categories') {
+      return `<div class="nav-category">
+        <a href="${section.href}"${active === section.key ? ' aria-current="page"' : ''}>${esc(section.label)}</a>
+        <button class="nav-category-toggle" type="button" aria-label="Show category menu" aria-controls="nav-category-list" aria-expanded="false" title="Browse categories">▾</button>
+        <div class="nav-category-panel" id="nav-category-list" hidden>
+          <span class="nav-category-title">All nine categories</span>
+          ${categoryLinks}
+        </div>
+      </div>`;
+    }
+    return `<a href="${section.href}"${active === section.key ? ' aria-current="page"' : ''}>${esc(section.label)}</a>`;
+  }).join('\n      ');
   return `<header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
@@ -100,7 +120,7 @@ function searchStrip() {
 }
 
 function footer() {
-  const categoryLinks = categories.slice(0, 5).map(category =>
+  const categoryLinks = categories.map(category =>
     `<li><a href="${category.path}">${esc(category.name)}</a></li>`
   ).join('\n          ');
   return `<footer class="site-footer">
@@ -123,7 +143,7 @@ function footer() {
         </ul>
       </div>
       <div class="footer-column">
-        <h3>Popular categories</h3>
+        <h3>All categories</h3>
         <ul>
           ${categoryLinks}
         </ul>
@@ -156,7 +176,7 @@ function page(options) {
   const structured = options.structured ? `<script type="application/ld+json">\n${jsonForScript(options.structured)}\n</script>` : '';
   const ogImage = options.image ? `<meta property="og:image" content="${esc(site + options.image)}">` : '';
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="${esc(options.lang || 'en')}" dir="${esc(options.dir || 'ltr')}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -217,7 +237,7 @@ function sidebar(assets, activeKey) {
   </div>
   <nav class="sidebar-list" aria-label="Categories">${links}</nav>
   <div class="sidebar-matches" id="sidebar-matches" hidden></div>
-  <p class="sidebar-note">Counts update automatically as tools are registered.</p>
+  <p class="sidebar-note">Counts show available tools. Planned slots are listed on each category page.</p>
 </aside>`;
 }
 
@@ -243,22 +263,43 @@ function breadcrumbStructured(trail) {
   };
 }
 
-function toolUrl(tool, assets) {
-  return tool.url ? `${assets}${tool.url}` : `${assets}${tool.category.path.replace(/^\//, '')}${tool.slug}/`;
+function toolUrl(tool) {
+  /* Category cards always use the preserved, root-relative historical route. */
+  return tool.pageUrl;
 }
 
 function toolCard(tool, assets, options) {
   const badge = tool.isNew ? '<span class="card-new">New</span>' : '';
   const featured = options && options.featured ? '<span class="card-featured" aria-label="Featured tool">★ Featured</span>' : '';
-  return `<a class="card tool-card" href="${toolUrl(tool, assets)}">
+  const catalog = tool.catalogSlots && tool.catalogSlots.length
+    ? `<span class="catalog-label">Catalog: ${esc(tool.catalogSlots.join(', '))}</span>`
+    : '';
+  const local = tool.layout === 'existing' ? 'Standalone tool' : 'On-device';
+  return `<a class="card tool-card available-card" href="${toolUrl(tool, assets)}" data-status="${esc(tool.status)}" data-slug="${esc(tool.slug)}" data-catalog-slots="${esc((tool.catalogSlots || []).join('|'))}">
   <span class="card-top">
     <span class="card-icon" style="--icon-bg:${tool.category.color}1a;--icon-color:${tool.category.color}" aria-hidden="true">${esc(tool.icon)}</span>
     <span class="card-arrow" aria-hidden="true">↗</span>
   </span>
   <h3>${esc(tool.name)}${badge}</h3>
   <p>${esc(tool.description)}</p>
-  <span class="card-foot">${featured}<span class="card-tag">${esc(tool.category.shortLabel)}</span><span class="card-local">On-device</span></span>
+  ${statusBadge(tool.status)}
+  ${catalog}
+  <span class="card-foot">${featured}<span class="card-tag">${esc(tool.category.shortLabel)}</span><span class="card-local">${local}</span></span>
 </a>`;
+}
+
+/* Planned catalog slots are visible for planning but never linked as tools. */
+function plannedCard(entry, assets) {
+  return `<div class="card tool-card planned-card" data-status="${esc(entry.status)}" data-catalog-key="${esc(entry.key)}">
+  <span class="card-top">
+    <span class="card-icon" aria-hidden="true">${esc(entry.icon)}</span>
+    <span class="card-planned-mark" aria-hidden="true">○</span>
+  </span>
+  <h3>${esc(entry.name)}</h3>
+  <p>${esc(entry.description)}</p>
+  ${statusBadge(entry.status)}
+  <span class="card-foot"><span class="card-tag">Planned slot</span><span class="card-local">Not yet available</span></span>
+</div>`;
 }
 
 function emptyState(title, message) {
@@ -505,10 +546,15 @@ ${faqSection(tool, assets)}`;
 /* ---------- Directory and content pages ---------- */
 
 function directoryLayout(options) {
-  const { assets, activeKey, heading, intro, tools, allCount, matchedMessage } = options;
-  const cards = tools.length
-    ? tools.map(tool => toolCard(tool, assets)).join('')
+  const { assets, activeKey, heading, intro, tools, allCount, plannedCount, planned } = options;
+  const availableCards = tools.map(tool => toolCard(tool, assets)).join('');
+  const plannedCards = (planned || []).map(entry => plannedCard(entry, assets)).join('');
+  const cards = (availableCards || plannedCards)
+    ? `${availableCards}${plannedCards}`
     : emptyState('No tools here yet', 'This category is ready for future tools. Nothing is published until it has been implemented and tested.');
+  const countText = plannedCount
+    ? `${allCount} available tool${allCount === 1 ? '' : 's'} · ${plannedCount} planned tool${plannedCount === 1 ? '' : 's'}`
+    : `${allCount} tool${allCount === 1 ? '' : 's'}`;
   return `${breadcrumbs(assets, [
     { label: 'Home', href: '/' },
     { label: options.crumb || 'All Tools', href: options.crumbHref || '/tools/' },
@@ -526,11 +572,11 @@ function directoryLayout(options) {
       <div class="directory-bar">
         <div>
           <h2>${esc(heading)}</h2>
-          <p class="directory-count">${allCount} tool${allCount === 1 ? '' : 's'}</p>
+          <p class="directory-count">${countText}</p>
         </div>
         <div class="directory-filter">
           <label class="sr-only" for="tool-filter">Filter tools on this page</label>
-          <input id="tool-filter" type="search" placeholder="Filter tools by name…" autocomplete="off">
+          <input id="tool-filter" type="search" placeholder="Filter available and planned tools…" autocomplete="off">
         </div>
       </div>
       <p class="directory-matched" id="directory-matched" hidden></p>
@@ -543,31 +589,60 @@ function directoryLayout(options) {
 function categoryPage(category) {
   const assets = '../../';
   const tools = registry.publishedByCategory(category.key);
+  const catalog = registry.catalogFor(category.key);
+  const planned = catalog.filter(entry => !entry.available);
+  const related = registry.relatedTools(category.key, 6);
+  const relatedLinks = category.related.map(key => categories.find(item => item.key === key))
+    .filter(Boolean)
+    .map(item => `<a href="${item.path}">${esc(item.name)}</a>`)
+    .join(', ');
+  const relatedCards = related.length
+    ? `<div class="grid tool-grid related-grid">${related.map(tool => toolCard(tool, assets)).join('')}</div>`
+    : emptyState('No related tools yet', 'Related tools will appear here as working tools are added to nearby categories.');
+  const trail = [
+    { label: 'Home', href: '/' },
+    { label: 'Categories', href: '/categories/' },
+    { label: category.name, href: category.path }
+  ];
   const body = `${directoryLayout({
     assets,
     activeKey: category.key,
-    heading: category.label,
+    heading: category.name,
     intro: category.intro,
     tools,
     allCount: tools.length,
+    plannedCount: planned.length,
+    planned,
     crumb: 'Categories',
     crumbHref: '/categories/',
     trail: [{ label: category.name, href: category.path }],
     eyebrow: 'Category directory'
   })}
-${tools.length ? `<section class="section section-soft">
-  <div class="container info-card">
-    <h2>About ${esc(category.name)}</h2>
-    <p>${esc(category.description)}</p>
-    <p>Every tool on this page is free, runs locally in your browser and links to its own guide with instructions, examples and FAQs.</p>
+<section class="section section-soft">
+  <div class="container info-grid">
+    <div class="info-card">
+      <h2>About ${esc(category.name)}</h2>
+      <p>${esc(category.description)}</p>
+      <p>Available tools are linked and open a real workspace. Planned slots are shown with their current status and never link to an empty page.</p>
+      <p>Related categories: ${relatedLinks}</p>
+    </div>
+    <div class="info-card">
+      <h2>Related tools</h2>
+      ${relatedCards}
+    </div>
   </div>
-</section>` : ''}`;
+</section>`;
   return page({
     title: category.seoTitle,
     description: category.seoDescription,
     canonical: category.path,
     assets,
-    body
+    dir: category.dir,
+    body,
+    structured: {
+      '@context': 'https://schema.org',
+      '@graph': [breadcrumbStructured(trail)]
+    }
   });
 }
 
@@ -581,11 +656,12 @@ function allToolsPage() {
     intro: `Every published LetitEdit tool in one place. Use the category sidebar or filter box to find the right utility, then open its page for instructions, examples and FAQs.`,
     tools,
     allCount: tools.length,
+    plannedCount: 0,
     eyebrow: 'Complete directory'
   })}`;
   return page({
     title: 'All Tools — Every Free LetitEdit Utility',
-    description: `Browse all ${tools.length} published LetitEdit tools across ${categories.length} categories. Filter by name or category; every tool runs locally in your browser.`,
+    description: `Browse all ${tools.length} published LetitEdit tools across ${categories.length} canonical categories. Filter by name or category; every tool runs locally in your browser.`,
     canonical: '/tools/',
     activeNav: 'all',
     assets,
@@ -596,6 +672,7 @@ function allToolsPage() {
 function categoriesPage() {
   const cards = categories.map(category => {
     const count = registry.publishedByCategory(category.key).length;
+    const planned = registry.plannedCount(category.key);
     return `<a class="card category-card" href="${category.path}" style="--icon-bg:${category.color}1a;--icon-color:${category.color};--category-accent:${category.color}">
       <span class="card-top">
         <span class="card-icon" aria-hidden="true">${esc(category.icon)}</span>
@@ -603,7 +680,7 @@ function categoriesPage() {
       </span>
       <h3>${esc(category.name)}</h3>
       <p>${esc(category.description)}</p>
-      <span class="card-foot"><span class="card-tag">${count} tool${count === 1 ? '' : 's'}</span><span class="card-explore">Explore →</span></span>
+      <span class="card-foot"><span class="card-tag">${count} available · ${planned} planned</span><span class="card-explore">Explore →</span></span>
     </a>`;
   }).join('');
   const assets = '../';
@@ -611,12 +688,12 @@ function categoriesPage() {
 <section class="container page-head">
   <span class="eyebrow">Browse by topic</span>
   <h1>Categories</h1>
-  <p>Ten stable categories are ready now. Each one has its own page, dynamic tool count and empty state. Tools appear as they are built and tested.</p>
+  <p>Nine professional categories organise ${catalogTotals.planned} registered tool slots. Available tools have real pages; planned slots show their status without pretending to be finished.</p>
 </section>
 <section class="section"><div class="container"><div class="grid category-grid">${cards}</div></div></section>`;
   return page({
     title: 'Tool Categories — Browse LetitEdit by Topic',
-    description: `Explore ${categories.length} LetitEdit categories, from Text & Writing to Device Testers. Counts are calculated from the live tool registry.`,
+    description: `Explore ${categories.length} LetitEdit categories and ${catalogTotals.planned} registered tool slots. Available tools and planned work are clearly distinguished.`,
     canonical: '/categories/',
     activeNav: 'categories',
     assets,
@@ -780,7 +857,7 @@ function homepage() {
     <div class="hero-copy">
       <span class="eyebrow">Free tools · Private by default</span>
       <h1>Professional tools.<br><span class="gradient-text">Zero friction.</span></h1>
-      <p>LetitEdit brings ${publishedTools.length} focused browser-side utilities together under ${categories.length} stable categories. Everything processes locally, with clear instructions and no uploads.</p>
+      <p>LetitEdit organises ${publishedTools.length} working browser-side utilities and ${catalogTotals.planned} registered tool slots under ${categories.length} professional categories. Available tools are clearly separated from planned work.</p>
       <form class="hero-search" role="search" action="/" method="get">
         <label class="sr-only" for="hero-search">Search all ${publishedTools.length} tools</label>
         <span class="search-icon" aria-hidden="true">🔍</span>
@@ -816,7 +893,7 @@ function homepage() {
 <section class="section featured-section">
   <div class="container">
     <div class="section-head section-head-split">
-      <div><span class="eyebrow">Editor's picks</span><h2>Featured tools</h2><p>A useful starting point across writing, developer, image and media work.</p></div>
+      <div><span class="eyebrow">Editor's picks</span><h2>Featured tools</h2><p>A useful starting point across image, video, audio, documents, writing, design, code and utility work.</p></div>
       <a class="text-link" href="/tools/">View all tools →</a>
     </div>
     <div class="grid tool-grid">${featured.map(tool => toolCard(tool, '', { featured: true })).join('')}</div>
@@ -831,7 +908,7 @@ function homepage() {
         <div><h2>Tool directory</h2><p class="directory-count">${publishedTools.length} published tools</p></div>
         <div class="directory-filter">
           <label class="sr-only" for="tool-filter">Filter tools on this page</label>
-          <input id="tool-filter" type="search" placeholder="Filter tools by name…" autocomplete="off">
+          <input id="tool-filter" type="search" placeholder="Filter available and planned tools…" autocomplete="off">
         </div>
       </div>
       <p class="directory-matched" id="directory-matched" hidden></p>
@@ -850,10 +927,22 @@ function homepage() {
   </div>
 </section>
 
+<section class="section section-soft">
+  <div class="container">
+    <div class="section-head"><h2>Catalogue status</h2><p>Phase 1 registers the complete nine-category plan without inventing tool pages.</p></div>
+    <div class="grid stats-grid">
+      <div class="stat-tile"><span>Registered slots</span><strong>${catalogTotals.planned}</strong><small>Across nine categories</small></div>
+      <div class="stat-tile"><span>Satisfied by working tools</span><strong>${catalogTotals.mapped}</strong><small>Linked to existing pages</small></div>
+      <div class="stat-tile"><span>Remaining planned</span><strong>${catalogTotals.remaining}</strong><small>Not yet provided or developed</small></div>
+      <div class="stat-tile"><span>Available tools</span><strong>${publishedTools.length}</strong><small>Real workspaces and pages</small></div>
+    </div>
+  </div>
+</section>
+
 <section class="section">
   <div class="container">
     <div class="section-head section-head-split">
-      <div><h2>Explore by category</h2><p>Every category has a working page now. Empty categories show an honest empty state until tools are added.</p></div>
+      <div><h2>Explore by category</h2><p>Nine category pages show available tools and clearly labelled planned slots. Nothing is linked until a real workspace exists.</p></div>
       <a class="text-link" href="/categories/">All categories →</a>
     </div>
     <div class="grid category-grid">
@@ -865,7 +954,7 @@ function homepage() {
             <span class="card-arrow" aria-hidden="true">↗</span>
           </span>
           <h3>${esc(category.name)}</h3><p>${esc(category.description)}</p>
-          <span class="card-foot"><span class="card-tag">${count} tool${count === 1 ? '' : 's'}</span><span class="card-explore">Explore →</span></span>
+          <span class="card-foot"><span class="card-tag">${count} available · ${registry.plannedCount(category.key)} planned</span><span class="card-explore">Explore →</span></span>
         </a>`;
       }).join('')}
     </div>
@@ -883,11 +972,11 @@ function homepage() {
   <div class="container">
     <div class="section-head"><h2>Preserved local tools</h2><p>These tools keep their original URLs while they are organised into categories.</p></div>
     <div class="grid tool-grid">
-      ${[['Text to Handwriting', 'tools/text-to-handwriting/index.html', 'Handwriting-style pages with PNG and PDF export.'],
-         ['Image Editor', 'tools/image-compressor/index.html', 'Crop, resize and export images locally.'],
-         ['Video Editor', 'tools/video-editor/index.html', 'Edit a multi-track video timeline with local export.'],
-         ['Resume Builder', 'tools/resume-builder/index.html', 'Build a print-ready CV with local templates.'],
-         ['PDF Editor', 'tools/pdf-editor/index.html', 'Edit, sign and organise PDF documents locally.']]
+      ${[['Text to Handwriting', '/tools/text-to-handwriting/', 'Handwriting-style pages with PNG and PDF export.'],
+         ['Image Editor', '/image-editor/', 'Crop, resize and export images locally.'],
+         ['Video Editor', '/tools/video-editor/', 'Edit a multi-track video timeline with local export.'],
+         ['Resume Builder', '/tools/resume-builder/', 'Build a print-ready CV with local templates.'],
+         ['PDF Editor', '/tools/pdf-editor/', 'Edit, sign and organise PDF documents locally.']]
         .map(([name, url, desc]) => `<a class="card" href="${url}"><span class="card-icon" aria-hidden="true">🔧</span><h3>${esc(name)}</h3><p>${esc(desc)}</p><span class="card-tag">Preserved tool</span></a>`).join('')}
     </div>
   </div>
@@ -895,7 +984,7 @@ function homepage() {
 </main>`;
   return page({
     title: 'LetitEdit — Free Online Tools That Run in Your Browser',
-    description: `Free browser-side utilities for writing, text cleanup, formatting, developer work and more. ${publishedTools.length} tools across ${categories.length} categories, with no uploads or accounts.`,
+    description: `Free browser-side utilities for image, video, audio, documents, writing, design, code and utility work. ${publishedTools.length} available tools and ${catalogTotals.planned} registered slots across ${categories.length} categories.`,
     canonical: '/',
     body,
     structured: {
@@ -966,6 +1055,43 @@ function redirectPage(tool) {
 `;
 }
 
+/* Old category directories stay live as accessible redirects. Tool routes
+ * below them are untouched, so indexed tool URLs continue to work. */
+function categoryRedirectPage(from, to) {
+  const target = esc(to);
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Category moved — LetitEdit</title>
+<meta name="description" content="The ${esc(from)} category has moved to its current LetitEdit category page.">
+<link rel="canonical" href="${site}${target}">
+<meta http-equiv="refresh" content="0; url=${target}">
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; background: #eff6ff; color: #0f172a; font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { width: min(520px, 100%); padding: 32px; border: 1px solid #bfdbfe; border-radius: 20px; background: #fff; box-shadow: 0 18px 48px rgba(37, 99, 235, .14); }
+  .tag { display: inline-block; margin-bottom: 14px; padding: 4px 10px; border-radius: 999px; background: #dbeafe; color: #1d4ed8; font-size: .75rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  h1 { margin: 0 0 10px; font-size: clamp(1.5rem, 5vw, 2rem); line-height: 1.2; }
+  p { margin: 0 0 22px; color: #475569; }
+  a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 18px; border-radius: 10px; background: #2563eb; color: #fff; font-weight: 700; text-decoration: none; }
+  a:hover { background: #1d4ed8; }
+</style>
+</head>
+<body>
+<main>
+  <span class="tag">Category relocated</span>
+  <h1>This category has moved</h1>
+  <p><code>${esc(from)}</code> now points to the current category. Use the link below if the automatic redirect does not happen.</p>
+  <a href="${target}">Open the current category →</a>
+</main>
+</body>
+</html>
+`;
+}
+
 /* ---------- Generate everything ---------- */
 
 write('index.html', homepage());
@@ -991,6 +1117,10 @@ categories.forEach(category => {
   });
 });
 
+Object.entries(registry.legacyCategoryRedirects).forEach(([from, to]) => {
+  write(`${from.replace(/^\//, '')}index.html`, categoryRedirectPage(from, to));
+});
+
 ['news', 'blog'].forEach(type => {
   const articles = type === 'news' ? content.news : content.blog;
   articles.forEach(article => write(`${type}/${article.slug}/index.html`, articlePage(article, type)));
@@ -1005,7 +1135,10 @@ write('js/seo-manifest.js', `/* Generated by scripts/build.js */\nwindow.LETITED
   pageUrl: tool.pageUrl,
   title: tool.title,
   description: tool.description,
-  layout: tool.layout
+  layout: tool.layout,
+  status: tool.status,
+  categoryKey: tool.categoryKey,
+  catalogSlots: tool.catalogSlots || []
 })))};\n`);
 
 const staticPages = {
@@ -1016,7 +1149,7 @@ const staticPages = {
     eyebrow: 'About the project',
     h1: 'Practical tools. Clear rules. No uploads.',
     intro: 'LetitEdit is a category-based online tools site. We finish one category at a time so every published page has working functionality, documented behaviour and an honest purpose.',
-    content: `<h2>Browser-side by design</h2><p>Our text and developer tools process everything in your browser. Input is not sent to a server for counting, cleaning, converting, formatting or matching. This keeps the tools fast and avoids collecting your content.</p><h2>What “complete category” means</h2><p>We do not publish a category until every approved tool has a real processor, an SEO-friendly page, mobile and desktop checks, empty-input handling, Unicode tests and repeated-use checks. Writing &amp; Text and Coding &amp; Developer Tools are complete.</p><h2>Content standards</h2><p>Each tool page explains what it does, how to use it, what its limits are and what related tools can help next. Examples show real input and output. We avoid fake processing, hidden paywalls and deceptive download buttons.</p><h2>Roadmap</h2><p>Future categories have stable pages and routes now, but tools are published only after they are built and tested. No category is announced as ready before testing is executed.</p><h2>Contact</h2><p>Questions, corrections or tool requests are welcome on the <a href="/contact/">Contact page</a>.</p>`
+    content: `<h2>Browser-side by design</h2><p>Our text, image, video and developer tools process everything in your browser wherever the tool specification allows it. Input is not sent to a server for counting, cleaning, converting, formatting or matching. This keeps the tools fast and avoids collecting your content.</p><h2>What “complete category” means</h2><p>We do not publish a tool until it has a real processor, an SEO-friendly page, mobile and desktop checks, empty-input handling, Unicode tests and repeated-use checks. The nine categories are now the stable taxonomy; ${catalogTotals.planned} tool slots are registered and ${catalogTotals.mapped} of them are satisfied by existing working tools.</p><h2>Content standards</h2><p>Each tool page explains what it does, how to use it, what its limits are and what related tools can help next. Examples show real input and output. Planned tools show an honest status and never open an empty workspace. We avoid fake processing, hidden paywalls and deceptive download buttons.</p><h2>Roadmap</h2><p>New tools are supplied and built category by category. Existing URLs stay live, and planned slots become linked only after a real implementation passes testing.</p><h2>Contact</h2><p>Questions, corrections or tool requests are welcome on the <a href="/contact/">Contact page</a>.</p>`
   }),
   'contact/index.html': staticPage({
     title: 'Contact LetitEdit — feedback and tool requests',
@@ -1060,4 +1193,4 @@ publishedTools.forEach(tool => sitemapUrls.push(tool.pageUrl));
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls.map(url => `  <url><loc>${xml(site + url)}</loc></url>`).join('\n')}\n</urlset>\n`;
 write('sitemap.xml', sitemap);
 
-console.log(`Built ${publishedTools.length} published tools across ${categories.length} categories, ${Object.keys(staticPages).length} static pages, 7 directory/content pages, ${registry.redirectTools.length} redirect stub${registry.redirectTools.length === 1 ? '' : 's'}, search index, sidebar data, SEO manifest and sitemap.`);
+console.log(`Built ${publishedTools.length} available tools across ${categories.length} categories, ${catalogTotals.planned} registered catalog slots (${catalogTotals.mapped} linked, ${catalogTotals.remaining} planned), ${Object.keys(staticPages).length} static pages, 7 directory/content pages, ${registry.redirectTools.length} tool redirect stub${registry.redirectTools.length === 1 ? '' : 's'}, ${Object.keys(registry.legacyCategoryRedirects).length} category redirects, search index, sidebar data, SEO manifest and sitemap.`);

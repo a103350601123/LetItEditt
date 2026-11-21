@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,10 +15,10 @@
 <meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="../../../css/site.css">
-<link rel="stylesheet" href="../../../css/mobile-workspace.css">
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/mobile-workspace.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Rich Text / HTML to Markdown","description":"Convert pasted HTML, rich text, text files or DOCX text into clean Markdown with headings, links, lists, tables, code and emphasis preserved.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/writing-text/html-to-markdown/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Writing \u0026 Text Tools","item":"https://letitedit.com/tools/writing-text/"},{"@type":"ListItem","position":3,"name":"Rich Text / HTML to Markdown","item":"https://letitedit.com/tools/writing-text/html-to-markdown/"}]},{"@type":"FAQPage","name":"Rich Text / HTML to Markdown","mainEntity":[{"@type":"Question","name":"Which elements are supported?","acceptedAnswer":{"@type":"Answer","text":"Headings, paragraphs, links, bold, italic, inline code, fenced code, ordered and unordered lists, nested lists, blockquotes, tables, horizontal rules, line breaks and images."}},{"@type":"Question","name":"Is pasted script or styling executed?","acceptedAnswer":{"@type":"Answer","text":"No. Scripts, styles, SVG, iframes and unsafe attributes are discarded. The preview is built with text nodes and a small allow-list of safe elements, never with innerHTML containing your content."}},{"@type":"Question","name":"Can I convert a Word document?","acceptedAnswer":{"@type":"Answer","text":"You can load a DOCX, but only its text is extracted. Tables, columns and styling are not kept. For a fully faithful layout conversion, export the document as HTML first."}}]}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Rich Text / HTML to Markdown","description":"Convert pasted HTML, rich text, text files or DOCX text into clean Markdown with headings, links, lists, tables, code and emphasis preserved.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/writing-text/html-to-markdown/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Text \u0026 Writing Editing","item":"https://letitedit.com/tools/text-writing-editing/"},{"@type":"ListItem","position":3,"name":"Rich Text / HTML to Markdown","item":"https://letitedit.com/tools/writing-text/html-to-markdown/"}]},{"@type":"FAQPage","name":"Rich Text / HTML to Markdown","mainEntity":[{"@type":"Question","name":"Which elements are supported?","acceptedAnswer":{"@type":"Answer","text":"Headings, paragraphs, links, bold, italic, inline code, fenced code, ordered and unordered lists, nested lists, blockquotes, tables, horizontal rules, line breaks and images."}},{"@type":"Question","name":"Is pasted script or styling executed?","acceptedAnswer":{"@type":"Answer","text":"No. Scripts, styles, SVG, iframes and unsafe attributes are discarded. The preview is built with text nodes and a small allow-list of safe elements, never with innerHTML containing your content."}},{"@type":"Question","name":"Can I convert a Word document?","acceptedAnswer":{"@type":"Answer","text":"You can load a DOCX, but only its text is extracted. Tables, columns and styling are not kept. For a fully faithful layout conversion, export the document as HTML first."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-text">
@@ -28,7 +28,22 @@
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
     <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
     <div class="nav-links" id="primary-links">
-      <a href="/categories/">Categories</a>
+      <div class="nav-category">
+        <a href="/categories/">Categories</a>
+        <button class="nav-category-toggle" type="button" aria-label="Show category menu" aria-controls="nav-category-list" aria-expanded="false" title="Browse categories">▾</button>
+        <div class="nav-category-panel" id="nav-category-list" hidden>
+          <span class="nav-category-title">All nine categories</span>
+          <a href="/tools/image-photo-editing/">Image &amp; Photo</a>
+        <a href="/tools/video-editing/">Video</a>
+        <a href="/tools/audio-music-editing/">Audio &amp; Music</a>
+        <a href="/tools/pdf-document-editing/">PDF &amp; Documents</a>
+        <a href="/tools/text-writing-editing/">Text &amp; Writing</a>
+        <a href="/tools/graphic-design-creative-editing/">Graphic Design</a>
+        <a href="/tools/web-code-editing/">Web &amp; Code</a>
+        <a href="/tools/diagram-presentation-productivity-design/">Diagrams &amp; Planning</a>
+        <a href="/tools/qr-barcode-utility-design/">QR &amp; Utilities</a>
+        </div>
+      </div>
       <a href="/new-tools/">New Tools</a>
       <a href="/news/">News</a>
       <a href="/blog/">Blog</a>
@@ -41,22 +56,22 @@
 <div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
-      <label class="sr-only" for="site-search">Search all 61 tools</label>
+      <label class="sr-only" for="site-search">Search all 62 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 62 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
       <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
 <div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
-  <a href="../../../">Home</a><span>/</span>
-  <a href="../../../tools/writing-text/">Writing &amp; Text Tools</a><span>/</span>
+  <a href="/">Home</a><span>/</span>
+  <a href="/tools/text-writing-editing/">Text &amp; Writing Editing</a><span>/</span>
   <span aria-current="page">Rich Text / HTML to Markdown</span>
 </nav>
 <section class="container page-head tool-head">
   <div class="tool-head-copy">
-    <span class="eyebrow">Writing &amp; Text Tools</span>
+    <span class="eyebrow">Text &amp; Writing Editing</span>
     <h1>Rich Text / HTML to Markdown</h1>
     <p>Paste markup from a webpage or rich-text editor, or load a text-like file or DOCX. A local DOM-free parser produces Markdown and a safe preview built from DOM nodes.</p>
   </div>
@@ -137,7 +152,7 @@
     <div class="info-card">
       <h2>Related tools</h2>
       <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
-        <a class="card tool-card" href="../../../tools/writing-text/bionic-reading/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📖</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Bionic Reading Converter</h3><p>Bold the first part of each word with adjustable fixation strength and saccade skipping. Preview the result, copy formatted text, HTML or Markdown, download an HTML file and open a distraction-free reading view.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/text-cleaner/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧹</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Text Cleaner</h3><p>Clean messy text in one ordered pass: trim whitespace, strip HTML tags and emoji, remove accents, unify quotes, fix punctuation and expand shorthand. Everything runs in your browser.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/text-to-slug/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔗</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Text to Slug Converter</h3><p>Turn headlines into clean URL slugs. Unicode-aware, lowercase and hyphen-separated, with a length limit.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/smart-quotes/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">“</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Straight Quotes to Curly Quotes</h3><p>Convert straight quotes and apostrophes into proper typographic curly quotes for articles, books and polished copy.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a>
+        <a class="card tool-card" href="/tools/writing-text/bionic-reading/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📖</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Bionic Reading Converter</h3><p>Bold the first part of each word with adjustable fixation strength and saccade skipping. Preview the result, copy formatted text, HTML or Markdown, download an HTML file and open a distraction-free reading view.</p><span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/tools/writing-text/text-cleaner/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧹</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Text Cleaner</h3><p>Clean messy text in one ordered pass: trim whitespace, strip HTML tags and emoji, remove accents, unify quotes, fix punctuation and expand shorthand. Everything runs in your browser.</p><span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/tools/writing-text/text-to-slug/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔗</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Text to Slug Converter</h3><p>Turn headlines into clean URL slugs. Unicode-aware, lowercase and hyphen-separated, with a length limit.</p><span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/tools/writing-text/smart-quotes/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">“</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Straight Quotes to Curly Quotes</h3><p>Convert straight quotes and apostrophes into proper typographic curly quotes for articles, books and polished copy.</p><span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span></a>
       </div>
     </div>
   </div>
@@ -163,13 +178,17 @@
         </ul>
       </div>
       <div class="footer-column">
-        <h3>Popular categories</h3>
+        <h3>All categories</h3>
         <ul>
-          <li><a href="/tools/writing-text/">Text &amp; Writing</a></li>
-          <li><a href="/tools/coding-developer/">Developer Tools</a></li>
-          <li><a href="/tools/image-photo/">Image &amp; Photo</a></li>
-          <li><a href="/tools/video-audio/">Video &amp; Audio</a></li>
-          <li><a href="/tools/social-media/">Social Media</a></li>
+          <li><a href="/tools/image-photo-editing/">Image &amp; Photo Editing</a></li>
+          <li><a href="/tools/video-editing/">Video Editing</a></li>
+          <li><a href="/tools/audio-music-editing/">Audio &amp; Music Editing</a></li>
+          <li><a href="/tools/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+          <li><a href="/tools/text-writing-editing/">Text &amp; Writing Editing</a></li>
+          <li><a href="/tools/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+          <li><a href="/tools/web-code-editing/">Web &amp; Code Editing</a></li>
+          <li><a href="/tools/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+          <li><a href="/tools/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
         </ul>
       </div>
       <div class="footer-column">
@@ -192,13 +211,13 @@
     </div>
   </div>
 </footer>
-<script src="../../../js/search-index.js"></script>
-<script src="../../../js/sidebar-data.js"></script>
-<script src="../../../js/site.js"></script>
-<script src="../../../js/category-sidebar.js"></script>
-<script src="../../../js/mobile-workspace.js"></script>
-<script src="../../../js/reference-core.js"></script>
-<script src="../../../js/reference-runtime.js"></script>
+<script src="/js/search-index.js"></script>
+<script src="/js/sidebar-data.js"></script>
+<script src="/js/site.js"></script>
+<script src="/js/category-sidebar.js"></script>
+<script src="/js/mobile-workspace.js"></script>
+<script src="/js/reference-core.js"></script>
+<script src="/js/reference-runtime.js"></script>
 <script id="tool-config" type="application/json">{"slug":"html-to-markdown","engine":"html-to-markdown","layout":"single","outputType":"text","controls":[],"example":{"input":"\u003ch2\u003eHello\u003c/h2\u003e\u003cp\u003e\u003cstrong\u003eWorld\u003c/strong\u003e\u003c/p\u003e","output":"## Hello\n\n**World**"}}</script>
 </body>
 </html>

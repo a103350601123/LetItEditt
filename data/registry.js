@@ -1,217 +1,155 @@
 /* LetitEdit central registry.
- * This is the single source of truth for categories, tool metadata, routes,
- * tool counts, "new" status and search data. Adding a tool never requires
- * editing the homepage, sidebar, sitemap or search code: register the tool in
- * one of the data files referenced by CATEGORIES below and the build
- * regenerates every derived page automatically.
+ * This is the single source of truth for the nine categories, tool metadata,
+ * routes, tool counts, status vocabulary, planned catalog slots, search data
+ * and sidebar data. Existing tool URLs are pinned to their historical paths
+ * so reorganising categories does not move an indexed page.
  */
 'use strict';
 
 const fs = require('fs');
 const path = require('path');
+const {
+  CATEGORY_COPY,
+  CATEGORY_ORDER,
+  LEGACY_CATEGORY_REDIRECTS
+} = require('./category-copy');
+const {
+  CATALOG,
+  CATALOG_TOOL_LINKS,
+  TOOL_STATUSES,
+  EXTERNAL_MODEL_SLUGS
+} = require('./category-catalog');
 
 const root = path.resolve(__dirname, '..');
 const site = 'https://letitedit.com';
 
-const CATEGORIES = [
-  {
-    key: 'writing',
-    name: 'Text & Writing',
-    label: 'Writing & Text Tools',
-    shortLabel: 'Writing & Text',
-    slug: 'writing-text',
-    path: '/tools/writing-text/',
-    icon: '✍️',
-    color: '#2563eb',
-    dataFile: 'tools.json',
-    runtime: 'text',
-    scripts: ['js/text-core.js', 'js/tool-runtime.js'],
-    description: 'Count, clean, convert, format, compare and generate text with private browser-side utilities.',
-    seoTitle: 'Text & Writing Tools — Free Browser-Side Writing Utilities',
-    seoDescription: 'Browse free text and writing tools for counting words, cleaning text, formatting, bionic reading, redaction and placeholder generation. Everything runs in your browser.',
-    intro: 'Focused writing utilities for counting, cleaning, converting, comparing and generating text. Every tool runs in your browser, so your writing stays private.',
-    featured: ['word-counter', 'text-cleaner', 'resume-builder', 'find-and-replace']
-  },
-  {
-    key: 'dev',
-    name: 'Developer Tools',
-    label: 'Coding & Developer Tools',
-    shortLabel: 'Coding & Developer',
-    slug: 'coding-developer',
-    path: '/tools/coding-developer/',
-    icon: '</>',
-    color: '#0ea5e9',
-    dataFile: 'dev-tools.json',
-    runtime: 'dev',
-    scripts: ['js/dev-core.js', 'js/dev-runtime.js'],
-    description: 'Format JSON, encode Base64 and test regular expressions without sending code anywhere.',
-    seoTitle: 'Coding & Developer Tools — JSON, Base64 and Regex',
-    seoDescription: 'Free browser-side developer utilities for formatting JSON, encoding Base64 and testing JavaScript regular expressions with clear errors and real output.',
-    intro: 'Everyday utilities for development work: format and validate JSON, convert UTF-8 text to Base64 and test JavaScript regular expressions locally.',
-    featured: ['json-formatter', 'base64-encoder-decoder', 'regex-tester']
-  },
-  {
-    key: 'image',
-    name: 'Image & Photo',
-    label: 'Image & Photo Tools',
-    shortLabel: 'Image & Photo',
-    slug: 'image-photo',
-    path: '/tools/image-photo/',
-    icon: '🖼️',
-    color: '#2563eb',
-    dataFile: 'image-tools.json',
+/* Runtime information is kept separate from public copy so the nine canonical
+ * category names can be used verbatim in navigation, breadcrumbs and SEO. */
+const CATEGORY_RUNTIME = {
+  image: {
+    dataFiles: ['image-tools.json'],
     runtime: 'image',
     scripts: ['js/image-core.js', 'js/image-runtime.js'],
-    description: 'Edit, convert, combine and understand images with local browser processing and no uploads.',
-    seoTitle: 'Image & Photo Tools — Free Browser-Side Image Utilities',
-    seoDescription: 'Browse 13 free image and photo tools for editing, HEIC viewing, borders, merging, screenshots, resizing, OCR, QR codes and compression. Files stay in your browser.',
-    intro: 'Thirteen practical image utilities for editing, converting, combining and reading photos. Every operation runs in your browser, with clear limits and honest previews.',
     featured: ['image-editor', 'heic-viewer', 'photo-merger', 'screenshot-beautifier']
   },
-  {
-    key: 'video',
-    name: 'Video & Audio',
-    label: 'Video & Audio Tools',
-    shortLabel: 'Video & Audio',
-    slug: 'video-audio',
-    path: '/tools/video-audio/',
-    icon: '🎬',
-    color: '#ec4899',
-    dataFile: 'video-tools.json',
+  video: {
+    dataFiles: ['video-tools.json'],
     runtime: 'video',
     scripts: ['js/video-core.js', 'js/video-runtime.js'],
-    description: 'Edit, trim, record, caption and convert video and audio files locally in the browser.',
-    seoTitle: 'Video & Audio Tools — Free Browser-Side Media Utilities',
-    seoDescription: 'Nine practical video and audio tools that trim, record, caption, convert and obscure media locally in your browser, with clear privacy disclosures.',
-    intro: 'Nine practical media utilities for editing, recording, trimming, captioning and exporting. Heavy codecs and optional AI models load only when a tool needs them, and your media is never uploaded.'
+    featured: ['video-editor', 'video-trimmer', 'mp4-to-gif', 'video-background-remover']
   },
-  {
-    key: 'social',
-    name: 'Social Media',
-    label: 'Social Media Tools',
-    shortLabel: 'Social Media',
-    slug: 'social-media',
-    path: '/tools/social-media/',
-    icon: '📣',
-    color: '#f59e0b',
-    dataFile: null,
-    runtime: null,
-    scripts: [],
-    description: 'Prepare captions, hashtags and shareable text for social platforms.',
-    seoTitle: 'Social Media Tools — Free Caption and Hashtag Utilities',
-    seoDescription: 'A directory for free social media utilities. Tools are added as each one is built and tested; no placeholder tools are published.',
-    intro: 'A home for future social media utilities. Categories are ready now; tools appear here as they are built and tested.'
+  audio: {
+    dataFiles: [],
+    runtime: 'video',
+    scripts: ['js/video-core.js', 'js/video-runtime.js'],
+    featured: ['audio-editor']
   },
-  {
-    key: 'seo',
-    name: 'Website & SEO',
-    label: 'Website & SEO Tools',
-    shortLabel: 'Website & SEO',
-    slug: 'website-seo',
-    path: '/tools/website-seo/',
-    icon: '📈',
-    color: '#10b981',
-    dataFile: null,
-    runtime: null,
-    scripts: [],
-    description: 'Create slugs, meta descriptions and structured data for websites.',
-    seoTitle: 'Website & SEO Tools — Free Browser-Side SEO Utilities',
-    seoDescription: 'A directory for free website and SEO utilities that run locally in your browser. Tools are added as each one is built and tested.',
-    intro: 'A home for future website and SEO utilities. Categories are ready now; tools appear here as they are built and tested.'
+  document: { dataFiles: ['document-tools.json'], runtime: null, scripts: [], featured: ['pdf-editor'] },
+  writing: {
+    dataFiles: ['tools.json'],
+    runtime: 'text',
+    scripts: ['js/text-core.js', 'js/tool-runtime.js'],
+    featured: ['word-counter', 'text-cleaner', 'find-and-replace', 'grammar-spell-checker']
   },
-  {
-    key: 'generators',
-    name: 'Generators',
-    label: 'Generator Tools',
-    shortLabel: 'Generators',
-    slug: 'generators',
-    path: '/tools/generators/',
-    icon: '✨',
-    color: '#6366f1',
-    dataFile: null,
-    runtime: null,
-    scripts: [],
-    description: 'Generate placeholder text, lists, passwords and other structured data.',
-    seoTitle: 'Generator Tools — Free Browser-Side Generators',
-    seoDescription: 'A directory for free generators such as placeholder text and list builders. Tools are added as each one is built and tested.',
-    intro: 'A home for future generator utilities. Categories are ready now; tools appear here as they are built and tested.'
+  design: { dataFiles: [], runtime: null, scripts: [], featured: ['thumbnail-generator', 'resume-builder'] },
+  code: {
+    dataFiles: ['dev-tools.json'],
+    runtime: 'dev',
+    scripts: ['js/dev-core.js', 'js/dev-runtime.js'],
+    featured: ['json-formatter', 'base64-encoder-decoder', 'regex-tester']
   },
-  {
-    key: 'counters',
-    name: 'Counters & Calculators',
-    label: 'Counters & Calculators',
-    shortLabel: 'Counters & Calculators',
-    slug: 'counters-calculators',
-    path: '/tools/counters-calculators/',
-    icon: '🧮',
-    color: '#14b8a6',
-    dataFile: null,
-    runtime: null,
-    scripts: [],
-    description: 'Count characters, words and values, or calculate common everyday results.',
-    seoTitle: 'Counters & Calculators — Free Browser-Side Calculators',
-    seoDescription: 'A directory for free counters and calculators that run locally in your browser. Tools are added as each one is built and tested.',
-    intro: 'A home for future counters and calculators. Categories are ready now; tools appear here as they are built and tested.'
-  },
-  {
-    key: 'games',
-    name: 'Games & Fun',
-    label: 'Games & Fun Tools',
-    shortLabel: 'Games & Fun',
-    slug: 'games-fun',
-    path: '/tools/games-fun/',
-    icon: '🎲',
-    color: '#f43f5e',
-    dataFile: null,
-    runtime: null,
-    scripts: [],
-    description: 'Lightweight games and fun text utilities that run entirely in the browser.',
-    seoTitle: 'Games & Fun Tools — Free Browser Games and Utilities',
-    seoDescription: 'A directory for free games and fun utilities that run locally in your browser. Tools are added as each one is built and tested.',
-    intro: 'A home for future games and fun utilities. Categories are ready now; tools appear here as they are built and tested.'
-  },
-  {
-    key: 'device',
-    name: 'Device Testers',
-    label: 'Device Tester Tools',
-    shortLabel: 'Device Testers',
-    slug: 'device-testers',
-    path: '/tools/device-testers/',
-    icon: '📱',
-    color: '#0284c7',
-    dataFile: null,
-    runtime: null,
-    scripts: [],
-    description: 'Check screen size, fonts, network and browser capabilities on any device.',
-    seoTitle: 'Device Tester Tools — Free Browser and Screen Tests',
-    seoDescription: 'A directory for free device and browser tests that run locally. Tools are added as each one is built and tested.',
-    intro: 'A home for future device tester utilities. Categories are ready now; tools appear here as they are built and tested.'
-  }
+  diagram: { dataFiles: [], runtime: null, scripts: [], featured: [] },
+  utility: { dataFiles: [], runtime: null, scripts: [], featured: ['qr-code-generator'] }
+};
+
+/* Each source file has one historical category path. Tools with no explicit
+ * URL keep that path even when they move to a different canonical category. */
+const DATA_SOURCES = [
+  { sourceKey: 'writing', dataFile: 'tools.json', legacyPath: '/tools/writing-text/' },
+  { sourceKey: 'dev', dataFile: 'dev-tools.json', legacyPath: '/tools/coding-developer/' },
+  { sourceKey: 'image', dataFile: 'image-tools.json', legacyPath: '/tools/image-photo/' },
+  { sourceKey: 'video', dataFile: 'video-tools.json', legacyPath: '/tools/video-audio/' },
+  { sourceKey: 'document', dataFile: 'document-tools.json', legacyPath: '/tools/pdf-editor/' }
 ];
+
+const SOURCE_CATEGORY = {
+  writing: 'writing',
+  dev: 'code',
+  image: 'image',
+  video: 'video',
+  document: 'document'
+};
+
+/* One primary category per tool. Related-tool links cover cross-category use. */
+const TOOL_CATEGORY_OVERRIDES = {
+  'audio-editor': 'audio',
+  'qr-code-generator': 'utility',
+  'thumbnail-generator': 'design',
+  'resume-builder': 'design',
+  'pdf-editor': 'document'
+};
+
+const CATEGORIES = CATEGORY_ORDER.map(key => {
+  const copy = CATEGORY_COPY[key];
+  const runtime = CATEGORY_RUNTIME[key] || {};
+  return {
+    key,
+    name: copy.name,
+    label: copy.name,
+    shortLabel: copy.shortName,
+    slug: copy.slug,
+    path: copy.path,
+    icon: copy.icon,
+    color: copy.color,
+    dir: 'ltr',
+    description: copy.description,
+    intro: copy.intro,
+    seoTitle: copy.seoTitle,
+    seoDescription: copy.seoDescription,
+    related: copy.related || [],
+    dataFiles: runtime.dataFiles || [],
+    runtime: runtime.runtime || null,
+    scripts: runtime.scripts || [],
+    featured: runtime.featured || [],
+    tools: []
+  };
+});
 
 const categoryByKey = new Map(CATEGORIES.map(category => [category.key, category]));
 const categoryBySlug = new Map(CATEGORIES.map(category => [category.slug, category]));
 
+function legacyPageUrl(url) {
+  const relative = String(url).replace(/^\/+/, '');
+  return `/${relative.replace(/index\.html$/, '')}`;
+}
+
 const tools = [];
-CATEGORIES.forEach(category => {
-  category.tools = [];
-  if (!category.dataFile) return;
-  const list = JSON.parse(fs.readFileSync(path.join(root, 'data', category.dataFile), 'utf8'));
-  list.forEach(tool => {
-    const redirectTo = tool.redirectTo
-      ? (String(tool.redirectTo).charAt(0) === '/' ? String(tool.redirectTo) : `/${String(tool.redirectTo).replace(/^\.\//, '')}`)
+DATA_SOURCES.forEach(source => {
+  const list = JSON.parse(fs.readFileSync(path.join(root, 'data', source.dataFile), 'utf8'));
+  list.forEach(raw => {
+    const categoryKey = TOOL_CATEGORY_OVERRIDES[raw.slug] || SOURCE_CATEGORY[source.sourceKey];
+    const category = categoryByKey.get(categoryKey);
+    if (!category) throw new Error(`${raw.slug} assigned to unknown category: ${categoryKey}`);
+
+    const redirectTo = raw.redirectTo
+      ? legacyPageUrl(String(raw.redirectTo).replace(/^\.\//, ''))
       : null;
-    const item = Object.assign({}, tool, {
-      categoryKey: category.key,
-      category: category,
-      redirectTo: redirectTo,
-      /* A redirect stub replaces the published page: it must never be counted,
-       * indexed, searched or surfaced as a working tool. */
-      published: tool.published !== false && !redirectTo,
-      isNew: tool.isNew === true && !redirectTo,
-      featured: (tool.featured === true || (category.featured || []).indexOf(tool.slug) !== -1) && !redirectTo,
-      added: tool.added || '2026-11-18',
-      pageUrl: tool.url ? `/${tool.url.replace(/index\.html$/, '')}` : `${category.path}${tool.slug}/`
+    const url = raw.url ? String(raw.url) : `${source.legacyPath}${raw.slug}/index.html`;
+    const item = Object.assign({}, raw, {
+      categoryKey,
+      category,
+      sourceKey: source.sourceKey,
+      redirectTo,
+      published: raw.published !== false && !redirectTo,
+      isNew: raw.isNew === true && !redirectTo,
+      featured: (raw.featured === true || category.featured.indexOf(raw.slug) !== -1) && !redirectTo,
+      added: raw.added || '2026-11-18',
+      status: raw.status || (raw.layout === 'existing'
+        ? TOOL_STATUSES.UNVERIFIED
+        : TOOL_STATUSES.VERIFIED),
+      url: String(url).replace(/^\/+/, ''),
+      pageUrl: legacyPageUrl(url),
+      catalogSlots: []
     });
     category.tools.push(item);
     tools.push(item);
@@ -229,8 +167,88 @@ tools.forEach(tool => {
   });
 });
 
+const catalogItems = new Map();
+CATEGORIES.forEach(category => {
+  const links = CATALOG_TOOL_LINKS[category.key] || {};
+  const entries = (CATALOG[category.key] || []).map((entry, index) => {
+    const slotSlug = entry[1];
+    const linkedSlug = links[slotSlug] || null;
+    const linkedTool = linkedSlug ? bySlug.get(linkedSlug) : null;
+    if (linkedSlug && !linkedTool) {
+      throw new Error(`${category.key} catalog slot ${slotSlug} links to unknown tool: ${linkedSlug}`);
+    }
+    const status = linkedTool
+      ? linkedTool.status
+      : (EXTERNAL_MODEL_SLUGS.has(slotSlug) ? TOOL_STATUSES.EXTERNAL : TOOL_STATUSES.PLANNED);
+    const result = {
+      key: slotSlug,
+      slug: slotSlug,
+      name: entry[0],
+      categoryKey: category.key,
+      categoryName: category.name,
+      catalogIndex: index + 1,
+      status,
+      available: !!linkedTool,
+      toolSlug: linkedTool ? linkedTool.slug : null,
+      url: linkedTool ? linkedTool.pageUrl : null,
+      icon: linkedTool ? linkedTool.icon : category.icon,
+      description: linkedTool
+        ? linkedTool.description
+        : `Planned ${category.name.toLowerCase()} tool. No implementation has been provided yet.`,
+      keywords: linkedTool ? (linkedTool.keywords || []) : []
+    };
+    if (linkedTool) linkedTool.catalogSlots.push(entry[0]);
+    return result;
+  });
+  catalogItems.set(category.key, entries);
+});
+
 function publishedByCategory(key) {
   return publishedTools.filter(tool => tool.categoryKey === key);
+}
+
+function catalogFor(key) {
+  const entries = catalogItems.get(key);
+  if (!entries) throw new Error(`Unknown catalog category: ${key}`);
+  return entries;
+}
+
+function plannedCount(key) {
+  return catalogFor(key).filter(entry => !entry.available).length;
+}
+
+function mappedCount(key) {
+  return catalogFor(key).filter(entry => entry.available).length;
+}
+
+function catalogTotals() {
+  const planned = CATEGORIES.reduce((sum, category) => sum + CATALOG[category.key].length, 0);
+  const mapped = CATEGORIES.reduce((sum, category) => sum + mappedCount(category.key), 0);
+  return { planned, mapped, remaining: planned - mapped };
+}
+
+function relatedTools(key, limit) {
+  const category = categoryByKey.get(key);
+  if (!category) return [];
+  const chosen = [];
+  const seen = new Set();
+  function add(list) {
+    list.forEach(tool => {
+      if (!tool || tool.categoryKey === key || seen.has(tool.slug)) return;
+      seen.add(tool.slug);
+      chosen.push(tool);
+    });
+  }
+  category.related.forEach(relatedKey => {
+    add(publishedTools
+      .filter(tool => tool.categoryKey === relatedKey)
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .slice(0, 3));
+  });
+  if (chosen.length < 6) {
+    add(publishedTools.slice().sort((a, b) => a.name.localeCompare(b.name)).slice(0, 6));
+  }
+  return typeof limit === 'number' ? chosen.slice(0, limit) : chosen;
 }
 
 function newTools(limit) {
@@ -241,8 +259,7 @@ function newTools(limit) {
 }
 
 /* Featured picks are declared in tool metadata or a category's featured list.
- * The fallback keeps the section useful when a category has no explicit picks:
- * spread flagged tools across categories first, then fill alphabetically. */
+ * The fallback spreads featured tools across the nine categories first. */
 function featuredTools(limit) {
   const chosen = [];
   const seen = new Set();
@@ -267,8 +284,10 @@ function searchItems() {
     icon: tool.icon,
     aliases: tool.aliases || [],
     keywords: tool.keywords || [],
-    category: tool.category.label,
+    category: tool.category.name,
     categoryKey: tool.categoryKey,
+    categoryPath: tool.category.path,
+    status: tool.status,
     url: tool.pageUrl
   }));
 }
@@ -282,6 +301,7 @@ function sidebarItems() {
       icon: category.icon,
       color: category.color,
       count: publishedByCategory(category.key).length,
+      plannedCount: plannedCount(category.key),
       url: category.path
     })),
     tools: publishedTools.map(tool => ({
@@ -298,12 +318,22 @@ module.exports = {
   site,
   root,
   CATEGORIES,
+  CATEGORY_COPY,
+  CATEGORY_ORDER,
+  CATALOG,
+  TOOL_STATUSES,
   categoryByKey,
   categoryBySlug,
   tools,
   publishedTools,
   redirectTools,
   publishedByCategory,
+  catalogFor,
+  plannedCount,
+  mappedCount,
+  catalogTotals,
+  relatedTools,
+  legacyCategoryRedirects: LEGACY_CATEGORY_REDIRECTS,
   bySlug,
   newTools,
   featuredTools,

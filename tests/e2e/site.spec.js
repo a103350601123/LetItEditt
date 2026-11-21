@@ -2,6 +2,34 @@ const { test, expect } = require('@playwright/test');
 const registry = require('../../data/registry');
 const content = require('../../data/content');
 
+function catalogCountText(available, planned) {
+  return `${available} available tool${available === 1 ? '' : 's'} · ${planned} planned tool${planned === 1 ? '' : 's'}`;
+}
+
+test('registry defines the complete nine-category catalog without inventing tools', () => {
+  expect(registry.CATEGORY_ORDER).toEqual([
+    'image', 'video', 'audio', 'document', 'writing', 'design', 'code', 'diagram', 'utility'
+  ]);
+  expect(registry.CATEGORIES).toHaveLength(9);
+  expect(registry.catalogTotals()).toEqual({ planned: 240, mapped: 23, remaining: 217 });
+  expect(registry.publishedTools).toHaveLength(62);
+  expect(registry.redirectTools).toHaveLength(1);
+
+  const slots = { image: 30, video: 30, audio: 30, document: 30, writing: 30, design: 30, code: 25, diagram: 20, utility: 15 };
+  registry.CATEGORIES.forEach(category => {
+    expect(registry.catalogFor(category.key), `${category.key} slots`).toHaveLength(slots[category.key]);
+  });
+
+  expect(registry.TOOL_STATUSES).toEqual({
+    VERIFIED: 'Available — implemented and verified.',
+    UNVERIFIED: 'Available — implemented but not fully verified.',
+    IN_PROGRESS: 'In progress.',
+    PLANNED: 'Planned — not yet provided or developed.',
+    EXTERNAL: 'Requires external model/API.',
+    UNAVAILABLE: 'Temporarily unavailable.'
+  });
+});
+
 test('homepage exposes every required nav item and the search icon focuses the field', async ({ page }) => {
   await page.goto('/');
   const nav = page.locator('.nav-links');
@@ -18,7 +46,7 @@ test('active navigation and sidebar states follow the current page', async ({ pa
   await page.goto('/new-tools/');
   await expect(page.locator('.nav-links a[aria-current="page"]')).toHaveText('New Tools');
 
-  await page.goto('/tools/writing-text/');
+  await page.goto(registry.CATEGORY_COPY.writing.path);
   const active = page.locator('.sidebar-link.is-active');
   await expect(active).toHaveAttribute('data-sidebar-key', 'writing');
   await expect(active).toHaveAttribute('aria-current', 'page');
@@ -51,31 +79,129 @@ test('sidebar counts come from the registry and filter categories and tools', as
   await expect(page.locator('.tool-grid')).toContainText('Bionic Reading');
 });
 
-test('categories page lists all ten stable categories with dynamic counts', async ({ page }) => {
+test('categories page lists all nine canonical categories with available and planned counts', async ({ page }) => {
   await page.goto('/categories/');
   await expect(page.locator('h1')).toHaveText('Categories');
-  await expect(page.locator('.category-card')).toHaveCount(registry.CATEGORIES.length);
+  await expect(page.locator('.category-card')).toHaveCount(9);
   for (const category of registry.CATEGORIES) {
-    const count = registry.publishedByCategory(category.key).length;
+    const available = registry.publishedByCategory(category.key).length;
+    const planned = registry.plannedCount(category.key);
     const card = page.locator(`.category-card[href="${category.path}"]`);
     await expect(card).toContainText(category.name);
-    await expect(card.locator('.card-tag')).toHaveText(`${count} tool${count === 1 ? '' : 's'}`);
+    await expect(card.locator('.card-tag')).toHaveText(`${available} available · ${planned} planned`);
   }
 });
 
-test('every category page has a title, description, count, cards or an honest empty state', async ({ page }) => {
+test('every canonical category page has SEO copy, real tool links and planned slots', async ({ page }) => {
+  const titles = new Set();
+  const descriptions = new Set();
+  const canonicals = new Set();
+
   for (const category of registry.CATEGORIES) {
     await page.goto(category.path);
-    await expect(page.locator('h1')).toHaveText(category.label);
+    const available = registry.publishedByCategory(category.key);
+    const planned = registry.plannedCount(category.key);
+
+    await expect(page.locator('h1')).toHaveText(category.name);
     await expect(page.locator('.page-head p')).toContainText(category.intro);
-    const count = registry.publishedByCategory(category.key).length;
-    await expect(page.locator('.directory-count')).toHaveText(`${count} tool${count === 1 ? '' : 's'}`);
-    if (count === 0) {
-      await expect(page.locator('.empty-state')).toBeVisible();
-      await expect(page.locator('.empty-state')).toContainText('future tools');
-    } else {
-      await expect(page.locator('#tool-grid .card')).toHaveCount(count);
-    }
+    await expect(page.locator('.directory-count')).toHaveText(catalogCountText(available.length, planned));
+
+    const title = await page.title();
+    const description = await page.locator('meta[name="description"]').getAttribute('content');
+    const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
+    expect(title, `${category.key} title`).toBe(category.seoTitle);
+    expect(description, `${category.key} description`).toBe(category.seoDescription);
+    expect(canonical, `${category.key} canonical`).toBe(`https://letitedit.com${category.path}`);
+    expect(titles.has(title), `${category.key} duplicate title`).toBe(false);
+    expect(descriptions.has(description), `${category.key} duplicate description`).toBe(false);
+    expect(canonicals.has(canonical), `${category.key} duplicate canonical`).toBe(false);
+    titles.add(title);
+    descriptions.add(description);
+    canonicals.add(canonical);
+
+    const structured = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent());
+    expect(structured['@graph'].some(node => node['@type'] === 'BreadcrumbList'), `${category.key} breadcrumb data`).toBe(true);
+
+    await expect(page.locator('#tool-grid .available-card')).toHaveCount(available.length);
+    await expect(page.locator('#tool-grid .planned-card')).toHaveCount(planned);
+    const hrefs = await page.locator('#tool-grid .available-card').evaluateAll(
+      elements => elements.map(element => element.getAttribute('href'))
+    );
+    expect(hrefs.slice().sort(), `${category.key} preserved tool URLs`).toEqual(
+      available.map(tool => tool.pageUrl).sort()
+    );
+    expect(await page.locator('#tool-grid .planned-card a').count(), `${category.key} planned links`).toBe(0);
+  }
+
+  expect(titles.size).toBe(9);
+  expect(descriptions.size).toBe(9);
+  expect(canonicals.size).toBe(9);
+});
+
+test('category dropdown exposes all nine categories without overflow across breakpoints', async ({ page }) => {
+  for (const width of [375, 680, 800, 900, 1000, 1280]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto('/');
+    if (width <= 680) await page.click('.menu-button');
+
+    const toggle = page.locator('.nav-category-toggle');
+    const panel = page.locator('#nav-category-list');
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await toggle.click();
+    await expect(panel).toBeVisible();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(panel.locator('a')).toHaveCount(9);
+
+    const hrefs = await panel.locator('a').evaluateAll(elements => elements.map(element => element.getAttribute('href')));
+    expect(hrefs).toEqual(registry.CATEGORY_ORDER.map(key => registry.CATEGORY_COPY[key].path));
+
+    const box = await page.evaluate(() => {
+      const rect = document.getElementById('nav-category-list').getBoundingClientRect();
+      return { left: rect.left, right: rect.right, overflow: document.documentElement.scrollWidth - window.innerWidth };
+    });
+    expect(box.left, `${width}px dropdown left edge`).toBeGreaterThanOrEqual(-1);
+    expect(box.right, `${width}px dropdown right edge`).toBeLessThanOrEqual(width + 1);
+    expect(box.overflow, `${width}px dropdown page overflow`).toBeLessThanOrEqual(1);
+
+    await page.keyboard.press('Escape');
+    await expect(panel).toBeHidden();
+  }
+});
+
+test('planned slots use the exact vocabulary and never generate tool pages', async ({ page, request }) => {
+  const allowed = new Set(Object.values(registry.TOOL_STATUSES));
+  const searchIndex = await (await request.get('/js/search-index.js')).text();
+
+  for (const category of registry.CATEGORIES) {
+    await page.goto(category.path);
+    const plannedCards = page.locator('#tool-grid .planned-card');
+    const statuses = await plannedCards.evaluateAll(elements => elements.map(element => element.getAttribute('data-status')));
+    expect(statuses.length, `${category.key} planned count`).toBe(registry.plannedCount(category.key));
+    statuses.forEach(status => expect(allowed.has(status), `${category.key} invalid status: ${status}`).toBe(true));
+    expect(await plannedCards.locator('a').count(), `${category.key} planned card links`).toBe(0);
+
+    registry.catalogFor(category.key).filter(entry => !entry.available).forEach(entry => {
+      expect(searchIndex, `${entry.key} leaked into search`).not.toContain(`/tools/${entry.key}/`);
+    });
+  }
+
+  for (const path of ['/tools/flowchart-maker/', '/tools/ai-image-upscaler/', '/tools/paraphrasing-editor/']) {
+    expect((await request.get(path)).status(), `${path} should not be generated`).toBe(404);
+  }
+});
+
+test('legacy category paths stay live while old tool routes remain available', async ({ request }) => {
+  for (const [from, to] of Object.entries(registry.legacyCategoryRedirects)) {
+    const response = await request.get(from);
+    expect(response.status(), `${from} status`).toBe(200);
+    const html = await response.text();
+    expect(html, `${from} refresh`).toContain('http-equiv="refresh"');
+    expect(html, `${from} target`).toContain(`url=${to}`);
+    expect(html, `${from} canonical`).toContain(`href="https://letitedit.com${to}"`);
+  }
+
+  for (const path of ['/tools/writing-text/word-counter/', '/tools/coding-developer/json-formatter/']) {
+    expect((await request.get(path)).status(), `${path} should remain live`).toBe(200);
   }
 });
 

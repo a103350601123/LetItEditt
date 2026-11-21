@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/mobile-workspace.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Image Compressor","description":"Re-encode images through a canvas with selectable JPEG or WebP quality and an optional maximum dimension, comparing original and resulting byte sizes before download.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/image-compressor/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Image \u0026 Photo Tools","item":"https://letitedit.com/tools/image-photo/"},{"@type":"ListItem","position":3,"name":"Image Compressor","item":"https://letitedit.com/image-compressor/"}]},{"@type":"FAQPage","name":"Image Compressor","mainEntity":[{"@type":"Question","name":"Is my image uploaded for compression?","acceptedAnswer":{"@type":"Answer","text":"No. The file is decoded, drawn to a canvas and encoded again in your browser. Nothing is sent to LetitEdit or to an external compression service."}},{"@type":"Question","name":"Why does the quality setting not change my PNG?","acceptedAnswer":{"@type":"Answer","text":"PNG is lossless, so quality does not apply. The setting affects JPEG and WebP output only. To reduce a PNG, try the maximum dimension control or switch to WebP when that format is acceptable."}},{"@type":"Question","name":"Why was my file rejected?","acceptedAnswer":{"@type":"Answer","text":"Very large files are refused so the page stays responsive and your browser does not run out of memory. The page states the size limit clearly. Resize or trim the original before choosing it again."}},{"@type":"Question","name":"Will a lower quality always produce a smaller file?","acceptedAnswer":{"@type":"Answer","text":"Usually for JPEG and WebP, but not always. An image that is already heavily compressed may enlarge slightly when re-encoded, and some detailed pictures resist compression. Compare the two byte sizes shown before downloading."}},{"@type":"Question","name":"Which output format should I pick?","acceptedAnswer":{"@type":"Answer","text":"JPEG suits photographs where tiny colour changes are acceptable. WebP often gives smaller files and can keep transparency. PNG preserves exact pixels and alpha but may stay large, especially for photos."}}]}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Image Compressor","description":"Re-encode images through a canvas with selectable JPEG or WebP quality and an optional maximum dimension, comparing original and resulting byte sizes before download.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/image-compressor/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Image \u0026 Photo Editing","item":"https://letitedit.com/tools/image-photo-editing/"},{"@type":"ListItem","position":3,"name":"Image Compressor","item":"https://letitedit.com/image-compressor/"}]},{"@type":"FAQPage","name":"Image Compressor","mainEntity":[{"@type":"Question","name":"Is my image uploaded for compression?","acceptedAnswer":{"@type":"Answer","text":"No. The file is decoded, drawn to a canvas and encoded again in your browser. Nothing is sent to LetitEdit or to an external compression service."}},{"@type":"Question","name":"Why does the quality setting not change my PNG?","acceptedAnswer":{"@type":"Answer","text":"PNG is lossless, so quality does not apply. The setting affects JPEG and WebP output only. To reduce a PNG, try the maximum dimension control or switch to WebP when that format is acceptable."}},{"@type":"Question","name":"Why was my file rejected?","acceptedAnswer":{"@type":"Answer","text":"Very large files are refused so the page stays responsive and your browser does not run out of memory. The page states the size limit clearly. Resize or trim the original before choosing it again."}},{"@type":"Question","name":"Will a lower quality always produce a smaller file?","acceptedAnswer":{"@type":"Answer","text":"Usually for JPEG and WebP, but not always. An image that is already heavily compressed may enlarge slightly when re-encoded, and some detailed pictures resist compression. Compare the two byte sizes shown before downloading."}},{"@type":"Question","name":"Which output format should I pick?","acceptedAnswer":{"@type":"Answer","text":"JPEG suits photographs where tiny colour changes are acceptable. WebP often gives smaller files and can keep transparency. PNG preserves exact pixels and alpha but may stay large, especially for photos."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-image">
@@ -28,7 +28,22 @@
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
     <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
     <div class="nav-links" id="primary-links">
-      <a href="/categories/">Categories</a>
+      <div class="nav-category">
+        <a href="/categories/">Categories</a>
+        <button class="nav-category-toggle" type="button" aria-label="Show category menu" aria-controls="nav-category-list" aria-expanded="false" title="Browse categories">▾</button>
+        <div class="nav-category-panel" id="nav-category-list" hidden>
+          <span class="nav-category-title">All nine categories</span>
+          <a href="/tools/image-photo-editing/">Image &amp; Photo</a>
+        <a href="/tools/video-editing/">Video</a>
+        <a href="/tools/audio-music-editing/">Audio &amp; Music</a>
+        <a href="/tools/pdf-document-editing/">PDF &amp; Documents</a>
+        <a href="/tools/text-writing-editing/">Text &amp; Writing</a>
+        <a href="/tools/graphic-design-creative-editing/">Graphic Design</a>
+        <a href="/tools/web-code-editing/">Web &amp; Code</a>
+        <a href="/tools/diagram-presentation-productivity-design/">Diagrams &amp; Planning</a>
+        <a href="/tools/qr-barcode-utility-design/">QR &amp; Utilities</a>
+        </div>
+      </div>
       <a href="/new-tools/">New Tools</a>
       <a href="/news/">News</a>
       <a href="/blog/">Blog</a>
@@ -41,9 +56,9 @@
 <div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
-      <label class="sr-only" for="site-search">Search all 61 tools</label>
+      <label class="sr-only" for="site-search">Search all 62 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 62 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
       <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
@@ -51,12 +66,12 @@
 <div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="/">Home</a><span>/</span>
-  <a href="/tools/image-photo/">Image &amp; Photo Tools</a><span>/</span>
+  <a href="/tools/image-photo-editing/">Image &amp; Photo Editing</a><span>/</span>
   <span aria-current="page">Image Compressor</span>
 </nav>
 <section class="container page-head tool-head">
   <div class="tool-head-copy">
-    <span class="eyebrow">Image &amp; Photo Tools</span>
+    <span class="eyebrow">Image &amp; Photo Editing</span>
     <h1>Image Compressor</h1>
     <p>Image Compressor redraws your picture on a canvas and encodes it again at the quality you choose. You can cap the longest edge, compare the original and resulting byte sizes, and download the smaller file. PNG is re-encoded losslessly, so quality has no effect, and your file stays in the browser with very large inputs rejected by a clear limit.</p>
   </div>
@@ -129,7 +144,7 @@
     <div class="info-card">
       <h2>Related tools</h2>
       <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
-        <a class="card tool-card" href="/image-resizer/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📐</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Resizer</h3><p>Resize photos to exact pixel dimensions. Lock aspect ratio, use fit or stretch modes within a documented pixel cap, and export PNG, JPG or WebP.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-editor/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🖼️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Editor</h3><p>Crop, rotate and flip photos, adjust brightness, contrast and colour, add a text overlay, then export PNG, JPG or WebP — all locally in your browser.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-to-svg/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🖼️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image to SVG</h3><p>Wrap a PNG, JPG or WebP image in an SVG using a Base64 data URL. It includes width and height metadata and downloads as .svg, but does not vector-trace.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/add-border-to-image/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔲</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Add Border to Image</h3><p>Wrap a photo in a solid colour border of any width and colour. Preview the frame live, keep the original image intact and download the bordered result as a PNG.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a>
+        <a class="card tool-card" href="/image-resizer/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📐</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Resizer</h3><p>Resize photos to exact pixel dimensions. Lock aspect ratio, use fit or stretch modes within a documented pixel cap, and export PNG, JPG or WebP.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-editor/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🖼️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Editor</h3><p>Crop, rotate and flip photos, adjust brightness, contrast and colour, add a text overlay, then export PNG, JPG or WebP — all locally in your browser.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-to-svg/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🖼️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image to SVG</h3><p>Wrap a PNG, JPG or WebP image in an SVG using a Base64 data URL. It includes width and height metadata and downloads as .svg, but does not vector-trace.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/add-border-to-image/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔲</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Add Border to Image</h3><p>Wrap a photo in a solid colour border of any width and colour. Preview the frame live, keep the original image intact and download the bordered result as a PNG.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a>
       </div>
     </div>
   </div>
@@ -155,13 +170,17 @@
         </ul>
       </div>
       <div class="footer-column">
-        <h3>Popular categories</h3>
+        <h3>All categories</h3>
         <ul>
-          <li><a href="/tools/writing-text/">Text &amp; Writing</a></li>
-          <li><a href="/tools/coding-developer/">Developer Tools</a></li>
-          <li><a href="/tools/image-photo/">Image &amp; Photo</a></li>
-          <li><a href="/tools/video-audio/">Video &amp; Audio</a></li>
-          <li><a href="/tools/social-media/">Social Media</a></li>
+          <li><a href="/tools/image-photo-editing/">Image &amp; Photo Editing</a></li>
+          <li><a href="/tools/video-editing/">Video Editing</a></li>
+          <li><a href="/tools/audio-music-editing/">Audio &amp; Music Editing</a></li>
+          <li><a href="/tools/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+          <li><a href="/tools/text-writing-editing/">Text &amp; Writing Editing</a></li>
+          <li><a href="/tools/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+          <li><a href="/tools/web-code-editing/">Web &amp; Code Editing</a></li>
+          <li><a href="/tools/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+          <li><a href="/tools/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
         </ul>
       </div>
       <div class="footer-column">

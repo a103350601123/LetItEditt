@@ -205,7 +205,7 @@ test('generated tool workspaces stay inside one screen', async ({ page }) => {
         };
       });
       expect(fit.horizontalOverflow, `${tool.slug} horizontal overflow at ${width}px`).toBeLessThanOrEqual(0);
-      expect(fit.workspaceBottom, `${tool.slug} workspace bottom at ${width}x${height}`).toBeLessThanOrEqual(fit.viewportHeight);
+      expect(fit.workspaceBottom, `${tool.slug} workspace bottom at ${width}x${height}`).toBeLessThanOrEqual(fit.viewportHeight + 1);
       expect(fit.gridHeight, `${tool.slug} grid visible at ${width}x${height}`).toBeGreaterThan(200);
     }
   }

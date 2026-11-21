@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/mobile-workspace.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"AI Video-to-Shorts","description":"Preview a real source video, add and retime clips, reorder them, choose crops and layouts, edit captions, then export locally rendered MP4 or WebM shorts. Optional local Whisper and face models require explicit opt-in.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/video-to-shorts/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Video \u0026 Audio Tools","item":"https://letitedit.com/tools/video-audio/"},{"@type":"ListItem","position":3,"name":"AI Video-to-Shorts","item":"https://letitedit.com/video-to-shorts/"}]},{"@type":"FAQPage","name":"AI Video-to-Shorts","mainEntity":[{"@type":"Question","name":"What does the AI actually do?","acceptedAnswer":{"@type":"Answer","text":"By default it analyses measurable signals: audio loudness and changes in the picture. Peaks in those signals suggest moments worth reviewing. If you opt in, a locally running Whisper model also provides a transcript, and windows with denser speech can rank higher. It is a suggestion system, not an understanding of what makes a clip go viral."}},{"@type":"Question","name":"What happens if I do not enable the model?","acceptedAnswer":{"@type":"Answer","text":"The signal-based suggestions still work. You get candidate windows from loudness and motion, and you can export vertical clips from them. There is no transcript and no SRT file in that mode. The fallback is a real feature, not a disabled tool."}},{"@type":"Question","name":"Is anything uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. Analysis, cropping and encoding run in your browser. If you enable Whisper, its model files are downloaded to your device; your video is not sent anywhere. Model and media handling are disclosed before you opt in."}},{"@type":"Question","name":"How large are the optional model downloads?","acceptedAnswer":{"@type":"Answer","text":"The Whisper tiny model used for speech-aware ranking and caption drafts is roughly 75 to 80 MB with its support files, fetched only after you opt in and usually cached afterwards. The optional face detector fetches a small MediaPipe model (roughly 200-250 KB) only when you choose the face-centred layout and check its consent box. Neither download is required for manual clips, crops, captions or export."}},{"@type":"Question","name":"Will the suggestions always pick the best moments?","acceptedAnswer":{"@type":"Answer","text":"No. Loud moments can be arguments or noise, and motion can come from a camera shake. Transcript density favours busy speech, which may not be the most interesting part. Treat every window as a candidate and watch it before exporting. Your judgement is the final filter."}},{"@type":"Question","name":"How is framing handled?","acceptedAnswer":{"@type":"Answer","text":"Choose a 9:16, 4:5, 1:1 or 16:9 crop, a blurred contain fill, or split and presenter-style layouts that deliberately reuse the same source footage. You can set the crop centre and zoom by hand. Subject-centred cropping needs explicit face-detection opt-in and falls back to your chosen centre crop if no face is found. Active-speaker framing is only a stereo-balance or frame-motion crop hint; it does not identify who is talking. Check each generated preview before export."}}]}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"AI Video-to-Shorts","description":"Preview a real source video, add and retime clips, reorder them, choose crops and layouts, edit captions, then export locally rendered MP4 or WebM shorts. Optional local Whisper and face models require explicit opt-in.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/video-to-shorts/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Video Editing","item":"https://letitedit.com/tools/video-editing/"},{"@type":"ListItem","position":3,"name":"AI Video-to-Shorts","item":"https://letitedit.com/video-to-shorts/"}]},{"@type":"FAQPage","name":"AI Video-to-Shorts","mainEntity":[{"@type":"Question","name":"What does the AI actually do?","acceptedAnswer":{"@type":"Answer","text":"By default it analyses measurable signals: audio loudness and changes in the picture. Peaks in those signals suggest moments worth reviewing. If you opt in, a locally running Whisper model also provides a transcript, and windows with denser speech can rank higher. It is a suggestion system, not an understanding of what makes a clip go viral."}},{"@type":"Question","name":"What happens if I do not enable the model?","acceptedAnswer":{"@type":"Answer","text":"The signal-based suggestions still work. You get candidate windows from loudness and motion, and you can export vertical clips from them. There is no transcript and no SRT file in that mode. The fallback is a real feature, not a disabled tool."}},{"@type":"Question","name":"Is anything uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. Analysis, cropping and encoding run in your browser. If you enable Whisper, its model files are downloaded to your device; your video is not sent anywhere. Model and media handling are disclosed before you opt in."}},{"@type":"Question","name":"How large are the optional model downloads?","acceptedAnswer":{"@type":"Answer","text":"The Whisper tiny model used for speech-aware ranking and caption drafts is roughly 75 to 80 MB with its support files, fetched only after you opt in and usually cached afterwards. The optional face detector fetches a small MediaPipe model (roughly 200-250 KB) only when you choose the face-centred layout and check its consent box. Neither download is required for manual clips, crops, captions or export."}},{"@type":"Question","name":"Will the suggestions always pick the best moments?","acceptedAnswer":{"@type":"Answer","text":"No. Loud moments can be arguments or noise, and motion can come from a camera shake. Transcript density favours busy speech, which may not be the most interesting part. Treat every window as a candidate and watch it before exporting. Your judgement is the final filter."}},{"@type":"Question","name":"How is framing handled?","acceptedAnswer":{"@type":"Answer","text":"Choose a 9:16, 4:5, 1:1 or 16:9 crop, a blurred contain fill, or split and presenter-style layouts that deliberately reuse the same source footage. You can set the crop centre and zoom by hand. Subject-centred cropping needs explicit face-detection opt-in and falls back to your chosen centre crop if no face is found. Active-speaker framing is only a stereo-balance or frame-motion crop hint; it does not identify who is talking. Check each generated preview before export."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-video">
@@ -28,7 +28,22 @@
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
     <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
     <div class="nav-links" id="primary-links">
-      <a href="/categories/">Categories</a>
+      <div class="nav-category">
+        <a href="/categories/">Categories</a>
+        <button class="nav-category-toggle" type="button" aria-label="Show category menu" aria-controls="nav-category-list" aria-expanded="false" title="Browse categories">▾</button>
+        <div class="nav-category-panel" id="nav-category-list" hidden>
+          <span class="nav-category-title">All nine categories</span>
+          <a href="/tools/image-photo-editing/">Image &amp; Photo</a>
+        <a href="/tools/video-editing/">Video</a>
+        <a href="/tools/audio-music-editing/">Audio &amp; Music</a>
+        <a href="/tools/pdf-document-editing/">PDF &amp; Documents</a>
+        <a href="/tools/text-writing-editing/">Text &amp; Writing</a>
+        <a href="/tools/graphic-design-creative-editing/">Graphic Design</a>
+        <a href="/tools/web-code-editing/">Web &amp; Code</a>
+        <a href="/tools/diagram-presentation-productivity-design/">Diagrams &amp; Planning</a>
+        <a href="/tools/qr-barcode-utility-design/">QR &amp; Utilities</a>
+        </div>
+      </div>
       <a href="/new-tools/">New Tools</a>
       <a href="/news/">News</a>
       <a href="/blog/">Blog</a>
@@ -41,9 +56,9 @@
 <div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
-      <label class="sr-only" for="site-search">Search all 61 tools</label>
+      <label class="sr-only" for="site-search">Search all 62 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 62 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
       <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
@@ -51,12 +66,12 @@
 <div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="/">Home</a><span>/</span>
-  <a href="/tools/video-audio/">Video &amp; Audio Tools</a><span>/</span>
+  <a href="/tools/video-editing/">Video Editing</a><span>/</span>
   <span aria-current="page">AI Video-to-Shorts</span>
 </nav>
 <section class="container page-head tool-head">
   <div class="tool-head-copy">
-    <span class="eyebrow">Video &amp; Audio Tools</span>
+    <span class="eyebrow">Video Editing</span>
     <h1>AI Video-to-Shorts</h1>
     <p>Turn a longer video into short clips without uploading it. Play the real source, preview a time range, add as many clips as you need and reorder or retime them before export. Choose from vertical, square, blurred-fill and split layouts, review rendered clip previews, and write captions yourself or from an optional local transcript. Loudness, motion and optional speech analysis can also suggest candidate windows. No media is uploaded and no paid API is used.</p>
   </div>
@@ -127,7 +142,7 @@
     <div class="info-card">
       <h2>Related tools</h2>
       <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
-        <a class="card tool-card" href="/tools/video-editor/"><span class="card-top"><span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">🎞️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Professional Video Editor</h3><p>Open the existing dedicated video editor with a multi-track timeline, media library, text overlays, filters, transitions, voiceover and SRT support. Projects save in IndexedDB.</p><span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/subtitle-generator/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">📝</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Multilingual Subtitle Generator</h3><p>Generate editable captions from video or audio with opt-in local Whisper tiny speech recognition. Review editable timed lines and export SRT, VTT or TXT. No media is uploaded.</p><span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/video-trimmer/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">✂️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Video Trimmer</h3><p>Pick start and end points on a real preview, then cut a clip without an upload. The tool uses stream copy when it can and re-encodes only when a cut needs it. Export MP4 or WebM.</p><span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/audio-editor/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">🎧</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Audio Editor</h3><p>Edit audio or a video soundtrack locally with a wave-form, real gains, fades, compression, EQ, filtering, pitch/speed, music mixing, A/B playback and undo. Export WAV, MP3 or M4A without uploading.</p><span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span></a>
+        <a class="card tool-card" href="/tools/video-editor/"><span class="card-top"><span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">🎞️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Professional Video Editor</h3><p>Open the existing dedicated video editor with a multi-track timeline, media library, text overlays, filters, transitions, voiceover and SRT support. Projects save in IndexedDB.</p><span class="card-foot"><span class="card-tag">Video</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/subtitle-generator/"><span class="card-top"><span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">📝</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Multilingual Subtitle Generator</h3><p>Generate editable captions from video or audio with opt-in local Whisper tiny speech recognition. Review editable timed lines and export SRT, VTT or TXT. No media is uploaded.</p><span class="card-foot"><span class="card-tag">Video</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/video-trimmer/"><span class="card-top"><span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">✂️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Video Trimmer</h3><p>Pick start and end points on a real preview, then cut a clip without an upload. The tool uses stream copy when it can and re-encodes only when a cut needs it. Export MP4 or WebM.</p><span class="card-foot"><span class="card-tag">Video</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/audio-editor/"><span class="card-top"><span class="card-icon" style="--icon-bg:#0891b21a;--icon-color:#0891b2" aria-hidden="true">🎧</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Audio Editor</h3><p>Edit audio or a video soundtrack locally with a wave-form, real gains, fades, compression, EQ, filtering, pitch/speed, music mixing, A/B playback and undo. Export WAV, MP3 or M4A without uploading.</p><span class="card-foot"><span class="card-tag">Audio &amp; Music</span><span class="card-local">On-device</span></span></a>
       </div>
     </div>
   </div>
@@ -153,13 +168,17 @@
         </ul>
       </div>
       <div class="footer-column">
-        <h3>Popular categories</h3>
+        <h3>All categories</h3>
         <ul>
-          <li><a href="/tools/writing-text/">Text &amp; Writing</a></li>
-          <li><a href="/tools/coding-developer/">Developer Tools</a></li>
-          <li><a href="/tools/image-photo/">Image &amp; Photo</a></li>
-          <li><a href="/tools/video-audio/">Video &amp; Audio</a></li>
-          <li><a href="/tools/social-media/">Social Media</a></li>
+          <li><a href="/tools/image-photo-editing/">Image &amp; Photo Editing</a></li>
+          <li><a href="/tools/video-editing/">Video Editing</a></li>
+          <li><a href="/tools/audio-music-editing/">Audio &amp; Music Editing</a></li>
+          <li><a href="/tools/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+          <li><a href="/tools/text-writing-editing/">Text &amp; Writing Editing</a></li>
+          <li><a href="/tools/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+          <li><a href="/tools/web-code-editing/">Web &amp; Code Editing</a></li>
+          <li><a href="/tools/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+          <li><a href="/tools/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
         </ul>
       </div>
       <div class="footer-column">

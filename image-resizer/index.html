@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/mobile-workspace.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Image Resizer","description":"Resize photos to exact pixel dimensions. Lock aspect ratio, use fit or stretch modes within a documented pixel cap, and export PNG, JPG or WebP.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/image-resizer/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Image \u0026 Photo Tools","item":"https://letitedit.com/tools/image-photo/"},{"@type":"ListItem","position":3,"name":"Image Resizer","item":"https://letitedit.com/image-resizer/"}]},{"@type":"FAQPage","name":"Image Resizer","mainEntity":[{"@type":"Question","name":"Is my image uploaded to resize it?","acceptedAnswer":{"@type":"Answer","text":"No. The resizing happens in your browser using the file you open. No copy is sent to a server, and the working image is cleared when the page closes."}},{"@type":"Question","name":"What is the maximum output size?","acceptedAnswer":{"@type":"Answer","text":"Width and height are each capped at a documented limit to protect browser memory. Requests above that limit show a clear error; for a larger result, use a desktop editor or work in stages."}},{"@type":"Question","name":"What happens when I unlock the aspect ratio?","acceptedAnswer":{"@type":"Answer","text":"Unlocked mode lets you set any width and height. Fit scales the image to stay inside that box, which can leave empty space, while Stretch changes the proportions to fill it exactly and may distort faces or circles."}},{"@type":"Question","name":"Can I enlarge a small photo without blur?","acceptedAnswer":{"@type":"Answer","text":"You can enter dimensions larger than the source, but the browser can only interpolate existing pixels. Upscaling looks soft and cannot create new detail that was never captured."}},{"@type":"Question","name":"Why did my download keep the original size?","acceptedAnswer":{"@type":"Answer","text":"Check that you applied the resize before downloading and that both values are positive numbers within the allowed cap. A very large source may take time to process, so wait for the preview to update. Reloading also resets settings."}}]}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Image Resizer","description":"Resize photos to exact pixel dimensions. Lock aspect ratio, use fit or stretch modes within a documented pixel cap, and export PNG, JPG or WebP.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/image-resizer/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Image \u0026 Photo Editing","item":"https://letitedit.com/tools/image-photo-editing/"},{"@type":"ListItem","position":3,"name":"Image Resizer","item":"https://letitedit.com/image-resizer/"}]},{"@type":"FAQPage","name":"Image Resizer","mainEntity":[{"@type":"Question","name":"Is my image uploaded to resize it?","acceptedAnswer":{"@type":"Answer","text":"No. The resizing happens in your browser using the file you open. No copy is sent to a server, and the working image is cleared when the page closes."}},{"@type":"Question","name":"What is the maximum output size?","acceptedAnswer":{"@type":"Answer","text":"Width and height are each capped at a documented limit to protect browser memory. Requests above that limit show a clear error; for a larger result, use a desktop editor or work in stages."}},{"@type":"Question","name":"What happens when I unlock the aspect ratio?","acceptedAnswer":{"@type":"Answer","text":"Unlocked mode lets you set any width and height. Fit scales the image to stay inside that box, which can leave empty space, while Stretch changes the proportions to fill it exactly and may distort faces or circles."}},{"@type":"Question","name":"Can I enlarge a small photo without blur?","acceptedAnswer":{"@type":"Answer","text":"You can enter dimensions larger than the source, but the browser can only interpolate existing pixels. Upscaling looks soft and cannot create new detail that was never captured."}},{"@type":"Question","name":"Why did my download keep the original size?","acceptedAnswer":{"@type":"Answer","text":"Check that you applied the resize before downloading and that both values are positive numbers within the allowed cap. A very large source may take time to process, so wait for the preview to update. Reloading also resets settings."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-image">
@@ -28,7 +28,22 @@
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
     <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
     <div class="nav-links" id="primary-links">
-      <a href="/categories/">Categories</a>
+      <div class="nav-category">
+        <a href="/categories/">Categories</a>
+        <button class="nav-category-toggle" type="button" aria-label="Show category menu" aria-controls="nav-category-list" aria-expanded="false" title="Browse categories">▾</button>
+        <div class="nav-category-panel" id="nav-category-list" hidden>
+          <span class="nav-category-title">All nine categories</span>
+          <a href="/tools/image-photo-editing/">Image &amp; Photo</a>
+        <a href="/tools/video-editing/">Video</a>
+        <a href="/tools/audio-music-editing/">Audio &amp; Music</a>
+        <a href="/tools/pdf-document-editing/">PDF &amp; Documents</a>
+        <a href="/tools/text-writing-editing/">Text &amp; Writing</a>
+        <a href="/tools/graphic-design-creative-editing/">Graphic Design</a>
+        <a href="/tools/web-code-editing/">Web &amp; Code</a>
+        <a href="/tools/diagram-presentation-productivity-design/">Diagrams &amp; Planning</a>
+        <a href="/tools/qr-barcode-utility-design/">QR &amp; Utilities</a>
+        </div>
+      </div>
       <a href="/new-tools/">New Tools</a>
       <a href="/news/">News</a>
       <a href="/blog/">Blog</a>
@@ -41,9 +56,9 @@
 <div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
-      <label class="sr-only" for="site-search">Search all 61 tools</label>
+      <label class="sr-only" for="site-search">Search all 62 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 62 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
       <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
@@ -51,12 +66,12 @@
 <div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="/">Home</a><span>/</span>
-  <a href="/tools/image-photo/">Image &amp; Photo Tools</a><span>/</span>
+  <a href="/tools/image-photo-editing/">Image &amp; Photo Editing</a><span>/</span>
   <span aria-current="page">Image Resizer</span>
 </nav>
 <section class="container page-head tool-head">
   <div class="tool-head-copy">
-    <span class="eyebrow">Image &amp; Photo Tools</span>
+    <span class="eyebrow">Image &amp; Photo Editing</span>
     <h1>Image Resizer</h1>
     <p>Set an exact pixel width and height for any PNG, JPG or WebP image. Keep the aspect ratio locked for proportional resizing, or turn it off to fit or stretch the picture into the requested box. Dimensions are capped at a documented maximum to keep the browser responsive.</p>
   </div>
@@ -129,7 +144,7 @@
     <div class="info-card">
       <h2>Related tools</h2>
       <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
-        <a class="card tool-card" href="/image-compressor/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🗜️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Compressor</h3><p>Re-encode images through a canvas with selectable JPEG or WebP quality and an optional maximum dimension, comparing original and resulting byte sizes before download.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-flip-rotate/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔄</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Flip &amp; Rotate</h3><p>Flip or rotate images in your browser. Mirror horizontally or vertically, turn in 90-degree steps, combine operations, and export PNG, JPG or WebP without upload.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/screenshot-beautifier/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">✨</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Screenshot Beautifier</h3><p>Dress up a screenshot with gradient, solid, transparent or patterned backgrounds, padding, rounded corners, shadow, filters and title bars. Export a polished PNG.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/add-border-to-image/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔲</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Add Border to Image</h3><p>Wrap a photo in a solid colour border of any width and colour. Preview the frame live, keep the original image intact and download the bordered result as a PNG.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a>
+        <a class="card tool-card" href="/image-compressor/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🗜️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Compressor</h3><p>Re-encode images through a canvas with selectable JPEG or WebP quality and an optional maximum dimension, comparing original and resulting byte sizes before download.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-flip-rotate/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔄</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Flip &amp; Rotate</h3><p>Flip or rotate images in your browser. Mirror horizontally or vertically, turn in 90-degree steps, combine operations, and export PNG, JPG or WebP without upload.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/screenshot-beautifier/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">✨</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Screenshot Beautifier</h3><p>Dress up a screenshot with gradient, solid, transparent or patterned backgrounds, padding, rounded corners, shadow, filters and title bars. Export a polished PNG.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/add-border-to-image/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔲</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Add Border to Image</h3><p>Wrap a photo in a solid colour border of any width and colour. Preview the frame live, keep the original image intact and download the bordered result as a PNG.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a>
       </div>
     </div>
   </div>
@@ -155,13 +170,17 @@
         </ul>
       </div>
       <div class="footer-column">
-        <h3>Popular categories</h3>
+        <h3>All categories</h3>
         <ul>
-          <li><a href="/tools/writing-text/">Text &amp; Writing</a></li>
-          <li><a href="/tools/coding-developer/">Developer Tools</a></li>
-          <li><a href="/tools/image-photo/">Image &amp; Photo</a></li>
-          <li><a href="/tools/video-audio/">Video &amp; Audio</a></li>
-          <li><a href="/tools/social-media/">Social Media</a></li>
+          <li><a href="/tools/image-photo-editing/">Image &amp; Photo Editing</a></li>
+          <li><a href="/tools/video-editing/">Video Editing</a></li>
+          <li><a href="/tools/audio-music-editing/">Audio &amp; Music Editing</a></li>
+          <li><a href="/tools/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+          <li><a href="/tools/text-writing-editing/">Text &amp; Writing Editing</a></li>
+          <li><a href="/tools/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+          <li><a href="/tools/web-code-editing/">Web &amp; Code Editing</a></li>
+          <li><a href="/tools/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+          <li><a href="/tools/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
         </ul>
       </div>
       <div class="footer-column">

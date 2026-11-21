@@ -1,0 +1,17 @@
+[
+  {
+    "slug": "pdf-editor",
+    "name": "PDF Editor",
+    "title": "PDF Editor — Local PDF Editing, Signing and Organisation",
+    "description": "Edit, annotate, sign, redact, number and organise PDF documents locally in your browser without uploading them.",
+    "h1": "PDF Editor",
+    "icon": "📄",
+    "layout": "existing",
+    "outputType": "pdf",
+    "intro": "A preserved standalone PDF workspace for editing text, adding highlights and drawings, signing, redacting and organising pages locally.",
+    "keywords": ["pdf", "document", "editor", "annotate", "sign", "redact", "local"],
+    "aliases": ["Advanced PDF Editor", "free pdf editor"],
+    "related": ["image-compressor", "image-editor", "image-resizer"],
+    "url": "tools/pdf-editor/index.html"
+  }
+]

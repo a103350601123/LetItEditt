@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/mobile-workspace.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Image Editor","description":"Crop, rotate and flip photos, adjust brightness, contrast and colour, add a text overlay, then export PNG, JPG or WebP — all locally in your browser.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/image-editor/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Image \u0026 Photo Tools","item":"https://letitedit.com/tools/image-photo/"},{"@type":"ListItem","position":3,"name":"Image Editor","item":"https://letitedit.com/image-editor/"}]},{"@type":"FAQPage","name":"Image Editor","mainEntity":[{"@type":"Question","name":"Is my photo uploaded anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. The image is decoded and edited by JavaScript running in your browser. Nothing is sent to LetitEdit or to a third-party image service, and closing the page clears the working copy."}},{"@type":"Question","name":"What can I actually change here?","acceptedAnswer":{"@type":"Answer","text":"You can crop with a slider, rotate and flip, adjust brightness, contrast, saturation and blur, apply grayscale or sepia, and add a text overlay. It is meant for quick corrections rather than layered design work."}},{"@type":"Question","name":"Which formats can I export?","acceptedAnswer":{"@type":"Answer","text":"PNG, JPG and WebP. PNG keeps sharp text and flat colour, JPG produces smaller photo files, and WebP offers a good size and quality balance where it is supported."}},{"@type":"Question","name":"Why does my export look different from the preview?","acceptedAnswer":{"@type":"Answer","text":"JPG and WebP are lossy, so fine gradients or small text can soften slightly after saving. Choose PNG when you need pixel-exact output, and re-check the preview after changing format."}},{"@type":"Question","name":"This tool feels slow with a large photo. What can I do?","acceptedAnswer":{"@type":"Answer","text":"Very high-resolution files can take a moment to process in any browser. Crop first to reduce the working area, close other heavy tabs, and try a smaller source image if the page becomes unresponsive."}}]}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Image Editor","description":"Crop, rotate and flip photos, adjust brightness, contrast and colour, add a text overlay, then export PNG, JPG or WebP — all locally in your browser.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/image-editor/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Image \u0026 Photo Editing","item":"https://letitedit.com/tools/image-photo-editing/"},{"@type":"ListItem","position":3,"name":"Image Editor","item":"https://letitedit.com/image-editor/"}]},{"@type":"FAQPage","name":"Image Editor","mainEntity":[{"@type":"Question","name":"Is my photo uploaded anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. The image is decoded and edited by JavaScript running in your browser. Nothing is sent to LetitEdit or to a third-party image service, and closing the page clears the working copy."}},{"@type":"Question","name":"What can I actually change here?","acceptedAnswer":{"@type":"Answer","text":"You can crop with a slider, rotate and flip, adjust brightness, contrast, saturation and blur, apply grayscale or sepia, and add a text overlay. It is meant for quick corrections rather than layered design work."}},{"@type":"Question","name":"Which formats can I export?","acceptedAnswer":{"@type":"Answer","text":"PNG, JPG and WebP. PNG keeps sharp text and flat colour, JPG produces smaller photo files, and WebP offers a good size and quality balance where it is supported."}},{"@type":"Question","name":"Why does my export look different from the preview?","acceptedAnswer":{"@type":"Answer","text":"JPG and WebP are lossy, so fine gradients or small text can soften slightly after saving. Choose PNG when you need pixel-exact output, and re-check the preview after changing format."}},{"@type":"Question","name":"This tool feels slow with a large photo. What can I do?","acceptedAnswer":{"@type":"Answer","text":"Very high-resolution files can take a moment to process in any browser. Crop first to reduce the working area, close other heavy tabs, and try a smaller source image if the page becomes unresponsive."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-image">
@@ -28,7 +28,22 @@
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
     <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
     <div class="nav-links" id="primary-links">
-      <a href="/categories/">Categories</a>
+      <div class="nav-category">
+        <a href="/categories/">Categories</a>
+        <button class="nav-category-toggle" type="button" aria-label="Show category menu" aria-controls="nav-category-list" aria-expanded="false" title="Browse categories">▾</button>
+        <div class="nav-category-panel" id="nav-category-list" hidden>
+          <span class="nav-category-title">All nine categories</span>
+          <a href="/tools/image-photo-editing/">Image &amp; Photo</a>
+        <a href="/tools/video-editing/">Video</a>
+        <a href="/tools/audio-music-editing/">Audio &amp; Music</a>
+        <a href="/tools/pdf-document-editing/">PDF &amp; Documents</a>
+        <a href="/tools/text-writing-editing/">Text &amp; Writing</a>
+        <a href="/tools/graphic-design-creative-editing/">Graphic Design</a>
+        <a href="/tools/web-code-editing/">Web &amp; Code</a>
+        <a href="/tools/diagram-presentation-productivity-design/">Diagrams &amp; Planning</a>
+        <a href="/tools/qr-barcode-utility-design/">QR &amp; Utilities</a>
+        </div>
+      </div>
       <a href="/new-tools/">New Tools</a>
       <a href="/news/">News</a>
       <a href="/blog/">Blog</a>
@@ -41,9 +56,9 @@
 <div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
-      <label class="sr-only" for="site-search">Search all 61 tools</label>
+      <label class="sr-only" for="site-search">Search all 62 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 62 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
       <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
@@ -51,12 +66,12 @@
 <div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="/">Home</a><span>/</span>
-  <a href="/tools/image-photo/">Image &amp; Photo Tools</a><span>/</span>
+  <a href="/tools/image-photo-editing/">Image &amp; Photo Editing</a><span>/</span>
   <span aria-current="page">Image Editor</span>
 </nav>
 <section class="container page-head tool-head">
   <div class="tool-head-copy">
-    <span class="eyebrow">Image &amp; Photo Tools</span>
+    <span class="eyebrow">Image &amp; Photo Editing</span>
     <h1>Image Editor</h1>
     <p>A compact photo editor for the tweaks you need most: straighten a crop, correct exposure, add a caption and save in a web-friendly format. Everything happens in your browser, so your original file never leaves the device. There is no account, upload queue or waiting step.</p>
   </div>
@@ -127,7 +142,7 @@
     <div class="info-card">
       <h2>Related tools</h2>
       <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
-        <a class="card tool-card" href="/image-resizer/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📐</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Resizer</h3><p>Resize photos to exact pixel dimensions. Lock aspect ratio, use fit or stretch modes within a documented pixel cap, and export PNG, JPG or WebP.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-flip-rotate/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔄</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Flip &amp; Rotate</h3><p>Flip or rotate images in your browser. Mirror horizontally or vertically, turn in 90-degree steps, combine operations, and export PNG, JPG or WebP without upload.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/black-and-white-image-converter/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">⚫</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Black &amp; White Image Converter</h3><p>Convert photos to black and white in your browser. Pick smooth grayscale or an adjustable threshold for line art, keep transparency, and export PNG, JPG or WebP.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-compressor/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🗜️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Compressor</h3><p>Re-encode images through a canvas with selectable JPEG or WebP quality and an optional maximum dimension, comparing original and resulting byte sizes before download.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a>
+        <a class="card tool-card" href="/image-resizer/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📐</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Resizer</h3><p>Resize photos to exact pixel dimensions. Lock aspect ratio, use fit or stretch modes within a documented pixel cap, and export PNG, JPG or WebP.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-flip-rotate/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔄</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Flip &amp; Rotate</h3><p>Flip or rotate images in your browser. Mirror horizontally or vertically, turn in 90-degree steps, combine operations, and export PNG, JPG or WebP without upload.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/black-and-white-image-converter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">⚫</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Black &amp; White Image Converter</h3><p>Convert photos to black and white in your browser. Pick smooth grayscale or an adjustable threshold for line art, keep transparency, and export PNG, JPG or WebP.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-compressor/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🗜️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Compressor</h3><p>Re-encode images through a canvas with selectable JPEG or WebP quality and an optional maximum dimension, comparing original and resulting byte sizes before download.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a>
       </div>
     </div>
   </div>
@@ -153,13 +168,17 @@
         </ul>
       </div>
       <div class="footer-column">
-        <h3>Popular categories</h3>
+        <h3>All categories</h3>
         <ul>
-          <li><a href="/tools/writing-text/">Text &amp; Writing</a></li>
-          <li><a href="/tools/coding-developer/">Developer Tools</a></li>
-          <li><a href="/tools/image-photo/">Image &amp; Photo</a></li>
-          <li><a href="/tools/video-audio/">Video &amp; Audio</a></li>
-          <li><a href="/tools/social-media/">Social Media</a></li>
+          <li><a href="/tools/image-photo-editing/">Image &amp; Photo Editing</a></li>
+          <li><a href="/tools/video-editing/">Video Editing</a></li>
+          <li><a href="/tools/audio-music-editing/">Audio &amp; Music Editing</a></li>
+          <li><a href="/tools/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+          <li><a href="/tools/text-writing-editing/">Text &amp; Writing Editing</a></li>
+          <li><a href="/tools/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+          <li><a href="/tools/web-code-editing/">Web &amp; Code Editing</a></li>
+          <li><a href="/tools/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+          <li><a href="/tools/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
         </ul>
       </div>
       <div class="footer-column">

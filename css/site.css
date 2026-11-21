@@ -24,7 +24,7 @@ body {
   margin: 0;
   background: var(--white);
   color: var(--ink);
-  font: 16px/1.65 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font: 16px/1.65 "Noto Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Naskh Arabic", "Noto Sans Devanagari", "Noto Sans CJK SC", "Microsoft YaHei", "Yu Gothic", Roboto, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 a { color: var(--blue); text-decoration: none; }
@@ -33,6 +33,7 @@ a:hover { text-decoration: underline; }
 img { max-width: 100%; }
 button, input, select, textarea { font: inherit; max-width: 100%; }
 input[type="file"] { max-width: 100%; }
+textarea, input[type="text"], input[type="search"] { unicode-bidi: plaintext; }
 button { cursor: pointer; }
 :focus-visible { outline: 3px solid rgba(37, 99, 235, .38); outline-offset: 2px; }
 .skip-link {
@@ -89,6 +90,46 @@ button { cursor: pointer; }
 .nav-links { display: flex; align-items: center; gap: 18px; margin-left: auto; }
 .nav-links a { display: inline-flex; align-items: center; min-height: 38px; color: var(--muted); font-weight: 600; font-size: .94rem; }
 .nav-links a:hover, .nav-links a[aria-current="page"] { color: var(--blue); }
+.nav-category { position: relative; display: inline-flex; align-items: center; gap: 4px; }
+.nav-category-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--blue);
+  font-size: .75rem;
+  line-height: 1;
+}
+.nav-category-toggle:hover { background: var(--blue-pale); }
+.nav-category-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px 10px;
+  width: min(620px, calc(100vw - 32px));
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--white);
+  box-shadow: var(--shadow-xl);
+}
+.nav-category-title {
+  grid-column: 1 / -1;
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.nav-category-panel a { font-size: .86rem; min-height: 34px; }
 .menu-button {
   display: none;
   margin-left: auto;
@@ -402,6 +443,32 @@ button { cursor: pointer; }
 .card-local { color: var(--muted); font-size: .72rem; font-weight: 700; white-space: nowrap; }
 .card-local::before { content: '●'; margin-right: 5px; color: var(--blue-soft); font-size: .6rem; }
 
+/* Status vocabulary shared by available and planned catalog cards. */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  margin-top: 10px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: .68rem;
+  font-weight: 800;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.status-available-implemented-and-verified { background: #dbeafe; color: #1d4ed8; }
+.status-available-implemented-but-not-fully-verified { background: var(--blue-pale); color: var(--blue); }
+.status-in-progress { background: #fef3c7; color: #92400e; }
+.status-planned-not-yet-provided-or-developed { background: #f1f5f9; color: var(--muted); }
+.status-requires-external-model-api { background: #fff7ed; color: #9a3412; }
+.status-temporarily-unavailable { background: #fee2e2; color: #991b1b; }
+.catalog-label { margin-top: 6px; color: var(--muted); font-size: .72rem; line-height: 1.4; }
+.planned-card { border-style: dashed; }
+.planned-card::before { background: repeating-linear-gradient(90deg, var(--blue), var(--blue) 14px, var(--blue-soft) 14px, var(--blue-soft) 28px); }
+.planned-card .card-icon { background: #f1f5f9; color: var(--muted); }
+.card-planned-mark { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #f1f5f9; color: var(--muted); font-size: 1rem; }
+.related-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 14px; }
+
 .category-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .category-card {
   position: relative;
@@ -632,6 +699,21 @@ pre.output-box { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberatio
   .hero-inner { gap: 32px; }
 }
 
+/* Below the full desktop width the toggle can sit less than half a panel
+ * width from the left edge. Centre the menu in the viewport so it cannot be
+ * clipped while still leaving a consistent gutter at narrow tablet widths. */
+@media (min-width: 681px) and (max-width: 1180px) {
+  .nav-category-panel {
+    position: fixed;
+    top: 60px;
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    max-height: calc(100vh - 72px);
+    overflow-y: auto;
+  }
+}
+
 /* Tablet: the hero visual reorganises into a static card row so floating
  * elements can never cover the headline, search or calls to action. */
 @media (max-width: 1020px) {
@@ -657,6 +739,16 @@ pre.output-box { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberatio
   .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; margin: 0; padding: 12px 16px; background: var(--white); border-bottom: 1px solid var(--border); flex-direction: column; align-items: stretch; gap: 4px; box-shadow: 0 18px 30px rgba(15, 23, 42, .12); }
   .nav-links.is-open { display: flex; }
   .nav-links a { padding: 10px 4px; min-height: 44px; }
+  .nav-category { width: 100%; justify-content: space-between; }
+  .nav-category-toggle { flex: 0 0 44px; height: 44px; }
+  .nav-category-panel {
+    position: static;
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 6px;
+    padding: 12px;
+    box-shadow: none;
+  }
   .hero-inner { padding: 40px 16px 36px; }
   .hero h1 { font-size: clamp(2.2rem, 10vw, 3rem); }
   .hero-search { flex-wrap: wrap; border-radius: 14px; }
@@ -1335,6 +1427,20 @@ body.tool-page-dev .regex-replacement { max-width: 100%; overflow-wrap: anywhere
 }
 
 .hero :focus-visible { outline-color: #bfdbfe; }
+
+/* The shell mirrors when a translated page supplies dir="rtl". Tool code
+ * still decides which languages it genuinely processes. */
+[dir="rtl"] .nav-links { margin-left: 0; margin-right: auto; }
+[dir="rtl"] .menu-button { margin-left: 0; margin-right: auto; }
+[dir="rtl"] .search-icon,
+[dir="rtl"] .sidebar-search-icon { left: auto; right: 16px; }
+[dir="rtl"] .search-input { padding-left: 16px; padding-right: 44px; }
+[dir="rtl"] .sidebar-search input { padding-left: 12px; padding-right: 36px; }
+[dir="rtl"] .breadcrumbs,
+[dir="rtl"] .page-head,
+[dir="rtl"] .section-head { text-align: right; }
+[dir="rtl"] .card-arrow { transform: scaleX(-1); }
+[dir="rtl"] .tool-card:hover .card-arrow { transform: scaleX(-1) translate(2px, -2px); }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

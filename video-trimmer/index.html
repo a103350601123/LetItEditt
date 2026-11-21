@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/mobile-workspace.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Video Trimmer","description":"Pick start and end points on a real preview, then cut a clip without an upload. The tool uses stream copy when it can and re-encodes only when a cut needs it. Export MP4 or WebM.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/video-trimmer/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Video \u0026 Audio Tools","item":"https://letitedit.com/tools/video-audio/"},{"@type":"ListItem","position":3,"name":"Video Trimmer","item":"https://letitedit.com/video-trimmer/"}]},{"@type":"FAQPage","name":"Video Trimmer","mainEntity":[{"@type":"Question","name":"Is my video uploaded to a server?","acceptedAnswer":{"@type":"Answer","text":"No. Preview, seeking and cutting happen in your browser. The file is not sent to LetitEdit or to a remote rendering service, and the working copy disappears when you close or reload the page."}},{"@type":"Question","name":"What is stream copy, and when is re-encoding used?","acceptedAnswer":{"@type":"Answer","text":"Stream copy writes existing compressed frames into a new container without recompressing them, so it is fast and keeps quality. It works cleanly only at certain frame boundaries. When a precise cut falls between those points, the tool re-encodes the needed part so the clip starts and ends where you asked."}},{"@type":"Question","name":"Will re-encoding reduce quality?","acceptedAnswer":{"@type":"Answer","text":"Possibly, slightly. Re-encoding has to compress the picture again, which can soften fine detail. It is used only when a stream-copy cut would be inaccurate. If quality matters, keep the original file and compare the download against the preview before deleting anything."}},{"@type":"Question","name":"Why can I not trim a particular file?","acceptedAnswer":{"@type":"Answer","text":"The browser must be able to decode the source and encode the output. An unusual codec, a damaged file or a browser without the right encoder can stop the process. The tool reports a failure rather than downloading an empty clip; try another browser or export the source from its original app."}},{"@type":"Question","name":"Can I join several clips or add effects?","acceptedAnswer":{"@type":"Answer","text":"No. This tool makes one continuous cut from one source. For multiple clips, overlays or a soundtrack, open the full video editor. For a still image from a frame, a screenshot step is more appropriate than a trim."}},{"@type":"Question","name":"Does trimming keep the original file intact?","acceptedAnswer":{"@type":"Answer","text":"Yes. The source on your device is never modified. The download is a separate file, so you can make several different cuts from the same video. Download each result before starting another trim, because a reload clears the working state."}}]}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Video Trimmer","description":"Pick start and end points on a real preview, then cut a clip without an upload. The tool uses stream copy when it can and re-encodes only when a cut needs it. Export MP4 or WebM.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/video-trimmer/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Video Editing","item":"https://letitedit.com/tools/video-editing/"},{"@type":"ListItem","position":3,"name":"Video Trimmer","item":"https://letitedit.com/video-trimmer/"}]},{"@type":"FAQPage","name":"Video Trimmer","mainEntity":[{"@type":"Question","name":"Is my video uploaded to a server?","acceptedAnswer":{"@type":"Answer","text":"No. Preview, seeking and cutting happen in your browser. The file is not sent to LetitEdit or to a remote rendering service, and the working copy disappears when you close or reload the page."}},{"@type":"Question","name":"What is stream copy, and when is re-encoding used?","acceptedAnswer":{"@type":"Answer","text":"Stream copy writes existing compressed frames into a new container without recompressing them, so it is fast and keeps quality. It works cleanly only at certain frame boundaries. When a precise cut falls between those points, the tool re-encodes the needed part so the clip starts and ends where you asked."}},{"@type":"Question","name":"Will re-encoding reduce quality?","acceptedAnswer":{"@type":"Answer","text":"Possibly, slightly. Re-encoding has to compress the picture again, which can soften fine detail. It is used only when a stream-copy cut would be inaccurate. If quality matters, keep the original file and compare the download against the preview before deleting anything."}},{"@type":"Question","name":"Why can I not trim a particular file?","acceptedAnswer":{"@type":"Answer","text":"The browser must be able to decode the source and encode the output. An unusual codec, a damaged file or a browser without the right encoder can stop the process. The tool reports a failure rather than downloading an empty clip; try another browser or export the source from its original app."}},{"@type":"Question","name":"Can I join several clips or add effects?","acceptedAnswer":{"@type":"Answer","text":"No. This tool makes one continuous cut from one source. For multiple clips, overlays or a soundtrack, open the full video editor. For a still image from a frame, a screenshot step is more appropriate than a trim."}},{"@type":"Question","name":"Does trimming keep the original file intact?","acceptedAnswer":{"@type":"Answer","text":"Yes. The source on your device is never modified. The download is a separate file, so you can make several different cuts from the same video. Download each result before starting another trim, because a reload clears the working state."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-video">
@@ -28,7 +28,22 @@
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
     <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
     <div class="nav-links" id="primary-links">
-      <a href="/categories/">Categories</a>
+      <div class="nav-category">
+        <a href="/categories/">Categories</a>
+        <button class="nav-category-toggle" type="button" aria-label="Show category menu" aria-controls="nav-category-list" aria-expanded="false" title="Browse categories">▾</button>
+        <div class="nav-category-panel" id="nav-category-list" hidden>
+          <span class="nav-category-title">All nine categories</span>
+          <a href="/tools/image-photo-editing/">Image &amp; Photo</a>
+        <a href="/tools/video-editing/">Video</a>
+        <a href="/tools/audio-music-editing/">Audio &amp; Music</a>
+        <a href="/tools/pdf-document-editing/">PDF &amp; Documents</a>
+        <a href="/tools/text-writing-editing/">Text &amp; Writing</a>
+        <a href="/tools/graphic-design-creative-editing/">Graphic Design</a>
+        <a href="/tools/web-code-editing/">Web &amp; Code</a>
+        <a href="/tools/diagram-presentation-productivity-design/">Diagrams &amp; Planning</a>
+        <a href="/tools/qr-barcode-utility-design/">QR &amp; Utilities</a>
+        </div>
+      </div>
       <a href="/new-tools/">New Tools</a>
       <a href="/news/">News</a>
       <a href="/blog/">Blog</a>
@@ -41,9 +56,9 @@
 <div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
-      <label class="sr-only" for="site-search">Search all 61 tools</label>
+      <label class="sr-only" for="site-search">Search all 62 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 62 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
       <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
@@ -51,12 +66,12 @@
 <div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="/">Home</a><span>/</span>
-  <a href="/tools/video-audio/">Video &amp; Audio Tools</a><span>/</span>
+  <a href="/tools/video-editing/">Video Editing</a><span>/</span>
   <span aria-current="page">Video Trimmer</span>
 </nav>
 <section class="container page-head tool-head">
   <div class="tool-head-copy">
-    <span class="eyebrow">Video &amp; Audio Tools</span>
+    <span class="eyebrow">Video Editing</span>
     <h1>Video Trimmer</h1>
     <p>Cut a video down to the part you want by choosing points on an actual moving preview rather than typing blind timestamps. The trimmer decodes and plays your file locally and downloads a new clip in MP4 or WebM. It uses stream copy when the cut can be made that way and re-encodes when a precise cut requires it. Your video is never uploaded.</p>
   </div>
@@ -127,7 +142,7 @@
     <div class="info-card">
       <h2>Related tools</h2>
       <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
-        <a class="card tool-card" href="/tools/video-editor/"><span class="card-top"><span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">🎞️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Professional Video Editor</h3><p>Open the existing dedicated video editor with a multi-track timeline, media library, text overlays, filters, transitions, voiceover and SRT support. Projects save in IndexedDB.</p><span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/audio-editor/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">🎧</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Audio Editor</h3><p>Edit audio or a video soundtrack locally with a wave-form, real gains, fades, compression, EQ, filtering, pitch/speed, music mixing, A/B playback and undo. Export WAV, MP3 or M4A without uploading.</p><span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/mp4-to-gif/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">🔁</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>MP4 to GIF</h3><p>Turn a section of a video into an animated GIF in your browser. Choose the start, end, frame rate and width, then download a GIF made from real decoded frames. No upload is needed.</p><span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/video-to-shorts/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">📱</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>AI Video-to-Shorts</h3><p>Preview a real source video, add and retime clips, reorder them, choose crops and layouts, edit captions, then export locally rendered MP4 or WebM shorts. Optional local Whisper and face models require explicit opt-in.</p><span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span></a>
+        <a class="card tool-card" href="/tools/video-editor/"><span class="card-top"><span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">🎞️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Professional Video Editor</h3><p>Open the existing dedicated video editor with a multi-track timeline, media library, text overlays, filters, transitions, voiceover and SRT support. Projects save in IndexedDB.</p><span class="card-foot"><span class="card-tag">Video</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/audio-editor/"><span class="card-top"><span class="card-icon" style="--icon-bg:#0891b21a;--icon-color:#0891b2" aria-hidden="true">🎧</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Audio Editor</h3><p>Edit audio or a video soundtrack locally with a wave-form, real gains, fades, compression, EQ, filtering, pitch/speed, music mixing, A/B playback and undo. Export WAV, MP3 or M4A without uploading.</p><span class="card-foot"><span class="card-tag">Audio &amp; Music</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/mp4-to-gif/"><span class="card-top"><span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">🔁</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>MP4 to GIF</h3><p>Turn a section of a video into an animated GIF in your browser. Choose the start, end, frame rate and width, then download a GIF made from real decoded frames. No upload is needed.</p><span class="card-foot"><span class="card-tag">Video</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/video-to-shorts/"><span class="card-top"><span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">📱</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>AI Video-to-Shorts</h3><p>Preview a real source video, add and retime clips, reorder them, choose crops and layouts, edit captions, then export locally rendered MP4 or WebM shorts. Optional local Whisper and face models require explicit opt-in.</p><span class="card-foot"><span class="card-tag">Video</span><span class="card-local">On-device</span></span></a>
       </div>
     </div>
   </div>
@@ -153,13 +168,17 @@
         </ul>
       </div>
       <div class="footer-column">
-        <h3>Popular categories</h3>
+        <h3>All categories</h3>
         <ul>
-          <li><a href="/tools/writing-text/">Text &amp; Writing</a></li>
-          <li><a href="/tools/coding-developer/">Developer Tools</a></li>
-          <li><a href="/tools/image-photo/">Image &amp; Photo</a></li>
-          <li><a href="/tools/video-audio/">Video &amp; Audio</a></li>
-          <li><a href="/tools/social-media/">Social Media</a></li>
+          <li><a href="/tools/image-photo-editing/">Image &amp; Photo Editing</a></li>
+          <li><a href="/tools/video-editing/">Video Editing</a></li>
+          <li><a href="/tools/audio-music-editing/">Audio &amp; Music Editing</a></li>
+          <li><a href="/tools/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+          <li><a href="/tools/text-writing-editing/">Text &amp; Writing Editing</a></li>
+          <li><a href="/tools/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+          <li><a href="/tools/web-code-editing/">Web &amp; Code Editing</a></li>
+          <li><a href="/tools/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+          <li><a href="/tools/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
         </ul>
       </div>
       <div class="footer-column">

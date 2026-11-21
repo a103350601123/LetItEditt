@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,10 +15,10 @@
 <meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="../../../css/site.css">
-<link rel="stylesheet" href="../../../css/mobile-workspace.css">
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/mobile-workspace.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Regex Tester \u0026 Match Highlighter","description":"Test JavaScript regular expressions against sample text. See highlighted matches, capture groups, flags and replacement output instantly in your browser.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/coding-developer/regex-tester/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Coding \u0026 Developer Tools","item":"https://letitedit.com/tools/coding-developer/"},{"@type":"ListItem","position":3,"name":"Regex Tester \u0026 Match Highlighter","item":"https://letitedit.com/tools/coding-developer/regex-tester/"}]},{"@type":"FAQPage","name":"Regex Tester \u0026 Match Highlighter","mainEntity":[{"@type":"Question","name":"Which regular expression flavour does this tool use?","acceptedAnswer":{"@type":"Answer","text":"It uses the JavaScript engine in your browser, the same one used by new RegExp() and String.replace(). Patterns written for PCRE, Python or Java may need changes, especially around named groups, inline flags and some escape sequences."}},{"@type":"Question","name":"What does the global flag change?","acceptedAnswer":{"@type":"Answer","text":"Without the global flag the tester stops after the first match. With it enabled, every match is highlighted and listed, up to a safety limit of 1,000 results."}},{"@type":"Question","name":"Are capture groups shown?","acceptedAnswer":{"@type":"Answer","text":"Yes. Numbered and named groups appear in the match table. Optional groups that did not participate are shown as empty, and each match includes its starting index in the original test string."}},{"@type":"Question","name":"Does the replacement preview modify my text?","acceptedAnswer":{"@type":"Answer","text":"No. The replacement is calculated for preview only. Nothing is changed until you copy the output or apply the pattern in your own code."}},{"@type":"Question","name":"Can I use lookbehind or Unicode property escapes?","acceptedAnswer":{"@type":"Answer","text":"Lookbehind and property escapes such as \\p{Letter} are supported in current browsers but may be unavailable in older ones. Enable the Unicode flag for property escapes. The tester reports an error if the engine cannot compile the pattern."}}]}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Regex Tester \u0026 Match Highlighter","description":"Test JavaScript regular expressions against sample text. See highlighted matches, capture groups, flags and replacement output instantly in your browser.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/coding-developer/regex-tester/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Web \u0026 Code Editing","item":"https://letitedit.com/tools/web-code-editing/"},{"@type":"ListItem","position":3,"name":"Regex Tester \u0026 Match Highlighter","item":"https://letitedit.com/tools/coding-developer/regex-tester/"}]},{"@type":"FAQPage","name":"Regex Tester \u0026 Match Highlighter","mainEntity":[{"@type":"Question","name":"Which regular expression flavour does this tool use?","acceptedAnswer":{"@type":"Answer","text":"It uses the JavaScript engine in your browser, the same one used by new RegExp() and String.replace(). Patterns written for PCRE, Python or Java may need changes, especially around named groups, inline flags and some escape sequences."}},{"@type":"Question","name":"What does the global flag change?","acceptedAnswer":{"@type":"Answer","text":"Without the global flag the tester stops after the first match. With it enabled, every match is highlighted and listed, up to a safety limit of 1,000 results."}},{"@type":"Question","name":"Are capture groups shown?","acceptedAnswer":{"@type":"Answer","text":"Yes. Numbered and named groups appear in the match table. Optional groups that did not participate are shown as empty, and each match includes its starting index in the original test string."}},{"@type":"Question","name":"Does the replacement preview modify my text?","acceptedAnswer":{"@type":"Answer","text":"No. The replacement is calculated for preview only. Nothing is changed until you copy the output or apply the pattern in your own code."}},{"@type":"Question","name":"Can I use lookbehind or Unicode property escapes?","acceptedAnswer":{"@type":"Answer","text":"Lookbehind and property escapes such as \\p{Letter} are supported in current browsers but may be unavailable in older ones. Enable the Unicode flag for property escapes. The tester reports an error if the engine cannot compile the pattern."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-dev">
@@ -28,7 +28,22 @@
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
     <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
     <div class="nav-links" id="primary-links">
-      <a href="/categories/">Categories</a>
+      <div class="nav-category">
+        <a href="/categories/">Categories</a>
+        <button class="nav-category-toggle" type="button" aria-label="Show category menu" aria-controls="nav-category-list" aria-expanded="false" title="Browse categories">▾</button>
+        <div class="nav-category-panel" id="nav-category-list" hidden>
+          <span class="nav-category-title">All nine categories</span>
+          <a href="/tools/image-photo-editing/">Image &amp; Photo</a>
+        <a href="/tools/video-editing/">Video</a>
+        <a href="/tools/audio-music-editing/">Audio &amp; Music</a>
+        <a href="/tools/pdf-document-editing/">PDF &amp; Documents</a>
+        <a href="/tools/text-writing-editing/">Text &amp; Writing</a>
+        <a href="/tools/graphic-design-creative-editing/">Graphic Design</a>
+        <a href="/tools/web-code-editing/">Web &amp; Code</a>
+        <a href="/tools/diagram-presentation-productivity-design/">Diagrams &amp; Planning</a>
+        <a href="/tools/qr-barcode-utility-design/">QR &amp; Utilities</a>
+        </div>
+      </div>
       <a href="/new-tools/">New Tools</a>
       <a href="/news/">News</a>
       <a href="/blog/">Blog</a>
@@ -41,22 +56,22 @@
 <div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
-      <label class="sr-only" for="site-search">Search all 61 tools</label>
+      <label class="sr-only" for="site-search">Search all 62 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 62 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
       <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
 <div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
-  <a href="../../../">Home</a><span>/</span>
-  <a href="../../../tools/coding-developer/">Coding &amp; Developer Tools</a><span>/</span>
+  <a href="/">Home</a><span>/</span>
+  <a href="/tools/web-code-editing/">Web &amp; Code Editing</a><span>/</span>
   <span aria-current="page">Regex Tester &amp; Match Highlighter</span>
 </nav>
 <section class="container page-head tool-head">
   <div class="tool-head-copy">
-    <span class="eyebrow">Coding &amp; Developer Tools</span>
+    <span class="eyebrow">Web &amp; Code Editing</span>
     <h1>Regex Tester &amp; Match Highlighter</h1>
     <p>Write a JavaScript regular expression, choose flags and see every match highlighted, with capture groups and an optional replacement preview.</p>
   </div>
@@ -142,7 +157,7 @@ sam@site.org</div></div>
     <div class="info-card">
       <h2>Related tools</h2>
       <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
-        <a class="card tool-card" href="../../../tools/coding-developer/json-formatter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#0ea5e91a;--icon-color:#0ea5e9" aria-hidden="true">{ }</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>JSON Formatter &amp; Validator</h3><p>Format, minify, validate and sort JSON in your browser. See clear parse errors, choose indentation and copy the result instantly.</p><span class="card-foot"><span class="card-tag">Coding &amp; Developer</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/coding-developer/base64-encoder-decoder/"><span class="card-top"><span class="card-icon" style="--icon-bg:#0ea5e91a;--icon-color:#0ea5e9" aria-hidden="true">B64</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Base64 Encoder &amp; Decoder</h3><p>Encode text to Base64 or decode Base64 to UTF-8 text. Supports accents, emoji, URL-safe characters and optional padding, entirely in your browser.</p><span class="card-foot"><span class="card-tag">Coding &amp; Developer</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/find-and-replace/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔎</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Find and Replace</h3><p>Replace all occurrences of a literal string, or turn off case sensitivity to treat Find as a live regular expression with global and case-insensitive flags. Invalid patterns show a clear error.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/text-filter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧽</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Text Filter</h3><p>Remove whole words and highlight others with safe DOM spans. Terms are comma separated, matched case-insensitively with word boundaries, and input HTML is never executed.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a>
+        <a class="card tool-card" href="/tools/coding-developer/json-formatter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#0f766e1a;--icon-color:#0f766e" aria-hidden="true">{ }</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>JSON Formatter &amp; Validator</h3><p>Format, minify, validate and sort JSON in your browser. See clear parse errors, choose indentation and copy the result instantly.</p><span class="card-foot"><span class="card-tag">Web &amp; Code</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/tools/coding-developer/base64-encoder-decoder/"><span class="card-top"><span class="card-icon" style="--icon-bg:#0f766e1a;--icon-color:#0f766e" aria-hidden="true">B64</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Base64 Encoder &amp; Decoder</h3><p>Encode text to Base64 or decode Base64 to UTF-8 text. Supports accents, emoji, URL-safe characters and optional padding, entirely in your browser.</p><span class="card-foot"><span class="card-tag">Web &amp; Code</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/tools/writing-text/find-and-replace/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔎</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Find and Replace</h3><p>Replace all occurrences of a literal string, or turn off case sensitivity to treat Find as a live regular expression with global and case-insensitive flags. Invalid patterns show a clear error.</p><span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/tools/writing-text/text-filter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧽</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Text Filter</h3><p>Remove whole words and highlight others with safe DOM spans. Terms are comma separated, matched case-insensitively with word boundaries, and input HTML is never executed.</p><span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span></a>
       </div>
     </div>
   </div>
@@ -168,13 +183,17 @@ sam@site.org</div></div>
         </ul>
       </div>
       <div class="footer-column">
-        <h3>Popular categories</h3>
+        <h3>All categories</h3>
         <ul>
-          <li><a href="/tools/writing-text/">Text &amp; Writing</a></li>
-          <li><a href="/tools/coding-developer/">Developer Tools</a></li>
-          <li><a href="/tools/image-photo/">Image &amp; Photo</a></li>
-          <li><a href="/tools/video-audio/">Video &amp; Audio</a></li>
-          <li><a href="/tools/social-media/">Social Media</a></li>
+          <li><a href="/tools/image-photo-editing/">Image &amp; Photo Editing</a></li>
+          <li><a href="/tools/video-editing/">Video Editing</a></li>
+          <li><a href="/tools/audio-music-editing/">Audio &amp; Music Editing</a></li>
+          <li><a href="/tools/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+          <li><a href="/tools/text-writing-editing/">Text &amp; Writing Editing</a></li>
+          <li><a href="/tools/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+          <li><a href="/tools/web-code-editing/">Web &amp; Code Editing</a></li>
+          <li><a href="/tools/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+          <li><a href="/tools/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
         </ul>
       </div>
       <div class="footer-column">
@@ -197,13 +216,13 @@ sam@site.org</div></div>
     </div>
   </div>
 </footer>
-<script src="../../../js/search-index.js"></script>
-<script src="../../../js/sidebar-data.js"></script>
-<script src="../../../js/site.js"></script>
-<script src="../../../js/category-sidebar.js"></script>
-<script src="../../../js/mobile-workspace.js"></script>
-<script src="../../../js/dev-core.js"></script>
-<script src="../../../js/dev-runtime.js"></script>
+<script src="/js/search-index.js"></script>
+<script src="/js/sidebar-data.js"></script>
+<script src="/js/site.js"></script>
+<script src="/js/category-sidebar.js"></script>
+<script src="/js/mobile-workspace.js"></script>
+<script src="/js/dev-core.js"></script>
+<script src="/js/dev-runtime.js"></script>
 <script id="tool-config" type="application/json">{"slug":"regex-tester","engine":null,"outputType":"text","controls":[{"type":"text","key":"pattern","label":"Regular expression","placeholder":"For example: \\b\\w+@\\w+\\.\\w+\\b","default":""},{"type":"text","key":"replacement","label":"Replacement text (optional)","placeholder":"Use $1, $\u0026 or $\u003cname\u003e in the replacement","default":""},{"type":"checkbox","key":"global","label":"Global — find every match","default":true},{"type":"checkbox","key":"ignoreCase","label":"Ignore case (i)","default":false},{"type":"checkbox","key":"multiline","label":"Multiline anchors (m)","default":false},{"type":"checkbox","key":"dotAll","label":"Dot matches newlines (s)","default":false},{"type":"checkbox","key":"unicode","label":"Unicode mode (u)","default":false}],"example":{"input":"Contact jane@example.com or sam@site.org","pattern":"[\\w.+-]+@[\\w-]+\\.[\\w.]+","replacement":"","output":"jane@example.com\nsam@site.org"},"kind":"regex","inputLabel":"Test string","placeholder":"Paste the text you want to test…"}</script>
 </body>
 </html>

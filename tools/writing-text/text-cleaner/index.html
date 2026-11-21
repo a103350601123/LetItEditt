@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,10 +15,10 @@
 <meta name="twitter:card" content="summary">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="../../../css/site.css">
-<link rel="stylesheet" href="../../../css/mobile-workspace.css">
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/mobile-workspace.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Text Cleaner","description":"Clean messy text in one ordered pass: trim whitespace, strip HTML tags and emoji, remove accents, unify quotes, fix punctuation and expand shorthand. Everything runs in your browser.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/writing-text/text-cleaner/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Writing \u0026 Text Tools","item":"https://letitedit.com/tools/writing-text/"},{"@type":"ListItem","position":3,"name":"Text Cleaner","item":"https://letitedit.com/tools/writing-text/text-cleaner/"}]},{"@type":"FAQPage","name":"Text Cleaner","mainEntity":[{"@type":"Question","name":"Does this upload my text?","acceptedAnswer":{"@type":"Answer","text":"No. Cleaning happens entirely in your browser. Nothing is sent to a server."}},{"@type":"Question","name":"Does Strip emoji remove every emoji?","acceptedAnswer":{"@type":"Answer","text":"No. It targets the common pictograph ranges used by the reference tool, so some modern emoji, flags and joined sequences can remain. Use the Remove Emojis tool for the broader Unicode-range filter."}},{"@type":"Question","name":"What does the Default preset select?","acceptedAnswer":{"@type":"Answer","text":"It selects trim, remove leading and trailing spaces, strip HTML tags, strip emoji, collapse multiple spaces and reduce multiple blank lines. It leaves letter case unchanged."}},{"@type":"Question","name":"Can I undo a cleanup?","acceptedAnswer":{"@type":"Answer","text":"Yes. The Undo button restores the previous result. It is a simple history for this tool, not a full text-editor undo stack."}}]}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Text Cleaner","description":"Clean messy text in one ordered pass: trim whitespace, strip HTML tags and emoji, remove accents, unify quotes, fix punctuation and expand shorthand. Everything runs in your browser.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/tools/writing-text/text-cleaner/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Text \u0026 Writing Editing","item":"https://letitedit.com/tools/text-writing-editing/"},{"@type":"ListItem","position":3,"name":"Text Cleaner","item":"https://letitedit.com/tools/writing-text/text-cleaner/"}]},{"@type":"FAQPage","name":"Text Cleaner","mainEntity":[{"@type":"Question","name":"Does this upload my text?","acceptedAnswer":{"@type":"Answer","text":"No. Cleaning happens entirely in your browser. Nothing is sent to a server."}},{"@type":"Question","name":"Does Strip emoji remove every emoji?","acceptedAnswer":{"@type":"Answer","text":"No. It targets the common pictograph ranges used by the reference tool, so some modern emoji, flags and joined sequences can remain. Use the Remove Emojis tool for the broader Unicode-range filter."}},{"@type":"Question","name":"What does the Default preset select?","acceptedAnswer":{"@type":"Answer","text":"It selects trim, remove leading and trailing spaces, strip HTML tags, strip emoji, collapse multiple spaces and reduce multiple blank lines. It leaves letter case unchanged."}},{"@type":"Question","name":"Can I undo a cleanup?","acceptedAnswer":{"@type":"Answer","text":"Yes. The Undo button restores the previous result. It is a simple history for this tool, not a full text-editor undo stack."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-text">
@@ -28,7 +28,22 @@
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
     <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
     <div class="nav-links" id="primary-links">
-      <a href="/categories/">Categories</a>
+      <div class="nav-category">
+        <a href="/categories/">Categories</a>
+        <button class="nav-category-toggle" type="button" aria-label="Show category menu" aria-controls="nav-category-list" aria-expanded="false" title="Browse categories">▾</button>
+        <div class="nav-category-panel" id="nav-category-list" hidden>
+          <span class="nav-category-title">All nine categories</span>
+          <a href="/tools/image-photo-editing/">Image &amp; Photo</a>
+        <a href="/tools/video-editing/">Video</a>
+        <a href="/tools/audio-music-editing/">Audio &amp; Music</a>
+        <a href="/tools/pdf-document-editing/">PDF &amp; Documents</a>
+        <a href="/tools/text-writing-editing/">Text &amp; Writing</a>
+        <a href="/tools/graphic-design-creative-editing/">Graphic Design</a>
+        <a href="/tools/web-code-editing/">Web &amp; Code</a>
+        <a href="/tools/diagram-presentation-productivity-design/">Diagrams &amp; Planning</a>
+        <a href="/tools/qr-barcode-utility-design/">QR &amp; Utilities</a>
+        </div>
+      </div>
       <a href="/new-tools/">New Tools</a>
       <a href="/news/">News</a>
       <a href="/blog/">Blog</a>
@@ -41,22 +56,22 @@
 <div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
-      <label class="sr-only" for="site-search">Search all 61 tools</label>
+      <label class="sr-only" for="site-search">Search all 62 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 62 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
       <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
 </div>
 <div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
-  <a href="../../../">Home</a><span>/</span>
-  <a href="../../../tools/writing-text/">Writing &amp; Text Tools</a><span>/</span>
+  <a href="/">Home</a><span>/</span>
+  <a href="/tools/text-writing-editing/">Text &amp; Writing Editing</a><span>/</span>
   <span aria-current="page">Text Cleaner</span>
 </nav>
 <section class="container page-head tool-head">
   <div class="tool-head-copy">
-    <span class="eyebrow">Writing &amp; Text Tools</span>
+    <span class="eyebrow">Text &amp; Writing Editing</span>
     <h1>Text Cleaner</h1>
     <p>Pick the rules you need from five groups, then clean the text in the reference tool’s processing order. An undo button restores the previous result, and a Default preset selects the commonly used rules.</p>
   </div>
@@ -137,7 +152,7 @@
     <div class="info-card">
       <h2>Related tools</h2>
       <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
-        <a class="card tool-card" href="../../../tools/writing-text/remove-extra-spaces/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">↔️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Remove Extra Spaces</h3><p>Replace every run of whitespace, including tabs and line breaks, with a single space and trim the ends. Upload a .txt file or paste text and copy the cleaned result.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/remove-emojis/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🚫</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Remove Emojis from Text</h3><p>Strip emoji and pictographic symbols using the exact Unicode ranges of the reference tool. Upload a .txt file or paste text; a selected file takes priority over pasted input.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/remove-punctuation/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">✏️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Remove Punctuation</h3><p>Remove all Unicode punctuation, common English marks or your own chosen characters from pasted text, TXT, CSV, Markdown or DOCX while keeping letters and numbers.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="../../../tools/writing-text/word-counter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔢</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Word Counter &amp; Text Statistics</h3><p>Count words, grapheme-based characters, sentences and paragraphs. See reading and speaking time, keyword density for one-to-three-word phrases and an optional progress goal.</p><span class="card-foot"><span class="card-tag">Writing &amp; Text</span><span class="card-local">On-device</span></span></a>
+        <a class="card tool-card" href="/tools/writing-text/remove-extra-spaces/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">↔️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Remove Extra Spaces</h3><p>Replace every run of whitespace, including tabs and line breaks, with a single space and trim the ends. Upload a .txt file or paste text and copy the cleaned result.</p><span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/tools/writing-text/remove-emojis/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🚫</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Remove Emojis from Text</h3><p>Strip emoji and pictographic symbols using the exact Unicode ranges of the reference tool. Upload a .txt file or paste text; a selected file takes priority over pasted input.</p><span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/tools/writing-text/remove-punctuation/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">✏️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Remove Punctuation</h3><p>Remove all Unicode punctuation, common English marks or your own chosen characters from pasted text, TXT, CSV, Markdown or DOCX while keeping letters and numbers.</p><span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/tools/writing-text/word-counter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔢</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Word Counter &amp; Text Statistics</h3><p>Count words, grapheme-based characters, sentences and paragraphs. See reading and speaking time, keyword density for one-to-three-word phrases and an optional progress goal.</p><span class="card-foot"><span class="card-tag">Text &amp; Writing</span><span class="card-local">On-device</span></span></a>
       </div>
     </div>
   </div>
@@ -163,13 +178,17 @@
         </ul>
       </div>
       <div class="footer-column">
-        <h3>Popular categories</h3>
+        <h3>All categories</h3>
         <ul>
-          <li><a href="/tools/writing-text/">Text &amp; Writing</a></li>
-          <li><a href="/tools/coding-developer/">Developer Tools</a></li>
-          <li><a href="/tools/image-photo/">Image &amp; Photo</a></li>
-          <li><a href="/tools/video-audio/">Video &amp; Audio</a></li>
-          <li><a href="/tools/social-media/">Social Media</a></li>
+          <li><a href="/tools/image-photo-editing/">Image &amp; Photo Editing</a></li>
+          <li><a href="/tools/video-editing/">Video Editing</a></li>
+          <li><a href="/tools/audio-music-editing/">Audio &amp; Music Editing</a></li>
+          <li><a href="/tools/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+          <li><a href="/tools/text-writing-editing/">Text &amp; Writing Editing</a></li>
+          <li><a href="/tools/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+          <li><a href="/tools/web-code-editing/">Web &amp; Code Editing</a></li>
+          <li><a href="/tools/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+          <li><a href="/tools/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
         </ul>
       </div>
       <div class="footer-column">
@@ -192,13 +211,13 @@
     </div>
   </div>
 </footer>
-<script src="../../../js/search-index.js"></script>
-<script src="../../../js/sidebar-data.js"></script>
-<script src="../../../js/site.js"></script>
-<script src="../../../js/category-sidebar.js"></script>
-<script src="../../../js/mobile-workspace.js"></script>
-<script src="../../../js/reference-core.js"></script>
-<script src="../../../js/reference-runtime.js"></script>
+<script src="/js/search-index.js"></script>
+<script src="/js/sidebar-data.js"></script>
+<script src="/js/site.js"></script>
+<script src="/js/category-sidebar.js"></script>
+<script src="/js/mobile-workspace.js"></script>
+<script src="/js/reference-core.js"></script>
+<script src="/js/reference-runtime.js"></script>
 <script id="tool-config" type="application/json">{"slug":"text-cleaner","engine":"text-cleaner","layout":"single","outputType":"text","controls":[{"type":"checkbox","key":"normalizeUnicode","label":"Normalize Unicode (NFC)","default":true},{"type":"checkbox","key":"zeroWidth","label":"Remove zero-width and control characters","default":true},{"type":"checkbox","key":"tabs","label":"Convert tabs to spaces","default":true},{"type":"checkbox","key":"collapseSpaces","label":"Collapse repeated spaces","default":true},{"type":"checkbox","key":"trim","label":"Trim leading and trailing spaces","default":true}],"example":{"input":"Hello   world​!","output":"Hello world!"}}</script>
 </body>
 </html>

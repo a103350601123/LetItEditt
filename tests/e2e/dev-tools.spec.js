@@ -133,7 +133,7 @@ test('developer tool pages expose unique SEO metadata and 500+ word guides', asy
 
     await expect(page.locator('h1')).toHaveText(tool.h1);
     await expect(page.locator('nav.breadcrumbs')).toBeVisible();
-    await expect(page.locator('nav.breadcrumbs')).toContainText('Coding & Developer Tools');
+    await expect(page.locator('nav.breadcrumbs')).toContainText('Web & Code Editing');
     await expect(page.locator('.faq-item').first()).toBeVisible();
     await expect(page.locator('.article-card')).toBeVisible();
 
@@ -149,13 +149,14 @@ test('developer tool pages expose unique SEO metadata and 500+ word guides', asy
   expect(seen.size).toBe(3);
 });
 
-test('developer tools category page lists all three tools', async ({ page }) => {
-  await page.goto('/tools/coding-developer/');
-  await expect(page.locator('h1')).toHaveText('Coding & Developer Tools');
-  await expect(page.locator('.tool-grid a.card')).toHaveCount(3);
-  await expect(page.locator('.tool-grid')).toContainText('JSON Formatter & Validator');
-  await expect(page.locator('.tool-grid')).toContainText('Base64 Encoder & Decoder');
-  await expect(page.locator('.tool-grid')).toContainText('Regex Tester & Match Highlighter');
+test('web and code category page lists all three tools and its planned slots', async ({ page }) => {
+  await page.goto('/tools/web-code-editing/');
+  await expect(page.locator('h1')).toHaveText('Web & Code Editing');
+  await expect(page.locator('#tool-grid a.available-card')).toHaveCount(3);
+  await expect(page.locator('#tool-grid .planned-card')).toHaveCount(23);
+  await expect(page.locator('#tool-grid')).toContainText('JSON Formatter & Validator');
+  await expect(page.locator('#tool-grid')).toContainText('Base64 Encoder & Decoder');
+  await expect(page.locator('#tool-grid')).toContainText('Regex Tester & Match Highlighter');
 });
 
 test('developer tools have no horizontal overflow on mobile and desktop', async ({ page }) => {
@@ -193,7 +194,7 @@ test('developer tools have no horizontal overflow on mobile and desktop', async 
 test('developer tool internal links and search results resolve', async ({ page, request }) => {
   const pages = [
     '/',
-    '/tools/coding-developer/',
+    '/tools/web-code-editing/',
     devPath('json-formatter'),
     devPath('base64-encoder-decoder'),
     devPath('regex-tester')
@@ -218,7 +219,7 @@ test('developer tool internal links and search results resolve', async ({ page, 
   await page.goto('/');
   await page.fill('#site-search', 'json');
   await expect(page.locator('.search-result').first()).toContainText('JSON Formatter');
-  await expect(page.locator('.search-result').first()).toContainText('Coding & Developer Tools');
+  await expect(page.locator('.search-result').first()).toContainText('Web & Code Editing');
   await page.fill('#site-search', 'base64');
   await expect(page.locator('.search-result').first()).toContainText('Base64');
   await page.fill('#site-search', 'regex');

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/mobile-workspace.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Screenshot Beautifier","description":"Dress up a screenshot with gradient, solid, transparent or patterned backgrounds, padding, rounded corners, shadow, filters and title bars. Export a polished PNG.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/screenshot-beautifier/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Image \u0026 Photo Tools","item":"https://letitedit.com/tools/image-photo/"},{"@type":"ListItem","position":3,"name":"Screenshot Beautifier","item":"https://letitedit.com/screenshot-beautifier/"}]},{"@type":"FAQPage","name":"Screenshot Beautifier","mainEntity":[{"@type":"Question","name":"Is my screenshot uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. The composition is assembled in your browser, and the screenshot is never sent to LetitEdit or a third-party service."}},{"@type":"Question","name":"Can I make the background transparent?","acceptedAnswer":{"@type":"Answer","text":"Yes. Choose the transparent background option when you want the padding around the screenshot to stay see-through in the exported PNG."}},{"@type":"Question","name":"What do the Mac and Windows title bars do?","acceptedAnswer":{"@type":"Answer","text":"They add a decorative window bar above the capture with the familiar dot or button styling. They are visual framing only and do not change the screenshot content beneath."}},{"@type":"Question","name":"Will this fix a blurry or low-resolution screenshot?","acceptedAnswer":{"@type":"Answer","text":"No. Filters and framing can make a capture look tidier, but they cannot add detail that was not captured. Start with the sharpest original you have."}},{"@type":"Question","name":"My export has a hard edge or the shadow is cut off. Why?","acceptedAnswer":{"@type":"Answer","text":"Increase the padding so there is enough room around the screenshot for the shadow to render. Also check that a transparent background is not being viewed against a similarly coloured page."}}]}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Screenshot Beautifier","description":"Dress up a screenshot with gradient, solid, transparent or patterned backgrounds, padding, rounded corners, shadow, filters and title bars. Export a polished PNG.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/screenshot-beautifier/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Image \u0026 Photo Editing","item":"https://letitedit.com/tools/image-photo-editing/"},{"@type":"ListItem","position":3,"name":"Screenshot Beautifier","item":"https://letitedit.com/screenshot-beautifier/"}]},{"@type":"FAQPage","name":"Screenshot Beautifier","mainEntity":[{"@type":"Question","name":"Is my screenshot uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. The composition is assembled in your browser, and the screenshot is never sent to LetitEdit or a third-party service."}},{"@type":"Question","name":"Can I make the background transparent?","acceptedAnswer":{"@type":"Answer","text":"Yes. Choose the transparent background option when you want the padding around the screenshot to stay see-through in the exported PNG."}},{"@type":"Question","name":"What do the Mac and Windows title bars do?","acceptedAnswer":{"@type":"Answer","text":"They add a decorative window bar above the capture with the familiar dot or button styling. They are visual framing only and do not change the screenshot content beneath."}},{"@type":"Question","name":"Will this fix a blurry or low-resolution screenshot?","acceptedAnswer":{"@type":"Answer","text":"No. Filters and framing can make a capture look tidier, but they cannot add detail that was not captured. Start with the sharpest original you have."}},{"@type":"Question","name":"My export has a hard edge or the shadow is cut off. Why?","acceptedAnswer":{"@type":"Answer","text":"Increase the padding so there is enough room around the screenshot for the shadow to render. Also check that a transparent background is not being viewed against a similarly coloured page."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-image">
@@ -28,7 +28,22 @@
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
     <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
     <div class="nav-links" id="primary-links">
-      <a href="/categories/">Categories</a>
+      <div class="nav-category">
+        <a href="/categories/">Categories</a>
+        <button class="nav-category-toggle" type="button" aria-label="Show category menu" aria-controls="nav-category-list" aria-expanded="false" title="Browse categories">▾</button>
+        <div class="nav-category-panel" id="nav-category-list" hidden>
+          <span class="nav-category-title">All nine categories</span>
+          <a href="/tools/image-photo-editing/">Image &amp; Photo</a>
+        <a href="/tools/video-editing/">Video</a>
+        <a href="/tools/audio-music-editing/">Audio &amp; Music</a>
+        <a href="/tools/pdf-document-editing/">PDF &amp; Documents</a>
+        <a href="/tools/text-writing-editing/">Text &amp; Writing</a>
+        <a href="/tools/graphic-design-creative-editing/">Graphic Design</a>
+        <a href="/tools/web-code-editing/">Web &amp; Code</a>
+        <a href="/tools/diagram-presentation-productivity-design/">Diagrams &amp; Planning</a>
+        <a href="/tools/qr-barcode-utility-design/">QR &amp; Utilities</a>
+        </div>
+      </div>
       <a href="/new-tools/">New Tools</a>
       <a href="/news/">News</a>
       <a href="/blog/">Blog</a>
@@ -41,9 +56,9 @@
 <div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
-      <label class="sr-only" for="site-search">Search all 61 tools</label>
+      <label class="sr-only" for="site-search">Search all 62 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 62 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
       <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
@@ -51,12 +66,12 @@
 <div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="/">Home</a><span>/</span>
-  <a href="/tools/image-photo/">Image &amp; Photo Tools</a><span>/</span>
+  <a href="/tools/image-photo-editing/">Image &amp; Photo Editing</a><span>/</span>
   <span aria-current="page">Screenshot Beautifier</span>
 </nav>
 <section class="container page-head tool-head">
   <div class="tool-head-copy">
-    <span class="eyebrow">Image &amp; Photo Tools</span>
+    <span class="eyebrow">Image &amp; Photo Editing</span>
     <h1>Screenshot Beautifier</h1>
     <p>Turn a raw screenshot into something presentable in one pass. Add a background, padding, rounded corners and a soft shadow, apply a filter or a text overlay, and optionally frame the image with a Mac or Windows-style title bar. Download the finished PNG.</p>
   </div>
@@ -127,7 +142,7 @@
     <div class="info-card">
       <h2>Related tools</h2>
       <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
-        <a class="card tool-card" href="/image-editor/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🖼️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Editor</h3><p>Crop, rotate and flip photos, adjust brightness, contrast and colour, add a text overlay, then export PNG, JPG or WebP — all locally in your browser.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/add-border-to-image/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔲</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Add Border to Image</h3><p>Wrap a photo in a solid colour border of any width and colour. Preview the frame live, keep the original image intact and download the bordered result as a PNG.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-compressor/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🗜️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Compressor</h3><p>Re-encode images through a canvas with selectable JPEG or WebP quality and an optional maximum dimension, comparing original and resulting byte sizes before download.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-resizer/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📐</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Resizer</h3><p>Resize photos to exact pixel dimensions. Lock aspect ratio, use fit or stretch modes within a documented pixel cap, and export PNG, JPG or WebP.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a>
+        <a class="card tool-card" href="/image-editor/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🖼️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Editor</h3><p>Crop, rotate and flip photos, adjust brightness, contrast and colour, add a text overlay, then export PNG, JPG or WebP — all locally in your browser.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/add-border-to-image/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🔲</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Add Border to Image</h3><p>Wrap a photo in a solid colour border of any width and colour. Preview the frame live, keep the original image intact and download the bordered result as a PNG.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-compressor/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🗜️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Compressor</h3><p>Re-encode images through a canvas with selectable JPEG or WebP quality and an optional maximum dimension, comparing original and resulting byte sizes before download.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-resizer/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📐</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Resizer</h3><p>Resize photos to exact pixel dimensions. Lock aspect ratio, use fit or stretch modes within a documented pixel cap, and export PNG, JPG or WebP.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a>
       </div>
     </div>
   </div>
@@ -153,13 +168,17 @@
         </ul>
       </div>
       <div class="footer-column">
-        <h3>Popular categories</h3>
+        <h3>All categories</h3>
         <ul>
-          <li><a href="/tools/writing-text/">Text &amp; Writing</a></li>
-          <li><a href="/tools/coding-developer/">Developer Tools</a></li>
-          <li><a href="/tools/image-photo/">Image &amp; Photo</a></li>
-          <li><a href="/tools/video-audio/">Video &amp; Audio</a></li>
-          <li><a href="/tools/social-media/">Social Media</a></li>
+          <li><a href="/tools/image-photo-editing/">Image &amp; Photo Editing</a></li>
+          <li><a href="/tools/video-editing/">Video Editing</a></li>
+          <li><a href="/tools/audio-music-editing/">Audio &amp; Music Editing</a></li>
+          <li><a href="/tools/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+          <li><a href="/tools/text-writing-editing/">Text &amp; Writing Editing</a></li>
+          <li><a href="/tools/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+          <li><a href="/tools/web-code-editing/">Web &amp; Code Editing</a></li>
+          <li><a href="/tools/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+          <li><a href="/tools/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
         </ul>
       </div>
       <div class="footer-column">

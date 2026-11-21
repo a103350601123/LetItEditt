@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/mobile-workspace.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Screen Recorder","description":"Use your browser's share picker to record a tab, window or whole screen, add microphone audio if you want, pause and resume, then download a WebM file. All capture stays on your device.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/screen-recorder/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Video \u0026 Audio Tools","item":"https://letitedit.com/tools/video-audio/"},{"@type":"ListItem","position":3,"name":"Screen Recorder","item":"https://letitedit.com/screen-recorder/"}]},{"@type":"FAQPage","name":"Screen Recorder","mainEntity":[{"@type":"Question","name":"Does the recording leave my device?","acceptedAnswer":{"@type":"Answer","text":"No. The browser captures the chosen surface and encodes it locally, and the download is written straight to your device. LetitEdit does not receive the video, and there is no account, upload queue or remote storage."}},{"@type":"Question","name":"Will this work on my phone?","acceptedAnswer":{"@type":"Answer","text":"Possibly, but many mobile browsers do not expose screen capture to web pages, and those that do may limit it to the current tab. If your browser offers no capture option, there is nothing the tool can record; try a desktop browser instead."}},{"@type":"Question","name":"Can I record system audio or just my microphone?","acceptedAnswer":{"@type":"Answer","text":"This build captures microphone audio when you enable it. It does not request tab or system audio from the browser, so only your microphone is recorded in the download."}},{"@type":"Question","name":"Why does the browser show a permission prompt?","acceptedAnswer":{"@type":"Answer","text":"Screen capture is deliberately guarded by the browser. You must choose what to share and confirm each recording session. If you dismiss the prompt or pick the wrong surface, stop and start again; the live preview shows what is actually being captured."}},{"@type":"Question","name":"What format is downloaded, and can I edit it?","acceptedAnswer":{"@type":"Answer","text":"WebM, which is a common format for browser-recorded video. It plays in most current browsers and can often be trimmed or re-encoded elsewhere. Export options depend on what your browser can encode, so the download uses a supported WebM configuration rather than a fixed preset."}},{"@type":"Question","name":"What happens to the recording when I close the page?","acceptedAnswer":{"@type":"Answer","text":"The in-memory recording is discarded. Download the file before you navigate away or reload. Pausing does not save anything permanently; it simply stops adding frames until you resume."}}]}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Screen Recorder","description":"Use your browser's share picker to record a tab, window or whole screen, add microphone audio if you want, pause and resume, then download a WebM file. All capture stays on your device.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/screen-recorder/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Video Editing","item":"https://letitedit.com/tools/video-editing/"},{"@type":"ListItem","position":3,"name":"Screen Recorder","item":"https://letitedit.com/screen-recorder/"}]},{"@type":"FAQPage","name":"Screen Recorder","mainEntity":[{"@type":"Question","name":"Does the recording leave my device?","acceptedAnswer":{"@type":"Answer","text":"No. The browser captures the chosen surface and encodes it locally, and the download is written straight to your device. LetitEdit does not receive the video, and there is no account, upload queue or remote storage."}},{"@type":"Question","name":"Will this work on my phone?","acceptedAnswer":{"@type":"Answer","text":"Possibly, but many mobile browsers do not expose screen capture to web pages, and those that do may limit it to the current tab. If your browser offers no capture option, there is nothing the tool can record; try a desktop browser instead."}},{"@type":"Question","name":"Can I record system audio or just my microphone?","acceptedAnswer":{"@type":"Answer","text":"This build captures microphone audio when you enable it. It does not request tab or system audio from the browser, so only your microphone is recorded in the download."}},{"@type":"Question","name":"Why does the browser show a permission prompt?","acceptedAnswer":{"@type":"Answer","text":"Screen capture is deliberately guarded by the browser. You must choose what to share and confirm each recording session. If you dismiss the prompt or pick the wrong surface, stop and start again; the live preview shows what is actually being captured."}},{"@type":"Question","name":"What format is downloaded, and can I edit it?","acceptedAnswer":{"@type":"Answer","text":"WebM, which is a common format for browser-recorded video. It plays in most current browsers and can often be trimmed or re-encoded elsewhere. Export options depend on what your browser can encode, so the download uses a supported WebM configuration rather than a fixed preset."}},{"@type":"Question","name":"What happens to the recording when I close the page?","acceptedAnswer":{"@type":"Answer","text":"The in-memory recording is discarded. Download the file before you navigate away or reload. Pausing does not save anything permanently; it simply stops adding frames until you resume."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-video">
@@ -28,7 +28,22 @@
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
     <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
     <div class="nav-links" id="primary-links">
-      <a href="/categories/">Categories</a>
+      <div class="nav-category">
+        <a href="/categories/">Categories</a>
+        <button class="nav-category-toggle" type="button" aria-label="Show category menu" aria-controls="nav-category-list" aria-expanded="false" title="Browse categories">▾</button>
+        <div class="nav-category-panel" id="nav-category-list" hidden>
+          <span class="nav-category-title">All nine categories</span>
+          <a href="/tools/image-photo-editing/">Image &amp; Photo</a>
+        <a href="/tools/video-editing/">Video</a>
+        <a href="/tools/audio-music-editing/">Audio &amp; Music</a>
+        <a href="/tools/pdf-document-editing/">PDF &amp; Documents</a>
+        <a href="/tools/text-writing-editing/">Text &amp; Writing</a>
+        <a href="/tools/graphic-design-creative-editing/">Graphic Design</a>
+        <a href="/tools/web-code-editing/">Web &amp; Code</a>
+        <a href="/tools/diagram-presentation-productivity-design/">Diagrams &amp; Planning</a>
+        <a href="/tools/qr-barcode-utility-design/">QR &amp; Utilities</a>
+        </div>
+      </div>
       <a href="/new-tools/">New Tools</a>
       <a href="/news/">News</a>
       <a href="/blog/">Blog</a>
@@ -41,9 +56,9 @@
 <div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
-      <label class="sr-only" for="site-search">Search all 61 tools</label>
+      <label class="sr-only" for="site-search">Search all 62 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 62 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
       <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
@@ -51,12 +66,12 @@
 <div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="/">Home</a><span>/</span>
-  <a href="/tools/video-audio/">Video &amp; Audio Tools</a><span>/</span>
+  <a href="/tools/video-editing/">Video Editing</a><span>/</span>
   <span aria-current="page">Screen Recorder</span>
 </nav>
 <section class="container page-head tool-head">
   <div class="tool-head-copy">
-    <span class="eyebrow">Video &amp; Audio Tools</span>
+    <span class="eyebrow">Video Editing</span>
     <h1>Screen Recorder</h1>
     <p>Record a demo, a tutorial step or a bug you need to show someone. The recorder opens your browser&#39;s normal share prompt so you can choose a tab, window or full screen, shows a live preview while it runs, and saves a WebM file when you stop. Microphone audio is optional, and everything stays local. Some mobile browsers do not offer screen capture at all; the tool will say so rather than pretending to record.</p>
   </div>
@@ -127,7 +142,7 @@
     <div class="info-card">
       <h2>Related tools</h2>
       <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
-        <a class="card tool-card" href="/tools/video-editor/"><span class="card-top"><span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">🎞️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Professional Video Editor</h3><p>Open the existing dedicated video editor with a multi-track timeline, media library, text overlays, filters, transitions, voiceover and SRT support. Projects save in IndexedDB.</p><span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/video-trimmer/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">✂️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Video Trimmer</h3><p>Pick start and end points on a real preview, then cut a clip without an upload. The tool uses stream copy when it can and re-encodes only when a cut needs it. Export MP4 or WebM.</p><span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/audio-editor/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">🎧</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Audio Editor</h3><p>Edit audio or a video soundtrack locally with a wave-form, real gains, fades, compression, EQ, filtering, pitch/speed, music mixing, A/B playback and undo. Export WAV, MP3 or M4A without uploading.</p><span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/video-to-shorts/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">📱</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>AI Video-to-Shorts</h3><p>Preview a real source video, add and retime clips, reorder them, choose crops and layouts, edit captions, then export locally rendered MP4 or WebM shorts. Optional local Whisper and face models require explicit opt-in.</p><span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span></a>
+        <a class="card tool-card" href="/tools/video-editor/"><span class="card-top"><span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">🎞️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Professional Video Editor</h3><p>Open the existing dedicated video editor with a multi-track timeline, media library, text overlays, filters, transitions, voiceover and SRT support. Projects save in IndexedDB.</p><span class="card-foot"><span class="card-tag">Video</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/video-trimmer/"><span class="card-top"><span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">✂️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Video Trimmer</h3><p>Pick start and end points on a real preview, then cut a clip without an upload. The tool uses stream copy when it can and re-encodes only when a cut needs it. Export MP4 or WebM.</p><span class="card-foot"><span class="card-tag">Video</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/audio-editor/"><span class="card-top"><span class="card-icon" style="--icon-bg:#0891b21a;--icon-color:#0891b2" aria-hidden="true">🎧</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Audio Editor</h3><p>Edit audio or a video soundtrack locally with a wave-form, real gains, fades, compression, EQ, filtering, pitch/speed, music mixing, A/B playback and undo. Export WAV, MP3 or M4A without uploading.</p><span class="card-foot"><span class="card-tag">Audio &amp; Music</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/video-to-shorts/"><span class="card-top"><span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">📱</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>AI Video-to-Shorts</h3><p>Preview a real source video, add and retime clips, reorder them, choose crops and layouts, edit captions, then export locally rendered MP4 or WebM shorts. Optional local Whisper and face models require explicit opt-in.</p><span class="card-foot"><span class="card-tag">Video</span><span class="card-local">On-device</span></span></a>
       </div>
     </div>
   </div>
@@ -153,13 +168,17 @@
         </ul>
       </div>
       <div class="footer-column">
-        <h3>Popular categories</h3>
+        <h3>All categories</h3>
         <ul>
-          <li><a href="/tools/writing-text/">Text &amp; Writing</a></li>
-          <li><a href="/tools/coding-developer/">Developer Tools</a></li>
-          <li><a href="/tools/image-photo/">Image &amp; Photo</a></li>
-          <li><a href="/tools/video-audio/">Video &amp; Audio</a></li>
-          <li><a href="/tools/social-media/">Social Media</a></li>
+          <li><a href="/tools/image-photo-editing/">Image &amp; Photo Editing</a></li>
+          <li><a href="/tools/video-editing/">Video Editing</a></li>
+          <li><a href="/tools/audio-music-editing/">Audio &amp; Music Editing</a></li>
+          <li><a href="/tools/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+          <li><a href="/tools/text-writing-editing/">Text &amp; Writing Editing</a></li>
+          <li><a href="/tools/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+          <li><a href="/tools/web-code-editing/">Web &amp; Code Editing</a></li>
+          <li><a href="/tools/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+          <li><a href="/tools/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
         </ul>
       </div>
       <div class="footer-column">

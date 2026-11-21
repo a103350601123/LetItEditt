@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/mobile-workspace.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Black \u0026 White Image Converter","description":"Convert photos to black and white in your browser. Pick smooth grayscale or an adjustable threshold for line art, keep transparency, and export PNG, JPG or WebP.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/black-and-white-image-converter/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Image \u0026 Photo Tools","item":"https://letitedit.com/tools/image-photo/"},{"@type":"ListItem","position":3,"name":"Black \u0026 White Image Converter","item":"https://letitedit.com/black-and-white-image-converter/"}]},{"@type":"FAQPage","name":"Black \u0026 White Image Converter","mainEntity":[{"@type":"Question","name":"Is my image uploaded anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. The conversion runs in your browser using the image data you open. Nothing is sent to a server, and closing the page clears the working copy."}},{"@type":"Question","name":"What is the difference between grayscale and threshold?","acceptedAnswer":{"@type":"Answer","text":"Grayscale maps each pixel to a shade of gray, keeping subtle detail. Threshold converts pixels to pure black or white based on a slider, which suits line art, stamps and text scans."}},{"@type":"Question","name":"Will transparent pixels stay transparent?","acceptedAnswer":{"@type":"Answer","text":"Yes. Alpha values are left unchanged in both modes, so logos and cut-outs keep their soft edges. Choose PNG or WebP to preserve transparency; JPG does not support it."}},{"@type":"Question","name":"Can it colorise or restore an old photograph?","acceptedAnswer":{"@type":"Answer","text":"No. It only removes color information. It cannot add color, repair scratches, straighten a skewed page or enlarge a small image."}},{"@type":"Question","name":"Why does my threshold preview look too dark or too noisy?","acceptedAnswer":{"@type":"Answer","text":"Lighting and compression artifacts push pixels across the cut-off. Move the slider slowly, try grayscale first, and use a clean evenly lit scan for crisp line art. Large images may take a moment to render."}}]}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Black \u0026 White Image Converter","description":"Convert photos to black and white in your browser. Pick smooth grayscale or an adjustable threshold for line art, keep transparency, and export PNG, JPG or WebP.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/black-and-white-image-converter/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Image \u0026 Photo Editing","item":"https://letitedit.com/tools/image-photo-editing/"},{"@type":"ListItem","position":3,"name":"Black \u0026 White Image Converter","item":"https://letitedit.com/black-and-white-image-converter/"}]},{"@type":"FAQPage","name":"Black \u0026 White Image Converter","mainEntity":[{"@type":"Question","name":"Is my image uploaded anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. The conversion runs in your browser using the image data you open. Nothing is sent to a server, and closing the page clears the working copy."}},{"@type":"Question","name":"What is the difference between grayscale and threshold?","acceptedAnswer":{"@type":"Answer","text":"Grayscale maps each pixel to a shade of gray, keeping subtle detail. Threshold converts pixels to pure black or white based on a slider, which suits line art, stamps and text scans."}},{"@type":"Question","name":"Will transparent pixels stay transparent?","acceptedAnswer":{"@type":"Answer","text":"Yes. Alpha values are left unchanged in both modes, so logos and cut-outs keep their soft edges. Choose PNG or WebP to preserve transparency; JPG does not support it."}},{"@type":"Question","name":"Can it colorise or restore an old photograph?","acceptedAnswer":{"@type":"Answer","text":"No. It only removes color information. It cannot add color, repair scratches, straighten a skewed page or enlarge a small image."}},{"@type":"Question","name":"Why does my threshold preview look too dark or too noisy?","acceptedAnswer":{"@type":"Answer","text":"Lighting and compression artifacts push pixels across the cut-off. Move the slider slowly, try grayscale first, and use a clean evenly lit scan for crisp line art. Large images may take a moment to render."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-image">
@@ -28,7 +28,22 @@
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
     <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
     <div class="nav-links" id="primary-links">
-      <a href="/categories/">Categories</a>
+      <div class="nav-category">
+        <a href="/categories/">Categories</a>
+        <button class="nav-category-toggle" type="button" aria-label="Show category menu" aria-controls="nav-category-list" aria-expanded="false" title="Browse categories">▾</button>
+        <div class="nav-category-panel" id="nav-category-list" hidden>
+          <span class="nav-category-title">All nine categories</span>
+          <a href="/tools/image-photo-editing/">Image &amp; Photo</a>
+        <a href="/tools/video-editing/">Video</a>
+        <a href="/tools/audio-music-editing/">Audio &amp; Music</a>
+        <a href="/tools/pdf-document-editing/">PDF &amp; Documents</a>
+        <a href="/tools/text-writing-editing/">Text &amp; Writing</a>
+        <a href="/tools/graphic-design-creative-editing/">Graphic Design</a>
+        <a href="/tools/web-code-editing/">Web &amp; Code</a>
+        <a href="/tools/diagram-presentation-productivity-design/">Diagrams &amp; Planning</a>
+        <a href="/tools/qr-barcode-utility-design/">QR &amp; Utilities</a>
+        </div>
+      </div>
       <a href="/new-tools/">New Tools</a>
       <a href="/news/">News</a>
       <a href="/blog/">Blog</a>
@@ -41,9 +56,9 @@
 <div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
-      <label class="sr-only" for="site-search">Search all 61 tools</label>
+      <label class="sr-only" for="site-search">Search all 62 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 62 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
       <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
@@ -51,12 +66,12 @@
 <div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="/">Home</a><span>/</span>
-  <a href="/tools/image-photo/">Image &amp; Photo Tools</a><span>/</span>
+  <a href="/tools/image-photo-editing/">Image &amp; Photo Editing</a><span>/</span>
   <span aria-current="page">Black &amp; White Image Converter</span>
 </nav>
 <section class="container page-head tool-head">
   <div class="tool-head-copy">
-    <span class="eyebrow">Image &amp; Photo Tools</span>
+    <span class="eyebrow">Image &amp; Photo Editing</span>
     <h1>Black &amp; White Image Converter</h1>
     <p>Convert a color image to black and white without uploading it. Use smooth grayscale for photographs or an adjustable threshold to turn sketches and scanned line art into crisp high-contrast shapes. Transparent areas stay transparent, and the result downloads as PNG, JPG or WebP.</p>
   </div>
@@ -129,7 +144,7 @@
     <div class="info-card">
       <h2>Related tools</h2>
       <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
-        <a class="card tool-card" href="/image-inverter/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🌗</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Inverter</h3><p>Reverse every RGB channel value directly in your browser to create negative artwork, then export the result as PNG, JPG or WebP with transparency preserved.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-resizer/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📐</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Resizer</h3><p>Resize photos to exact pixel dimensions. Lock aspect ratio, use fit or stretch modes within a documented pixel cap, and export PNG, JPG or WebP.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-compressor/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🗜️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Compressor</h3><p>Re-encode images through a canvas with selectable JPEG or WebP quality and an optional maximum dimension, comparing original and resulting byte sizes before download.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/photo-merger/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧩</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Photo Merger</h3><p>Join up to six images into one picture, side by side or stacked, with adjustable spacing and a single PNG download. The merge happens locally in your browser.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a>
+        <a class="card tool-card" href="/image-inverter/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🌗</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Inverter</h3><p>Reverse every RGB channel value directly in your browser to create negative artwork, then export the result as PNG, JPG or WebP with transparency preserved.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-resizer/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">📐</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Resizer</h3><p>Resize photos to exact pixel dimensions. Lock aspect ratio, use fit or stretch modes within a documented pixel cap, and export PNG, JPG or WebP.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/image-compressor/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🗜️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Image Compressor</h3><p>Re-encode images through a canvas with selectable JPEG or WebP quality and an optional maximum dimension, comparing original and resulting byte sizes before download.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/photo-merger/"><span class="card-top"><span class="card-icon" style="--icon-bg:#2563eb1a;--icon-color:#2563eb" aria-hidden="true">🧩</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Photo Merger</h3><p>Join up to six images into one picture, side by side or stacked, with adjustable spacing and a single PNG download. The merge happens locally in your browser.</p><span class="card-foot"><span class="card-tag">Image &amp; Photo</span><span class="card-local">On-device</span></span></a>
       </div>
     </div>
   </div>
@@ -155,13 +170,17 @@
         </ul>
       </div>
       <div class="footer-column">
-        <h3>Popular categories</h3>
+        <h3>All categories</h3>
         <ul>
-          <li><a href="/tools/writing-text/">Text &amp; Writing</a></li>
-          <li><a href="/tools/coding-developer/">Developer Tools</a></li>
-          <li><a href="/tools/image-photo/">Image &amp; Photo</a></li>
-          <li><a href="/tools/video-audio/">Video &amp; Audio</a></li>
-          <li><a href="/tools/social-media/">Social Media</a></li>
+          <li><a href="/tools/image-photo-editing/">Image &amp; Photo Editing</a></li>
+          <li><a href="/tools/video-editing/">Video Editing</a></li>
+          <li><a href="/tools/audio-music-editing/">Audio &amp; Music Editing</a></li>
+          <li><a href="/tools/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+          <li><a href="/tools/text-writing-editing/">Text &amp; Writing Editing</a></li>
+          <li><a href="/tools/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+          <li><a href="/tools/web-code-editing/">Web &amp; Code Editing</a></li>
+          <li><a href="/tools/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+          <li><a href="/tools/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
         </ul>
       </div>
       <div class="footer-column">

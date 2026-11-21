@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/mobile-workspace.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"MP4 to GIF","description":"Turn a section of a video into an animated GIF in your browser. Choose the start, end, frame rate and width, then download a GIF made from real decoded frames. No upload is needed.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/mp4-to-gif/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Video \u0026 Audio Tools","item":"https://letitedit.com/tools/video-audio/"},{"@type":"ListItem","position":3,"name":"MP4 to GIF","item":"https://letitedit.com/mp4-to-gif/"}]},{"@type":"FAQPage","name":"MP4 to GIF","mainEntity":[{"@type":"Question","name":"Does the video get uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. The browser decodes the selected frames and the GIF is assembled locally. Nothing is sent to LetitEdit or to an image service, and reloading the page clears the working copy."}},{"@type":"Question","name":"Does this only accept MP4 files?","acceptedAnswer":{"@type":"Answer","text":"No. The name reflects the common use case, but any video the browser can decode will work. WebM and other playable formats can be used. If a file will not load, the browser may lack support for its codec."}},{"@type":"Question","name":"Why is my GIF so large?","acceptedAnswer":{"@type":"Answer","text":"GIF stores each frame as a limited palette image, so size grows quickly with width, frame rate and duration. Lower the frame rate, narrow the width or shorten the range. A few seconds at a modest size is usually enough for a reaction loop."}},{"@type":"Question","name":"Where did the sound go?","acceptedAnswer":{"@type":"Answer","text":"The GIF format does not carry audio. Only the picture is used. If you need sound, keep the original video or use a video export instead of a GIF."}},{"@type":"Question","name":"Why does the loop look choppy?","acceptedAnswer":{"@type":"Answer","text":"Choppiness comes from too few frames per second or from a source that was recorded at a low frame rate. Raising the GIF frame rate can smooth motion, but it also increases file size and processing time. Very fast motion may still look uneven."}},{"@type":"Question","name":"Can I make a GIF from the whole video?","acceptedAnswer":{"@type":"Answer","text":"Technically you can if it is short, but long GIFs become large and slow to build. Choose a compact, self-contained moment. The preview lets you check that the action starts and ends cleanly before you export."}}]}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"MP4 to GIF","description":"Turn a section of a video into an animated GIF in your browser. Choose the start, end, frame rate and width, then download a GIF made from real decoded frames. No upload is needed.","applicationCategory":"Utilities","operatingSystem":"Web browser","url":"https://letitedit.com/mp4-to-gif/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Video Editing","item":"https://letitedit.com/tools/video-editing/"},{"@type":"ListItem","position":3,"name":"MP4 to GIF","item":"https://letitedit.com/mp4-to-gif/"}]},{"@type":"FAQPage","name":"MP4 to GIF","mainEntity":[{"@type":"Question","name":"Does the video get uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. The browser decodes the selected frames and the GIF is assembled locally. Nothing is sent to LetitEdit or to an image service, and reloading the page clears the working copy."}},{"@type":"Question","name":"Does this only accept MP4 files?","acceptedAnswer":{"@type":"Answer","text":"No. The name reflects the common use case, but any video the browser can decode will work. WebM and other playable formats can be used. If a file will not load, the browser may lack support for its codec."}},{"@type":"Question","name":"Why is my GIF so large?","acceptedAnswer":{"@type":"Answer","text":"GIF stores each frame as a limited palette image, so size grows quickly with width, frame rate and duration. Lower the frame rate, narrow the width or shorten the range. A few seconds at a modest size is usually enough for a reaction loop."}},{"@type":"Question","name":"Where did the sound go?","acceptedAnswer":{"@type":"Answer","text":"The GIF format does not carry audio. Only the picture is used. If you need sound, keep the original video or use a video export instead of a GIF."}},{"@type":"Question","name":"Why does the loop look choppy?","acceptedAnswer":{"@type":"Answer","text":"Choppiness comes from too few frames per second or from a source that was recorded at a low frame rate. Raising the GIF frame rate can smooth motion, but it also increases file size and processing time. Very fast motion may still look uneven."}},{"@type":"Question","name":"Can I make a GIF from the whole video?","acceptedAnswer":{"@type":"Answer","text":"Technically you can if it is short, but long GIFs become large and slow to build. Choose a compact, self-contained moment. The preview lets you check that the action starts and ends cleanly before you export."}}]}]}
 </script>
 </head>
 <body class="tool-page tool-page-video">
@@ -28,7 +28,22 @@
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
     <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
     <div class="nav-links" id="primary-links">
-      <a href="/categories/">Categories</a>
+      <div class="nav-category">
+        <a href="/categories/">Categories</a>
+        <button class="nav-category-toggle" type="button" aria-label="Show category menu" aria-controls="nav-category-list" aria-expanded="false" title="Browse categories">▾</button>
+        <div class="nav-category-panel" id="nav-category-list" hidden>
+          <span class="nav-category-title">All nine categories</span>
+          <a href="/tools/image-photo-editing/">Image &amp; Photo</a>
+        <a href="/tools/video-editing/">Video</a>
+        <a href="/tools/audio-music-editing/">Audio &amp; Music</a>
+        <a href="/tools/pdf-document-editing/">PDF &amp; Documents</a>
+        <a href="/tools/text-writing-editing/">Text &amp; Writing</a>
+        <a href="/tools/graphic-design-creative-editing/">Graphic Design</a>
+        <a href="/tools/web-code-editing/">Web &amp; Code</a>
+        <a href="/tools/diagram-presentation-productivity-design/">Diagrams &amp; Planning</a>
+        <a href="/tools/qr-barcode-utility-design/">QR &amp; Utilities</a>
+        </div>
+      </div>
       <a href="/new-tools/">New Tools</a>
       <a href="/news/">News</a>
       <a href="/blog/">Blog</a>
@@ -41,9 +56,9 @@
 <div class="site-search-strip" id="search-strip" role="search">
   <div class="container">
     <div class="search-wrap">
-      <label class="sr-only" for="site-search">Search all 61 tools</label>
+      <label class="sr-only" for="site-search">Search all 62 tools</label>
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 61 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
+      <input class="search-input" id="site-search" type="search" name="q" data-search-input placeholder="Search 62 free tools…" aria-label="Search all tools" aria-controls="search-results" aria-expanded="false" autocomplete="off">
       <div class="search-results" id="search-results" data-search-results role="listbox" aria-label="Tool search results" hidden></div>
     </div>
   </div>
@@ -51,12 +66,12 @@
 <div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="/">Home</a><span>/</span>
-  <a href="/tools/video-audio/">Video &amp; Audio Tools</a><span>/</span>
+  <a href="/tools/video-editing/">Video Editing</a><span>/</span>
   <span aria-current="page">MP4 to GIF</span>
 </nav>
 <section class="container page-head tool-head">
   <div class="tool-head-copy">
-    <span class="eyebrow">Video &amp; Audio Tools</span>
+    <span class="eyebrow">Video Editing</span>
     <h1>MP4 to GIF</h1>
     <p>Make a short looping GIF from a moment in a video. Pick a start and end on the preview, set a frame rate and width, and the tool decodes the real frames and builds the animation locally. It is named MP4 to GIF, but in practice it accepts any video your browser can play. No file is uploaded.</p>
   </div>
@@ -127,7 +142,7 @@
     <div class="info-card">
       <h2>Related tools</h2>
       <div class="grid tool-grid" style="grid-template-columns:1fr;gap:12px">
-        <a class="card tool-card" href="/video-trimmer/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">✂️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Video Trimmer</h3><p>Pick start and end points on a real preview, then cut a clip without an upload. The tool uses stream copy when it can and re-encodes only when a cut needs it. Export MP4 or WebM.</p><span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/tools/video-editor/"><span class="card-top"><span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">🎞️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Professional Video Editor</h3><p>Open the existing dedicated video editor with a multi-track timeline, media library, text overlays, filters, transitions, voiceover and SRT support. Projects save in IndexedDB.</p><span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/video-background-remover/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">🎭</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Video Background Remover</h3><p>Use opt-in local MediaPipe person segmentation to replace a video background with a colour or image. Download a video or transparent WebM where your browser supports alpha.</p><span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/video-to-shorts/index.html"><span class="card-top"><span class="card-icon" style="--icon-bg:#ec48991a;--icon-color:#ec4899" aria-hidden="true">📱</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>AI Video-to-Shorts</h3><p>Preview a real source video, add and retime clips, reorder them, choose crops and layouts, edit captions, then export locally rendered MP4 or WebM shorts. Optional local Whisper and face models require explicit opt-in.</p><span class="card-foot"><span class="card-tag">Video &amp; Audio</span><span class="card-local">On-device</span></span></a>
+        <a class="card tool-card" href="/video-trimmer/"><span class="card-top"><span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">✂️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Video Trimmer</h3><p>Pick start and end points on a real preview, then cut a clip without an upload. The tool uses stream copy when it can and re-encodes only when a cut needs it. Export MP4 or WebM.</p><span class="card-foot"><span class="card-tag">Video</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/tools/video-editor/"><span class="card-top"><span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">🎞️</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Professional Video Editor</h3><p>Open the existing dedicated video editor with a multi-track timeline, media library, text overlays, filters, transitions, voiceover and SRT support. Projects save in IndexedDB.</p><span class="card-foot"><span class="card-tag">Video</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/video-background-remover/"><span class="card-top"><span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">🎭</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>Video Background Remover</h3><p>Use opt-in local MediaPipe person segmentation to replace a video background with a colour or image. Download a video or transparent WebM where your browser supports alpha.</p><span class="card-foot"><span class="card-tag">Video</span><span class="card-local">On-device</span></span></a><a class="card tool-card" href="/video-to-shorts/"><span class="card-top"><span class="card-icon" style="--icon-bg:#7c3aed1a;--icon-color:#7c3aed" aria-hidden="true">📱</span><span class="card-arrow" aria-hidden="true">↗</span></span><h3>AI Video-to-Shorts</h3><p>Preview a real source video, add and retime clips, reorder them, choose crops and layouts, edit captions, then export locally rendered MP4 or WebM shorts. Optional local Whisper and face models require explicit opt-in.</p><span class="card-foot"><span class="card-tag">Video</span><span class="card-local">On-device</span></span></a>
       </div>
     </div>
   </div>
@@ -153,13 +168,17 @@
         </ul>
       </div>
       <div class="footer-column">
-        <h3>Popular categories</h3>
+        <h3>All categories</h3>
         <ul>
-          <li><a href="/tools/writing-text/">Text &amp; Writing</a></li>
-          <li><a href="/tools/coding-developer/">Developer Tools</a></li>
-          <li><a href="/tools/image-photo/">Image &amp; Photo</a></li>
-          <li><a href="/tools/video-audio/">Video &amp; Audio</a></li>
-          <li><a href="/tools/social-media/">Social Media</a></li>
+          <li><a href="/tools/image-photo-editing/">Image &amp; Photo Editing</a></li>
+          <li><a href="/tools/video-editing/">Video Editing</a></li>
+          <li><a href="/tools/audio-music-editing/">Audio &amp; Music Editing</a></li>
+          <li><a href="/tools/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+          <li><a href="/tools/text-writing-editing/">Text &amp; Writing Editing</a></li>
+          <li><a href="/tools/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+          <li><a href="/tools/web-code-editing/">Web &amp; Code Editing</a></li>
+          <li><a href="/tools/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+          <li><a href="/tools/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
         </ul>
       </div>
       <div class="footer-column">
