@@ -25,15 +25,112 @@
 <header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
-    <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
     <div class="nav-links" id="primary-links">
       <a href="/categories/" aria-current="page">Categories</a>
       <a href="/blog/">Blog</a>
       <a href="/news/">News</a>
       <a href="/faq/">FAQ</a>
     </div>
+    <div class="nav-actions">
+      <button class="search-button" type="button" data-search-open aria-haspopup="dialog" aria-controls="search-dialog">
+        <span class="search-button-icon" aria-hidden="true">🔍</span><span class="search-button-label">Search</span>
+      </button>
+      <button class="menu-button" type="button" aria-controls="mobile-menu" aria-expanded="false">Menu</button>
+    </div>
   </nav>
 </header>
+<div class="mobile-menu" id="mobile-menu" hidden>
+  <div class="mobile-menu-backdrop" data-menu-close></div>
+  <div class="mobile-menu-panel" role="dialog" aria-modal="true" aria-label="Site menu">
+    <div class="mobile-menu-head">
+      <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+      <button class="icon-button" type="button" data-menu-close aria-label="Close menu">✕</button>
+    </div>
+    <button class="mobile-search" type="button" data-search-open aria-haspopup="dialog" aria-controls="search-dialog">
+      <span aria-hidden="true">🔍</span><span>Search categories and tools</span>
+    </button>
+    <nav class="mobile-nav" aria-label="Mobile navigation">
+      <div class="mobile-primary">
+        <a href="/categories/" aria-current="page">Categories</a>
+        <a href="/blog/">Blog</a>
+        <a href="/news/">News</a>
+        <a href="/faq/">FAQ</a>
+      </div>
+      <p class="mobile-nav-title">All 28 categories</p>
+      <details class="mobile-group">
+        <summary><span>Media &amp; Motion</span><span class="mobile-group-count">8</span></summary>
+        <ul>
+          <li><a href="/categories/image-photo-editing/"><span class="mobile-cat-icon" aria-hidden="true">🖼️</span><span>Image &amp; Photo Editing</span></a></li>
+          <li><a href="/categories/video-editing/"><span class="mobile-cat-icon" aria-hidden="true">🎬</span><span>Video Editing</span></a></li>
+          <li><a href="/categories/audio-music-editing/"><span class="mobile-cat-icon" aria-hidden="true">🎧</span><span>Audio &amp; Music Editing</span></a></li>
+          <li><a href="/categories/face-portrait-editing/"><span class="mobile-cat-icon" aria-hidden="true">👤</span><span>Face &amp; Portrait Editing</span></a></li>
+          <li><a href="/categories/ai-image-enhancement-restoration/"><span class="mobile-cat-icon" aria-hidden="true">✨</span><span>AI Image Enhancement &amp; Restoration</span></a></li>
+          <li><a href="/categories/animation-motion-graphics/"><span class="mobile-cat-icon" aria-hidden="true">🎞️</span><span>Animation &amp; Motion Graphics</span></a></li>
+          <li><a href="/categories/screenshot-screen-image-editing/"><span class="mobile-cat-icon" aria-hidden="true">🖥️</span><span>Screenshot &amp; Screen Image Editing</span></a></li>
+          <li><a href="/categories/sound-effects-voice-design/"><span class="mobile-cat-icon" aria-hidden="true">🔊</span><span>Sound Effects &amp; Voice Design</span></a></li>
+        </ul>
+      </details>
+      <details class="mobile-group">
+        <summary><span>Design &amp; Branding</span><span class="mobile-group-count">7</span></summary>
+        <ul>
+          <li><a href="/categories/graphic-design-creative-editing/"><span class="mobile-cat-icon" aria-hidden="true">🎨</span><span>Graphic Design &amp; Creative Editing</span></a></li>
+          <li><a href="/categories/font-typography-editing/"><span class="mobile-cat-icon" aria-hidden="true">🔤</span><span>Font &amp; Typography Editing</span></a></li>
+          <li><a href="/categories/color-gradient-tools/"><span class="mobile-cat-icon" aria-hidden="true">🌈</span><span>Color &amp; Gradient Tools</span></a></li>
+          <li><a href="/categories/logo-branding-tools/"><span class="mobile-cat-icon" aria-hidden="true">💠</span><span>Logo &amp; Branding Tools</span></a></li>
+          <li><a href="/categories/social-media-design-tools/"><span class="mobile-cat-icon" aria-hidden="true">📱</span><span>Social Media Design Tools</span></a></li>
+          <li><a href="/categories/print-marketing-material-design/"><span class="mobile-cat-icon" aria-hidden="true">🖨️</span><span>Print &amp; Marketing Material Design</span></a></li>
+          <li><a href="/categories/digital-drawing-illustration/"><span class="mobile-cat-icon" aria-hidden="true">🖌️</span><span>Digital Drawing &amp; Illustration</span></a></li>
+        </ul>
+      </details>
+      <details class="mobile-group">
+        <summary><span>Documents &amp; Publishing</span><span class="mobile-group-count">6</span></summary>
+        <ul>
+          <li><a href="/categories/pdf-document-editing/"><span class="mobile-cat-icon" aria-hidden="true">📄</span><span>PDF &amp; Document Editing</span></a></li>
+          <li><a href="/categories/text-writing-editing/"><span class="mobile-cat-icon" aria-hidden="true">✍️</span><span>Text &amp; Writing Editing</span></a></li>
+          <li><a href="/categories/ebook-publishing-tools/"><span class="mobile-cat-icon" aria-hidden="true">📚</span><span>eBook &amp; Publishing Tools</span></a></li>
+          <li><a href="/categories/email-newsletter-design/"><span class="mobile-cat-icon" aria-hidden="true">✉️</span><span>Email &amp; Newsletter Design</span></a></li>
+          <li><a href="/categories/signature-document-annotation/"><span class="mobile-cat-icon" aria-hidden="true">🖋️</span><span>Signature &amp; Document Annotation</span></a></li>
+          <li><a href="/categories/metadata-file-information-editing/"><span class="mobile-cat-icon" aria-hidden="true">🏷️</span><span>Metadata &amp; File Information Editing</span></a></li>
+        </ul>
+      </details>
+      <details class="mobile-group">
+        <summary><span>Web, Data &amp; Technical</span><span class="mobile-group-count">7</span></summary>
+        <ul>
+          <li><a href="/categories/web-code-editing/"><span class="mobile-cat-icon" aria-hidden="true">💻</span><span>Web &amp; Code Editing</span></a></li>
+          <li><a href="/categories/diagram-presentation-productivity-design/"><span class="mobile-cat-icon" aria-hidden="true">🧩</span><span>Diagram, Presentation &amp; Productivity Design</span></a></li>
+          <li><a href="/categories/qr-barcode-utility-design/"><span class="mobile-cat-icon" aria-hidden="true">🔳</span><span>QR, Barcode &amp; Utility Design</span></a></li>
+          <li><a href="/categories/3d-design-model-editing/"><span class="mobile-cat-icon" aria-hidden="true">🧊</span><span>3D Design &amp; Model Editing</span></a></li>
+          <li><a href="/categories/data-visualization-infographic-editing/"><span class="mobile-cat-icon" aria-hidden="true">📊</span><span>Data Visualization &amp; Infographic Editing</span></a></li>
+          <li><a href="/categories/cad-technical-drawing/"><span class="mobile-cat-icon" aria-hidden="true">📐</span><span>CAD &amp; Technical Drawing</span></a></li>
+          <li><a href="/categories/ui-ux-website-design-tools/"><span class="mobile-cat-icon" aria-hidden="true">🧭</span><span>UI/UX &amp; Website Design Tools</span></a></li>
+        </ul>
+      </details>
+      <div class="mobile-secondary">
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+        <a href="/privacy-policy/">Privacy</a>
+        <a href="/terms-of-service/">Terms</a>
+      </div>
+    </nav>
+  </div>
+</div>
+<div class="search-dialog" id="search-dialog" hidden>
+  <div class="search-backdrop" data-search-close></div>
+  <div class="search-panel" role="dialog" aria-modal="true" aria-labelledby="search-title">
+    <div class="search-head">
+      <h2 id="search-title">Search LetitEdit</h2>
+      <button class="icon-button" type="button" data-search-close aria-label="Close search">✕</button>
+    </div>
+    <form class="search-form" role="search" data-search-form>
+      <label class="visually-hidden" for="site-search">Search tools and categories</label>
+      <input id="site-search" name="q" type="search" placeholder="Try “upscale”, “PDF” or “gradient”" autocomplete="off" enterkeyhint="search">
+      <button class="btn btn-hero-primary" type="submit">Search</button>
+    </form>
+    <p class="search-hint">Search every category and planned tool. Published tools are marked separately once they go live.</p>
+    <p class="search-status" role="status" aria-live="polite"></p>
+    <div class="search-results" id="search-results"></div>
+  </div>
+</div>
 <div id="main-content">
 <nav class="container breadcrumbs" aria-label="Breadcrumb">
   <a href="../../">Home</a><span aria-hidden="true">/</span>
@@ -45,22 +142,27 @@
   <h1>Graphic Design &amp; Creative Editing</h1>
   <p>Creative design work has a dedicated category for future guides and releases. It does not list unfinished products as available tools.</p>
 </section>
-<section class="section"><div class="container info-grid">
-  <div class="info-card">
-    <h2>About Graphic Design &amp; Creative Editing</h2>
-    <p>A home for future guides about thumbnails, logos, posters, cards and layered design.</p>
-    <p>This category is part of the permanent LetitEdit taxonomy. No tools are published here yet.</p>
+<section class="section"><div class="container category-layout">
+  <div class="category-main">
+    <div class="info-card">
+      <h2>About Graphic Design &amp; Creative Editing</h2>
+      <p>A home for future guides about thumbnails, logos, posters, cards and layered design.</p>
+      <p>This category is part of the permanent LetitEdit taxonomy. No tools are published here yet.</p>
+    </div>
+    <div class="info-card"><h2>Tool status</h2><p>No tools are published in this category yet. The page stays structural until a real tool is ready.</p></div>
   </div>
-  <div class="info-card">
-    <h2>Nearby categories</h2>
-    <p><a href="/categories/image-photo-editing/">Image &amp; Photo Editing</a>, <a href="/categories/video-editing/">Video Editing</a>, <a href="/categories/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></p>
-    <p><a class="text-link" href="/categories/">See all categories →</a></p>
-  </div>
-</div></section>
-<section class="section section-soft"><div class="container info-card">
-  <h2>Follow the rebuild</h2>
-  <p>Read the blog for notes about privacy, browser-side processing and the next releases.</p>
-  <a class="btn btn-secondary btn-small" href="../../blog/">Read the blog</a>
+  <aside class="category-side">
+    <div class="info-card">
+      <h2>Nearby categories</h2>
+      <ul class="related-list"><li><a href="/categories/image-photo-editing/"><span class="related-icon" aria-hidden="true">🖼️</span><span>Image &amp; Photo Editing</span></a></li><li><a href="/categories/video-editing/"><span class="related-icon" aria-hidden="true">🎬</span><span>Video Editing</span></a></li><li><a href="/categories/qr-barcode-utility-design/"><span class="related-icon" aria-hidden="true">🔳</span><span>QR, Barcode &amp; Utility Design</span></a></li></ul>
+      <p><a class="text-link" href="/categories/">See all 28 categories →</a></p>
+    </div>
+    <div class="info-card">
+      <h2>Follow the rebuild</h2>
+      <p>Read the blog for notes about privacy, browser-side processing and the next releases.</p>
+      <a class="btn btn-secondary btn-small" href="../../blog/">Read the blog</a>
+    </div>
+  </aside>
 </div></section>
 </div>
 <footer class="site-footer">
@@ -81,20 +183,6 @@
         </ul>
       </div>
       <div class="footer-column">
-        <h3>All categories</h3>
-        <ul>
-          <li><a href="/categories/image-photo-editing/">Image &amp; Photo Editing</a></li>
-          <li><a href="/categories/video-editing/">Video Editing</a></li>
-          <li><a href="/categories/audio-music-editing/">Audio &amp; Music Editing</a></li>
-          <li><a href="/categories/pdf-document-editing/">PDF &amp; Document Editing</a></li>
-          <li><a href="/categories/text-writing-editing/">Text &amp; Writing Editing</a></li>
-          <li><a href="/categories/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
-          <li><a href="/categories/web-code-editing/">Web &amp; Code Editing</a></li>
-          <li><a href="/categories/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
-          <li><a href="/categories/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
-        </ul>
-      </div>
-      <div class="footer-column">
         <h3>Trust &amp; policies</h3>
         <ul>
           <li><a href="/about/">About LetitEdit</a></li>
@@ -103,6 +191,40 @@
           <li><a href="/terms-of-service/">Terms of Service</a></li>
         </ul>
       </div>
+    </div>
+    <div class="footer-categories">
+      <h3>All categories</h3>
+      <ul class="footer-category-list">
+        <li><a href="/categories/image-photo-editing/">Image &amp; Photo Editing</a></li>
+          <li><a href="/categories/video-editing/">Video Editing</a></li>
+          <li><a href="/categories/audio-music-editing/">Audio &amp; Music Editing</a></li>
+          <li><a href="/categories/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+          <li><a href="/categories/text-writing-editing/">Text &amp; Writing Editing</a></li>
+          <li><a href="/categories/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+          <li><a href="/categories/web-code-editing/">Web &amp; Code Editing</a></li>
+          <li><a href="/categories/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+          <li><a href="/categories/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
+          <li><a href="/categories/face-portrait-editing/">Face &amp; Portrait Editing</a></li>
+          <li><a href="/categories/ai-image-enhancement-restoration/">AI Image Enhancement &amp; Restoration</a></li>
+          <li><a href="/categories/3d-design-model-editing/">3D Design &amp; Model Editing</a></li>
+          <li><a href="/categories/animation-motion-graphics/">Animation &amp; Motion Graphics</a></li>
+          <li><a href="/categories/font-typography-editing/">Font &amp; Typography Editing</a></li>
+          <li><a href="/categories/color-gradient-tools/">Color &amp; Gradient Tools</a></li>
+          <li><a href="/categories/logo-branding-tools/">Logo &amp; Branding Tools</a></li>
+          <li><a href="/categories/social-media-design-tools/">Social Media Design Tools</a></li>
+          <li><a href="/categories/screenshot-screen-image-editing/">Screenshot &amp; Screen Image Editing</a></li>
+          <li><a href="/categories/data-visualization-infographic-editing/">Data Visualization &amp; Infographic Editing</a></li>
+          <li><a href="/categories/ebook-publishing-tools/">eBook &amp; Publishing Tools</a></li>
+          <li><a href="/categories/email-newsletter-design/">Email &amp; Newsletter Design</a></li>
+          <li><a href="/categories/sound-effects-voice-design/">Sound Effects &amp; Voice Design</a></li>
+          <li><a href="/categories/cad-technical-drawing/">CAD &amp; Technical Drawing</a></li>
+          <li><a href="/categories/signature-document-annotation/">Signature &amp; Document Annotation</a></li>
+          <li><a href="/categories/ui-ux-website-design-tools/">UI/UX &amp; Website Design Tools</a></li>
+          <li><a href="/categories/print-marketing-material-design/">Print &amp; Marketing Material Design</a></li>
+          <li><a href="/categories/metadata-file-information-editing/">Metadata &amp; File Information Editing</a></li>
+          <li><a href="/categories/digital-drawing-illustration/">Digital Drawing &amp; Illustration</a></li>
+      </ul>
+      <a class="footer-all-categories" href="/categories/">Browse all 28 categories →</a>
     </div>
     <div class="footer-promise">
       <span aria-hidden="true">🔒</span>
@@ -114,6 +236,7 @@
     </div>
   </div>
 </footer>
+<script src="../../js/search-index.js"></script>
 <script src="../../js/site.js"></script>
 </body>
 </html>

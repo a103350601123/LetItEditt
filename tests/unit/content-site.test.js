@@ -11,9 +11,37 @@ function read(relativePath) {
 }
 
 describe('content registry', () => {
-  it('keeps exactly the nine canonical categories', () => {
-    expect(registry.CATEGORIES).toHaveLength(9);
-    expect(new Set(registry.CATEGORIES.map(category => category.key)).size).toBe(9);
+  it('keeps exactly the 28 canonical categories', () => {
+    expect(registry.CATEGORIES).toHaveLength(28);
+    expect(new Set(registry.CATEGORIES.map(category => category.key)).size).toBe(28);
+  });
+
+  it('keeps the original nine categories first and unchanged', () => {
+    expect(registry.CATEGORIES.slice(0, 9).map(category => category.slug)).toEqual([
+      'image-photo-editing',
+      'video-editing',
+      'audio-music-editing',
+      'pdf-document-editing',
+      'text-writing-editing',
+      'graphic-design-creative-editing',
+      'web-code-editing',
+      'diagram-presentation-productivity-design',
+      'qr-barcode-utility-design'
+    ]);
+  });
+
+  it('uses unique category slugs and paths', () => {
+    expect(new Set(registry.CATEGORIES.map(category => category.slug)).size).toBe(28);
+    expect(new Set(registry.CATEGORIES.map(category => category.path)).size).toBe(28);
+  });
+
+  it('assigns every category to a real group', () => {
+    expect(registry.GROUPS).toHaveLength(4);
+    const grouped = registry.GROUPS.reduce((total, group) => total + group.categories.length, 0);
+    expect(grouped).toBe(28);
+    registry.CATEGORIES.forEach(category => {
+      expect(registry.GROUPS.some(group => group.key === category.group)).toBe(true);
+    });
   });
 
   it('uses category routes outside the removed tool namespace', () => {
@@ -37,6 +65,13 @@ describe('content registry', () => {
       });
     });
   });
+
+  it('gives the new categories a labelled planned-tool list', () => {
+    registry.CATEGORIES.slice(9).forEach(category => {
+      expect(category.plannedTools.length).toBeGreaterThanOrEqual(6);
+      expect(new Set(category.plannedTools).size).toBe(category.plannedTools.length);
+    });
+  });
 });
 
 describe('generated content-only site', () => {
@@ -47,6 +82,15 @@ describe('generated content-only site', () => {
       const file = path.join(root, category.path.replace(/^\//, ''), 'index.html');
       expect(fs.existsSync(file)).toBe(true);
     });
+  });
+
+  it('generates the search index for all categories', () => {
+    const index = read('js/search-index.js');
+    expect(index).toContain('window.LETITEDIT_SEARCH');
+    registry.CATEGORIES.forEach(category => {
+      expect(index).toContain(category.path);
+    });
+    expect(index).toContain('"tools":[]');
   });
 
   it('generates the blog listing and the published post', () => {

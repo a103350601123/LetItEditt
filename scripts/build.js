@@ -12,6 +12,13 @@ const content = require('../data/content');
 const root = registry.root;
 const site = registry.site;
 const categories = registry.CATEGORIES;
+const groups = registry.GROUPS;
+const categoryByKey = registry.categoryByKey;
+const groupLabel = key => {
+  const group = groups.find(item => item.key === key);
+  return group ? group.label : '';
+};
+const plannedToolCount = categories.reduce((total, category) => total + category.plannedTools.length, 0);
 
 function write(relativePath, data) {
   const file = path.join(root, relativePath.replace(/^\/+/, ''));
@@ -53,12 +60,76 @@ function nav(active) {
   return `<header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
     <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
-    <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
     <div class="nav-links" id="primary-links">
       ${links}
     </div>
+    <div class="nav-actions">
+      <button class="search-button" type="button" data-search-open aria-haspopup="dialog" aria-controls="search-dialog">
+        <span class="search-button-icon" aria-hidden="true">🔍</span><span class="search-button-label">Search</span>
+      </button>
+      <button class="menu-button" type="button" aria-controls="mobile-menu" aria-expanded="false">Menu</button>
+    </div>
   </nav>
 </header>`;
+}
+
+function mobileMenu(active) {
+  const primary = navSections.map(section =>
+    `<a href="${section.href}"${active === section.key ? ' aria-current="page"' : ''}>${esc(section.label)}</a>`
+  ).join('\n        ');
+  const categoryGroups = groups.map(group => `<details class="mobile-group">
+        <summary><span>${esc(group.label)}</span><span class="mobile-group-count">${group.categories.length}</span></summary>
+        <ul>
+          ${group.categories.map(category =>
+            `<li><a href="${category.path}"><span class="mobile-cat-icon" aria-hidden="true">${esc(category.icon)}</span><span>${esc(category.name)}</span></a></li>`
+          ).join('\n          ')}
+        </ul>
+      </details>`).join('\n      ');
+  return `<div class="mobile-menu" id="mobile-menu" hidden>
+  <div class="mobile-menu-backdrop" data-menu-close></div>
+  <div class="mobile-menu-panel" role="dialog" aria-modal="true" aria-label="Site menu">
+    <div class="mobile-menu-head">
+      <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+      <button class="icon-button" type="button" data-menu-close aria-label="Close menu">✕</button>
+    </div>
+    <button class="mobile-search" type="button" data-search-open aria-haspopup="dialog" aria-controls="search-dialog">
+      <span aria-hidden="true">🔍</span><span>Search categories and tools</span>
+    </button>
+    <nav class="mobile-nav" aria-label="Mobile navigation">
+      <div class="mobile-primary">
+        ${primary}
+      </div>
+      <p class="mobile-nav-title">All ${categories.length} categories</p>
+      ${categoryGroups}
+      <div class="mobile-secondary">
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+        <a href="/privacy-policy/">Privacy</a>
+        <a href="/terms-of-service/">Terms</a>
+      </div>
+    </nav>
+  </div>
+</div>`;
+}
+
+function searchDialog() {
+  return `<div class="search-dialog" id="search-dialog" hidden>
+  <div class="search-backdrop" data-search-close></div>
+  <div class="search-panel" role="dialog" aria-modal="true" aria-labelledby="search-title">
+    <div class="search-head">
+      <h2 id="search-title">Search LetitEdit</h2>
+      <button class="icon-button" type="button" data-search-close aria-label="Close search">✕</button>
+    </div>
+    <form class="search-form" role="search" data-search-form>
+      <label class="visually-hidden" for="site-search">Search tools and categories</label>
+      <input id="site-search" name="q" type="search" placeholder="Try “upscale”, “PDF” or “gradient”" autocomplete="off" enterkeyhint="search">
+      <button class="btn btn-hero-primary" type="submit">Search</button>
+    </form>
+    <p class="search-hint">Search every category and planned tool. Published tools are marked separately once they go live.</p>
+    <p class="search-status" role="status" aria-live="polite"></p>
+    <div class="search-results" id="search-results"></div>
+  </div>
+</div>`;
 }
 
 function footer() {
@@ -83,12 +154,6 @@ function footer() {
         </ul>
       </div>
       <div class="footer-column">
-        <h3>All categories</h3>
-        <ul>
-          ${categoryLinks}
-        </ul>
-      </div>
-      <div class="footer-column">
         <h3>Trust &amp; policies</h3>
         <ul>
           <li><a href="/about/">About LetitEdit</a></li>
@@ -97,6 +162,13 @@ function footer() {
           <li><a href="/terms-of-service/">Terms of Service</a></li>
         </ul>
       </div>
+    </div>
+    <div class="footer-categories">
+      <h3>All categories</h3>
+      <ul class="footer-category-list">
+        ${categoryLinks}
+      </ul>
+      <a class="footer-all-categories" href="/categories/">Browse all ${categories.length} categories →</a>
     </div>
     <div class="footer-promise">
       <span aria-hidden="true">🔒</span>
@@ -142,10 +214,13 @@ ${structured}
 <body${bodyClass}>
 <a class="skip-link" href="#main-content">Skip to main content</a>
 ${nav(options.activeNav)}
+${mobileMenu(options.activeNav)}
+${searchDialog()}
 <div id="main-content">
 ${options.body}
 </div>
 ${footer()}
+<script src="${assets}js/search-index.js"></script>
 <script src="${assets}js/site.js"></script>
 </body>
 </html>
@@ -174,33 +249,54 @@ function breadcrumbStructured(trail) {
   };
 }
 
-function categoryCard(category) {
-  return `<a class="card category-card" href="${category.path}" style="--icon-bg:${category.color}1a;--icon-color:${category.color};--category-accent:${category.color}">
-    <span class="card-top">
-      <span class="card-icon" aria-hidden="true">${esc(category.icon)}</span>
-      <span class="card-arrow" aria-hidden="true">↗</span>
-    </span>
-    <h3>${esc(category.name)}</h3>
-    <p>${esc(category.description)}</p>
-    <span class="card-foot"><span class="card-tag">Category</span><span class="card-explore">Explore →</span></span>
+function categoryTile(category, compact) {
+  const planned = category.plannedTools.length;
+  const meta = planned ? `${planned} planned` : 'Category ready';
+  const terms = [category.name, category.shortLabel, category.slug, groupLabel(category.group)]
+    .concat(category.plannedTools)
+    .join(' ');
+  return `<a class="category-tile${compact ? ' category-tile-compact' : ''}" href="${category.path}" data-category data-terms="${esc(terms)}" style="--icon-bg:${category.color}1a;--icon-color:${category.color}">
+    <span class="tile-icon" aria-hidden="true">${esc(category.icon)}</span>
+    <span class="tile-body"><span class="tile-name">${esc(compact ? category.shortLabel : category.name)}</span>${compact ? '' : `<span class="tile-meta">${esc(meta)}</span>`}</span>
+    ${compact ? '' : '<span class="tile-arrow" aria-hidden="true">→</span>'}
   </a>`;
 }
 
+function categoryGroupBlock(group, compact, headingTag) {
+  const tag = headingTag || 'h2';
+  const tiles = group.categories.map(category => categoryTile(category, compact)).join('\n');
+  return `<section class="category-group" data-category-group id="group-${group.key}">
+    <div class="category-group-head">
+      <${tag}>${esc(group.label)}</${tag}>
+      <span>${group.categories.length} categories</span>
+    </div>
+    <div class="category-tile-grid${compact ? ' category-tile-grid-compact' : ''}">
+      ${tiles}
+    </div>
+  </section>`;
+}
+
 function homepage() {
-  const cards = categories.map(category => categoryCard(category)).join('');
+  const groupBlocks = groups.map(group => categoryGroupBlock(group, true, 'h3')).join('\n    ');
   const body = `<main>
 <section class="hero">
   <div class="container hero-inner">
     <div class="hero-copy">
-      <span class="eyebrow">Categories · Guides · Updates</span>
+      <span class="eyebrow">${categories.length} categories · Guides · Updates</span>
       <h1>A clean home for<br><span class="gradient-text">browser tools.</span></h1>
-      <p>LetitEdit is being rebuilt around nine clear categories. Browse the structure, read the blog and follow updates while the next generation of private browser-side tools is prepared.</p>
+      <p>LetitEdit now organises ${categories.length} clear categories, from photo editing to CAD and metadata. Browse the structure, search the planned tools and follow updates while real browser-side tools are published one at a time.</p>
+      <form class="hero-search" role="search" data-search-form>
+        <label class="visually-hidden" for="hero-search">Search tools and categories</label>
+        <span class="hero-search-icon" aria-hidden="true">🔍</span>
+        <input id="hero-search" name="q" type="search" placeholder="Search tools and categories" autocomplete="off" enterkeyhint="search">
+        <button type="submit">Search</button>
+      </form>
       <div class="hero-actions">
-        <a class="btn btn-hero-primary" href="/categories/">Explore categories</a>
+        <a class="btn btn-hero-primary" href="#categories">Browse categories</a>
         <a class="btn btn-hero-secondary" href="/blog/">Read the blog</a>
         <a class="btn btn-hero-text" href="/news/">Site updates →</a>
       </div>
-      <ul class="hero-proof" aria-label="Site promises"><li>No sign-up</li><li>No uploads</li><li>Clear categories</li></ul>
+      <ul class="hero-proof" aria-label="Site promises"><li>No sign-up</li><li>No uploads</li><li>${categories.length} categories</li></ul>
     </div>
     <aside class="hero-visual" aria-label="Site summary">
       <div class="hero-card">
@@ -208,31 +304,43 @@ function homepage() {
         <p class="hero-card-sub">A simpler, category-led site with room for carefully built tools.</p>
         <div class="hero-stat"><span>Categories</span><strong>${categories.length}</strong></div>
         <div class="hero-stat"><span>Tools live</span><strong>0</strong></div>
+        <div class="hero-stat"><span>Planned tools</span><strong>${plannedToolCount}</strong></div>
         <div class="hero-stat"><span>Accounts needed</span><strong>None</strong></div>
-        <div class="hero-stat"><span>Processing</span><strong>On-device when available</strong></div>
       </div>
     </aside>
   </div>
 </section>
 
-<section class="section">
+<section class="section" id="categories">
   <div class="container">
     <div class="section-head section-head-split">
-      <div><span class="eyebrow">Nine clear topics</span><h2>Explore by category</h2><p>Each category has its own page and permanent place in the site structure.</p></div>
-      <a class="text-link" href="/categories/">All categories →</a>
+      <div><span class="eyebrow">${categories.length} clear topics</span><h2>Browse by category</h2><p>Every category has its own page and permanent place in the structure. Grouped to make mobile browsing quicker.</p></div>
+      <a class="text-link" href="/categories/">Category directory →</a>
     </div>
-    <div class="grid category-grid">${cards}</div>
+    <div class="category-groups">
+    ${groupBlocks}
+    </div>
   </div>
 </section>
 
 <section class="section section-soft">
+  <div class="container">
+    <div class="section-head"><span class="eyebrow">Tools</span><h2>Nothing is published yet</h2><p>Planned tools are listed on their category pages and labelled clearly. No placeholder editor is presented as a working tool.</p></div>
+    <div class="info-grid">
+      <div class="info-card"><h2>What is live</h2><p>${categories.length} category pages, the blog, news, FAQ and policy pages. Zero tools have been published so far.</p><a class="btn btn-secondary btn-small" href="/categories/">Browse categories</a></div>
+      <div class="info-card"><h2>What is planned</h2><p>${plannedToolCount} tools are planned across the new categories. Each is marked Planned until it has a real workspace, documented limits and checks.</p><a class="text-link" href="/categories/color-gradient-tools/">Example category →</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
   <div class="container info-grid">
     <div class="info-card"><h2>Blog</h2><p>Notes about browser-side processing, privacy and how each category will grow.</p><a class="btn btn-secondary btn-small" href="/blog/">Open Blog</a></div>
     <div class="info-card"><h2>News</h2><p>Site announcements and rebuild updates will be published here with dates and clear summaries.</p><a class="btn btn-secondary btn-small" href="/news/">Open News</a></div>
   </div>
 </section>
 
-<section class="section">
+<section class="section section-soft">
   <div class="container info-grid">
     <div class="info-card"><h2>What comes next</h2><p>New tools will be introduced one at a time, with a real workspace, documented behaviour and honest limits before each page goes live.</p></div>
     <div class="info-card"><h2>How we handle data</h2><p>Privacy remains the default. Future browser-side tools will keep input on your device unless a page clearly explains an external requirement.</p></div>
@@ -256,16 +364,38 @@ function homepage() {
 
 function categoriesPage() {
   const assets = '../';
+  const groupBlocks = groups.map(group => categoryGroupBlock(group, false, 'h2')).join('\n    ');
+  const jumpLinks = groups.map(group =>
+    `<a href="#group-${group.key}">${esc(group.label)} <span aria-hidden="true">${group.categories.length}</span></a>`
+  ).join('\n      ');
   const body = `${breadcrumbs(assets, [{ label: 'Home', href: '/' }, { label: 'Categories', href: '/categories/' }])}
 <section class="container page-head">
-  <span class="eyebrow">Browse by topic</span>
+  <span class="eyebrow">Category directory</span>
   <h1>Categories</h1>
-  <p>Nine professional categories organise the LetitEdit site. Each page is ready for new tools while the library is rebuilt.</p>
+  <p>All ${categories.length} LetitEdit categories, grouped by discipline. Filter the directory below, or search from any page, to find the right editor quickly.</p>
+  <form class="directory-search" role="search" data-directory-form>
+    <label class="visually-hidden" for="directory-search">Filter categories</label>
+    <span class="directory-search-icon" aria-hidden="true">🔍</span>
+    <input id="directory-search" type="search" placeholder="Filter categories and planned tools" autocomplete="off" data-directory-search>
+  </form>
+  <nav class="group-jump" aria-label="Category groups">
+      ${jumpLinks}
+  </nav>
+  <p class="directory-status" role="status" aria-live="polite" data-directory-status>Showing ${categories.length} of ${categories.length} categories</p>
 </section>
-<section class="section"><div class="container"><div class="grid category-grid">${categories.map(category => categoryCard(category)).join('')}</div></div></section>`;
+<section class="section section-tight"><div class="container">
+  <div class="category-groups category-groups-full">
+    ${groupBlocks}
+  </div>
+  <div class="empty-state" data-directory-empty hidden>
+    <span class="empty-icon" aria-hidden="true">🔍</span>
+    <h3>No category matches that filter</h3>
+    <p>Try a broader word such as “photo”, “PDF” or “design”, or clear the filter.</p>
+  </div>
+</div></section>`;
   return page({
-    title: 'Categories — Browse LetitEdit by Topic',
-    description: `Explore ${categories.length} LetitEdit categories for browser-side tools, guides and future releases.`,
+    title: `All ${categories.length} Categories — LetitEdit`,
+    description: `Browse all ${categories.length} LetitEdit categories for image, video, audio, documents, design, code, 3D, data and publishing tools.`,
     canonical: '/categories/',
     activeNav: 'categories',
     assets,
@@ -281,32 +411,50 @@ function categoryPage(category) {
     { label: category.name, href: category.path }
   ];
   const related = category.related
-    .map(key => registry.categoryByKey.get(key))
-    .filter(Boolean)
-    .map(item => `<a href="${item.path}">${esc(item.name)}</a>`)
-    .join(', ');
+    .map(key => categoryByKey.get(key))
+    .filter(Boolean);
+  const relatedList = related.length
+    ? `<ul class="related-list">${related.map(item => `<li><a href="${item.path}"><span class="related-icon" aria-hidden="true">${esc(item.icon)}</span><span>${esc(item.name)}</span></a></li>`).join('')}</ul>`
+    : '<p>Related categories will be added here as the site grows.</p>';
+  const planned = category.plannedTools.length
+    ? `<div class="info-card planned-card" id="planned-tools">
+      <div class="info-card-head"><h2>Planned tools</h2><span class="badge">Planned</span></div>
+      <p>These tools are planned for this category. They are not published, and no placeholder editor is available yet.</p>
+      <label class="filter-label" for="tool-filter">Filter this list</label>
+      <input class="filter-input" id="tool-filter" type="search" placeholder="Filter planned tools…" autocomplete="off" data-filter-input>
+      <ul class="tool-chip-list" data-filter-list>
+        ${category.plannedTools.map(tool => `<li class="tool-chip" data-filter-item><span class="tool-chip-name">${esc(tool)}</span><span class="tool-chip-state">Planned</span></li>`).join('\n        ')}
+      </ul>
+      <p class="filter-empty" data-filter-empty hidden>No planned tool matches that filter.</p>
+    </div>`
+    : `<div class="info-card"><h2>Tool status</h2><p>No tools are published in this category yet. The page stays structural until a real tool is ready.</p></div>`;
   const body = `${breadcrumbs(assets, trail)}
 <section class="container page-head" dir="${esc(category.dir)}">
   <span class="eyebrow" style="color:${esc(category.color)}">${esc(category.shortLabel)}</span>
   <h1>${esc(category.name)}</h1>
   <p>${esc(category.intro)}</p>
 </section>
-<section class="section"><div class="container info-grid">
-  <div class="info-card">
-    <h2>About ${esc(category.name)}</h2>
-    <p>${esc(category.description)}</p>
-    <p>This category is part of the permanent LetitEdit taxonomy. No tools are published here yet.</p>
+<section class="section"><div class="container category-layout">
+  <div class="category-main">
+    <div class="info-card">
+      <h2>About ${esc(category.name)}</h2>
+      <p>${esc(category.description)}</p>
+      <p>This category is part of the permanent LetitEdit taxonomy. No tools are published here yet.</p>
+    </div>
+    ${planned}
   </div>
-  <div class="info-card">
-    <h2>Nearby categories</h2>
-    <p>${related || 'Related categories will be added here as the site grows.'}</p>
-    <p><a class="text-link" href="/categories/">See all categories →</a></p>
-  </div>
-</div></section>
-<section class="section section-soft"><div class="container info-card">
-  <h2>Follow the rebuild</h2>
-  <p>Read the blog for notes about privacy, browser-side processing and the next releases.</p>
-  <a class="btn btn-secondary btn-small" href="${assets}blog/">Read the blog</a>
+  <aside class="category-side">
+    <div class="info-card">
+      <h2>Nearby categories</h2>
+      ${relatedList}
+      <p><a class="text-link" href="/categories/">See all ${categories.length} categories →</a></p>
+    </div>
+    <div class="info-card">
+      <h2>Follow the rebuild</h2>
+      <p>Read the blog for notes about privacy, browser-side processing and the next releases.</p>
+      <a class="btn btn-secondary btn-small" href="${assets}blog/">Read the blog</a>
+    </div>
+  </aside>
 </div></section>`;
   return page({
     title: category.seoTitle,
@@ -539,6 +687,21 @@ Object.entries(staticPages).forEach(([file, data]) => write(file, data));
 write('404.html', notFoundPage());
 
 write('robots.txt', `User-agent: *\nAllow: /\nSitemap: ${site}/sitemap.xml\n`);
+
+const searchIndex = {
+  generated: new Date().toISOString().slice(0, 10),
+  categories: categories.map(category => ({
+    name: category.name,
+    short: category.shortLabel,
+    path: category.path,
+    icon: category.icon,
+    group: groupLabel(category.group),
+    description: category.description,
+    planned: category.plannedTools
+  })),
+  tools: []
+};
+write('js/search-index.js', `/* Generated by scripts/build.js. Do not edit by hand. */\nwindow.LETITEDIT_SEARCH = ${JSON.stringify(searchIndex)};\n`);
 
 const sitemapUrls = ['/', '/categories/', '/news/', '/blog/', '/faq/',
   ...categories.map(category => category.path), '/about/', '/contact/', '/privacy-policy/', '/terms-of-service/'];
