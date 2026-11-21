@@ -1,14 +1,22 @@
 /* LetitEdit global mobile preview workspace.
  * Progressive enhancement only: existing tool markup and runtimes stay in
- * charge of editing. This module marks preview/control panels, adds a mobile
- * Preview/Controls switch, zoom/fit/fullscreen actions and a pinned action
- * bar that forwards clicks to the original buttons. */
+ * charge of editing. On phones this adds a focused, Tuxpi-inspired app shell:
+ * one viewport-high workspace, compact scrolling toolbar, large preview and a
+ * controls drawer. Desktop/tablet layouts keep the original behaviour. */
 (function (global) {
   'use strict';
 
   var M = { roots: [], mode: 'preview', zoom: 1 };
   var fullscreenRoot = null;
   var viewportTimer = null;
+  var shellRoot = null;
+  var shellDismissed = false;
+  var actionCounter = 0;
+  var titleHome = null;
+  var menuHome = null;
+  var navHome = null;
+
+  var APP_QUERY = global.matchMedia ? global.matchMedia('(max-width: 680px)') : null;
 
   function ready(fn) {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
@@ -64,7 +72,8 @@
       if (!grids[i].contains(preview)) continue;
       if (all(':scope > *', grids[i]).length > 1) return grids[i];
     }
-    if (root.contains(preview) && all(':scope > *', root).length > 1) return root;
+    var rootChildren = all(':scope > *', root);
+    if (root.contains(preview) && rootChildren.length > 1) return root;
     return null;
   }
 
@@ -76,7 +85,96 @@
     return current && current.parentElement === grid ? current : node;
   }
 
-  function buildToolbar(root) {
+  var ACTION_WORDS = [
+    ['upload', 'Upload'], ['import', 'Import'], ['open', 'Open'],
+    ['sample', 'Sample'], ['save', 'Save'], ['download', 'Download'],
+    ['export', 'Export'], ['generate', 'Generate'], ['process', 'Process'],
+    ['apply', 'Apply'], ['update', 'Update'], ['format', 'Format'],
+    ['validate', 'Validate'], ['copy', 'Copy'], ['clear', 'Clear'],
+    ['reset', 'Reset'], ['undo', 'Undo'], ['redo', 'Redo']
+  ];
+
+  var ACTION_PRIORITY = {
+    upload: 0, import: 0, open: 1, sample: 1, save: 1, download: 1,
+    export: 1, generate: 1, process: 1, apply: 1, update: 1,
+    format: 1, validate: 1, copy: 2, clear: 3, reset: 4, undo: 5, redo: 6
+  };
+
+  function cleanText(value) {
+    return String(value || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function actionKey(element) {
+    var label = cleanText((element.id || '') + ' ' + (element.getAttribute('aria-label') || '') + ' ' +
+      (element.textContent || '') + ' ' + (element.title || ''));
+    var found = ACTION_WORDS.filter(function (word) {
+      return new RegExp(word[0], 'i').test(label);
+    });
+    return found.length ? found[0][0] : '';
+  }
+
+  function actionLabel(element, key) {
+    if (element.tagName === 'INPUT' && element.type === 'file') {
+      var labelText = element.labels && element.labels.length ? cleanText(element.labels[0].textContent) : '';
+      return labelText && labelText.length <= 16 ? labelText : 'Upload';
+    }
+    var text = cleanText(element.textContent || element.value || element.getAttribute('aria-label'));
+    if (text && text.length <= 18) return text;
+    var found = ACTION_WORDS.filter(function (word) { return word[0] === key; })[0];
+    return found ? found[1] : text.slice(0, 16) || 'Action';
+  }
+
+  function collectActions(root) {
+    var candidates = [];
+
+    all('input[type="file"]', root).forEach(function (input) {
+      if (input.closest('.mw-toolbar') || input.closest('.mw-action-bar')) return;
+      if (input.disabled) return;
+      candidates.push({ element: input, key: 'upload', label: actionLabel(input, 'upload') });
+    });
+
+    all('button', root).forEach(function (button) {
+      if (button.closest('.mw-toolbar') || button.closest('.mw-action-bar')) return;
+      if (button.disabled) return;
+      var key = actionKey(button);
+      if (!key) return;
+      candidates.push({ element: button, key: key, label: actionLabel(button, key) });
+    });
+
+    candidates.sort(function (a, b) {
+      return (ACTION_PRIORITY[a.key] || 9) - (ACTION_PRIORITY[b.key] || 9);
+    });
+
+    var seen = [];
+    return candidates.filter(function (candidate) {
+      if (seen.indexOf(candidate.element) !== -1) return false;
+      seen.push(candidate.element);
+      return true;
+    }).slice(0, 8);
+  }
+
+  function createActionProxy(candidate, extraClass) {
+    var original = candidate.element;
+    if (!original.id) original.id = 'mw-action-source-' + (++actionCounter);
+
+    var proxy = document.createElement('button');
+    proxy.type = 'button';
+    proxy.className = 'mw-action-btn' + (extraClass ? ' ' + extraClass : '');
+    proxy.setAttribute('data-mw-proxy-for', original.id);
+    proxy.textContent = candidate.label;
+    proxy.disabled = Boolean(original.disabled);
+    proxy.addEventListener('click', function () {
+      if (!original.isConnected || original.disabled) return;
+      original.click();
+    });
+    if (global.MutationObserver) {
+      var observer = new MutationObserver(function () { proxy.disabled = Boolean(original.disabled); });
+      observer.observe(original, { attributes: true, attributeFilter: ['disabled'] });
+    }
+    return proxy;
+  }
+
+  function buildToolbar(root, candidates) {
     var bar = document.createElement('div');
     bar.className = 'mw-toolbar';
     bar.setAttribute('role', 'toolbar');
@@ -86,62 +184,32 @@
         '<button type="button" class="mw-mode is-active" data-mw-mode="preview" aria-pressed="true">Preview</button>' +
         '<button type="button" class="mw-mode" data-mw-mode="controls" aria-pressed="false">Controls</button>' +
       '</div>' +
+      '<div class="mw-quick-actions" role="group" aria-label="Quick actions"></div>' +
       '<div class="mw-view-tools" role="group" aria-label="Preview zoom">' +
         '<button type="button" class="mw-icon-btn" data-mw-action="zoom-out" aria-label="Zoom out" title="Zoom out">−</button>' +
         '<span class="mw-zoom" aria-live="polite">100%</span>' +
         '<button type="button" class="mw-icon-btn" data-mw-action="zoom-in" aria-label="Zoom in" title="Zoom in">+</button>' +
         '<button type="button" class="mw-text-btn" data-mw-action="fit" aria-label="Fit preview to screen">Fit</button>' +
+        '<button type="button" class="mw-icon-btn" data-mw-action="settings" aria-label="Open controls drawer" title="Settings">⚙</button>' +
         '<button type="button" class="mw-text-btn" data-mw-action="fullscreen" aria-label="Expand preview to fullscreen" aria-pressed="false">Expand</button>' +
+        '<button type="button" class="mw-text-btn mw-exit-btn" data-mw-action="exit" aria-label="Exit focused tool view">Done</button>' +
       '</div>';
+
+    var quick = one('.mw-quick-actions', bar);
+    candidates.slice(0, 3).forEach(function (candidate) {
+      quick.appendChild(createActionProxy(candidate, 'mw-quick-btn'));
+    });
     return bar;
   }
 
-  var ACTION_WORDS = [
-    ['undo', '↶ Undo'], ['redo', '↷ Redo'], ['reset', 'Reset'], ['save', 'Save'],
-    ['download', 'Download'], ['export', 'Export'], ['apply', 'Apply'],
-    ['update', 'Update'], ['generate', 'Generate'], ['process', 'Process']
-  ];
-
-  function actionLabel(button, key) {
-    var text = String(button.textContent || '').replace(/\s+/g, ' ').trim();
-    if (text && text.length <= 18) return text;
-    var found = ACTION_WORDS.filter(function (word) { return word[0] === key; })[0];
-    return found ? found[1] : text.slice(0, 16);
-  }
-
-  function buildActionBar(root) {
-    var candidates = all('button', root).filter(function (button) {
-      if (button.closest('.mw-toolbar') || button.closest('.mw-action-bar')) return false;
-      var label = button.id + ' ' + (button.getAttribute('aria-label') || '') + ' ' + (button.textContent || '');
-      return ACTION_WORDS.some(function (word) { return new RegExp(word[0], 'i').test(label); });
-    }).slice(0, 8);
+  function buildActionBar(candidates) {
     if (!candidates.length) return null;
-
     var bar = document.createElement('div');
     bar.className = 'mw-action-bar';
     bar.setAttribute('role', 'toolbar');
     bar.setAttribute('aria-label', 'Essential actions');
-    candidates.forEach(function (original, index) {
-      var key = ACTION_WORDS.filter(function (word) {
-        var label = original.id + ' ' + (original.getAttribute('aria-label') || '') + ' ' + (original.textContent || '');
-        return new RegExp(word[0], 'i').test(label);
-      })[0];
-      if (!original.id) original.id = 'mw-action-source-' + index;
-      var proxy = document.createElement('button');
-      proxy.type = 'button';
-      proxy.className = 'mw-action-btn';
-      proxy.setAttribute('data-mw-proxy-for', original.id);
-      proxy.textContent = actionLabel(original, key ? key[0] : '');
-      proxy.disabled = Boolean(original.disabled);
-      proxy.addEventListener('click', function () {
-        if (!original.isConnected || original.disabled) return;
-        original.click();
-      });
-      if (global.MutationObserver) {
-        var observer = new MutationObserver(function () { proxy.disabled = Boolean(original.disabled); });
-        observer.observe(original, { attributes: true, attributeFilter: ['disabled'] });
-      }
-      bar.appendChild(proxy);
+    candidates.forEach(function (candidate, index) {
+      bar.appendChild(createActionProxy(candidate, index === 0 ? 'mw-primary-action' : ''));
     });
     return bar;
   }
@@ -248,7 +316,162 @@
     if (action === 'zoom-in') applyZoom(root, (root._mwZoom || 1) + 0.25);
     else if (action === 'zoom-out') applyZoom(root, (root._mwZoom || 1) - 0.25);
     else if (action === 'fit') applyZoom(root, 1);
+    else if (action === 'settings') setMode(root.getAttribute('data-mw-mode') === 'controls' ? 'preview' : 'controls', root);
+    else if (action === 'exit') dismissAppShell();
     else if (action === 'fullscreen') enterFullscreen(root);
+  }
+
+  function isVisibleElement(element) {
+    if (!element || element.closest('[hidden]')) return false;
+    var style = global.getComputedStyle(element);
+    if (style.display === 'none' || style.visibility === 'hidden') return false;
+    var rect = element.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0;
+  }
+
+  var IGNORED_HIDDEN = { SCRIPT: true, STYLE: true, META: true, LINK: true, TEMPLATE: true, NOSCRIPT: true };
+
+  function hideNonToolSiblings(root) {
+    var node = root;
+    while (node && node !== document.body) {
+      var parent = node.parentElement;
+      if (!parent) break;
+      all(':scope > *', parent).forEach(function (child) {
+        if (child === node || child.contains(root) || IGNORED_HIDDEN[child.tagName]) return;
+        child.classList.add('mw-app-hidden');
+      });
+      node = parent;
+    }
+  }
+
+  function adoptTitle(root) {
+    var heading = one('h1');
+    var bar = one('.mw-toolbar', root);
+    if (!heading || !bar || heading.closest('.mw-toolbar')) return;
+    titleHome = { parent: heading.parentNode, next: heading.nextSibling };
+    var title = document.createElement('div');
+    title.className = 'mw-app-title';
+    title.appendChild(heading);
+    var menu = one('.mw-app-menu', bar);
+    if (menu && menu.parentNode === bar) bar.insertBefore(title, menu.nextSibling);
+    else bar.insertBefore(title, bar.firstChild);
+  }
+
+  function restoreTitle() {
+    if (!titleHome) return;
+    var heading = one('.mw-app-title h1');
+    if (heading) titleHome.parent.insertBefore(heading, titleHome.next);
+    all('.mw-app-title').forEach(function (node) { node.remove(); });
+    titleHome = null;
+  }
+
+  /* The focused shell hides the site header visually. Adopt the existing
+   * navigation controls instead of cloning them so js/site.js listeners keep
+   * working and the menu stays reachable inside the app toolbar. */
+  function adoptNavigation(root) {
+    var menu = one('.menu-button');
+    var bar = one('.mw-toolbar', root);
+    if (menu && bar && !menu.closest('.mw-toolbar')) {
+      menuHome = { parent: menu.parentNode, next: menu.nextSibling };
+      menu.classList.add('mw-app-menu');
+      bar.insertBefore(menu, bar.firstChild);
+    }
+
+    var nav = one('.nav-links');
+    if (nav && root && !nav.closest('.mw-app-root')) {
+      navHome = { parent: nav.parentNode, next: nav.nextSibling };
+      nav.classList.add('mw-nav-overlay');
+      root.appendChild(nav);
+    }
+  }
+
+  function restoreNavigation() {
+    if (menuHome) {
+      var menu = one('.mw-app-menu');
+      if (menu) {
+        menu.classList.remove('mw-app-menu');
+        menuHome.parent.insertBefore(menu, menuHome.next);
+      }
+      menuHome = null;
+    }
+
+    if (navHome) {
+      var nav = one('.mw-nav-overlay');
+      if (nav) {
+        nav.classList.remove('mw-nav-overlay', 'is-open');
+        navHome.parent.insertBefore(nav, navHome.next);
+      }
+      var menuButton = one('.menu-button');
+      if (menuButton) {
+        menuButton.setAttribute('aria-expanded', 'false');
+        menuButton.textContent = 'Menu';
+      }
+      var categoryPanel = one('#nav-category-list');
+      if (categoryPanel) categoryPanel.hidden = true;
+      var categoryToggle = one('.nav-category-toggle');
+      if (categoryToggle) categoryToggle.setAttribute('aria-expanded', 'false');
+      navHome = null;
+    }
+  }
+
+  function addDrawerBackdrop(root) {
+    var backdrop = one('.mw-drawer-backdrop', root);
+    if (!backdrop) {
+      backdrop = document.createElement('button');
+      backdrop.type = 'button';
+      backdrop.className = 'mw-drawer-backdrop';
+      backdrop.setAttribute('aria-label', 'Close controls drawer');
+      root.appendChild(backdrop);
+    }
+    backdrop.addEventListener('click', function () { setMode('preview', root); });
+  }
+
+  function activateAppShell(root) {
+    if (!root) return;
+    if (shellRoot === root && document.documentElement.classList.contains('mw-app')) return;
+    if (fullscreenRoot) exitFullscreen();
+    deactivateAppShell(false);
+    shellRoot = root;
+    root.classList.add('mw-app-root');
+    document.documentElement.classList.add('mw-app');
+    document.body.classList.add('mw-app-active');
+    adoptNavigation(root);
+    adoptTitle(root);
+    hideNonToolSiblings(root);
+    addDrawerBackdrop(root);
+  }
+
+  function deactivateAppShell(restoreScroll) {
+    restoreTitle();
+    restoreNavigation();
+    all('.mw-app-hidden').forEach(function (element) { element.classList.remove('mw-app-hidden'); });
+    all('.mw-app-root').forEach(function (element) { element.classList.remove('mw-app-root'); });
+    document.documentElement.classList.remove('mw-app');
+    document.body.classList.remove('mw-app-active');
+    shellRoot = null;
+    if (restoreScroll !== false && M.roots.forEach) {
+      M.roots.forEach(function (root) { setMode('preview', root); });
+    }
+  }
+
+  function dismissAppShell() {
+    shellDismissed = true;
+    deactivateAppShell();
+  }
+
+  function updateAppShell() {
+    if (!APP_QUERY) return;
+    if (!APP_QUERY.matches) {
+      if (document.documentElement.classList.contains('mw-app')) deactivateAppShell();
+      return;
+    }
+    if (shellDismissed) return;
+    var visible = M.roots.filter(isVisibleElement);
+    if (!visible.length) {
+      if (document.documentElement.classList.contains('mw-app')) deactivateAppShell();
+      return;
+    }
+    activateAppShell(visible[visible.length - 1]);
   }
 
   function updateViewport() {
@@ -304,11 +527,12 @@
       if (controls[0] && controls[0] !== node) controls[0].appendChild(node);
     });
 
-    var toolbar = buildToolbar(root);
+    var candidates = collectActions(root);
+    var toolbar = buildToolbar(root, candidates);
     root.insertBefore(toolbar, root.firstChild);
     toolbar.addEventListener('click', function (event) { handleToolbarClick(root, event); });
 
-    var actionBar = buildActionBar(root);
+    var actionBar = buildActionBar(candidates);
     if (actionBar) root.insertBefore(actionBar, root.firstChild);
 
     all(MEDIA_SELECTORS, previewPanel).forEach(function (media) {
@@ -330,6 +554,7 @@
       seen.push(root);
       enhance(root);
     });
+    updateAppShell();
   }
 
   M.refresh = refresh;
@@ -339,9 +564,16 @@
 
   ready(function () {
     refresh();
+    updateAppShell();
     updateViewport();
     global.addEventListener('resize', updateViewport, { passive: true });
     global.addEventListener('orientationchange', updateViewport, { passive: true });
+    if (APP_QUERY && APP_QUERY.addEventListener) {
+      APP_QUERY.addEventListener('change', function () {
+        shellDismissed = false;
+        refresh();
+      });
+    }
     if (global.visualViewport) {
       global.visualViewport.addEventListener('resize', updateViewport, { passive: true });
       global.visualViewport.addEventListener('scroll', updateViewport, { passive: true });
@@ -350,11 +582,18 @@
       if (event.key === 'Escape' && fullscreenRoot) {
         exitFullscreen();
         event.preventDefault();
+      } else if (event.key === 'Escape' && document.documentElement.classList.contains('mw-app')) {
+        dismissAppShell();
       }
     });
     if (global.MutationObserver) {
       var observer = new MutationObserver(function () { refresh(); });
-      observer.observe(document.body, { childList: true, subtree: true });
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['hidden']
+      });
     }
   });
 
