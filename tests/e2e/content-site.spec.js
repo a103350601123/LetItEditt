@@ -1,4 +1,6 @@
 const { test, expect } = require('@playwright/test');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const keptRoutes = [
   '/',
@@ -52,13 +54,15 @@ test.describe('content-only site', () => {
     }
   });
 
-  test('homepage shows all 28 categories grouped and no tool links', async ({ page }) => {
+  test('homepage shows all 28 categories grouped and only the live tool link', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('h1')).toContainText('clean home');
     await expect(page.locator('.category-tile')).toHaveCount(28);
     await expect(page.locator('.category-group')).toHaveCount(4);
     const toolLinks = await page.locator('a[href*="/tools/"]').count();
     expect(toolLinks).toBe(0);
+    await expect(page.locator('a[href="/media-and-motion/image-photo-editor/"]').first()).toBeVisible();
+    await expect(page.locator('.tool-card-feature')).toContainText('Image & Photo Editor');
   });
 
   test('category page explains the category and labels planned tools', async ({ page }) => {
@@ -177,7 +181,7 @@ test.describe('content-only site', () => {
 
   test('no horizontal overflow at mobile and desktop widths', async ({ page }) => {
     const widths = [320, 360, 375, 390, 430, 768, 1280];
-    const routes = ['/', '/categories/', '/categories/face-portrait-editing/', '/faq/'];
+    const routes = ['/', '/categories/', '/categories/face-portrait-editing/', '/faq/', '/media-and-motion/image-photo-editor/'];
     for (const width of widths) {
       await page.setViewportSize({ width, height: 900 });
       for (const route of routes) {
@@ -204,7 +208,7 @@ test.describe('content-only site', () => {
     }
   });
 
-  test('sitemap contains kept pages and no tool routes', async ({ request }) => {
+  test('sitemap contains kept pages, the live tool and no legacy tool routes', async ({ request }) => {
     const response = await request.get('/sitemap.xml');
     expect(response.status()).toBe(200);
     const sitemap = await response.text();
@@ -212,7 +216,186 @@ test.describe('content-only site', () => {
     expect(sitemap).toContain('https://letitedit.com/categories/image-photo-editing/');
     expect(sitemap).toContain('https://letitedit.com/categories/face-portrait-editing/');
     expect(sitemap).toContain('https://letitedit.com/blog/a-smaller-category-first-letitedit/');
+    expect(sitemap).toContain('https://letitedit.com/media-and-motion/image-photo-editor/');
     expect(sitemap).not.toContain('/tools/');
     expect(sitemap).not.toContain('/new-tools/');
+  });
+});
+
+test.describe('image and photo editor', () => {
+  const fixture = name => path.join(__dirname, '..', 'fixtures', name);
+  const toolPath = '/media-and-motion/image-photo-editor/';
+
+  async function openFixture(page, name) {
+    await page.goto(toolPath);
+    await page.locator('[data-file-input]').setInputFiles(fixture(name));
+    await expect(page.locator('[data-status-left]')).toContainText('×');
+  }
+
+  test('renders the editor shell with one heading and real controls', async ({ page }) => {
+    await page.goto(toolPath);
+    await expect(page.locator('h1')).toHaveCount(1);
+    await expect(page.locator('h1')).toHaveText('Image & Photo Editor');
+    await expect(page.locator('[data-editor]')).toBeVisible();
+    await expect(page.locator('[data-canvas]')).toBeVisible();
+    await expect(page.locator('.editor-rail [data-tool]')).toHaveCount(12);
+    await expect(page.locator('[data-panel-title]')).toHaveText('Import');
+    await expect(page.getByRole('link', { name: 'Image & Photo Editing' }).first()).toBeVisible();
+    const structured = await page.locator('script[type="application/ld+json"]').first().textContent();
+    expect(structured).toContain('SoftwareApplication');
+    expect(structured).toContain('FAQPage');
+  });
+
+  test('imports a PNG locally and reports its real dimensions', async ({ page }) => {
+    await openFixture(page, 'sample.png');
+    await expect(page.locator('[data-status-left]')).toContainText('320 × 200');
+    await expect(page.locator('[data-status-left]')).toContainText('PNG');
+    await expect(page.locator('[data-file-name]')).toContainText('sample.png');
+    await expect(page.locator('[data-panel-title]')).toHaveText('Adjust');
+    await expect(page.locator('[data-adjust="brightness"]')).toBeVisible();
+  });
+
+  test('adjusts brightness, undoes it and redoes it', async ({ page }) => {
+    await openFixture(page, 'sample.png');
+    await page.locator('.editor-rail [data-tool="adjust"]').click();
+    await expect(page.locator('[data-panel-title]')).toHaveText('Adjust');
+    const brightness = page.locator('[data-adjust="brightness"]');
+    await brightness.evaluate(el => {
+      el.value = '35';
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    await expect(page.locator('[data-adjust="brightness"]')).toHaveValue('35');
+    await page.waitForTimeout(250);
+    await page.locator('[data-action="undo"]').click();
+    await expect(page.locator('[data-adjust="brightness"]')).toHaveValue('0');
+    await page.locator('[data-action="redo"]').click();
+    await expect(page.locator('[data-adjust="brightness"]')).toHaveValue('35');
+  });
+
+  test('crop ratios stay square and rotation swaps the working size', async ({ page }) => {
+    await openFixture(page, 'sample.png');
+    await page.locator('.editor-rail [data-tool="crop"]').click();
+    await page.locator('[data-aspect="1"]').click();
+    const read = async () => page.evaluate(() => {
+      const fields = {};
+      document.querySelectorAll('[data-crop-field]').forEach(input => { fields[input.getAttribute('data-crop-field')] = Number(input.value); });
+      return fields;
+    });
+    let crop = await read();
+    expect(crop.w).toBe(crop.h);
+    await page.locator('[data-action="rotate-right"]').click();
+    await page.waitForTimeout(200);
+    crop = await read();
+    expect(crop.w).toBe(200);
+    expect(crop.h).toBe(320);
+    await expect(page.locator('[data-status-right]')).toContainText('Crop');
+  });
+
+  test('adds a text layer and lists it in the layers panel', async ({ page }) => {
+    await openFixture(page, 'sample.png');
+    await page.locator('.editor-rail [data-tool="text"]').click();
+    await page.locator('[data-action="add-text"]').click();
+    await expect(page.locator('[data-text-content]')).toBeVisible();
+    await page.locator('[data-text-content]').fill('Hello LetitEdit');
+    await page.locator('[data-text-content]').blur();
+    await page.locator('.editor-rail [data-tool="layers"]').click();
+    await expect(page.locator('[data-layer-row]')).toHaveCount(1);
+    const nameInput = page.locator('[data-rename-layer]');
+    await nameInput.fill('Headline');
+    await nameInput.blur();
+    await expect(page.locator('[data-rename-layer]')).toHaveValue('Headline');
+    await page.locator('[data-layer-action="duplicate"]').click();
+    await expect(page.locator('[data-layer-row]')).toHaveCount(2);
+    await page.locator('[data-layer-action="delete"]').first().click();
+    await expect(page.locator('[data-layer-row]')).toHaveCount(1);
+  });
+
+  test('applies a filter preset and a frame without losing the image', async ({ page }) => {
+    await openFixture(page, 'sample.png');
+    await page.locator('.editor-rail [data-tool="filters"]').click();
+    await page.locator('[data-filter="grayscale"]').click();
+    await expect(page.locator('[data-filter="grayscale"]')).toHaveAttribute('aria-pressed', 'true');
+    await page.waitForTimeout(250);
+    await page.locator('.editor-rail [data-tool="frame"]').click();
+    await page.locator('[data-frame-padding]').evaluate(el => {
+      el.value = '40';
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    await page.waitForTimeout(200);
+    const size = await page.locator('[data-status-right]').textContent();
+    expect(size).toContain('400 × 280');
+  });
+
+  test('resizes to a preset and reports the new dimensions', async ({ page }) => {
+    await openFixture(page, 'sample.png');
+    await page.locator('.editor-rail [data-tool="resize"]').click();
+    await page.locator('[data-resize-preset="1080x1080"]').click();
+    await expect(page.locator('[data-resize-field="width"]')).toHaveValue('1080');
+    await expect(page.locator('[data-resize-field="height"]')).toHaveValue('1080');
+    await expect(page.locator('[data-status-right]')).toContainText('1080 × 1080');
+  });
+
+  test('estimates and downloads a real PNG export', async ({ page }) => {
+    await openFixture(page, 'sample.png');
+    await page.locator('[data-tool="export"]').last().click();
+    await expect(page.locator('[data-panel-title]')).toHaveText('Export');
+    await page.locator('[data-export-format]').selectOption('image/png');
+    await page.locator('[data-export-filename]').fill('letitedit-test');
+    await page.locator('[data-action="estimate"]').click();
+    await expect(page.locator('[data-export-result]')).toContainText('Last encoded size');
+    const downloadPromise = page.waitForEvent('download');
+    await page.locator('[data-action="download"]').click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toBe('letitedit-test.png');
+    const file = await download.path();
+    const stat = fs.statSync(file);
+    expect(stat.size).toBeGreaterThan(1000);
+  });
+
+  test('exports JPEG at a chosen quality and reports the encoded size', async ({ page }) => {
+    await openFixture(page, 'sample.png');
+    await page.locator('[data-tool="export"]').last().click();
+    await page.locator('[data-export-format]').selectOption('image/jpeg');
+    await page.locator('[data-export-quality]').fill('70');
+    await page.locator('[data-export-quality]').blur();
+    await page.locator('[data-action="estimate"]').click();
+    await expect(page.locator('[data-export-result]')).toContainText('Format');
+    await expect(page.locator('[data-export-result]')).toContainText('JPG');
+    await expect(page.locator('[data-export-result]')).toContainText('Quality');
+  });
+
+  test('mobile layout uses the bottom bar and a bottom sheet', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(toolPath);
+    await expect(page.locator('.editor-mobilebar')).toBeVisible();
+    await expect(page.locator('.editor-rail')).toBeHidden();
+    await page.locator('[data-file-input]').setInputFiles(fixture('sample.bmp'));
+    await expect(page.locator('[data-status-left]')).toContainText('BMP');
+    await page.locator('.editor-mobilebar [data-tool="adjust"]').click();
+    await expect(page.locator('[data-panel]')).toHaveClass(/is-open/);
+    await expect(page.locator('[data-sheet-backdrop]')).toBeVisible();
+    await expect(page.locator('[data-adjust="brightness"]')).toBeVisible();
+    await page.locator('[data-panel-close]').click();
+    await expect(page.locator('[data-panel]')).not.toHaveClass(/is-open/);
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(1);
+    const canvasBox = await page.locator('[data-canvas]').boundingBox();
+    expect(canvasBox.width).toBeGreaterThan(300);
+  });
+
+  test('mobile sheet closes with Escape and export opens from the bottom bar', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 740 });
+    await page.goto(toolPath);
+    await page.locator('[data-file-input]').setInputFiles(fixture('sample.png'));
+    await expect(page.locator('[data-status-left]')).toContainText('320 × 200');
+    await page.locator('.editor-mobilebar [data-tool="filters"]').click();
+    await expect(page.locator('[data-panel]')).toHaveClass(/is-open/);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('[data-panel]')).not.toHaveClass(/is-open/);
+    await page.locator('.editor-mobilebar [data-action="export"]').click();
+    await expect(page.locator('[data-panel-title]')).toHaveText('Export');
+    await expect(page.locator('[data-export-format]')).toBeVisible();
   });
 });

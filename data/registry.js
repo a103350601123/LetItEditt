@@ -11,6 +11,7 @@ const {
   CATEGORY_ORDER,
   CATEGORY_GROUPS
 } = require('./category-copy');
+const { TOOLS } = require('./tools');
 
 const root = path.resolve(__dirname, '..');
 const site = 'https://letitedit.com';
@@ -61,6 +62,22 @@ const GROUPS = CATEGORY_GROUPS.map(group => ({
   categories: CATEGORIES.filter(category => category.group === group.key)
 }));
 
+// Guard the published tool registry against duplicate routes and unknown categories.
+const seenToolPaths = new Set();
+for (const tool of TOOLS) {
+  if (seenToolPaths.has(tool.path)) throw new Error(`Duplicate tool path: ${tool.path}`);
+  seenToolPaths.add(tool.path);
+  if (!categoryByKey.has(tool.categoryKey)) {
+    throw new Error(`Tool ${tool.key} belongs to unknown category: ${tool.categoryKey}`);
+  }
+  if (CATEGORIES.some(category => category.path === tool.path)) {
+    throw new Error(`Tool path collides with a category path: ${tool.path}`);
+  }
+}
+
+const toolByKey = new Map(TOOLS.map(tool => [tool.key, tool]));
+const toolsForCategory = categoryKey => TOOLS.filter(tool => tool.categoryKey === categoryKey);
+
 module.exports = {
   site,
   root,
@@ -69,6 +86,9 @@ module.exports = {
   CATEGORY_ORDER,
   CATEGORY_GROUPS,
   GROUPS,
+  TOOLS,
   categoryByKey,
-  categoryBySlug
+  categoryBySlug,
+  toolByKey,
+  toolsForCategory
 };
