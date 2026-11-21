@@ -126,7 +126,7 @@ function page(options) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(options.title)}</title>
 <meta name="description" content="${esc(options.description)}">
-<meta name="theme-color" content="#2563EB">
+<meta name="theme-color" content="#5C2DDD">
 <link rel="canonical" href="${site}${options.canonical}">
 <meta property="og:type" content="${options.ogType || 'website'}">
 <meta property="og:title" content="${esc(options.title)}">
@@ -135,7 +135,7 @@ function page(options) {
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary">
 ${ogImage}
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%235c2ddd'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="${assets}css/site.css">
 ${structured}
 </head>
@@ -190,11 +190,6 @@ function homepage() {
   const cards = categories.map(category => categoryCard(category)).join('');
   const body = `<main>
 <section class="hero">
-  <div class="hero-atmosphere" aria-hidden="true">
-    <span class="hero-glow hero-glow-a"></span>
-    <span class="hero-glow hero-glow-b"></span>
-    <span class="hero-beam"></span>
-  </div>
   <div class="container hero-inner">
     <div class="hero-copy">
       <span class="eyebrow">Categories · Guides · Updates</span>
