@@ -438,6 +438,7 @@ test.describe('image size compressor', () => {
     await expect(page.locator('a[href="/media-and-motion/image-size-compressor/"]')).toHaveCount(1);
     await page.goto('/');
     await expect(page.locator('a[href="/media-and-motion/image-size-compressor/"]')).toHaveCount(1);
-    await expect(page.locator('section.section-soft .section-head h2')).toHaveText('Two real tools are live');
+    await expect(page.locator('section.section-soft .section-head h2')).toHaveText('Three real tools are live');
+    await expect(page.locator('a[href="/media-and-motion/video-trimmer/"]')).toHaveCount(1);
   });
 });

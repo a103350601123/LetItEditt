@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Fixture generator</title></head>
+<body>
+<p>Generating fixtures…</p>
+<script type="module">
+import * as MB from '/vendor/mediabunny/mediabunny.min.mjs';
+
+const QUALITY = new MB.Quality('medium');
+
+function makeCanvas(width, height) {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  return canvas;
+}
+
+function drawFrame(canvas, index, fps, label) {
+  const context = canvas.getContext('2d');
+  const { width, height } = canvas;
+  const hue = (index * 7) % 360;
+  context.fillStyle = `hsl(${hue} 65% 42%)`;
+  context.fillRect(0, 0, width, height);
+  context.fillStyle = 'rgba(15, 23, 42, .45)';
+  context.fillRect(0, height * 0.7, width, height * 0.3);
+  context.fillStyle = '#ffffff';
+  context.font = `700 ${Math.max(14, Math.round(height * 0.16))}px sans-serif`;
+  context.textAlign = 'center';
+  context.fillText(`${label} ${(index / fps).toFixed(2)}s`, width / 2, height * 0.48);
+  context.font = `${Math.max(10, Math.round(height * 0.07))}px sans-serif`;
+  context.fillText(`frame ${index}`, width / 2, height * 0.86);
+  context.strokeStyle = 'rgba(255,255,255,.5)';
+  context.lineWidth = 3;
+  context.strokeRect(6, 6, width - 12, height - 12);
+}
+
+function makeAudioBuffer(seconds, sampleRate = 48000) {
+  const context = new AudioContext();
+  const length = Math.ceil(seconds * sampleRate);
+  const buffer = context.createBuffer(2, length, sampleRate);
+  for (let channel = 0; channel < 2; channel += 1) {
+    const data = buffer.getChannelData(channel);
+    for (let i = 0; i < length; i += 1) {
+      const t = i / sampleRate;
+      const envelope = 0.18 + 0.12 * Math.sin(2 * Math.PI * 0.5 * t);
+      data[i] = Math.sin(2 * Math.PI * 440 * t) * envelope
+        + Math.sin(2 * Math.PI * 660 * t) * 0.05;
+    }
+  }
+  context.close();
+  return buffer;
+}
+
+async function encodeMp4({ width, height, fps, seconds, audio, label }) {
+  const canvas = makeCanvas(width, height);
+  const target = new MB.BufferTarget();
+  const output = new MB.Output({ format: new MB.Mp4OutputFormat(), target });
+  const videoSource = new MB.CanvasSource(canvas, { codec: 'avc', quality: QUALITY });
+  output.addVideoTrack(videoSource, { frameRate: fps });
+  let audioSource = null;
+  if (audio) {
+    audioSource = new MB.AudioBufferSource({ codec: 'aac', quality: QUALITY });
+    output.addAudioTrack(audioSource);
+  }
+  await output.start();
+  const frames = Math.round(seconds * fps);
+  for (let index = 0; index < frames; index += 1) {
+    drawFrame(canvas, index, fps, label);
+    await videoSource.add(index / fps, 1 / fps);
+  }
+  if (audioSource) {
+    await audioSource.add(makeAudioBuffer(seconds));
+  }
+  await output.finalize();
+  return new Blob([target.buffer], { type: 'video/mp4' });
+}
+
+async function remux(blob, formatName) {
+  const input = new MB.Input({ source: new MB.BlobSource(blob), formats: MB.ALL_FORMATS });
+  const target = new MB.BufferTarget();
+  const format = formatName === 'mov'
+    ? new MB.MovOutputFormat()
+    : formatName === 'mkv'
+      ? new MB.MkvOutputFormat()
+      : formatName === 'webm'
+        ? new MB.WebMOutputFormat()
+        : new MB.Mp4OutputFormat();
+  const output = new MB.Output({ format, target });
+  const conversion = await MB.Conversion.init({ input, output, copy: {} });
+  if (!conversion.isValid) throw new Error('remux invalid');
+  await conversion.execute();
+  return new Blob([target.buffer], { type: format.mimeType });
+}
+
+async function encodeAudioOnly(seconds) {
+  const target = new MB.BufferTarget();
+  const output = new MB.Output({ format: new MB.Mp4OutputFormat(), target });
+  const audioSource = new MB.AudioBufferSource({ codec: 'aac', quality: QUALITY });
+  output.addAudioTrack(audioSource);
+  await output.start();
+  await audioSource.add(makeAudioBuffer(seconds));
+  await output.finalize();
+  return new Blob([target.buffer], { type: 'audio/mp4' });
+}
+
+function toBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(',')[1]);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
+window.makeFixtures = async () => {
+  const fixtures = [];
+  const add = async (name, blob) => {
+    fixtures.push({ name, size: blob.size, type: blob.type, base64: await toBase64(blob) });
+  };
+
+  const base = await encodeMp4({ width: 640, height: 360, fps: 30, seconds: 4, audio: true, label: 'MP4 4s' });
+  await add('trim-4s.mp4', base);
+
+  await add('trim-2s-mute.mp4', await encodeMp4({ width: 480, height: 270, fps: 30, seconds: 2, audio: false, label: 'MP4 mute' }));
+
+  const webmSource = await encodeMp4({ width: 320, height: 240, fps: 30, seconds: 3, audio: true, label: 'WebM source' });
+  await add('trim-3s.webm', await remux(webmSource, 'webm'));
+
+  await add('trim-mov.mov', await remux(base, 'mov'));
+  await add('trim-mkv.mkv', await remux(base, 'mkv'));
+
+  await add('trim-portrait.mp4', await encodeMp4({ width: 270, height: 480, fps: 25, seconds: 2, audio: true, label: 'Portrait' }));
+  await add('trim-long.mp4', await encodeMp4({ width: 320, height: 180, fps: 24, seconds: 12, audio: true, label: 'Long' }));
+  await add('trim-short.mp4', await encodeMp4({ width: 320, height: 180, fps: 30, seconds: 0.6, audio: true, label: 'Short' }));
+  await add('trim-odd.mp4', await encodeMp4({ width: 322, height: 182, fps: 30, seconds: 2, audio: true, label: 'Odd size' }));
+  await add('trim-audio-only.m4a', await encodeAudioOnly(2));
+
+  const corrupt = new Uint8Array(4096);
+  for (let i = 0; i < corrupt.length; i += 1) corrupt[i] = (i * 37 + 11) % 256;
+  corrupt.set([0, 0, 0, 24, 0x66, 0x74, 0x79, 0x70], 0);
+  await add('trim-corrupt.mp4', new Blob([corrupt], { type: 'video/mp4' }));
+
+  const notVideo = new TextEncoder().encode('This is not a video file.\n'.repeat(40));
+  await add('trim-not-video.avi', new Blob([notVideo], { type: 'video/x-msvideo' }));
+
+  return fixtures;
+};
+
+window.fixturesReady = true;
+</script>
+</body>
+</html>
