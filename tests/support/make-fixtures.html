@@ -51,12 +51,12 @@ function makeAudioBuffer(seconds, sampleRate = 48000) {
   return buffer;
 }
 
-async function encodeMp4({ width, height, fps, seconds, audio, label }) {
+async function encodeMp4({ width, height, fps, seconds, audio, audioSampleRate = 48000, rotation = 0, label }) {
   const canvas = makeCanvas(width, height);
   const target = new MB.BufferTarget();
   const output = new MB.Output({ format: new MB.Mp4OutputFormat(), target });
   const videoSource = new MB.CanvasSource(canvas, { codec: 'avc', quality: QUALITY });
-  output.addVideoTrack(videoSource, { frameRate: fps });
+  output.addVideoTrack(videoSource, rotation ? { frameRate: fps, rotation } : { frameRate: fps });
   let audioSource = null;
   if (audio) {
     audioSource = new MB.AudioBufferSource({ codec: 'aac', quality: QUALITY });
@@ -69,10 +69,40 @@ async function encodeMp4({ width, height, fps, seconds, audio, label }) {
     await videoSource.add(index / fps, 1 / fps);
   }
   if (audioSource) {
-    await audioSource.add(makeAudioBuffer(seconds));
+    await audioSource.add(makeAudioBuffer(seconds, audioSampleRate));
   }
   await output.finalize();
   return new Blob([target.buffer], { type: 'video/mp4' });
+}
+
+async function encodeMovAudio({ codec, channels, seconds, label }) {
+  const width = 320;
+  const height = 180;
+  const fps = 30;
+  const canvas = makeCanvas(width, height);
+  const target = new MB.BufferTarget();
+  const output = new MB.Output({ format: new MB.MovOutputFormat(), target });
+  const videoSource = new MB.CanvasSource(canvas, { codec: 'avc', quality: QUALITY });
+  output.addVideoTrack(videoSource, { frameRate: fps });
+  const audioSource = new MB.AudioBufferSource({ codec });
+  output.addAudioTrack(audioSource);
+  await output.start();
+  const frames = Math.round(seconds * fps);
+  for (let index = 0; index < frames; index += 1) {
+    drawFrame(canvas, index, fps, label);
+    await videoSource.add(index / fps, 1 / fps);
+  }
+  const stereo = makeAudioBuffer(seconds);
+  let buffer = stereo;
+  if (channels === 1) {
+    const context = new AudioContext();
+    buffer = context.createBuffer(1, stereo.length, stereo.sampleRate);
+    buffer.copyToChannel(stereo.getChannelData(0), 0);
+    context.close();
+  }
+  await audioSource.add(buffer);
+  await output.finalize();
+  return new Blob([target.buffer], { type: 'video/quicktime' });
 }
 
 async function remux(blob, formatName) {
@@ -128,8 +158,12 @@ window.makeFixtures = async () => {
 
   await add('trim-mov.mov', await remux(base, 'mov'));
   await add('trim-mkv.mkv', await remux(base, 'mkv'));
+  await add('trim-pcm.mov', await encodeMovAudio({ codec: 'pcm-s16', channels: 2, seconds: 1.5, label: 'PCM' }));
+  await add('trim-ulaw.mov', await encodeMovAudio({ codec: 'ulaw', channels: 1, seconds: 1.5, label: 'ULAW' }));
 
   await add('trim-portrait.mp4', await encodeMp4({ width: 270, height: 480, fps: 25, seconds: 2, audio: true, label: 'Portrait' }));
+  await add('trim-44100.mp4', await encodeMp4({ width: 320, height: 180, fps: 25, seconds: 1.6, audio: true, audioSampleRate: 44100, label: '44.1k' }));
+  await add('trim-rotated.mp4', await encodeMp4({ width: 640, height: 360, fps: 30, seconds: 2, audio: true, rotation: 90, label: 'ROTATED' }));
   await add('trim-long.mp4', await encodeMp4({ width: 320, height: 180, fps: 24, seconds: 12, audio: true, label: 'Long' }));
   await add('trim-short.mp4', await encodeMp4({ width: 320, height: 180, fps: 30, seconds: 0.6, audio: true, label: 'Short' }));
   await add('trim-odd.mp4', await encodeMp4({ width: 322, height: 182, fps: 30, seconds: 2, audio: true, label: 'Odd size' }));

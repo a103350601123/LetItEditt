@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Online Video Merger – Combine Videos into One | LetitEdit</title>
+<meta name="description" content="Merge multiple videos online for free. Upload, reorder and combine video clips into one file with adjustable output settings. No installation required.">
+<meta name="theme-color" content="#2563EB">
+<link rel="canonical" href="https://letitedit.com/media-and-motion/video-merger/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Free Online Video Merger – Combine Videos into One | LetitEdit">
+<meta property="og:description" content="Merge multiple videos online for free. Upload, reorder and combine video clips into one file with adjustable output settings. No installation required.">
+<meta property="og:url" content="https://letitedit.com/media-and-motion/video-merger/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="stylesheet" href="../../css/video-merger.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://letitedit.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Categories", "item": "https://letitedit.com/categories/" },
+        { "@type": "ListItem", "position": 3, "name": "Video Editing", "item": "https://letitedit.com/categories/video-editing/" },
+        { "@type": "ListItem", "position": 4, "name": "Video Merger", "item": "https://letitedit.com/media-and-motion/video-merger/" }
+      ]
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "Free Online Video Merger",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Any modern browser",
+      "url": "https://letitedit.com/media-and-motion/video-merger/",
+      "description": "Merge multiple video clips in the browser. Add, reorder and combine videos into one MP4 or WebM file with adjustable aspect ratio, resolution, fit mode and quality. Files are processed locally and are not uploaded.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "featureList": [
+        "Browser-side video merging",
+        "Drag-and-drop upload and clip ordering",
+        "Mixed resolution, aspect ratio and frame rate normalization",
+        "Audio preservation with silent-clip handling",
+        "MP4 and WebM output when supported",
+        "Local processing with no upload"
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Does the video merger upload my videos?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The clips are decoded, normalized, re-encoded and muxed inside your browser tab. They are not sent to LetitEdit or to a third-party service, and no account is required." }
+        },
+        {
+          "@type": "Question",
+          "name": "Which video formats can I merge?",
+          "acceptedAnswer": { "@type": "Answer", "text": "MP4, M4V, MOV, WebM and MKV are accepted when this browser can decode their video and audio codecs. Unsupported, corrupted or audio-only files are rejected with a clear message." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I merge videos with different resolutions and frame rates?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Every clip is decoded and drawn onto a common output canvas at the selected aspect ratio and resolution. Frame timestamps are offset in the selected order, so clips with different frame rates can share one output timeline without stretching." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does the merger preserve audio?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes, when the browser can decode and encode the audio. Audio is normalized to 48 kHz stereo, offset to match each clip, and padded with silence for clips that have no audio. If a clip's audio cannot be decoded, the merge is blocked with an explanation instead of silently dropping it." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is the merged video lossless?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. Merging clips with different codecs, sizes or frame rates requires decoding and re-encoding. The High, Balanced and Smaller file options change the encoder quality target. The tool does not claim a lossless stream copy." }
+        },
+        {
+          "@type": "Question",
+          "name": "Why can I not choose MP4 or WebM?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Output formats are checked against the browser's WebCodecs encoders for the selected resolution and aspect ratio. A format that cannot be encoded at those settings is disabled rather than offered as a broken option." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I change the order of the clips?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Drag a clip onto another position, use the Up and Down buttons, or focus a clip and press Alt+Up or Alt+Down. The merged file follows the order shown in the clip list." }
+        },
+        {
+          "@type": "Question",
+          "name": "What happens to videos with a different shape?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Choose Fit with padding to keep the whole frame and fill the bars with your chosen color, or Fill by cropping to fill the output frame by trimming the edges. The tool never stretches a clip to fit." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does the merger work on phones?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The workspace is a single column on small screens and includes touch-friendly Up and Down reorder controls. Export speed depends on the phone's decoder and encoder support and on available memory." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is there a file size or clip limit?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Each file can be up to 2 GB and one merge can contain up to 20 clips. The practical limit is the memory available on your device. Very large or very long clips may be slow or may fail, and the page warns when the total input is large." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body class="vm-page">
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="topbar">
+  <nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+    <div class="nav-links" id="primary-links">
+      <a href="/categories/">Categories</a>
+      <a href="/blog/">Blog</a>
+      <a href="/news/">News</a>
+      <a href="/faq/">FAQ</a>
+    </div>
+    <div class="nav-actions">
+      <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
+    </div>
+  </nav>
+</header>
+
+<main id="main-content">
+<nav class="container breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../">Home</a><span aria-hidden="true">/</span>
+  <a href="../../categories/">Categories</a><span aria-hidden="true">/</span>
+  <a href="../../categories/video-editing/">Video Editing</a><span aria-hidden="true">/</span>
+  <span aria-current="page">Video Merger</span>
+</nav>
+
+<section class="vm-hero">
+  <div class="container">
+    <span class="eyebrow">Media &amp; Motion · Video Editing · Live tool</span>
+    <h1>Free Online Video Merger</h1>
+    <p>Combine multiple video clips into one file. Add your videos, put them in the right order, preview the sequence and export a real MP4 or WebM file. Everything runs in your browser and your files are never uploaded.</p>
+    <ul class="vm-hero-points">
+      <li>Runs on your device</li>
+      <li>Reorder by drag or buttons</li>
+      <li>Mixed sizes and frame rates</li>
+      <li>MP4 and WebM output</li>
+    </ul>
+  </div>
+</section>
+
+<section class="vm-section" aria-labelledby="merger-title">
+  <div class="container vm-workspace">
+    <div class="vm-panel" data-app>
+      <div class="vm-panel-head">
+        <div>
+          <h2 id="merger-title">Merge your videos</h2>
+          <p>Add at least two clips, arrange the order, then choose how the joined file should look.</p>
+        </div>
+        <span class="vm-privacy">Local processing</span>
+      </div>
+
+      <div class="vm-drop" data-dropzone>
+        <span class="vm-drop-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8" height="14" rx="2"/><rect x="13.5" y="5" width="8" height="14" rx="2"/><path d="M10.5 12h3M12 10.5v3"/></svg>
+        </span>
+        <p class="vm-drop-title" data-drop-title>Drag and drop your videos here</p>
+        <p class="vm-drop-sub" data-drop-sub>Select two or more MP4, WebM, MOV, M4V or MKV files. Up to 2 GB each.</p>
+        <button class="vm-btn vm-btn-primary" type="button" data-browse>Browse videos</button>
+        <p class="vm-drop-note">No upload. The files stay in this browser tab.</p>
+        <input type="file" hidden multiple data-file-input accept="video/mp4,video/webm,video/quicktime,video/x-m4v,video/x-matroska,.mp4,.m4v,.mov,.webm,.mkv">
+      </div>
+
+      <p class="vm-alert" data-global-error role="alert" hidden></p>
+      <p class="vm-warning" data-warning hidden></p>
+
+      <div class="vm-loading" data-loading hidden>
+        <span class="vm-spinner" aria-hidden="true"></span>
+        <p data-loading-text role="status" aria-live="polite">Reading videos…</p>
+      </div>
+
+      <div class="vm-preview" data-preview hidden>
+        <div class="vm-preview-head">
+          <div>
+            <h3 data-preview-title>Preview</h3>
+            <p data-preview-meta></p>
+          </div>
+          <button class="vm-btn vm-btn-secondary vm-btn-small" type="button" data-preview-close>Close preview</button>
+        </div>
+        <video data-preview-video controls playsinline aria-label="Clip preview"></video>
+        <p class="vm-preview-status" data-preview-status role="status" aria-live="polite"></p>
+      </div>
+
+      <div class="vm-workspace-grid">
+        <section class="vm-clips" aria-labelledby="clips-title">
+          <div class="vm-clips-head">
+            <div>
+              <h3 id="clips-title">Your clips</h3>
+              <p class="vm-clips-summary"><strong data-clip-count>0</strong> clips · <span data-total-duration>00:00.000</span> total · <span data-total-size>0 B</span></p>
+            </div>
+            <div class="vm-clips-actions">
+              <button class="vm-btn vm-btn-secondary vm-btn-small" type="button" data-preview-sequence disabled>Preview sequence</button>
+              <button class="vm-btn vm-btn-secondary vm-btn-small" type="button" data-add-more>Add more</button>
+              <button class="vm-btn vm-btn-ghost vm-btn-small" type="button" data-clear-all disabled>Clear all</button>
+            </div>
+          </div>
+
+          <div class="vm-empty" data-empty>
+            <span class="vm-empty-icon" aria-hidden="true">+</span>
+            <p><strong>No clips yet.</strong> Add two or more videos to build a merged sequence.</p>
+          </div>
+
+          <ol class="vm-clip-list" data-clip-list hidden aria-label="Clips in merge order"></ol>
+        </section>
+
+        <aside class="vm-settings" aria-labelledby="settings-title">
+          <h3 id="settings-title">Output settings</h3>
+          <fieldset class="vm-settings-fieldset" data-settings>
+            <legend class="vm-sr-only">Output settings</legend>
+
+            <div class="vm-field">
+              <label for="vm-aspect">Aspect ratio</label>
+              <select id="vm-aspect" data-aspect>
+                <option value="source" selected>Preserve first video</option>
+                <option value="16:9">16:9 landscape</option>
+                <option value="9:16">9:16 vertical</option>
+                <option value="1:1">1:1 square</option>
+                <option value="4:3">4:3 classic</option>
+              </select>
+              <p class="vm-hint">The output frame is chosen before any clip is fitted or cropped.</p>
+            </div>
+
+            <div class="vm-field">
+              <label for="vm-resolution">Resolution</label>
+              <select id="vm-resolution" data-resolution>
+                <option value="source" selected>Original / first clip</option>
+                <option value="1080">1080p</option>
+                <option value="720">720p</option>
+                <option value="480">480p</option>
+              </select>
+              <p class="vm-hint">Estimated output: <strong data-output-size>—</strong></p>
+            </div>
+
+            <fieldset class="vm-choice-group">
+              <legend>Mismatched shapes</legend>
+              <label class="vm-choice">
+                <input type="radio" name="vm-fit" value="contain" checked>
+                <span><strong>Fit with padding</strong><small>Keep the whole frame and fill the bars with your color.</small></span>
+              </label>
+              <label class="vm-choice">
+                <input type="radio" name="vm-fit" value="cover">
+                <span><strong>Fill by cropping</strong><small>Fill the frame by trimming the edges. Nothing is stretched.</small></span>
+              </label>
+            </fieldset>
+
+            <div class="vm-field vm-color-field">
+              <label for="vm-background">Padding color</label>
+              <div class="vm-color-row">
+                <input type="color" id="vm-background" data-background value="#0f172a">
+                <span data-background-label>#0F172A</span>
+              </div>
+              <div class="vm-swatches" data-swatches aria-label="Padding color presets">
+                <button type="button" data-color="#0f172a" style="--swatch:#0f172a" aria-label="Use dark navy padding"></button>
+                <button type="button" data-color="#ffffff" style="--swatch:#ffffff" aria-label="Use white padding"></button>
+                <button type="button" data-color="#eff6ff" style="--swatch:#eff6ff" aria-label="Use pale blue padding"></button>
+                <button type="button" data-color="#64748b" style="--swatch:#64748b" aria-label="Use slate gray padding"></button>
+              </div>
+              <p class="vm-hint" data-background-note>Bars around fitted video use this color.</p>
+            </div>
+
+            <div class="vm-field">
+              <label for="vm-format">Output format</label>
+              <select id="vm-format" data-format>
+                <option value="mp4" selected>MP4 · H.264 / AAC</option>
+                <option value="webm">WebM · VP9 / Opus</option>
+              </select>
+              <p class="vm-hint" data-format-note>Formats are enabled only when this browser can encode them at the chosen size.</p>
+            </div>
+
+            <fieldset class="vm-choice-group">
+              <legend>Quality</legend>
+              <label class="vm-choice">
+                <input type="radio" name="vm-quality" value="high">
+                <span><strong>High</strong><small>Largest file, most visual detail.</small></span>
+              </label>
+              <label class="vm-choice">
+                <input type="radio" name="vm-quality" value="medium" checked>
+                <span><strong>Balanced</strong><small>A practical default for most clips.</small></span>
+              </label>
+              <label class="vm-choice">
+                <input type="radio" name="vm-quality" value="low">
+                <span><strong>Smaller file</strong><small>More compression and a smaller download.</small></span>
+              </label>
+            </fieldset>
+
+            <p class="vm-hint">The browser decodes and re-encodes the merge. This is not a lossless stream copy.</p>
+          </fieldset>
+        </aside>
+      </div>
+
+      <div class="vm-action">
+        <div class="vm-action-summary">
+          <strong data-action-title>Build your merge</strong>
+          <p data-merge-note>Add at least two video clips to merge.</p>
+          <p class="vm-hint" data-output-summary>Add clips to see the output estimate.</p>
+        </div>
+        <div class="vm-action-buttons">
+          <button class="vm-btn vm-btn-primary" type="button" data-merge disabled>Merge videos</button>
+          <button class="vm-btn vm-btn-secondary" type="button" data-cancel hidden>Cancel merge</button>
+        </div>
+      </div>
+
+      <div class="vm-progress" data-progress hidden>
+        <div class="vm-progress-track" data-progress-track role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Merge progress"><div class="vm-progress-bar" data-progress-bar></div></div>
+        <p class="vm-progress-label" data-progress-label role="status" aria-live="polite">Preparing the merge…</p>
+      </div>
+
+      <div class="vm-result" data-result hidden aria-live="polite">
+        <div class="vm-result-head">
+          <span class="vm-result-check" aria-hidden="true">✓</span>
+          <div>
+            <h3>Your merged video is ready</h3>
+            <p data-result-note>Created locally. The original files were not uploaded.</p>
+          </div>
+        </div>
+        <video class="vm-result-video" data-result-video controls playsinline aria-label="Merged video preview"></video>
+        <dl class="vm-result-meta">
+          <div><dt>File</dt><dd data-result-name>—</dd></div>
+          <div><dt>Format</dt><dd data-result-format>—</dd></div>
+          <div><dt>Duration</dt><dd data-result-duration>—</dd></div>
+          <div><dt>Size</dt><dd data-result-size>—</dd></div>
+          <div><dt>Resolution</dt><dd data-result-resolution>—</dd></div>
+          <div><dt>Audio</dt><dd data-result-audio>—</dd></div>
+        </dl>
+        <div class="vm-result-actions">
+          <a class="vm-btn vm-btn-primary" data-download download aria-disabled="true">Download merged video</a>
+          <button class="vm-btn vm-btn-secondary" type="button" data-new-merge>Start a new merge</button>
+        </div>
+        <p class="vm-hint">The download is a local blob. Nothing was sent to a server.</p>
+      </div>
+
+      <noscript><p class="vm-alert">This video merger needs JavaScript. All processing runs locally in your browser.</p></noscript>
+    </div>
+  </div>
+</section>
+
+<section class="section vm-content">
+  <div class="container vm-content-layout">
+    <article class="article-card vm-article">
+      <span class="eyebrow" style="color:#2563eb">Guide</span>
+      <h2>What merging videos actually means</h2>
+      <p>Merging is more than putting two files next to each other. A video file is a container with a video track, often an audio track, timing information and codec setup data. Two files can both be MP4s and still use different codecs, frame sizes, sample rates or rotation flags. Joining the raw bytes would usually produce a file that plays the first clip and then stops, or does not play at all.</p>
+      <p>This tool decodes each clip, draws it onto one shared output canvas, normalizes the audio, and writes a new video track and audio track in the order you chose. That is a real merge, but it is also a re-encode. The original files are never changed and never uploaded.</p>
+
+      <h2>How to merge videos in your browser</h2>
+      <ol>
+        <li><strong>Add your clips.</strong> Drag several files onto the upload area or choose Browse videos. You can keep adding clips later.</li>
+        <li><strong>Put them in order.</strong> Drag a clip to a new position, use its Up and Down buttons, or focus it and press Alt+Up or Alt+Down. The list order is the output order.</li>
+        <li><strong>Check the clips.</strong> Each card shows a thumbnail, duration, file size, resolution, frame rate and audio status. Use Preview to check one clip, or Preview sequence to play the clips in order.</li>
+        <li><strong>Choose the output shape.</strong> Pick an aspect ratio and resolution. For mismatched clips, choose padding or cropping. Pick a padding color if you are fitting rather than filling.</li>
+        <li><strong>Choose format and quality.</strong> Only formats that this browser can encode at the selected size are enabled. High keeps more detail; Smaller file compresses more.</li>
+        <li><strong>Merge and download.</strong> The page reports real progress, allows cancellation, verifies the output file, and only then offers the download.</li>
+      </ol>
+
+      <h2>Supported formats and honest limits</h2>
+      <p>MP4, M4V, MOV, WebM and MKV inputs are accepted when the browser can decode their video and audio codecs. In current Chrome and Edge, common H.264/AAC MP4 files, VP8/VP9/Opus WebM files, and many MOV, M4V and MKV files work. Firefox and Safari expose different codec sets, so the same file may work in one browser and fail in another.</p>
+      <p>Output is limited to MP4 and WebM. MP4 uses H.264 video and AAC audio; WebM uses VP9 video and Opus audio. The format selector is checked against the browser's WebCodecs encoders for the selected resolution and aspect ratio. If a format cannot be encoded, it is disabled with an explanation instead of producing a broken download.</p>
+      <p>This is not a lossless joiner. Clips with different codecs, sizes, frame rates or audio parameters must be normalized, and that requires decoding and re-encoding. Even clips that already match are re-encoded so the output has one consistent track. Re-encoding can make a file larger than the input, especially when the source was already heavily compressed.</p>
+
+      <h2>How clip order and timing work</h2>
+      <p>Each clip keeps its full duration from the moment it is added. The tool places the first clip at time zero, then starts the next clip at the exact end of the previous one. Video frame timestamps are shifted by that offset, and audio sample timestamps are shifted by the same amount. Nothing is overlapped unless you deliberately add the same clip twice.</p>
+      <p>The output uses variable frame timing when the inputs do. A 24 fps clip, a 30 fps clip and a 25 fps clip can sit next to each other without forcing every clip onto one frame rate. The result plays at the timing encoded for each segment, which is more faithful than duplicating or dropping frames just to make the numbers match.</p>
+      <p>Clip boundaries land on decoded frames, not on an exact millisecond chosen in an editor. The last frame of a clip may be extended slightly to cover the full clip duration. Audio is trimmed and padded at sample boundaries, which are much finer than video frames.</p>
+
+      <h2>Resolution, aspect ratio and padding</h2>
+      <p>Preserve first video uses the first clip's display shape. 16:9, 9:16, 1:1 and 4:3 give the whole merge a consistent frame. Resolution can stay at the first clip's size or be set to 1080p, 720p or 480p. The tool makes both dimensions even, which is required by common video encoders.</p>
+      <p>Fit with padding keeps the whole picture and puts the unused area in bars. Fill by cropping scales the picture until the frame is covered and trims the overflow. Neither option stretches the image. Rotation metadata is applied before the frame is fitted, so a portrait phone video is not accidentally rotated or distorted.</p>
+      <p>Padding color is applied to the canvas before each frame is drawn. It is visible only in fit mode; crop mode covers the full frame. A white, dark navy, pale blue or slate background is one click away, and the color picker accepts any hex color.</p>
+
+      <h2>Audio compatibility and synchronization</h2>
+      <p>Audio is decoded separately from video, resampled to 48 kHz, and mixed to stereo. The same timeline offset used for video is applied to audio, so a clip's sound starts when its picture starts. If a clip has no audio track, the merger inserts silence for exactly that clip's duration. This keeps later clips aligned instead of letting the audio jump forward.</p>
+      <p>If a clip has an audio track that this browser cannot decode, the merge is blocked with a message naming the clip. The tool does not silently discard the audio or pretend the result includes it. Removing that clip or trying a browser with the right decoder is the reliable fix.</p>
+      <p>Audio from one clip never overlaps the next clip. The output contains one continuous audio track, with silence where a source clip is silent. If the original audio has a deliberate delay at the start, that delay is preserved inside the clip's time range.</p>
+
+      <h2>Processing, privacy and browser limits</h2>
+      <p>The heavy work happens in a Web Worker using Mediabunny for demuxing, muxing and sample handling, plus the browser's WebCodecs decoders and encoders. The worker is loaded when you add a clip, not on page load. It is terminated after an export or when you leave the page, which releases decoder and encoder resources.</p>
+      <p>Each file can be up to 2 GB and one merge can contain up to 20 clips. Those are safety limits, not a promise that a phone can handle them. A long 4K clip can exhaust memory even when each file is below the limit. The page warns when the total input is large. If a merge fails, try fewer clips, a shorter selection or a smaller resolution, and close other memory-heavy tabs.</p>
+      <p>Your files are decoded and encoded inside this tab. There is no upload, account, paid API or server-side copy. Temporary object URLs for the clips and the result are released when you remove a clip, start a new merge or leave the page.</p>
+
+      <h2>Frequently asked questions</h2>
+      <div class="vm-faq">
+        <details class="faq-item"><summary>Does the video merger upload my videos?</summary><p>No. The clips are decoded, normalized, re-encoded and muxed inside your browser tab. They are not sent to LetitEdit or to a third-party service, and no account is required.</p></details>
+        <details class="faq-item"><summary>Which video formats can I merge?</summary><p>MP4, M4V, MOV, WebM and MKV are accepted when this browser can decode their video and audio codecs. Unsupported, corrupted or audio-only files are rejected with a clear message.</p></details>
+        <details class="faq-item"><summary>Can I merge videos with different resolutions and frame rates?</summary><p>Yes. Every clip is decoded and drawn onto a common output canvas at the selected aspect ratio and resolution. Frame timestamps are offset in the selected order, so clips with different frame rates can share one output timeline without stretching.</p></details>
+        <details class="faq-item"><summary>Does the merger preserve audio?</summary><p>Yes, when the browser can decode and encode the audio. Audio is normalized to 48 kHz stereo, offset to match each clip, and padded with silence for clips that have no audio. If a clip's audio cannot be decoded, the merge is blocked with an explanation instead of silently dropping it.</p></details>
+        <details class="faq-item"><summary>Is the merged video lossless?</summary><p>No. Merging clips with different codecs, sizes or frame rates requires decoding and re-encoding. The High, Balanced and Smaller file options change the encoder quality target. The tool does not claim a lossless stream copy.</p></details>
+        <details class="faq-item"><summary>Why can I not choose MP4 or WebM?</summary><p>Output formats are checked against the browser's WebCodecs encoders for the selected resolution and aspect ratio. A format that cannot be encoded at those settings is disabled rather than offered as a broken option.</p></details>
+        <details class="faq-item"><summary>Can I change the order of the clips?</summary><p>Yes. Drag a clip onto another position, use the Up and Down buttons, or focus a clip and press Alt+Up or Alt+Down. The merged file follows the order shown in the clip list.</p></details>
+        <details class="faq-item"><summary>What happens to videos with a different shape?</summary><p>Choose Fit with padding to keep the whole frame and fill the bars with your chosen color, or Fill by cropping to fill the output frame by trimming the edges. The tool never stretches a clip to fit.</p></details>
+        <details class="faq-item"><summary>Does the merger work on phones?</summary><p>The workspace is a single column on small screens and includes touch-friendly Up and Down reorder controls. Export speed depends on the phone's decoder and encoder support and on available memory.</p></details>
+        <details class="faq-item"><summary>Is there a file size or clip limit?</summary><p>Each file can be up to 2 GB and one merge can contain up to 20 clips. The practical limit is the memory available on your device. Very large or very long clips may be slow or may fail, and the page warns when the total input is large.</p></details>
+      </div>
+    </article>
+
+    <aside class="vm-side">
+      <div class="info-card">
+        <h2>At a glance</h2>
+        <ul class="vm-facts">
+          <li>Input <span>MP4, WebM, MOV, M4V, MKV*</span></li>
+          <li>Output <span>MP4 (H.264/AAC), WebM (VP9/Opus)</span></li>
+          <li>Clips <span>Up to 20 per merge</span></li>
+          <li>Ordering <span>Drag, buttons or Alt+Arrow</span></li>
+          <li>Audio <span>48 kHz stereo, silence padded</span></li>
+          <li>Processing <span>On your device</span></li>
+          <li>Price <span>Free</span></li>
+        </ul>
+        <p class="vm-hint">*Accepted when this browser can decode the file. Output formats appear only when the browser can encode them.</p>
+      </div>
+      <div class="info-card">
+        <h2>Related</h2>
+        <ul class="related-list">
+          <li><a href="/media-and-motion/video-trimmer/"><span class="related-icon" aria-hidden="true">✂️</span><span>Video Trimmer</span></a></li>
+          <li><a href="/categories/video-editing/"><span class="related-icon" aria-hidden="true">🎬</span><span>Video Editing category</span></a></li>
+          <li><a href="/media-and-motion/image-size-compressor/"><span class="related-icon" aria-hidden="true">🖼️</span><span>Image Size Compressor</span></a></li>
+          <li><a href="/categories/"><span class="related-icon" aria-hidden="true">🧭</span><span>All categories</span></a></li>
+        </ul>
+        <p><a class="text-link" href="/categories/">Browse all 28 categories →</a></p>
+      </div>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="footer-logo" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+        <p>A category-led home for guides, updates and carefully built browser-side tools. The tool library is being rebuilt one focused release at a time.</p>
+        <a class="footer-contact" href="mailto:info@letitedit.com">info@letitedit.com</a>
+      </div>
+      <div class="footer-column">
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="/categories/">Categories</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/news/">News</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Trust &amp; policies</h3>
+        <ul>
+          <li><a href="/about/">About LetitEdit</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="/terms-of-service/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-categories">
+      <h3>All categories</h3>
+      <ul class="footer-category-list">
+        <li><a href="/categories/image-photo-editing/">Image &amp; Photo Editing</a></li>
+        <li><a href="/categories/video-editing/">Video Editing</a></li>
+        <li><a href="/categories/audio-music-editing/">Audio &amp; Music Editing</a></li>
+        <li><a href="/categories/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+        <li><a href="/categories/text-writing-editing/">Text &amp; Writing Editing</a></li>
+        <li><a href="/categories/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+        <li><a href="/categories/web-code-editing/">Web &amp; Code Editing</a></li>
+        <li><a href="/categories/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+        <li><a href="/categories/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
+        <li><a href="/categories/face-portrait-editing/">Face &amp; Portrait Editing</a></li>
+        <li><a href="/categories/ai-image-enhancement-restoration/">AI Image Enhancement &amp; Restoration</a></li>
+        <li><a href="/categories/3d-design-model-editing/">3D Design &amp; Model Editing</a></li>
+        <li><a href="/categories/animation-motion-graphics/">Animation &amp; Motion Graphics</a></li>
+        <li><a href="/categories/font-typography-editing/">Font &amp; Typography Editing</a></li>
+        <li><a href="/categories/color-gradient-tools/">Color &amp; Gradient Tools</a></li>
+        <li><a href="/categories/logo-branding-tools/">Logo &amp; Branding Tools</a></li>
+        <li><a href="/categories/social-media-design-tools/">Social Media Design Tools</a></li>
+        <li><a href="/categories/screenshot-screen-image-editing/">Screenshot &amp; Screen Image Editing</a></li>
+        <li><a href="/categories/data-visualization-infographic-editing/">Data Visualization &amp; Infographic Editing</a></li>
+        <li><a href="/categories/ebook-publishing-tools/">eBook &amp; Publishing Tools</a></li>
+        <li><a href="/categories/email-newsletter-design/">Email &amp; Newsletter Design</a></li>
+        <li><a href="/categories/sound-effects-voice-design/">Sound Effects &amp; Voice Design</a></li>
+        <li><a href="/categories/cad-technical-drawing/">CAD &amp; Technical Drawing</a></li>
+        <li><a href="/categories/signature-document-annotation/">Signature &amp; Document Annotation</a></li>
+        <li><a href="/categories/ui-ux-website-design-tools/">UI/UX &amp; Website Design Tools</a></li>
+        <li><a href="/categories/print-marketing-material-design/">Print &amp; Marketing Material Design</a></li>
+        <li><a href="/categories/metadata-file-information-editing/">Metadata &amp; File Information Editing</a></li>
+        <li><a href="/categories/digital-drawing-illustration/">Digital Drawing &amp; Illustration</a></li>
+      </ul>
+      <a class="footer-all-categories" href="/categories/">Browse all 28 categories →</a>
+    </div>
+    <div class="footer-promise">
+      <span aria-hidden="true">🔒</span>
+      <p><strong>Privacy by design.</strong> This tool keeps your videos in your browser, avoids accounts and explains exactly what the merge does.</p>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> LetitEdit.com</span>
+      <span>Built for privacy, accuracy and plain-English tooling.</span>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="../../js/video-merger.js"></script>
+</body>
+</html>
