@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Online Video Compressor – Reduce Video File Size | LetitEdit</title>
+<meta name="description" content="Compress MP4, WebM, MOV, M4V and MKV videos in your browser. Choose High, Balanced or Smallest File, set a target bitrate or file size, resize, keep the audio and download a genuinely re-encoded MP4 or WebM file. No upload.">
+<meta name="theme-color" content="#2563EB">
+<link rel="canonical" href="https://letitedit.com/media-and-motion/video-compressor/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Free Online Video Compressor – Reduce Video File Size | LetitEdit">
+<meta property="og:description" content="Compress MP4, WebM, MOV, M4V and MKV videos in your browser. Choose a quality mode, target bitrate or file size, resize, keep the audio and download a real MP4 or WebM file. Processing stays on your device.">
+<meta property="og:url" content="https://letitedit.com/media-and-motion/video-compressor/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="stylesheet" href="../../css/video-compressor.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://letitedit.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Categories", "item": "https://letitedit.com/categories/" },
+        { "@type": "ListItem", "position": 3, "name": "Video Editing", "item": "https://letitedit.com/categories/video-editing/" },
+        { "@type": "ListItem", "position": 4, "name": "Video Compressor", "item": "https://letitedit.com/media-and-motion/video-compressor/" }
+      ]
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "Free Online Video Compressor",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Any modern browser",
+      "url": "https://letitedit.com/media-and-motion/video-compressor/",
+      "description": "Compress a video in the browser with High quality, Balanced, Smallest file or advanced bitrate, target-size, CRF, frame-rate, resolution and audio controls. Export a genuinely re-encoded MP4 or WebM file. Files are processed locally and are not uploaded.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "featureList": [
+        "High Quality, Balanced and Smallest File compression modes",
+        "Advanced bitrate, target file size and constant-quality controls",
+        "Resolution presets from 4K to 360p plus custom dimensions",
+        "Optional frame-rate cap that drops frames without duplicating them",
+        "Keep or remove audio with a selectable audio bitrate",
+        "MP4 with H.264/AAC and WebM with VP9 or VP8 and Opus",
+        "Real before-and-after size, saved bytes and compression percentage",
+        "Local processing with no upload"
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Does this video compressor upload my video?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The video is decoded and re-encoded inside your browser tab with WebCodecs and Mediabunny. It is not sent to LetitEdit or to a third-party service, and no account is required." }
+        },
+        {
+          "@type": "Question",
+          "name": "Which formats can I compress?",
+          "acceptedAnswer": { "@type": "Answer", "text": "MP4, M4V, MOV, WebM and MKV are accepted when this browser can decode their video and audio codecs. AVI is not decoded by the browser engine, so AVI must be converted to one of those formats first. Corrupted, oversized and audio-only files are rejected with a clear message." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is the compressed video really smaller?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The tool measures the original and the exported file and shows the real sizes. Balanced and Smallest File usually reduce size, but a file that is already heavily compressed can grow when it is re-encoded. When that happens the result panel says so instead of claiming a saving." }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between the three modes?",
+          "acceptedAnswer": { "@type": "Answer", "text": "High Quality keeps more detail and uses a higher bitrate. Balanced is the recommended default and aims for a practical size. Smallest File uses stronger compression and lower audio bitrates, so the picture may lose detail. Advanced lets you set the bitrate, target size, CRF, frame rate, resolution and audio yourself." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does the compressor guarantee a target file size?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. A target size is converted into a video bitrate for the clip duration and is treated as a goal. The final size depends on scene complexity, the encoder, the container and the audio. The actual size is measured after export." }
+        },
+        {
+          "@type": "Question",
+          "name": "Will compressing change the duration or audio sync?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The tool keeps the source duration, preserves frame timestamps and normalizes audio to 48 kHz stereo at the same timing. If you choose a maximum frame rate, extra frames are dropped and the previous frame is extended, so audio stays aligned." }
+        },
+        {
+          "@type": "Question",
+          "name": "What is CRF or constant quality?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Constant quality targets a visual quality level instead of a fixed bitrate. Lower values keep more detail and produce larger files. Browser encoders vary in support, so the tool also supplies a bitrate fallback and says when the fallback is used." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I remove the audio to make the file smaller?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Choose Remove audio in the advanced settings. The exported file then has no audio track. Leaving audio enabled preserves it and lets you pick an audio bitrate from 64 to 256 kbps." }
+        },
+        {
+          "@type": "Question",
+          "name": "Will compressing improve the quality?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. Compression removes data to make the file smaller, so quality can stay close to the source but cannot improve. Upscaling the resolution also cannot add real detail. Keep the original resolution and a high bitrate when quality matters most." }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is an output format or codec disabled?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The tool asks the browser which codecs it can actually encode at the chosen resolution. A format or codec that is unavailable is disabled with an explanation instead of producing a broken file." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body class="vc-page">
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="topbar">
+  <nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+    <div class="nav-links" id="primary-links">
+      <a href="/categories/">Categories</a>
+      <a href="/blog/">Blog</a>
+      <a href="/news/">News</a>
+      <a href="/faq/">FAQ</a>
+    </div>
+    <div class="nav-actions">
+      <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
+    </div>
+  </nav>
+</header>
+
+<main id="main-content">
+<nav class="container breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../">Home</a><span aria-hidden="true">/</span>
+  <a href="../../categories/">Categories</a><span aria-hidden="true">/</span>
+  <a href="../../categories/video-editing/">Video Editing</a><span aria-hidden="true">/</span>
+  <span aria-current="page">Video Compressor</span>
+</nav>
+
+<section class="vc-hero">
+  <div class="container">
+    <span class="eyebrow">Media &amp; Motion · Video Editing · Live tool</span>
+    <h1>Free Online Video Compressor</h1>
+    <p>Reduce a video's real file size by decoding and re-encoding it with settings you control. Pick High Quality, Balanced or Smallest File, or open the advanced controls for bitrate, target size, CRF, resolution, frame rate and audio. The compressed MP4 or WebM is created on your device and never uploaded.</p>
+    <ul class="vc-hero-points">
+      <li>Runs on your device</li>
+      <li>Real re-encoding</li>
+      <li>Honest before-and-after sizes</li>
+      <li>MP4 and WebM output</li>
+    </ul>
+  </div>
+</section>
+
+<section class="vc-section" aria-labelledby="compressor-title">
+  <div class="container vc-workspace">
+    <div class="vc-panel" data-app>
+      <div class="vc-panel-head">
+        <div>
+          <h2 id="compressor-title">Compress your video</h2>
+          <p>Upload one clip, choose how hard to compress, then download the smaller result.</p>
+        </div>
+        <span class="vc-privacy">Local processing</span>
+      </div>
+
+      <div class="vc-drop" data-dropzone>
+        <span class="vc-drop-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+        </span>
+        <p class="vc-drop-title" data-drop-title>Drag and drop your video here</p>
+        <p class="vc-drop-sub" data-drop-sub>Select an MP4, WebM, MOV, M4V or MKV file. Up to 2 GB. AVI is not decoded by the browser engine.</p>
+        <button class="vc-btn vc-btn-primary" type="button" data-browse>Browse video</button>
+        <p class="vc-drop-note">No upload. The file stays in this browser tab.</p>
+        <input type="file" hidden data-file-input aria-label="Choose a video file" accept="video/mp4,video/webm,video/quicktime,video/x-m4v,video/x-matroska,.mp4,.m4v,.mov,.webm,.mkv">
+      </div>
+
+      <p class="vc-alert" data-global-error role="alert" hidden></p>
+      <p class="vc-warning" data-warning hidden></p>
+
+      <div class="vc-loading" data-loading hidden>
+        <span class="vc-spinner" aria-hidden="true"></span>
+        <p data-loading-text role="status" aria-live="polite">Reading the video…</p>
+      </div>
+
+      <div class="vc-editor" data-editor hidden>
+        <div class="vc-filebar">
+          <div class="vc-file-thumb"><img data-file-thumb alt="" hidden></div>
+          <div class="vc-file-info">
+            <strong data-file-name>—</strong>
+            <p data-file-meta>—</p>
+          </div>
+          <div class="vc-file-actions">
+            <button class="vc-btn vc-btn-secondary vc-btn-small" type="button" data-replace>Replace video</button>
+            <button class="vc-btn vc-btn-ghost vc-btn-small" type="button" data-remove-video>Remove</button>
+          </div>
+        </div>
+
+        <div class="vc-layout">
+          <div class="vc-main">
+            <div class="vc-preview-card">
+              <div class="vc-preview-head">
+                <span class="vc-preview-label">Source video</span>
+                <span class="vc-preview-dims" data-source-dims>—</span>
+              </div>
+              <div class="vc-player" data-player tabindex="0" aria-label="Source video player">
+                <div class="vc-stage" data-stage>
+                  <video data-video playsinline preload="metadata" aria-label="Source video preview"></video>
+                  <p class="vc-video-error" data-video-error hidden></p>
+                  <button class="vc-big-play" type="button" data-big-play aria-label="Play video">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>
+                  </button>
+                </div>
+                <div class="vc-controls">
+                  <div class="vc-seek-row">
+                    <span class="vc-time" data-current>00:00</span>
+                    <input class="vc-range vc-seek" type="range" data-seek min="0" max="1000" step="1" value="0" aria-label="Seek through the video">
+                    <span class="vc-time" data-total>00:00</span>
+                  </div>
+                  <div class="vc-button-row">
+                    <button class="vc-icon-btn" type="button" data-play aria-label="Play video" title="Play">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>
+                    </button>
+                    <div class="vc-volume-group">
+                      <button class="vc-icon-btn" type="button" data-mute aria-label="Mute video" title="Mute">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                      </button>
+                      <input class="vc-range vc-volume" type="range" data-volume min="0" max="1" step="0.01" value="1" aria-label="Volume">
+                    </div>
+                    <span class="vc-controls-spacer"></span>
+                    <button class="vc-icon-btn" type="button" data-fullscreen aria-label="Enter fullscreen" title="Fullscreen">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="vc-meta" aria-label="Source video details">
+              <div class="vc-meta-item"><span>Duration</span><strong data-meta-duration>—</strong></div>
+              <div class="vc-meta-item"><span>Original</span><strong data-meta-resolution>—</strong></div>
+              <div class="vc-meta-item"><span>Frame rate</span><strong data-meta-fps>—</strong></div>
+              <div class="vc-meta-item"><span>Video codec</span><strong data-meta-video>—</strong></div>
+              <div class="vc-meta-item"><span>Audio</span><strong data-meta-audio>—</strong></div>
+              <div class="vc-meta-item"><span>Rotation</span><strong data-meta-rotation>—</strong></div>
+              <div class="vc-meta-item"><span>File size</span><strong data-meta-size>—</strong></div>
+              <div class="vc-meta-item"><span>Source bitrate</span><strong data-meta-bitrate>—</strong></div>
+            </div>
+
+            <div class="vc-plan" aria-label="Compression plan">
+              <h3>Compression plan</h3>
+              <dl>
+                <div><dt>Original</dt><dd data-plan-original>—</dd></div>
+                <div><dt>Output</dt><dd data-plan-output>—</dd></div>
+                <div><dt>Video target</dt><dd data-plan-video>—</dd></div>
+                <div><dt>Audio</dt><dd data-plan-audio>—</dd></div>
+              </dl>
+              <p class="vc-hint">The final size is measured after compression. Until then, only the encoder targets are shown.</p>
+            </div>
+
+            <p class="vc-keyhint">Keyboard: Space or K play/pause · ←/→ seek 5 s · M mute · F fullscreen.</p>
+          </div>
+
+          <aside class="vc-side" aria-labelledby="settings-title">
+            <h3 id="settings-title">Compression settings</h3>
+
+            <fieldset class="vc-fieldset">
+              <legend>Compression mode</legend>
+              <div class="vc-modes" role="radiogroup" aria-labelledby="settings-title">
+                <label class="vc-mode"><input type="radio" name="vc-mode" value="high"><span><strong>High quality</strong><small>Moderate compression. Keeps the most visual detail.</small></span></label>
+                <label class="vc-mode"><input type="radio" name="vc-mode" value="balanced" checked><span><strong>Balanced <em>Recommended</em></strong><small>A practical mix of size and quality.</small></span></label>
+                <label class="vc-mode"><input type="radio" name="vc-mode" value="smallest"><span><strong>Smallest file</strong><small>Stronger compression. The picture may lose detail.</small></span></label>
+                <label class="vc-mode"><input type="radio" name="vc-mode" value="advanced"><span><strong>Advanced</strong><small>Set bitrate, target size, CRF, frame rate and audio.</small></span></label>
+              </div>
+              <p class="vc-hint" data-mode-note>Balanced is recommended for most videos.</p>
+            </fieldset>
+
+            <fieldset class="vc-fieldset">
+              <legend>Output</legend>
+              <div class="vc-field">
+                <label for="vc-format">Output format</label>
+                <select id="vc-format" data-format>
+                  <option value="mp4" selected>MP4 · H.264 / AAC</option>
+                  <option value="webm">WebM · VP9 / Opus</option>
+                </select>
+                <p class="vc-hint" data-format-note>Formats are enabled only when this browser can encode them at the chosen size.</p>
+              </div>
+
+              <div class="vc-field">
+                <label for="vc-resolution">Resolution</label>
+                <select id="vc-resolution" data-resolution>
+                  <option value="original" selected>Keep original resolution</option>
+                  <option value="2160">4K · 3840 × 2160</option>
+                  <option value="1440">1440p · 2560 × 1440</option>
+                  <option value="1080">1080p · 1920 × 1080</option>
+                  <option value="720">720p · 1280 × 720</option>
+                  <option value="480">480p · 854 × 480</option>
+                  <option value="360">360p · 640 × 360</option>
+                  <option value="custom">Custom dimensions</option>
+                </select>
+              </div>
+
+              <div class="vc-custom-size" data-custom-size hidden>
+                <div class="vc-fields">
+                  <div class="vc-field">
+                    <label for="vc-width">Output width</label>
+                    <input id="vc-width" data-width type="number" min="2" max="4096" step="2" inputmode="numeric" value="">
+                  </div>
+                  <div class="vc-field">
+                    <label for="vc-height">Output height</label>
+                    <input id="vc-height" data-height type="number" min="2" max="4096" step="2" inputmode="numeric" value="">
+                  </div>
+                </div>
+                <label class="vc-check">
+                  <input type="checkbox" data-aspect-lock checked>
+                  <span><strong>Keep source aspect ratio</strong><small>Changing one side updates the other. Unlocked sizes are letterboxed, never stretched.</small></span>
+                </label>
+              </div>
+
+              <p class="vc-hint" data-size-note>Original resolution keeps the source size.</p>
+              <p class="vc-warning-inline" data-upscale hidden></p>
+              <p class="vc-validation" data-size-validation role="alert" hidden></p>
+            </fieldset>
+
+            <div class="vc-advanced" data-advanced hidden>
+              <fieldset class="vc-fieldset">
+                <legend>Rate control</legend>
+                <div class="vc-field">
+                  <label for="vc-rate-mode">Choose by</label>
+                  <select id="vc-rate-mode" data-rate-mode>
+                    <option value="bitrate" selected>Target video bitrate</option>
+                    <option value="size">Target file size</option>
+                  </select>
+                </div>
+                <div class="vc-field" data-bitrate-field>
+                  <label for="vc-bitrate">Video bitrate (Mbps)</label>
+                  <input id="vc-bitrate" data-bitrate type="number" min="0.02" max="100" step="0.1" inputmode="decimal" value="4">
+                  <p class="vc-hint">A higher bitrate keeps more detail and makes a larger file.</p>
+                  <p class="vc-validation" data-bitrate-validation role="alert" hidden></p>
+                </div>
+                <div class="vc-field" data-target-field hidden>
+                  <label for="vc-target-size">Target file size (MB)</label>
+                  <input id="vc-target-size" data-target-size type="number" min="0.1" max="20000" step="0.1" inputmode="decimal" value="20">
+                  <p class="vc-hint">A goal, not a guarantee. The video bitrate is calculated from this size and the clip duration.</p>
+                  <p class="vc-validation" data-target-validation role="alert" hidden></p>
+                </div>
+                <label class="vc-check">
+                  <input type="checkbox" data-crf-enabled>
+                  <span><strong>Use constant quality (CRF)</strong><small>Lower values keep more detail. Falls back to the bitrate above when the encoder does not support it.</small></span>
+                </label>
+                <div class="vc-field vc-crf-field" data-crf-field hidden>
+                  <label for="vc-crf">Constant quality value</label>
+                  <input id="vc-crf" data-crf type="number" min="0" max="51" step="1" inputmode="numeric" value="28">
+                  <p class="vc-hint" data-crf-note>Typical H.264 values are 18–28. Higher values mean more compression.</p>
+                </div>
+              </fieldset>
+
+              <fieldset class="vc-fieldset">
+                <legend>Frames and codecs</legend>
+                <div class="vc-field">
+                  <label for="vc-fps-cap">Maximum frame rate</label>
+                  <select id="vc-fps-cap" data-fps-cap>
+                    <option value="0" selected>Keep original frame rate</option>
+                    <option value="60">60 fps</option>
+                    <option value="50">50 fps</option>
+                    <option value="30">30 fps</option>
+                    <option value="25">25 fps</option>
+                    <option value="24">24 fps</option>
+                  </select>
+                  <p class="vc-hint" data-fps-note>Extra frames above the cap are dropped. Frames are never duplicated.</p>
+                </div>
+                <div class="vc-field">
+                  <label for="vc-codec">Video codec</label>
+                  <select id="vc-codec" data-codec>
+                    <option value="avc" selected>H.264 (AVC)</option>
+                    <option value="vp9">VP9</option>
+                    <option value="vp8">VP8</option>
+                  </select>
+                  <p class="vc-hint" data-codec-note>Codecs are limited to the ones the selected container and browser can encode.</p>
+                </div>
+              </fieldset>
+
+              <fieldset class="vc-fieldset">
+                <legend>Audio</legend>
+                <label class="vc-check">
+                  <input type="checkbox" data-audio-keep checked>
+                  <span><strong>Keep the audio track</strong><small>Uncheck to export a silent video.</small></span>
+                </label>
+                <div class="vc-field vc-audio-field" data-audio-field>
+                  <label for="vc-audio-bitrate">Audio bitrate</label>
+                  <select id="vc-audio-bitrate" data-audio-bitrate>
+                    <option value="64">64 kbps</option>
+                    <option value="96">96 kbps</option>
+                    <option value="128" selected>128 kbps</option>
+                    <option value="160">160 kbps</option>
+                    <option value="192">192 kbps</option>
+                    <option value="256">256 kbps</option>
+                  </select>
+                </div>
+                <p class="vc-hint" data-audio-codec>Audio is encoded as AAC in MP4 and Opus in WebM, normalized to 48 kHz stereo.</p>
+              </fieldset>
+
+              <p class="vc-hint" data-advanced-note>Advanced settings override the selected mode.</p>
+            </div>
+
+            <div class="vc-export-action">
+              <button class="vc-btn vc-btn-primary vc-export-button" type="button" data-export disabled>Compress video</button>
+              <button class="vc-btn vc-btn-secondary" type="button" data-cancel hidden>Cancel compression</button>
+              <p class="vc-export-note" data-export-note>Upload a video to enable compression.</p>
+              <p class="vc-hint" data-output-summary>Add a video to see the compression plan.</p>
+              <p class="vc-hint vc-target-hint" data-target-hint hidden></p>
+            </div>
+          </aside>
+        </div>
+
+        <div class="vc-progress" data-progress hidden>
+          <div class="vc-progress-track" data-progress-track role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Compression progress"><div class="vc-progress-bar" data-progress-bar></div></div>
+          <p class="vc-progress-label" data-progress-label role="status" aria-live="polite">Preparing the compression…</p>
+          <p class="vc-progress-timing" data-progress-timing></p>
+        </div>
+
+        <div class="vc-result" data-result hidden aria-live="polite">
+          <div class="vc-result-head">
+            <span class="vc-result-check" aria-hidden="true">✓</span>
+            <div>
+              <h3>Your compressed video is ready</h3>
+              <p data-result-note>Measured locally. The original video was never uploaded.</p>
+            </div>
+          </div>
+          <div class="vc-compare" data-compare>
+            <div class="vc-compare-item"><span>Before</span><strong data-result-before>—</strong><small data-result-before-detail>—</small></div>
+            <div class="vc-compare-arrow" aria-hidden="true">→</div>
+            <div class="vc-compare-item vc-compare-after"><span>After</span><strong data-result-after>—</strong><small data-result-after-detail>—</small></div>
+            <div class="vc-compare-saved"><span data-result-saved>— saved</span><strong data-result-percent>—</strong></div>
+          </div>
+          <p class="vc-result-warning" data-result-warning hidden></p>
+          <video class="vc-result-video" data-result-video controls playsinline aria-label="Compressed video preview"></video>
+          <dl class="vc-result-meta">
+            <div><dt>File</dt><dd data-result-name>—</dd></div>
+            <div><dt>Format</dt><dd data-result-format>—</dd></div>
+            <div><dt>Resolution</dt><dd data-result-resolution>—</dd></div>
+            <div><dt>Duration</dt><dd data-result-duration>—</dd></div>
+            <div><dt>Audio</dt><dd data-result-audio>—</dd></div>
+            <div><dt>Mode</dt><dd data-result-mode>—</dd></div>
+            <div><dt>Size saved</dt><dd data-result-saved-bytes>—</dd></div>
+            <div><dt>Reduction</dt><dd data-result-reduction>—</dd></div>
+          </dl>
+          <div class="vc-result-actions">
+            <button class="vc-btn vc-btn-primary" type="button" data-download disabled>Download compressed video</button>
+            <button class="vc-btn vc-btn-secondary" type="button" data-compress-again>Compress again</button>
+            <button class="vc-btn vc-btn-ghost" type="button" data-new-video>Start new compression</button>
+          </div>
+          <p class="vc-hint">The download is a local blob. Nothing was sent to a server.</p>
+        </div>
+      </div>
+
+      <noscript><p class="vc-alert">This video compressor needs JavaScript. All processing runs locally in your browser.</p></noscript>
+    </div>
+  </div>
+</section>
+
+<section class="section vc-content">
+  <div class="container vc-content-layout">
+    <article class="article-card vc-article">
+      <span class="eyebrow" style="color:#2563eb">Guide</span>
+      <h2>What video compression does</h2>
+      <p>A video file stores far more information than the eye notices frame by frame. Compression decides which detail can be simplified or discarded while the clip still looks close to the original. Reducing the bitrate asks the encoder to spend fewer bits on each second. Reducing the resolution rebuilds each frame with fewer pixels. Both approaches make the file smaller, and both require a real decode and re-encode.</p>
+      <p>This tool never renames a file or changes its extension and calls it compressed. It decodes the actual frames, optionally resizes them, encodes a new video track, encodes the audio again when you keep it, and muxes both into a new container. The result panel compares the measured input and output sizes.</p>
+
+      <h2>How to compress a video in your browser</h2>
+      <ol>
+        <li><strong>Add one video.</strong> Drag a file onto the upload area or choose Browse video. MP4, M4V, MOV, WebM and MKV are accepted when this browser can decode them.</li>
+        <li><strong>Read the source details.</strong> The workspace shows the duration, original resolution, frame rate, codecs, rotation, file size and source bitrate so you know what you are starting from.</li>
+        <li><strong>Choose a compression mode.</strong> High Quality protects detail, Balanced is the recommended default, and Smallest File compresses harder. Advanced exposes every supported control.</li>
+        <li><strong>Set the output.</strong> Keep the original resolution or choose 4K, 1440p, 1080p, 720p, 480p, 360p or exact custom dimensions. Smaller frames need less data.</li>
+        <li><strong>Adjust advanced options if needed.</strong> Choose a target bitrate or target file size, enable CRF, cap the frame rate, pick the container codec, and keep or remove audio.</li>
+        <li><strong>Compress and wait for real progress.</strong> The worker reports the video, audio and finalizing stages. You can cancel safely while it runs.</li>
+        <li><strong>Check the measured result.</strong> Compare before and after, read the saved bytes and percentage, preview the compressed video, then download it.</li>
+      </ol>
+
+      <h2>Compression modes explained</h2>
+      <ul>
+        <li><strong>High Quality</strong> uses a higher bitrate and a larger share of the source bitrate. It applies moderate compression and is the safest choice when the picture matters more than storage.</li>
+        <li><strong>Balanced</strong> is the default. It lowers the video bitrate noticeably while keeping a practical level of detail, and it uses a moderate audio bitrate.</li>
+        <li><strong>Smallest File</strong> uses the strongest compression and the lowest audio bitrate. It is useful for sharing, previews and archives, but fine texture and fast motion may become softer.</li>
+        <li><strong>Advanced</strong> replaces the preset targets with values you supply. The plan panel updates to show the bitrate the encoder will receive.</li>
+      </ul>
+      <p>The modes are not fixed file-size promises. Each mode calculates a video bitrate from the output pixel count, the effective frame rate and the source bitrate, so a 4K clip and a 360p clip receive different targets even in the same mode.</p>
+
+      <h2>What the advanced settings control</h2>
+      <p><strong>Target bitrate</strong> sets the video data per second. Higher values keep more detail. <strong>Target file size</strong> converts the size you enter into a video bitrate using the clip duration, audio bitrate and container overhead. It is a goal: complex scenes and encoder behaviour can push the real size above or below it.</p>
+      <p><strong>Constant quality (CRF)</strong> asks the encoder for a consistent visual quality rather than a fixed bitrate. Lower values produce larger, more detailed files. Browser encoders differ in support; the tool always supplies a bitrate fallback and the plan panel explains which target is active.</p>
+      <p><strong>Maximum frame rate</strong> caps the encoded frame rate. If you choose 30 fps for a 60 fps source, every other frame can be dropped and the previous frame is extended, which saves data without changing duration or audio sync. The tool never invents duplicate frames to raise the rate.</p>
+      <p><strong>Resolution</strong> changes the encoded frame size. Aspect ratio is preserved, so the picture is never stretched. A custom size with the aspect lock off is letterboxed inside the chosen frame rather than distorted.</p>
+      <p><strong>Audio</strong> can be kept at 64–256 kbps or removed entirely. MP4 uses AAC audio and WebM uses Opus audio. Audio is normalized to 48 kHz stereo and keeps its timing.</p>
+
+      <h2>Supported formats, codecs and limits</h2>
+      <p>MP4, M4V, MOV, WebM and MKV inputs are accepted when the browser can decode their video and audio codecs. H.264/AAC MP4, VP8/VP9/Opus WebM and many MOV, M4V and MKV files work in current Chrome and Edge. Firefox and Safari expose different decoder and encoder sets, so the same file may work in one browser and not another.</p>
+      <p>AVI is not decoded by the browser engine used here, so AVI files are rejected with an explanation rather than a broken result. Convert AVI to MP4 or WebM first if you need to compress it.</p>
+      <p>Output is limited to formats this browser can genuinely encode at the chosen resolution. MP4 uses H.264 video with AAC audio. WebM uses VP9 or VP8 video with Opus audio. If a codec cannot be encoded at the selected size, its option is disabled instead of producing an invalid file. Output is capped at 4096 pixels per edge and dimensions are rounded to even numbers for the encoder.</p>
+
+      <h2>Reading your compression results</h2>
+      <p>The result panel uses measured numbers, not estimates. <strong>Size saved</strong> is the original size minus the compressed size. <strong>Compression percentage</strong> is the saved bytes divided by the original size, multiplied by 100. A positive percentage means the new file is smaller.</p>
+      <p>Re-encoding can also increase a file. A clip that was already encoded at a very low bitrate may need more data to survive another generation, or the container may add overhead. When that happens the page reports the increase plainly and does not claim a saving. In that case, try Smallest File, a lower resolution, a frame-rate cap or removing audio.</p>
+      <p>Before compression, only real inputs are shown: the source size, the output resolution, the selected codecs and the encoder targets. The tool does not invent a quality score. The actual output size is known only after the file has been written and measured.</p>
+
+      <h2>Common reasons to compress a video</h2>
+      <ul>
+        <li><strong>Upload limits.</strong> Email, forms, learning platforms and chat apps often cap attachment size.</li>
+        <li><strong>Faster sharing.</strong> Smaller files move through messaging and cloud storage with less waiting.</li>
+        <li><strong>Storage and archives.</strong> A lower bitrate or resolution keeps a long recording manageable.</li>
+        <li><strong>Web playback.</strong> Lighter files start faster and use less bandwidth on mobile connections.</li>
+        <li><strong>Presentations and embeds.</strong> A 720p or 1080p version is usually enough for a slide or website player.</li>
+        <li><strong>Slow devices.</strong> A 480p or 360p export plays more reliably on older hardware.</li>
+      </ul>
+
+      <h2>Privacy, speed and memory</h2>
+      <p>The video is decoded, compressed and muxed inside a Web Worker in this tab using Mediabunny and the browser's WebCodecs implementation. The worker is loaded only after you add a video and is terminated when you remove the video or leave the page. Source and result object URLs are released when you replace the video, start another job or navigate away.</p>
+      <p>Compression speed depends on the clip length, resolution, frame rate and the device's encoder. 4K and long videos need more memory and time. The page warns when the input file is large, the clip is long or the output is very large. If a job fails, try a shorter clip, a smaller resolution, a lower frame-rate cap or closing other memory-heavy tabs.</p>
+      <p>There is no upload, account, paid API or server-side copy. The only network requests are for the page, its stylesheet and the self-hosted engine and worker files.</p>
+
+      <h2>Troubleshooting</h2>
+      <ul>
+        <li><strong>The file is rejected.</strong> The browser may not decode its codecs, it may be corrupted or audio-only, or it may be an AVI. Try an MP4 or WebM that plays in the same browser.</li>
+        <li><strong>A format or codec is disabled.</strong> The browser cannot encode it at the chosen size. Try the other format or a smaller resolution.</li>
+        <li><strong>The output is larger than the source.</strong> The source was already heavily compressed. Use Smallest File, a lower resolution, a frame-rate cap or a lower custom bitrate.</li>
+        <li><strong>The compression is slow.</strong> Long or high-resolution clips take longer. Keep the tab open and avoid heavy background tabs.</li>
+        <li><strong>It runs out of memory.</strong> Try a shorter clip or a smaller output, especially on phones.</li>
+        <li><strong>The preview will not play.</strong> The browser may lack the playback codec even when the encoder can produce the file. Download it and open it in a video app.</li>
+        <li><strong>Audio is missing.</strong> Check that Keep the audio track is enabled and that the source actually has audio. A silent source exports without an audio track.</li>
+      </ul>
+
+      <h2>Frequently asked questions</h2>
+      <div class="vc-faq">
+        <details class="faq-item"><summary>Does this video compressor upload my video?</summary><p>No. The video is decoded and re-encoded inside your browser tab with WebCodecs and Mediabunny. It is not sent to LetitEdit or to a third-party service, and no account is required.</p></details>
+        <details class="faq-item"><summary>Which formats can I compress?</summary><p>MP4, M4V, MOV, WebM and MKV are accepted when this browser can decode their video and audio codecs. AVI is not decoded by the browser engine, so AVI must be converted to one of those formats first. Corrupted, oversized and audio-only files are rejected with a clear message.</p></details>
+        <details class="faq-item"><summary>Is the compressed video really smaller?</summary><p>The tool measures the original and the exported file and shows the real sizes. Balanced and Smallest File usually reduce size, but a file that is already heavily compressed can grow when it is re-encoded. When that happens the result panel says so instead of claiming a saving.</p></details>
+        <details class="faq-item"><summary>What is the difference between the three modes?</summary><p>High Quality keeps more detail and uses a higher bitrate. Balanced is the recommended default and aims for a practical size. Smallest File uses stronger compression and lower audio bitrates, so the picture may lose detail. Advanced lets you set the bitrate, target size, CRF, frame rate, resolution and audio yourself.</p></details>
+        <details class="faq-item"><summary>Does the compressor guarantee a target file size?</summary><p>No. A target size is converted into a video bitrate for the clip duration and is treated as a goal. The final size depends on scene complexity, the encoder, the container and the audio. The actual size is measured after export.</p></details>
+        <details class="faq-item"><summary>Will compressing change the duration or audio sync?</summary><p>No. The tool keeps the source duration, preserves frame timestamps and normalizes audio to 48 kHz stereo at the same timing. If you choose a maximum frame rate, extra frames are dropped and the previous frame is extended, so audio stays aligned.</p></details>
+        <details class="faq-item"><summary>What is CRF or constant quality?</summary><p>Constant quality targets a visual quality level instead of a fixed bitrate. Lower values keep more detail and produce larger files. Browser encoders vary in support, so the tool also supplies a bitrate fallback and says when the fallback is used.</p></details>
+        <details class="faq-item"><summary>Can I remove the audio to make the file smaller?</summary><p>Yes. Choose Remove audio in the advanced settings. The exported file then has no audio track. Leaving audio enabled preserves it and lets you pick an audio bitrate from 64 to 256 kbps.</p></details>
+        <details class="faq-item"><summary>Will compressing improve the quality?</summary><p>No. Compression removes data to make the file smaller, so quality can stay close to the source but cannot improve. Upscaling the resolution also cannot add real detail. Keep the original resolution and a high bitrate when quality matters most.</p></details>
+        <details class="faq-item"><summary>Why is an output format or codec disabled?</summary><p>The tool asks the browser which codecs it can actually encode at the chosen resolution. A format or codec that is unavailable is disabled with an explanation instead of producing a broken file.</p></details>
+      </div>
+    </article>
+
+    <aside class="vc-side-content">
+      <div class="info-card">
+        <h2>At a glance</h2>
+        <ul class="vc-facts">
+          <li>Input <span>MP4, MOV, M4V, WebM, MKV*</span></li>
+          <li>Output <span>MP4 (H.264/AAC), WebM (VP9/VP8/Opus)</span></li>
+          <li>Modes <span>High, Balanced, Smallest, Advanced</span></li>
+          <li>Resolution <span>Original, 4K–360p, custom</span></li>
+          <li>Rate control <span>Bitrate, target size or CRF</span></li>
+          <li>Frame rate <span>Original or capped at 60/50/30/25/24</span></li>
+          <li>Audio <span>Keep or remove, 64–256 kbps</span></li>
+          <li>Results <span>Measured size, saved bytes, percentage</span></li>
+          <li>Processing <span>On your device</span></li>
+          <li>Price <span>Free</span></li>
+        </ul>
+        <p class="vc-hint">*Accepted when this browser can decode the file. AVI is not supported by the browser engine. Output formats appear only when the browser can encode them.</p>
+      </div>
+      <div class="info-card">
+        <h2>Related</h2>
+        <ul class="related-list">
+          <li><a href="/media-and-motion/video-trimmer/"><span class="related-icon" aria-hidden="true">✂️</span><span>Video Trimmer</span></a></li>
+          <li><a href="/media-and-motion/video-cropper/"><span class="related-icon" aria-hidden="true">🔲</span><span>Video Cropper</span></a></li>
+          <li><a href="/media-and-motion/video-resizer/"><span class="related-icon" aria-hidden="true">↔️</span><span>Video Resizer</span></a></li>
+          <li><a href="/media-and-motion/video-merger/"><span class="related-icon" aria-hidden="true">🔗</span><span>Video Merger</span></a></li>
+          <li><a href="/categories/video-editing/"><span class="related-icon" aria-hidden="true">🎬</span><span>Video Editing category</span></a></li>
+          <li><a href="/categories/"><span class="related-icon" aria-hidden="true">🧭</span><span>All categories</span></a></li>
+        </ul>
+        <p><a class="text-link" href="/categories/">Browse all 28 categories →</a></p>
+      </div>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="footer-logo" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+        <p>A category-led home for guides, updates and carefully built browser-side tools. The tool library is being rebuilt one focused release at a time.</p>
+        <a class="footer-contact" href="mailto:info@letitedit.com">info@letitedit.com</a>
+      </div>
+      <div class="footer-column">
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="/categories/">Categories</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/news/">News</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Trust &amp; policies</h3>
+        <ul>
+          <li><a href="/about/">About LetitEdit</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="/terms-of-service/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-categories">
+      <h3>All categories</h3>
+      <ul class="footer-category-list">
+        <li><a href="/categories/image-photo-editing/">Image &amp; Photo Editing</a></li>
+        <li><a href="/categories/video-editing/">Video Editing</a></li>
+        <li><a href="/categories/audio-music-editing/">Audio &amp; Music Editing</a></li>
+        <li><a href="/categories/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+        <li><a href="/categories/text-writing-editing/">Text &amp; Writing Editing</a></li>
+        <li><a href="/categories/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+        <li><a href="/categories/web-code-editing/">Web &amp; Code Editing</a></li>
+        <li><a href="/categories/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+        <li><a href="/categories/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
+        <li><a href="/categories/face-portrait-editing/">Face &amp; Portrait Editing</a></li>
+        <li><a href="/categories/ai-image-enhancement-restoration/">AI Image Enhancement &amp; Restoration</a></li>
+        <li><a href="/categories/3d-design-model-editing/">3D Design &amp; Model Editing</a></li>
+        <li><a href="/categories/animation-motion-graphics/">Animation &amp; Motion Graphics</a></li>
+        <li><a href="/categories/font-typography-editing/">Font &amp; Typography Editing</a></li>
+        <li><a href="/categories/color-gradient-tools/">Color &amp; Gradient Tools</a></li>
+        <li><a href="/categories/logo-branding-tools/">Logo &amp; Branding Tools</a></li>
+        <li><a href="/categories/social-media-design-tools/">Social Media Design Tools</a></li>
+        <li><a href="/categories/screenshot-screen-image-editing/">Screenshot &amp; Screen Image Editing</a></li>
+        <li><a href="/categories/data-visualization-infographic-editing/">Data Visualization &amp; Infographic Editing</a></li>
+        <li><a href="/categories/ebook-publishing-tools/">eBook &amp; Publishing Tools</a></li>
+        <li><a href="/categories/email-newsletter-design/">Email &amp; Newsletter Design</a></li>
+        <li><a href="/categories/sound-effects-voice-design/">Sound Effects &amp; Voice Design</a></li>
+        <li><a href="/categories/cad-technical-drawing/">CAD &amp; Technical Drawing</a></li>
+        <li><a href="/categories/signature-document-annotation/">Signature &amp; Document Annotation</a></li>
+        <li><a href="/categories/ui-ux-website-design-tools/">UI/UX &amp; Website Design Tools</a></li>
+        <li><a href="/categories/print-marketing-material-design/">Print &amp; Marketing Material Design</a></li>
+        <li><a href="/categories/metadata-file-information-editing/">Metadata &amp; File Information Editing</a></li>
+        <li><a href="/categories/digital-drawing-illustration/">Digital Drawing &amp; Illustration</a></li>
+      </ul>
+      <a class="footer-all-categories" href="/categories/">Browse all 28 categories →</a>
+    </div>
+    <div class="footer-promise">
+      <span aria-hidden="true">🔒</span>
+      <p><strong>Privacy by design.</strong> This tool keeps your video in your browser, reports measured sizes and explains exactly what the compression does.</p>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> LetitEdit.com</span>
+      <span>Built for privacy, accuracy and plain-English tooling.</span>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="../../js/video-compressor.js"></script>
+</body>
+</html>
