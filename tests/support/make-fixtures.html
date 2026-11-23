@@ -34,6 +34,45 @@ function drawFrame(canvas, index, fps, label) {
   context.strokeRect(6, 6, width - 12, height - 12);
 }
 
+function drawQuadrants(canvas, index, fps) {
+  const context = canvas.getContext('2d');
+  const { width, height } = canvas;
+  const halfW = width / 2;
+  const halfH = height / 2;
+  context.fillStyle = '#dc2626';
+  context.fillRect(0, 0, halfW, halfH);
+  context.fillStyle = '#16a34a';
+  context.fillRect(halfW, 0, halfW, halfH);
+  context.fillStyle = '#2563eb';
+  context.fillRect(0, halfH, halfW, halfH);
+  context.fillStyle = '#eab308';
+  context.fillRect(halfW, halfH, halfW, halfH);
+  context.fillStyle = '#ffffff';
+  context.font = `700 ${Math.max(16, Math.round(height * 0.09))}px sans-serif`;
+  context.textAlign = 'center';
+  context.fillText(`Q ${(index / fps).toFixed(1)}s`, width / 2, height * 0.53);
+}
+
+async function encodeQuadrants() {
+  const width = 640;
+  const height = 360;
+  const fps = 30;
+  const seconds = 2;
+  const canvas = makeCanvas(width, height);
+  const target = new MB.BufferTarget();
+  const output = new MB.Output({ format: new MB.Mp4OutputFormat(), target });
+  const videoSource = new MB.CanvasSource(canvas, { codec: 'avc', quality: QUALITY });
+  output.addVideoTrack(videoSource, { frameRate: fps });
+  await output.start();
+  const frames = Math.round(seconds * fps);
+  for (let index = 0; index < frames; index += 1) {
+    drawQuadrants(canvas, index, fps);
+    await videoSource.add(index / fps, 1 / fps);
+  }
+  await output.finalize();
+  return new Blob([target.buffer], { type: 'video/mp4' });
+}
+
 function makeAudioBuffer(seconds, sampleRate = 48000) {
   const context = new AudioContext();
   const length = Math.ceil(seconds * sampleRate);
@@ -150,6 +189,7 @@ window.makeFixtures = async () => {
 
   const base = await encodeMp4({ width: 640, height: 360, fps: 30, seconds: 4, audio: true, label: 'MP4 4s' });
   await add('trim-4s.mp4', base);
+  await add('crop-quadrants.mp4', await encodeQuadrants());
 
   await add('trim-2s-mute.mp4', await encodeMp4({ width: 480, height: 270, fps: 30, seconds: 2, audio: false, label: 'MP4 mute' }));
 
@@ -158,6 +198,7 @@ window.makeFixtures = async () => {
 
   await add('trim-mov.mov', await remux(base, 'mov'));
   await add('trim-mkv.mkv', await remux(base, 'mkv'));
+  await add('trim-sample.m4v', base);
   await add('trim-pcm.mov', await encodeMovAudio({ codec: 'pcm-s16', channels: 2, seconds: 1.5, label: 'PCM' }));
   await add('trim-ulaw.mov', await encodeMovAudio({ codec: 'ulaw', channels: 1, seconds: 1.5, label: 'ULAW' }));
 
@@ -168,6 +209,7 @@ window.makeFixtures = async () => {
   await add('trim-short.mp4', await encodeMp4({ width: 320, height: 180, fps: 30, seconds: 0.6, audio: true, label: 'Short' }));
   await add('trim-odd.mp4', await encodeMp4({ width: 322, height: 182, fps: 30, seconds: 2, audio: true, label: 'Odd size' }));
   await add('trim-audio-only.m4a', await encodeAudioOnly(2));
+  await add('trim-audio-only.mp4', await encodeAudioOnly(2));
 
   const corrupt = new Uint8Array(4096);
   for (let i = 0; i < corrupt.length; i += 1) corrupt[i] = (i * 37 + 11) % 256;

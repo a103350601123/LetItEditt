@@ -7,10 +7,12 @@ const FIXTURE_DIR = path.resolve(__dirname, '..', 'fixtures');
 
 const FIXTURES = [
   'trim-4s.mp4',
+  'crop-quadrants.mp4',
   'trim-2s-mute.mp4',
   'trim-3s.webm',
   'trim-mov.mov',
   'trim-mkv.mkv',
+  'trim-sample.m4v',
   'trim-pcm.mov',
   'trim-ulaw.mov',
   'trim-44100.mp4',
@@ -20,6 +22,7 @@ const FIXTURES = [
   'trim-short.mp4',
   'trim-odd.mp4',
   'trim-audio-only.m4a',
+  'trim-audio-only.mp4',
   'trim-corrupt.mp4',
   'trim-not-video.avi'
 ];
