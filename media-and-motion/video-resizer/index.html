@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Online Video Resizer – Resize Video to Any Resolution | LetitEdit</title>
+<meta name="description" content="Resize videos online for free. Change a video to 4K, 1440p, 1080p, 720p, 480p or a custom resolution with fit or fill, keep the audio and download a real MP4 or WebM file. Processing stays in your browser.">
+<meta name="theme-color" content="#2563EB">
+<link rel="canonical" href="https://letitedit.com/media-and-motion/video-resizer/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Free Online Video Resizer – Resize Video to Any Resolution | LetitEdit">
+<meta property="og:description" content="Resize videos online for free. Change a video to 4K, 1440p, 1080p, 720p, 480p or a custom resolution with fit or fill, keep the audio and download a real MP4 or WebM file. Processing stays in your browser.">
+<meta property="og:url" content="https://letitedit.com/media-and-motion/video-resizer/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="stylesheet" href="../../css/video-resizer.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://letitedit.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Categories", "item": "https://letitedit.com/categories/" },
+        { "@type": "ListItem", "position": 3, "name": "Video Editing", "item": "https://letitedit.com/categories/video-editing/" },
+        { "@type": "ListItem", "position": 4, "name": "Video Resizer", "item": "https://letitedit.com/media-and-motion/video-resizer/" }
+      ]
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "Free Online Video Resizer",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Any modern browser",
+      "url": "https://letitedit.com/media-and-motion/video-resizer/",
+      "description": "Resize a video in the browser to 4K, 1440p, 1080p, 720p, 480p, 360p, 240p, the original size or a custom resolution. Fit or fill the frame, choose a background colour, keep the audio and export MP4 or WebM. Files are processed locally and are not uploaded.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "featureList": [
+        "Resolution presets from 4K to 240p plus original and custom sizes",
+        "Aspect ratio presets including 16:9, 9:16, 1:1, 4:3, 3:2, 2:3 and 4:5",
+        "Aspect-ratio lock and independent width and height fields",
+        "Fit mode with black, white or custom padding",
+        "Fill mode that crops the edges without stretching",
+        "Live output-frame preview",
+        "High, Balanced, Smaller file and custom bitrate quality settings",
+        "MP4 and WebM output when the browser supports it",
+        "Audio preservation, rotation handling and frame-timing preservation",
+        "Local processing with no upload"
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Does the video resizer upload my video?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The video is decoded, resized, re-encoded and muxed inside your browser tab. It is not sent to LetitEdit or to a third-party service, and no account is required." }
+        },
+        {
+          "@type": "Question",
+          "name": "Which video formats can I resize?",
+          "acceptedAnswer": { "@type": "Answer", "text": "MP4, M4V, MOV, WebM and MKV are accepted when this browser can decode their video and audio codecs. Unsupported, corrupted, oversized or audio-only files are rejected with a clear message." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does resizing change the video's aspect ratio?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Only when you choose a different aspect ratio. Fit keeps the whole picture and adds padding; Fill covers the frame and crops the edges. The tool never stretches the picture to force it into a new shape." }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between Fit and Fill?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Fit scales the video so the entire frame is visible. If the output shape is different, the leftover area is filled with the chosen background colour. Fill scales the video so it covers the whole output frame and crops the parts that overflow. Fill removes some of the picture." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is the resized video lossless?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. Resizing changes the pixels in every frame, so the video is decoded and re-encoded. The High, Balanced and Smaller file options change the encoder quality target. The tool does not claim a lossless stream copy." }
+        },
+        {
+          "@type": "Question",
+          "name": "Why are the output dimensions rounded to even numbers?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Common video encoders require even width and height values. When a preset, aspect ratio or custom size produces an odd value, the tool rounds it to the nearest even pixel and explains the change. The picture is not stretched." }
+        },
+        {
+          "@type": "Question",
+          "name": "Will resizing to 4K improve the quality?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. Upscaling adds pixels but cannot recover detail that the original recording did not contain. A 4K output from a smaller source may look softer and will usually be larger. Choose the original resolution or a smaller size when you want to avoid upscaling." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is the audio preserved?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes, when the browser can decode and encode the audio. Audio is normalized to 48 kHz stereo and keeps its original timing. If the audio cannot be decoded, the file is rejected instead of silently losing its sound." }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I keep the whole video without black bars?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Use the Original aspect ratio and Fit. The output then has the same shape as the source, so no padding or cropping is needed. A different output shape either needs padding (Fit) or removes part of the picture (Fill)." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I set a custom bitrate?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Choose Custom bitrate and enter a value in megabits per second. The page shows an estimate based on that bitrate and the video duration. The real file size can differ because encoders vary their rate, so the actual size is reported after export." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does the resizer work on phones?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The workspace becomes a single column on small screens, with touch-friendly controls and a responsive preview. Export speed depends on the phone's decoder and encoder support and on available memory." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body class="vr-page">
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="topbar">
+  <nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+    <div class="nav-links" id="primary-links">
+      <a href="/categories/">Categories</a>
+      <a href="/blog/">Blog</a>
+      <a href="/news/">News</a>
+      <a href="/faq/">FAQ</a>
+    </div>
+    <div class="nav-actions">
+      <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
+    </div>
+  </nav>
+</header>
+
+<main id="main-content">
+<nav class="container breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../">Home</a><span aria-hidden="true">/</span>
+  <a href="../../categories/">Categories</a><span aria-hidden="true">/</span>
+  <a href="../../categories/video-editing/">Video Editing</a><span aria-hidden="true">/</span>
+  <span aria-current="page">Video Resizer</span>
+</nav>
+
+<section class="vr-hero">
+  <div class="container">
+    <span class="eyebrow">Media &amp; Motion · Video Editing · Live tool</span>
+    <h1>Free Online Video Resizer</h1>
+    <p>Change a video's real resolution and export a new file. Choose 4K, 1080p, 720p, a phone-friendly size or exact custom dimensions, then fit or fill the frame without stretching the picture. Everything runs in your browser and your video is never uploaded.</p>
+    <ul class="vr-hero-points">
+      <li>Runs on your device</li>
+      <li>Nine resolution presets</li>
+      <li>Fit or fill without distortion</li>
+      <li>MP4 and WebM output</li>
+    </ul>
+  </div>
+</section>
+
+<section class="vr-section" aria-labelledby="resizer-title">
+  <div class="container vr-workspace">
+    <div class="vr-panel" data-app>
+      <div class="vr-panel-head">
+        <div>
+          <h2 id="resizer-title">Resize your video</h2>
+          <p>Upload one clip, choose the output size, then export the resized result.</p>
+        </div>
+        <span class="vr-privacy">Local processing</span>
+      </div>
+
+      <div class="vr-drop" data-dropzone>
+        <span class="vr-drop-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M8 5V3M16 5V3M8 21v-2M16 21v-2"/></svg>
+        </span>
+        <p class="vr-drop-title" data-drop-title>Drag and drop your video here</p>
+        <p class="vr-drop-sub" data-drop-sub>Select an MP4, WebM, MOV, M4V or MKV file. Up to 2 GB.</p>
+        <button class="vr-btn vr-btn-primary" type="button" data-browse>Browse video</button>
+        <p class="vr-drop-note">No upload. The file stays in this browser tab.</p>
+        <input type="file" hidden data-file-input aria-label="Choose a video file" accept="video/mp4,video/webm,video/quicktime,video/x-m4v,video/x-matroska,.mp4,.m4v,.mov,.webm,.mkv">
+      </div>
+
+      <p class="vr-alert" data-global-error role="alert" hidden></p>
+      <p class="vr-warning" data-warning hidden></p>
+
+      <div class="vr-loading" data-loading hidden>
+        <span class="vr-spinner" aria-hidden="true"></span>
+        <p data-loading-text role="status" aria-live="polite">Reading the video…</p>
+      </div>
+
+      <div class="vr-editor" data-editor hidden>
+        <div class="vr-filebar">
+          <div class="vr-file-thumb"><img data-file-thumb alt="" hidden></div>
+          <div class="vr-file-info">
+            <strong data-file-name>—</strong>
+            <p data-file-meta>—</p>
+          </div>
+          <div class="vr-file-actions">
+            <button class="vr-btn vr-btn-secondary vr-btn-small" type="button" data-replace>Replace video</button>
+            <button class="vr-btn vr-btn-ghost vr-btn-small" type="button" data-remove-video>Remove</button>
+          </div>
+        </div>
+
+        <div class="vr-layout">
+          <div class="vr-main">
+            <div class="vr-preview-grid">
+              <div class="vr-preview-card">
+                <div class="vr-preview-head">
+                  <span class="vr-preview-label">Source video</span>
+                  <span class="vr-preview-dims" data-source-dims>—</span>
+                </div>
+                <div class="vr-player" data-player tabindex="0" aria-label="Source video player">
+                  <div class="vr-stage" data-stage>
+                    <video data-video playsinline preload="metadata" aria-label="Source video preview"></video>
+                    <p class="vr-video-error" data-video-error hidden></p>
+                    <button class="vr-big-play" type="button" data-big-play aria-label="Play video">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>
+                    </button>
+                  </div>
+                  <div class="vr-controls">
+                    <div class="vr-seek-row">
+                      <span class="vr-time" data-current>00:00</span>
+                      <input class="vr-range vr-seek" type="range" data-seek min="0" max="1000" step="1" value="0" aria-label="Seek through the video">
+                      <span class="vr-time" data-total>00:00</span>
+                    </div>
+                    <div class="vr-button-row">
+                      <button class="vr-icon-btn" type="button" data-play aria-label="Play video" title="Play">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>
+                      </button>
+                      <div class="vr-volume-group">
+                        <button class="vr-icon-btn" type="button" data-mute aria-label="Mute video" title="Mute">
+                          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                        </button>
+                        <input class="vr-range vr-volume" type="range" data-volume min="0" max="1" step="0.01" value="1" aria-label="Volume">
+                      </div>
+                      <span class="vr-controls-spacer"></span>
+                      <button class="vr-icon-btn" type="button" data-fullscreen aria-label="Enter fullscreen" title="Fullscreen">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="vr-preview-card vr-output-card">
+                <div class="vr-preview-head">
+                  <span class="vr-preview-label">Output frame</span>
+                  <span class="vr-preview-dims" data-output-preview-dims>—</span>
+                </div>
+                <div class="vr-canvas-wrap" data-canvas-wrap>
+                  <canvas data-preview-canvas aria-label="Preview of the resized video frame"></canvas>
+                </div>
+                <div class="vr-output-badges">
+                  <span class="vr-output-badge" data-preview-mode>Fit · black background</span>
+                </div>
+                <p class="vr-hint vr-preview-note" data-preview-note>This preview composites the current frame at the chosen shape. The exported video is encoded at the full output size.</p>
+              </div>
+            </div>
+
+            <div class="vr-meta" aria-label="Video details">
+              <div class="vr-meta-item"><span>Duration</span><strong data-meta-duration>—</strong></div>
+              <div class="vr-meta-item"><span>Original</span><strong data-meta-resolution>—</strong></div>
+              <div class="vr-meta-item"><span>Aspect</span><strong data-meta-aspect>—</strong></div>
+              <div class="vr-meta-item"><span>Frame rate</span><strong data-meta-fps>—</strong></div>
+              <div class="vr-meta-item"><span>Audio</span><strong data-meta-audio>—</strong></div>
+              <div class="vr-meta-item"><span>Rotation</span><strong data-meta-rotation>—</strong></div>
+              <div class="vr-meta-item"><span>File size</span><strong data-meta-size>—</strong></div>
+            </div>
+
+            <p class="vr-keyhint">Keyboard: Space or K play/pause · ←/→ seek 5 s · M mute · F fullscreen.</p>
+          </div>
+
+          <aside class="vr-side" aria-labelledby="settings-title">
+            <h3 id="settings-title">Resize settings</h3>
+
+            <fieldset class="vr-fieldset">
+              <legend>Resolution</legend>
+              <div class="vr-presets" data-presets role="group" aria-label="Resolution presets">
+                <button type="button" data-preset="2160" aria-pressed="false"><strong>4K</strong><small>2160p</small></button>
+                <button type="button" data-preset="1440" aria-pressed="false"><strong>1440p</strong><small>QHD</small></button>
+                <button type="button" data-preset="1080" aria-pressed="false"><strong>1080p</strong><small>Full HD</small></button>
+                <button type="button" data-preset="720" aria-pressed="false"><strong>720p</strong><small>HD</small></button>
+                <button type="button" data-preset="480" aria-pressed="false"><strong>480p</strong><small>SD</small></button>
+                <button type="button" data-preset="360" aria-pressed="false"><strong>360p</strong><small>Small</small></button>
+                <button type="button" data-preset="240" aria-pressed="false"><strong>240p</strong><small>Smallest</small></button>
+                <button type="button" data-preset="original" aria-pressed="true"><strong>Original</strong><small data-original-label>—</small></button>
+                <button type="button" data-preset="custom" aria-pressed="false"><strong>Custom</strong><small>Your size</small></button>
+              </div>
+              <div class="vr-fields">
+                <div class="vr-field">
+                  <label for="vr-width">Output width</label>
+                  <input id="vr-width" data-width type="number" min="2" max="4096" step="2" inputmode="numeric" value="">
+                </div>
+                <div class="vr-field">
+                  <label for="vr-height">Output height</label>
+                  <input id="vr-height" data-height type="number" min="2" max="4096" step="2" inputmode="numeric" value="">
+                </div>
+              </div>
+              <label class="vr-check">
+                <input type="checkbox" data-aspect-lock checked>
+                <span><strong>Lock aspect ratio</strong><small>Changing one side updates the other.</small></span>
+              </label>
+              <p class="vr-hint" data-size-note>Choose a preset or enter a custom size.</p>
+              <p class="vr-validation" data-size-validation role="alert" hidden></p>
+            </fieldset>
+
+            <fieldset class="vr-fieldset">
+              <legend>Aspect ratio</legend>
+              <div class="vr-ratios" data-ratio-buttons role="group" aria-label="Aspect ratio">
+                <button type="button" class="is-active" data-ratio="original" aria-pressed="true">Original</button>
+                <button type="button" data-ratio="16:9" aria-pressed="false">16:9</button>
+                <button type="button" data-ratio="9:16" aria-pressed="false">9:16</button>
+                <button type="button" data-ratio="1:1" aria-pressed="false">1:1</button>
+                <button type="button" data-ratio="4:3" aria-pressed="false">4:3</button>
+                <button type="button" data-ratio="3:2" aria-pressed="false">3:2</button>
+                <button type="button" data-ratio="2:3" aria-pressed="false">2:3</button>
+                <button type="button" data-ratio="4:5" aria-pressed="false">4:5</button>
+                <button type="button" data-ratio="custom" aria-pressed="false">Custom</button>
+              </div>
+              <p class="vr-hint" data-ratio-note>Original keeps the source shape.</p>
+            </fieldset>
+
+            <fieldset class="vr-fieldset">
+              <legend>Fit and background</legend>
+              <div class="vr-fit-options" role="radiogroup" aria-label="How the video fills the output frame">
+                <label class="vr-fit-option"><input type="radio" name="vr-fit" value="fit" checked><span><strong>Fit</strong><small>Keep the whole video and pad the frame.</small></span></label>
+                <label class="vr-fit-option"><input type="radio" name="vr-fit" value="fill"><span><strong>Fill</strong><small>Fill the frame and crop the edges.</small></span></label>
+              </div>
+              <p class="vr-hint" data-fit-note>Fit keeps the whole picture visible.</p>
+              <div class="vr-background" data-background-group>
+                <span class="vr-quality-label" id="vr-bg-label">Background</span>
+                <div class="vr-swatches" role="radiogroup" aria-labelledby="vr-bg-label">
+                  <label class="vr-swatch"><input type="radio" name="vr-bg" value="black" checked><span style="--swatch:#000000"></span><em>Black</em></label>
+                  <label class="vr-swatch"><input type="radio" name="vr-bg" value="white"><span style="--swatch:#ffffff"></span><em>White</em></label>
+                  <label class="vr-swatch"><input type="radio" name="vr-bg" value="custom"><span style="--swatch:#2563eb"></span><em>Custom</em></label>
+                </div>
+                <div class="vr-field vr-color-field" data-color-field hidden>
+                  <label for="vr-color">Background colour</label>
+                  <input id="vr-color" data-background-color type="color" value="#2563eb">
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="vr-fieldset">
+              <legend>Format and quality</legend>
+              <div class="vr-field">
+                <label for="vr-format">Output format</label>
+                <select id="vr-format" data-format>
+                  <option value="mp4" selected>MP4 · H.264 / AAC</option>
+                  <option value="webm">WebM · VP9 / Opus</option>
+                </select>
+                <p class="vr-hint" data-format-note>Formats are enabled only when this browser can encode them at the chosen output size.</p>
+              </div>
+              <div class="vr-quality">
+                <span class="vr-quality-label" id="vr-quality-label">Quality</span>
+                <div class="vr-quality-options" role="radiogroup" aria-labelledby="vr-quality-label">
+                  <label class="vr-quality-option"><input type="radio" name="vr-quality" value="high"><span><strong>High</strong><small>Most detail, largest file</small></span></label>
+                  <label class="vr-quality-option"><input type="radio" name="vr-quality" value="balanced" checked><span><strong>Balanced</strong><small>A practical default</small></span></label>
+                  <label class="vr-quality-option"><input type="radio" name="vr-quality" value="smaller"><span><strong>Smaller file</strong><small>More compression</small></span></label>
+                  <label class="vr-quality-option"><input type="radio" name="vr-quality" value="custom"><span><strong>Custom bitrate</strong><small>Set the video bitrate yourself</small></span></label>
+                </div>
+              </div>
+              <div class="vr-field vr-bitrate-field" data-bitrate-field hidden>
+                <label for="vr-bitrate">Video bitrate (Mbps)</label>
+                <input id="vr-bitrate" data-bitrate type="number" min="0.1" max="100" step="0.1" inputmode="decimal" value="8">
+                <p class="vr-hint">Used only with Custom bitrate. The size estimate is based on this value.</p>
+                <p class="vr-validation" data-bitrate-validation role="alert" hidden></p>
+              </div>
+              <p class="vr-hint">Resizing re-encodes every frame. It is not a lossless stream copy.</p>
+            </fieldset>
+
+            <div class="vr-export-action">
+              <button class="vr-btn vr-btn-primary vr-export-button" type="button" data-export disabled>Resize video</button>
+              <button class="vr-btn vr-btn-secondary" type="button" data-cancel hidden>Cancel resize</button>
+              <p class="vr-export-note" data-export-note>Upload a video to enable export.</p>
+              <p class="vr-hint" data-output-summary>Add a video to see the output size.</p>
+              <p class="vr-hint vr-estimate" data-size-estimate hidden></p>
+            </div>
+          </aside>
+        </div>
+
+        <div class="vr-progress" data-progress hidden>
+          <div class="vr-progress-track" data-progress-track role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Resize progress"><div class="vr-progress-bar" data-progress-bar></div></div>
+          <p class="vr-progress-label" data-progress-label role="status" aria-live="polite">Preparing the resize…</p>
+        </div>
+
+        <div class="vr-result" data-result hidden aria-live="polite">
+          <div class="vr-result-head">
+            <span class="vr-result-check" aria-hidden="true">✓</span>
+            <div>
+              <h3>Your resized video is ready</h3>
+              <p data-result-note>Created locally and verified. The original video was never uploaded.</p>
+            </div>
+          </div>
+          <video class="vr-result-video" data-result-video controls playsinline aria-label="Resized video preview"></video>
+          <dl class="vr-result-meta">
+            <div><dt>File</dt><dd data-result-name>—</dd></div>
+            <div><dt>Format</dt><dd data-result-format>—</dd></div>
+            <div><dt>Duration</dt><dd data-result-duration>—</dd></div>
+            <div><dt>Size</dt><dd data-result-size>—</dd></div>
+            <div><dt>Resolution</dt><dd data-result-resolution>—</dd></div>
+            <div><dt>Audio</dt><dd data-result-audio>—</dd></div>
+          </dl>
+          <div class="vr-result-actions">
+            <button class="vr-btn vr-btn-primary" type="button" data-download disabled>Download resized video</button>
+            <button class="vr-btn vr-btn-secondary" type="button" data-new-video>Resize another video</button>
+          </div>
+          <p class="vr-hint">The download is a local blob. Nothing was sent to a server.</p>
+        </div>
+      </div>
+
+      <noscript><p class="vr-alert">This video resizer needs JavaScript. All processing runs locally in your browser.</p></noscript>
+    </div>
+  </div>
+</section>
+
+<section class="section vr-content">
+  <div class="container vr-content-layout">
+    <article class="article-card vr-article">
+      <span class="eyebrow" style="color:#2563eb">Guide</span>
+      <h2>What video resizing means</h2>
+      <p>Resizing changes how many pixels represent each frame. A 1920 × 1080 video contains about two million pixels per frame; a 1280 × 720 version contains fewer than one million. The picture is the same scene, but every frame is rebuilt at the new size and encoded again. This is different from changing a player's display size with CSS, which only makes the original file look smaller or larger.</p>
+      <p>This tool decodes the actual frames, draws them into a new canvas at the chosen output size, and encodes that canvas into a new video file. The downloaded file really is the resolution shown in the result panel. The original file is never modified.</p>
+
+      <h2>How to resize a video in your browser</h2>
+      <ol>
+        <li><strong>Add one video.</strong> Drag a file onto the upload area or choose Browse video. MP4, M4V, MOV, WebM and MKV files are accepted when this browser can decode them.</li>
+        <li><strong>Choose a resolution.</strong> Pick 4K, 1440p, 1080p, 720p, 480p, 360p, 240p, Original or Custom. The width and height fields show the exact output size.</li>
+        <li><strong>Pick the shape.</strong> Use Original to keep the source shape, or choose 16:9, 9:16, 1:1, 4:3, 3:2, 2:3, 4:5 or Custom. The preset resolution adapts to the chosen shape instead of stretching the picture.</li>
+        <li><strong>Decide how it fits.</strong> Fit keeps the whole video and pads any leftover area with the background colour. Fill covers the output frame and crops the overflowing edges. Neither mode distorts the image.</li>
+        <li><strong>Set the background if needed.</strong> Black, white and a custom colour are available for Fit. Fill does not use a background because the frame is fully covered.</li>
+        <li><strong>Choose format and quality.</strong> MP4 and WebM are offered only when this browser can encode them at the chosen size. High, Balanced, Smaller file and Custom bitrate control the encoder target.</li>
+        <li><strong>Resize and download.</strong> The page reports real progress, allows a safe cancel, verifies the resulting file and then offers a local download.</li>
+      </ol>
+
+      <h2>Resolution presets and the short edge</h2>
+      <p>The presets are named after the familiar 16:9 sizes: 4K is 3840 × 2160, 1440p is 2560 × 1440, 1080p is 1920 × 1080, 720p is 1280 × 720, 480p is 854 × 480, 360p is 640 × 360 and 240p is 426 × 240. Those exact numbers apply when the output is 16:9.</p>
+      <p>For other shapes the preset keeps the same short edge and recalculates the other side. A 1080p preset with 9:16 becomes 1080 × 1920, not 1920 × 1080 squeezed into a tall frame. A 1080p preset with 1:1 becomes 1080 × 1080. A 720p preset with 4:3 becomes 960 × 720. This keeps the quality tier consistent while respecting the selected shape.</p>
+      <p>Original uses the uploaded video's own display size. If you keep the Original aspect ratio, the output is the same size as the source. If you choose another shape while Original is selected, the tool uses the source's short edge as the quality tier and adapts the other side. Custom lets you type both sides directly.</p>
+
+      <h2>Aspect ratios, Fit and Fill</h2>
+      <p>An aspect ratio is the relationship between width and height. If the output shape matches the source, Fit and Fill produce the same picture. If the shapes differ, the tool has to do something with the extra space or the extra picture:</p>
+      <ul>
+        <li><strong>Fit</strong> scales the video until the whole frame is visible. The leftover area becomes padding in the chosen background colour. Nothing is cropped.</li>
+        <li><strong>Fill</strong> scales the video until it covers the whole output frame. The parts that overflow the frame are cropped. Nothing is stretched.</li>
+      </ul>
+      <p>For example, a 16:9 video placed in a 1:1 frame with Fit becomes a square with black bars above and below. With Fill, the square uses the full height and cuts off the left and right edges. The page states which one will happen before you export, so important content is not removed silently.</p>
+      <p>The aspect-ratio lock keeps width and height proportional when you edit one of them. Unlock it to enter independent values. Choosing a named ratio locks it again and recalculates the output size.</p>
+
+      <h2>Common reasons to resize a video</h2>
+      <ul>
+        <li><strong>Platform limits.</strong> Some upload forms accept a maximum width, height or file size, and a smaller export can pass a limit that the original cannot.</li>
+        <li><strong>Social formats.</strong> A 9:16 export suits short-form phone video, a 1:1 export suits square posts, and a 16:9 export suits landscape players.</li>
+        <li><strong>Older devices.</strong> A 480p or 360p file plays more reliably on slow hardware and uses less storage.</li>
+        <li><strong>Presentations and embeds.</strong> Matching a slide, kiosk or website player avoids unnecessary scaling by the player.</li>
+        <li><strong>Consistent project sizes.</strong> Several clips can be exported at the same resolution before they are edited together.</li>
+        <li><strong>Smaller archives.</strong> A lower resolution usually produces a smaller file, although the encoder settings still matter.</li>
+      </ul>
+
+      <h2>Quality, file size and re-encoding</h2>
+      <p>Resizing always re-encodes. High targets more detail and usually produces a larger file. Balanced is a practical default. Smaller file compresses more aggressively. Custom bitrate lets you set a video bitrate in megabits per second and shows an estimate based on that bitrate and the duration.</p>
+      <p>The estimate is only shown for Custom bitrate, because the qualitative presets do not promise an exact size. Even with an explicit bitrate, the real file can be smaller or larger: encoders vary their rate, the container adds overhead, and audio has its own bitrate. The actual output size is measured after export and displayed in the result panel.</p>
+      <p>Upscaling cannot add detail. A 4K export from a 720p source has more pixels but not more real information, and it may look softer while taking longer to encode. Original resolution avoids unnecessary enlargement.</p>
+
+      <h2>Supported formats and browser limits</h2>
+      <p>MP4, M4V, MOV, WebM and MKV inputs are accepted when the browser can decode their video and audio codecs. Current Chrome and Edge usually handle H.264/AAC MP4, VP8/VP9/Opus WebM and many MOV, M4V and MKV files. Firefox and Safari expose different codec sets, so the same file may work in one browser and fail in another.</p>
+      <p>Output is limited to MP4 and WebM. MP4 uses H.264 video and AAC audio; WebM uses VP9 video and Opus audio. The format selector is checked against the browser's WebCodecs encoders for the exact output size. A format that cannot be encoded at that size is disabled with an explanation instead of producing a broken download.</p>
+      <p>Encoders generally require even width and height. When a preset, ratio or custom size produces an odd number, the tool rounds that dimension to the nearest even pixel and says so. The output is capped at 4096 pixels on either edge.</p>
+
+      <h2>Audio, rotation and frame timing</h2>
+      <p>Audio is decoded separately, normalized to 48 kHz stereo, and written alongside the resized video with its original timing. A video without an audio track exports without one. If a file has audio that this browser cannot decode, the file is rejected with a clear message; the tool does not silently drop the sound. If the browser cannot encode the selected audio codec, that output format is disabled.</p>
+      <p>Rotation metadata is applied while the frames are decoded, so the output shows the same orientation you see in the preview and does not carry a misleading rotation flag. Decoded frame timestamps are kept, so variable-frame-rate sources are not flattened into a fixed rate and the duration stays aligned with the source.</p>
+
+      <h2>Privacy and performance</h2>
+      <p>The video is decoded, resized, encoded and muxed inside a Web Worker in this tab using Mediabunny and the browser's WebCodecs implementation. The worker is loaded only after a video is added. It is terminated when you remove the video or leave the page, which releases decoder and encoder resources.</p>
+      <p>Files can be up to 2 GB, but that is a safety limit, not a promise that every device can process a file that size. Long or high-resolution videos need more memory. The page warns when a file is large or the output is very large. If an export fails, try a shorter video, a smaller output size, or close other memory-heavy tabs.</p>
+      <p>There is no upload, account, paid API or server-side copy. Temporary object URLs for the source and the result are released when you replace the video, start another resize or leave the page.</p>
+
+      <h2>Troubleshooting</h2>
+      <ul>
+        <li><strong>The file is rejected.</strong> The browser may not decode its codecs, the file may be corrupted, or it may be audio-only. Try an MP4 or WebM that plays in the same browser.</li>
+        <li><strong>A format is disabled.</strong> The browser cannot encode that codec at the current output size. Choose the other format or a smaller resolution.</li>
+        <li><strong>The export is slow.</strong> 4K and long videos take longer. Keep the tab open, close other memory-heavy tabs and try 1080p or 720p first.</li>
+        <li><strong>The export runs out of memory.</strong> Use a shorter clip or a smaller output, especially on phones.</li>
+        <li><strong>The preview will not play.</strong> The browser may lack the playback codec even when the exporter can decode it. The result panel will still let you download the file.</li>
+        <li><strong>The output is larger than expected.</strong> Re-encoding can increase size, especially when the source was already heavily compressed. Try Smaller file or a lower custom bitrate.</li>
+      </ul>
+
+      <h2>Frequently asked questions</h2>
+      <div class="vr-faq">
+        <details class="faq-item"><summary>Does the video resizer upload my video?</summary><p>No. The video is decoded, resized, re-encoded and muxed inside your browser tab. It is not sent to LetitEdit or to a third-party service, and no account is required.</p></details>
+        <details class="faq-item"><summary>Which video formats can I resize?</summary><p>MP4, M4V, MOV, WebM and MKV are accepted when this browser can decode their video and audio codecs. Unsupported, corrupted, oversized or audio-only files are rejected with a clear message.</p></details>
+        <details class="faq-item"><summary>Does resizing change the video's aspect ratio?</summary><p>Only when you choose a different aspect ratio. Fit keeps the whole picture and adds padding; Fill covers the frame and crops the edges. The tool never stretches the picture to force it into a new shape.</p></details>
+        <details class="faq-item"><summary>What is the difference between Fit and Fill?</summary><p>Fit scales the video so the entire frame is visible. If the output shape is different, the leftover area is filled with the chosen background colour. Fill scales the video so it covers the whole output frame and crops the parts that overflow. Fill removes some of the picture.</p></details>
+        <details class="faq-item"><summary>Is the resized video lossless?</summary><p>No. Resizing changes the pixels in every frame, so the video is decoded and re-encoded. The High, Balanced and Smaller file options change the encoder quality target. The tool does not claim a lossless stream copy.</p></details>
+        <details class="faq-item"><summary>Why are the output dimensions rounded to even numbers?</summary><p>Common video encoders require even width and height values. When a preset, aspect ratio or custom size produces an odd value, the tool rounds it to the nearest even pixel and explains the change. The picture is not stretched.</p></details>
+        <details class="faq-item"><summary>Will resizing to 4K improve the quality?</summary><p>No. Upscaling adds pixels but cannot recover detail that the original recording did not contain. A 4K output from a smaller source may look softer and will usually be larger. Choose the original resolution or a smaller size when you want to avoid upscaling.</p></details>
+        <details class="faq-item"><summary>Is the audio preserved?</summary><p>Yes, when the browser can decode and encode the audio. Audio is normalized to 48 kHz stereo and keeps its original timing. If the audio cannot be decoded, the file is rejected instead of silently losing its sound.</p></details>
+        <details class="faq-item"><summary>How do I keep the whole video without black bars?</summary><p>Use the Original aspect ratio and Fit. The output then has the same shape as the source, so no padding or cropping is needed. A different output shape either needs padding (Fit) or removes part of the picture (Fill).</p></details>
+        <details class="faq-item"><summary>Can I set a custom bitrate?</summary><p>Yes. Choose Custom bitrate and enter a value in megabits per second. The page shows an estimate based on that bitrate and the video duration. The real file size can differ because encoders vary their rate, so the actual size is reported after export.</p></details>
+        <details class="faq-item"><summary>Does the resizer work on phones?</summary><p>The workspace becomes a single column on small screens, with touch-friendly controls and a responsive preview. Export speed depends on the phone's decoder and encoder support and on available memory.</p></details>
+      </div>
+    </article>
+
+    <aside class="vr-side-content">
+      <div class="info-card">
+        <h2>At a glance</h2>
+        <ul class="vr-facts">
+          <li>Input <span>MP4, WebM, MOV, M4V, MKV*</span></li>
+          <li>Output <span>MP4 (H.264/AAC), WebM (VP9/Opus)</span></li>
+          <li>Presets <span>4K, 1440p, 1080p, 720p, 480p, 360p, 240p</span></li>
+          <li>Custom sizes <span>2–4096 px per edge</span></li>
+          <li>Ratios <span>Original, eight presets and custom</span></li>
+          <li>Frame options <span>Fit with padding or Fill with cropping</span></li>
+          <li>Background <span>Black, white or custom colour</span></li>
+          <li>Audio <span>48 kHz stereo, timing preserved</span></li>
+          <li>Processing <span>On your device</span></li>
+          <li>Price <span>Free</span></li>
+        </ul>
+        <p class="vr-hint">*Accepted when this browser can decode the file. Output formats appear only when the browser can encode them.</p>
+      </div>
+      <div class="info-card">
+        <h2>Related</h2>
+        <ul class="related-list">
+          <li><a href="/media-and-motion/video-trimmer/"><span class="related-icon" aria-hidden="true">✂️</span><span>Video Trimmer</span></a></li>
+          <li><a href="/media-and-motion/video-cropper/"><span class="related-icon" aria-hidden="true">🔲</span><span>Video Cropper</span></a></li>
+          <li><a href="/media-and-motion/video-merger/"><span class="related-icon" aria-hidden="true">🔗</span><span>Video Merger</span></a></li>
+          <li><a href="/categories/video-editing/"><span class="related-icon" aria-hidden="true">🎬</span><span>Video Editing category</span></a></li>
+          <li><a href="/categories/"><span class="related-icon" aria-hidden="true">🧭</span><span>All categories</span></a></li>
+        </ul>
+        <p><a class="text-link" href="/categories/">Browse all 28 categories →</a></p>
+      </div>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="footer-logo" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+        <p>A category-led home for guides, updates and carefully built browser-side tools. The tool library is being rebuilt one focused release at a time.</p>
+        <a class="footer-contact" href="mailto:info@letitedit.com">info@letitedit.com</a>
+      </div>
+      <div class="footer-column">
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="/categories/">Categories</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/news/">News</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Trust &amp; policies</h3>
+        <ul>
+          <li><a href="/about/">About LetitEdit</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="/terms-of-service/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-categories">
+      <h3>All categories</h3>
+      <ul class="footer-category-list">
+        <li><a href="/categories/image-photo-editing/">Image &amp; Photo Editing</a></li>
+        <li><a href="/categories/video-editing/">Video Editing</a></li>
+        <li><a href="/categories/audio-music-editing/">Audio &amp; Music Editing</a></li>
+        <li><a href="/categories/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+        <li><a href="/categories/text-writing-editing/">Text &amp; Writing Editing</a></li>
+        <li><a href="/categories/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+        <li><a href="/categories/web-code-editing/">Web &amp; Code Editing</a></li>
+        <li><a href="/categories/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+        <li><a href="/categories/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
+        <li><a href="/categories/face-portrait-editing/">Face &amp; Portrait Editing</a></li>
+        <li><a href="/categories/ai-image-enhancement-restoration/">AI Image Enhancement &amp; Restoration</a></li>
+        <li><a href="/categories/3d-design-model-editing/">3D Design &amp; Model Editing</a></li>
+        <li><a href="/categories/animation-motion-graphics/">Animation &amp; Motion Graphics</a></li>
+        <li><a href="/categories/font-typography-editing/">Font &amp; Typography Editing</a></li>
+        <li><a href="/categories/color-gradient-tools/">Color &amp; Gradient Tools</a></li>
+        <li><a href="/categories/logo-branding-tools/">Logo &amp; Branding Tools</a></li>
+        <li><a href="/categories/social-media-design-tools/">Social Media Design Tools</a></li>
+        <li><a href="/categories/screenshot-screen-image-editing/">Screenshot &amp; Screen Image Editing</a></li>
+        <li><a href="/categories/data-visualization-infographic-editing/">Data Visualization &amp; Infographic Editing</a></li>
+        <li><a href="/categories/ebook-publishing-tools/">eBook &amp; Publishing Tools</a></li>
+        <li><a href="/categories/email-newsletter-design/">Email &amp; Newsletter Design</a></li>
+        <li><a href="/categories/sound-effects-voice-design/">Sound Effects &amp; Voice Design</a></li>
+        <li><a href="/categories/cad-technical-drawing/">CAD &amp; Technical Drawing</a></li>
+        <li><a href="/categories/signature-document-annotation/">Signature &amp; Document Annotation</a></li>
+        <li><a href="/categories/ui-ux-website-design-tools/">UI/UX &amp; Website Design Tools</a></li>
+        <li><a href="/categories/print-marketing-material-design/">Print &amp; Marketing Material Design</a></li>
+        <li><a href="/categories/metadata-file-information-editing/">Metadata &amp; File Information Editing</a></li>
+        <li><a href="/categories/digital-drawing-illustration/">Digital Drawing &amp; Illustration</a></li>
+      </ul>
+      <a class="footer-all-categories" href="/categories/">Browse all 28 categories →</a>
+    </div>
+    <div class="footer-promise">
+      <span aria-hidden="true">🔒</span>
+      <p><strong>Privacy by design.</strong> This tool keeps your video in your browser, avoids accounts and explains exactly what the resize does.</p>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> LetitEdit.com</span>
+      <span>Built for privacy, accuracy and plain-English tooling.</span>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="../../js/video-resizer.js"></script>
+</body>
+</html>
