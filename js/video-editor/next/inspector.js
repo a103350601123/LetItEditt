@@ -91,6 +91,8 @@ export class Inspector {
     this.onEdit = onEdit || (() => {});
     this.root = null;
     this.lastRenderKey = '';
+    this.openSections = new Map();
+    this.savedScrollTop = 0;
   }
 
   mount(root) {
@@ -119,12 +121,26 @@ export class Inspector {
     if (!this.root) return;
     const found = this.primary();
     const subtitle = this.subtitle();
+    const renderKey = subtitle ? `subtitle:${subtitle.id}` : found ? `clip:${found.clip.id}` : 'empty';
+    if (renderKey === this.lastRenderKey) {
+      this.openSections.clear();
+      for (const detail of this.root.querySelectorAll('details.ve-inspector-section')) {
+        const key = detail.querySelector('summary')?.textContent.trim() || '';
+        this.openSections.set(key, detail.open);
+      }
+      this.savedScrollTop = this.root.scrollTop;
+    } else {
+      this.openSections.clear();
+      this.savedScrollTop = 0;
+    }
     if (subtitle) {
       this.root.innerHTML = this.subtitlePanel(subtitle);
+      this.restorePanelLayout(renderKey);
       return;
     }
     if (!found) {
       this.root.innerHTML = this.emptyPanel();
+      this.restorePanelLayout(renderKey);
       return;
     }
     const { clip, track } = found;
@@ -310,6 +326,16 @@ export class Inspector {
     }
 
     this.root.innerHTML = html;
+    this.restorePanelLayout(renderKey);
+  }
+
+  restorePanelLayout(renderKey) {
+    this.lastRenderKey = renderKey;
+    for (const detail of this.root.querySelectorAll('details.ve-inspector-section')) {
+      const key = detail.querySelector('summary')?.textContent.trim() || '';
+      if (this.openSections.has(key)) detail.open = this.openSections.get(key);
+    }
+    if (this.savedScrollTop) this.root.scrollTop = this.savedScrollTop;
   }
 
   subtitlePanel(item) {

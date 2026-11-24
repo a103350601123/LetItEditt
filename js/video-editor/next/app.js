@@ -68,6 +68,7 @@ class VideoEditorApp {
     this.pendingRestore = null;
     this.restoredOnce = false;
     this.activePopover = null;
+    this.popoverAnchor = null;
     this.lastSaveAt = 0;
     this.previewWasPlaying = false;
     this.resizer = null;
@@ -135,6 +136,8 @@ class VideoEditorApp {
     this.clipCount = $('#ve-clip-count');
     this.projectMenu = $('#ve-project-menu');
     this.projectMenuButton = $('#ve-project-menu-button');
+    this.projectMenuWrap = this.projectMenuButton.closest('.ve-menu-wrap');
+    this.mobileMenuButton = $('#ve-mobile-menu');
     this.restoreBanner = $('#ve-restore-banner');
     this.restoreText = $('#ve-restore-text');
     this.relinkBanner = $('#ve-relink-banner');
@@ -1468,8 +1471,9 @@ class VideoEditorApp {
       item?.action();
     });
     this.activePopover = pop;
+    this.popoverAnchor = anchor;
     setTimeout(() => document.addEventListener('pointerdown', this._outsidePopover = (event) => {
-      if (!pop.contains(event.target)) this.closePopover();
+      if (!pop.contains(event.target) && !anchor.contains(event.target)) this.closePopover();
     }, { once: true }), 0);
   }
 
@@ -1478,6 +1482,7 @@ class VideoEditorApp {
       this.activePopover.remove();
       this.activePopover = null;
     }
+    this.popoverAnchor = null;
     if (this._outsidePopover) {
       document.removeEventListener('pointerdown', this._outsidePopover);
       this._outsidePopover = null;
@@ -1491,6 +1496,7 @@ class VideoEditorApp {
   }
 
   openSheet(name) {
+    this.closeProjectMenu();
     this.sheetTrigger = document.activeElement;
     this.app.dataset.mobileSheet = name;
     this.sheetBackdrop.hidden = false;
@@ -1639,7 +1645,9 @@ class VideoEditorApp {
       if (!button) return;
       this.closeProjectMenu();
       const action = button.dataset.projectAction;
-      if (action === 'new') this.newProject();
+      if (action === 'undo') this.undo();
+      else if (action === 'redo') this.redo();
+      else if (action === 'new') this.newProject();
       else if (action === 'save') this.saveProjectFile();
       else if (action === 'open') this.openInput.click();
       else if (action === 'canvas') this.setCategory('canvas', { openSheet: this.isMobile() });
@@ -1661,10 +1669,12 @@ class VideoEditorApp {
     const open = this.projectMenu.hidden;
     this.projectMenu.hidden = !open;
     this.projectMenuButton.setAttribute('aria-expanded', String(open));
+    this.mobileMenuButton?.setAttribute('aria-expanded', String(open));
+    this.projectMenuWrap?.classList.toggle('is-mobile-open', open && this.isMobile());
     if (open) {
       setTimeout(() => {
         document.addEventListener('pointerdown', this._outsideMenu = (event) => {
-          if (!this.projectMenu.contains(event.target) && !this.projectMenuButton.contains(event.target)) this.closeProjectMenu();
+          if (!this.projectMenu.contains(event.target) && !this.projectMenuButton.contains(event.target) && !this.mobileMenuButton?.contains(event.target)) this.closeProjectMenu();
         }, { once: true });
       }, 0);
     }
@@ -1673,6 +1683,8 @@ class VideoEditorApp {
   closeProjectMenu() {
     this.projectMenu.hidden = true;
     this.projectMenuButton.setAttribute('aria-expanded', 'false');
+    this.mobileMenuButton?.setAttribute('aria-expanded', 'false');
+    this.projectMenuWrap?.classList.remove('is-mobile-open');
     if (this._outsideMenu) {
       document.removeEventListener('pointerdown', this._outsideMenu);
       this._outsideMenu = null;
@@ -1682,7 +1694,9 @@ class VideoEditorApp {
   bindProjectMenu() {
     document.addEventListener('click', (event) => {
       if (!this.activePopover) return;
-      if (!this.activePopover.contains(event.target)) this.closePopover();
+      if (this.activePopover.contains(event.target)) return;
+      if (this.popoverAnchor?.contains(event.target)) return;
+      this.closePopover();
     });
   }
 
@@ -1762,8 +1776,9 @@ class VideoEditorApp {
       this.preview.stepFrames(1);
     });
     this.scrub.addEventListener('input', () => {
+      const value = Number(this.scrub.value);
       this.preview.pause();
-      this.preview.seek(Number(this.scrub.value));
+      this.preview.seek(value);
     });
     this.rateSelect.addEventListener('change', () => {
       this.preview.setRate(Number(this.rateSelect.value) || 1);

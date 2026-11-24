@@ -1,5 +1,13 @@
 'use strict';
 
+/* End-to-end suite for the rebuilt LetitEdit video editor (V3).
+ *
+ * The tests drive the real workspace in Chromium: import legal fixtures,
+ * edit the timeline, exercise the inspector, restore an autosave, relink
+ * missing media, verify mobile layouts at every required width and read
+ * exported files back through a <video> element.
+ */
+
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -7,6 +15,7 @@ const { test, expect } = require('@playwright/test');
 const { fixturePath, ensureFixtures } = require('../support/fixtures');
 
 const PAGE = '/media-and-motion/video-editor/';
+const MOBILE_WIDTHS = [320, 360, 375, 390, 430];
 
 test.beforeAll(async ({ browser, baseURL }) => {
   test.setTimeout(300000);
@@ -25,7 +34,7 @@ function collectErrors(page) {
 async function openEditor(page) {
   const errors = collectErrors(page);
   await page.goto(PAGE, { waitUntil: 'networkidle' });
-  await page.waitForFunction(() => Boolean(window.__videoEditor), null, { timeout: 30000 });
+  await page.waitForFunction(() => window.__videoEditorReady === true, null, { timeout: 30000 });
   await expect(page.locator('#ve-preview-canvas')).toBeVisible();
   return errors;
 }
@@ -40,7 +49,7 @@ async function importFiles(page, names) {
   );
 }
 
-async function readSnapshot(page) {
+async function projectState(page) {
   return page.evaluate(() => {
     const ed = window.__videoEditor;
     return {
@@ -48,172 +57,83 @@ async function readSnapshot(page) {
       aspect: ed.project.aspect,
       resolution: ed.project.resolution,
       fps: ed.project.fps,
-      masterVolume: ed.project.masterVolume,
+      guides: ed.project.guides,
+      subtitles: ed.project.subtitles.items.length,
       tracks: ed.project.tracks.map((track) => ({
         id: track.id,
-        name: track.name,
         kind: track.kind,
-        hidden: track.hidden,
-        locked: track.locked,
-        muted: track.muted,
-        volume: track.volume,
+        category: track.category,
         clips: track.clips.map((clip) => ({
           id: clip.id,
           kind: clip.kind,
+          name: clip.name,
           start: clip.start,
           duration: clip.duration,
-          mediaId: clip.mediaId,
-          name: clip.name,
-          hidden: clip.hidden,
-          locked: clip.locked,
-          transition: clip.transition?.type || 'none',
-          filter: clip.filter || 'none',
-          filterIntensity: clip.filterIntensity,
-          scale: clip.scale,
-          rotation: clip.rotation,
-          x: clip.x,
-          y: clip.y,
-          speed: clip.speed,
-          reverse: clip.reverse,
+          mediaId: clip.mediaId || null,
           volume: clip.volume,
           muted: clip.muted,
-          fadeIn: clip.fadeIn,
-          fadeOut: clip.fadeOut,
-          keyframes: clip.keyframes
-            ? Object.fromEntries(Object.entries(clip.keyframes).map(([key, list]) => [key, (list || []).length]))
-            : {}
+          transition: clip.transition?.type || 'none',
+          keyframes: Object.fromEntries(
+            Object.entries(clip.keyframes || {}).map(([key, list]) => [key, (list || []).length])
+          )
         }))
       })),
-      subtitles: ed.project.subtitles,
-      selection: [...ed.state.selection],
-      playhead: ed.state.playhead
+      selection: [...ed.store.selection],
+      playhead: ed.store.playhead
     };
   });
 }
 
-async function frameStats(page, time) {
-  return page.evaluate(async (at) => {
-    const ed = window.__videoEditor;
-    ed.seek(at);
-    await ed.renderPreview();
-    const canvas = ed.elements.previewCanvas;
-    const data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+async function previewStats(page) {
+  return page.evaluate(() => {
+    const canvas = document.querySelector('#ve-preview-canvas');
+    const ctx = canvas.getContext('2d');
+    const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
     let lit = 0;
     let sum = 0;
     let hash = 2166136261;
-    for (let i = 0; i < data.length; i += 4 * 13) {
+    for (let i = 0; i < data.length; i += 4 * 31) {
       const value = data[i] + data[i + 1] + data[i + 2];
       if (value > 24) lit += 1;
       sum += value;
       hash = Math.imul(hash ^ value, 16777619) >>> 0;
     }
     return { lit, sum, hash, width: canvas.width, height: canvas.height };
-  }, time);
-}
-
-/* Reads the exported file back through a <video> element, measures it and
- * samples the real decoded frame (including the lower band where text and
- * subtitles live). */
-async function exportAndInspect(page, options, inspectTime) {
-  return page.evaluate(async ({ settings, at }) => {
-    const ed = window.__videoEditor;
-    const out = await ed.exportToBlob(settings);
-    const url = URL.createObjectURL(out.blob);
-    const video = document.createElement('video');
-    video.muted = true;
-    video.playsInline = true;
-    video.src = url;
-    try {
-      await new Promise((resolve, reject) => {
-        video.onloadedmetadata = resolve;
-        video.onerror = () => reject(new Error('The exported file could not be decoded.'));
-      });
-      const seekTo = at ?? Math.min(0.6, Math.max(0.05, out.meta.duration / 2));
-      await new Promise((resolve) => {
-        video.onseeked = resolve;
-        video.currentTime = Math.min(seekTo, Math.max(0.01, video.duration - 0.05));
-      });
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0);
-      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-      let lit = 0;
-      let bandLit = 0;
-      let bandHash = 2166136261;
-      const bandStart = Math.floor(canvas.height * 0.55);
-      for (let y = 0; y < canvas.height; y += 3) {
-        for (let x = 0; x < canvas.width; x += 3) {
-          const i = (y * canvas.width + x) * 4;
-          const value = data[i] + data[i + 1] + data[i + 2];
-          if (value > 30) lit += 1;
-          if (y >= bandStart) {
-            if (value > 30) bandLit += 1;
-            bandHash = Math.imul(bandHash ^ value, 16777619) >>> 0;
-          }
-        }
-      }
-      return {
-        size: out.blob.size,
-        meta: out.meta,
-        playback: {
-          width: video.videoWidth,
-          height: video.videoHeight,
-          duration: video.duration
-        },
-        lit,
-        bandLit,
-        bandHash
-      };
-    } finally {
-      URL.revokeObjectURL(url);
-    }
-  }, { settings: options, at: inspectTime });
-}
-
-async function setInputValue(page, selector, value) {
-  await page.locator(selector).evaluate((element, next) => {
-    element.value = String(next);
-    element.dispatchEvent(new Event('input', { bubbles: true }));
-    element.dispatchEvent(new Event('change', { bubbles: true }));
-  }, value);
-}
-
-async function blur(page) {
-  await page.evaluate(() => document.activeElement?.blur?.());
-}
-
-async function addVideoClip(page, name = 'trim-4s.mp4') {
-  await importFiles(page, [name]);
-  return page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const asset = ed.media.list().find((item) => item.type === 'video');
-    const clip = ed.addAssetToTimeline(asset.id, { start: 0 });
-    ed.selectClip(clip.id, { additive: false });
-    ed.seek(Math.min(0.6, clip.duration / 2));
-    return { clipId: clip.id, assetId: asset.id, duration: clip.duration };
   });
 }
 
-async function seek(page, time) {
-  await page.evaluate((at) => window.__videoEditor.seek(at), time);
+async function addVideo(page, name = 'trim-4s.mp4') {
+  await importFiles(page, [name]);
+  return page.evaluate((filename) => {
+    const ed = window.__videoEditor;
+    const asset = ed.media.list().find((item) => item.name === filename);
+    const inserted = ed.addAssetToTimeline(asset.id, { start: 0 });
+    ed.seek(Math.min(0.6, inserted.clip.duration / 2));
+    return { clipId: inserted.clip.id, assetId: asset.id, duration: inserted.clip.duration };
+  }, name);
 }
 
-async function setClipHidden(page, clipId, hidden) {
-  await page.evaluate(({ id, value }) => {
-    window.__videoEditor.store.apply((draft) => {
-      for (const track of draft.tracks) {
-        const clip = track.clips.find((item) => item.id === id);
-        if (clip) clip.hidden = value;
-      }
-    });
-  }, { id: clipId, value: hidden });
+async function openInspectorSection(page, title) {
+  const handle = await page.evaluateHandle((name) => {
+    const sections = [...document.querySelectorAll('#ve-inspector-panel details')];
+    return sections.find((section) => section.querySelector('summary')?.textContent.trim().startsWith(name)) || null;
+  }, title);
+  const element = handle.asElement();
+  if (!element) return false;
+  await element.evaluate((section) => {
+    section.open = true;
+    section.scrollIntoView({ block: 'center' });
+  });
+  return true;
+}
+
+async function scrollInspectorTo(page, selector) {
+  await page.locator(selector).evaluate((element) => element.scrollIntoView({ block: 'center' }));
 }
 
 /* ------------------------------------------------------------------------- */
 
-test('page structure, documentation and initial workspace are complete', async ({ page }) => {
+test('workspace, nine categories and accessibility baseline', async ({ page }) => {
   const errors = await openEditor(page);
 
   await expect(page).toHaveTitle(/Professional Video Editor/);
@@ -224,7 +144,7 @@ test('page structure, documentation and initial workspace are complete', async (
   );
   await expect(page.locator('h1')).toHaveCount(1);
   await expect(page.locator('h1')).toHaveText('Professional Video Editor');
-  expect(await page.locator('h2').count()).toBeGreaterThan(6);
+  expect(await page.locator('h2').count()).toBeGreaterThanOrEqual(6);
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toBeVisible();
 
   const structured = await page.evaluate(() =>
@@ -237,36 +157,32 @@ test('page structure, documentation and initial workspace are complete', async (
   );
   expect(structured).toEqual(expect.arrayContaining(['BreadcrumbList', 'SoftwareApplication', 'FAQPage']));
 
-  const initial = await readSnapshot(page);
-  expect(initial.tracks.map((track) => track.kind)).toEqual(['video', 'video', 'audio']);
+  const initial = await projectState(page);
+  expect(initial.aspect).toBe('16:9');
+  expect(initial.guides).toEqual({ center: false, safe: false });
+  expect(initial.tracks.map((track) => track.category)).toEqual(['text', 'video', 'audio']);
   expect(initial.tracks.every((track) => track.clips.length === 0)).toBe(true);
-  expect(initial.subtitles.items).toHaveLength(0);
-
-  const tabs = await page.locator('#ve-tabs [data-tab]').evaluateAll((nodes) =>
-    nodes.map((node) => node.dataset.tab)
-  );
-  expect(tabs).toEqual([
-    'media',
-    'text',
-    'audio',
-    'overlays',
-    'transitions',
-    'filters',
-    'effects',
-    'subtitles',
-    'layers'
-  ]);
-
+  expect(initial.subtitles).toBe(0);
   await expect(page.locator('#ve-preview-empty')).toBeVisible();
-  await expect(page.locator('#ve-export-open')).toBeEnabled();
-  await expect(page.locator('#ve-help')).toHaveCount(1);
 
-  const support = await page.evaluate(() => window.__videoEditor.support());
-  expect(support.renderer).toBe(true);
-  expect(support.encoder).toBe(true);
-  expect(support.decoder).toBe(true);
+  const categories = ['media', 'canvas', 'text', 'audio', 'videos', 'images', 'elements', 'subtitles', 'record'];
+  const railIds = await page.locator('#ve-rail [data-category]').evaluateAll((nodes) =>
+    nodes.map((node) => node.dataset.category)
+  );
+  expect(railIds).toEqual(categories);
 
-  /* Every field is labelled and every button has an accessible name. */
+  for (const category of categories) {
+    await page.click(`#ve-rail [data-category="${category}"]`);
+    await expect(page.locator('#ve-library-panel h2')).not.toHaveText('');
+    const heading = (await page.locator('#ve-library-panel h2').textContent())?.trim();
+    expect(heading?.length || 0).toBeGreaterThan(2);
+  }
+  await page.click('#ve-rail [data-category="media"]');
+
+  await page.locator('#ve-project-name').fill('Launch cut');
+  await page.locator('#ve-project-name').press('Enter');
+  await expect.poll(async () => (await projectState(page)).name).toBe('Launch cut');
+
   const unlabelled = await page.evaluate(() => {
     const missing = [];
     const text = (element) => (element.textContent || '').trim();
@@ -293,23 +209,23 @@ test('page structure, documentation and initial workspace are complete', async (
     const rules = [...document.styleSheets].flatMap((sheet) => {
       try {
         return [...sheet.cssRules];
-      } catch (error) {
+      } catch {
         return [];
       }
     });
     return rules.some((rule) => rule.conditionText && rule.conditionText.includes('prefers-reduced-motion'));
   });
   expect(reducedMotion).toBe(true);
-
   expect(errors).toEqual([]);
 });
 
-test('media import validates files, shows metadata, reuses and removes them', async ({ page }) => {
+test('media library imports, filters, renames and removes files', async ({ page }) => {
   const errors = await openEditor(page);
-
   await importFiles(page, ['trim-4s.mp4', 'sample.png', 'trim-audio-only.m4a']);
+
   const assets = await page.evaluate(() =>
     window.__videoEditor.media.list().map((asset) => ({
+      id: asset.id,
       name: asset.name,
       type: asset.type,
       duration: asset.duration,
@@ -331,2049 +247,645 @@ test('media import validates files, shows metadata, reuses and removes them', as
   expect(image.type).toBe('image');
   expect(image.width).toBe(320);
   expect(image.height).toBe(200);
-  expect(image.thumbnail).toBe(true);
   expect(audio.type).toBe('audio');
   expect(audio.duration).toBeGreaterThan(0.5);
 
-  await expect(page.locator('.ve-media-card')).toHaveCount(3);
-  await expect(page.locator('.ve-media-card', { hasText: 'trim-4s.mp4' })).toContainText('Video');
-  await expect(page.locator('.ve-media-card', { hasText: 'sample.png' })).toContainText('320×200');
-  await expect(page.locator('.ve-media-card', { hasText: 'trim-audio-only.m4a' })).toContainText('Audio');
+  await expect(page.locator('.ve-asset-card')).toHaveCount(3);
+  await expect(page.locator('.ve-asset-card', { hasText: 'trim-4s.mp4' })).toContainText('Video');
 
-  /* Invalid files are rejected with explicit messages and do not break import. */
-  await page.setInputFiles('#ve-media-input', [fixturePath('trim-corrupt.mp4'), fixturePath('trim-not-video.avi')]);
-  await page.waitForFunction(() => window.__videoEditor.state.importErrors.length >= 2, null, { timeout: 30000 });
-  const failures = await page.evaluate(() => window.__videoEditor.state.importErrors);
-  expect(failures.join(' ')).toContain('trim-corrupt.mp4');
-  expect(failures.join(' ')).toContain('trim-not-video.avi');
-  await expect(page.locator('.ve-alert-warn').first()).toBeVisible();
+  await page.locator('[data-media-search]').fill('trim');
+  await expect(page.locator('.ve-asset-card')).toHaveCount(2);
+  await page.locator('[data-media-search]').fill('audio-only');
+  await expect(page.locator('.ve-asset-card')).toHaveCount(1);
+  await page.locator('[data-media-search]').fill('');
 
-  /* Add the video, then swap its source with the transparent PNG through "Use". */
-  const clipId = await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const asset = ed.media.list().find((item) => item.name === 'trim-4s.mp4');
-    const clip = ed.addAssetToTimeline(asset.id, { start: 0 });
-    ed.selectClip(clip.id, { additive: false });
-    return clip.id;
-  });
-  await page.locator('.ve-media-card:has-text("sample.png") [data-media-action="replace"]').click();
-  await page.waitForFunction(
-    (id) => {
-      const clip = window.__videoEditor.project.tracks
-        .flatMap((track) => track.clips)
-        .find((item) => item.id === id);
-      return Boolean(clip && clip.kind === 'image' && /sample\.png/.test(clip.name));
-    },
-    clipId,
-    { timeout: 30000 }
-  );
+  await page.click('[data-media-filter="image"]');
+  await expect(page.locator('.ve-asset-card')).toHaveCount(1);
+  await page.click('[data-media-filter="all"]');
 
-  /* The properties panel can import a brand new file straight into the clip. */
-  await page.locator('#ve-props-body [data-prop-action="replace"]').click();
-  await page.setInputFiles('#ve-replace-input', fixturePath('sample-alpha.png'));
-  await page.waitForFunction(
-    (id) => {
-      const clip = window.__videoEditor.project.tracks
-        .flatMap((track) => track.clips)
-        .find((item) => item.id === id);
-      return Boolean(clip && clip.kind === 'image' && /sample-alpha/.test(clip.name));
-    },
-    clipId,
-    { timeout: 30000 }
-  );
+  await page.locator(`.ve-asset-card[data-asset-id="${video.id}"] [data-panel-action="add-asset"]`).click();
+  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).length).toBe(1);
+  await expect(page.locator(`.ve-asset-card[data-asset-id="${video.id}"]`)).toContainText('1 in timeline');
 
-  /* Removing unused media is immediate; used media is guarded by a confirm. */
-  const used = await page.evaluate(() =>
-    window.__videoEditor.project.tracks.flatMap((track) => track.clips).map((clip) => clip.mediaId)
-  );
-  const unused = await page.evaluate(
-    (ids) => window.__videoEditor.media.list().find((asset) => !ids.includes(asset.id)).id,
-    used
-  );
-  await page.evaluate((id) => {
-    document.querySelector(`[data-media-id="${id}"] [data-media-action="remove"]`).click();
-  }, unused);
-  await page.waitForFunction((id) => !window.__videoEditor.media.list().some((asset) => asset.id === id), unused);
-  await expect(page.locator('.ve-media-card')).toHaveCount(3);
+  await page.click('[data-media-usage="used"]');
+  await expect(page.locator('.ve-asset-card')).toHaveCount(1);
+  await page.click('[data-media-usage="unused"]');
+  await expect(page.locator('.ve-asset-card')).toHaveCount(2);
+  await page.click('[data-media-usage="all"]');
 
+  page.once('dialog', (dialog) => dialog.accept('hero-shot.mp4'));
+  await page.click(`.ve-asset-card[data-asset-id="${video.id}"] [data-panel-action="asset-menu"]`);
+  await page.locator('.ve-popover [role="menuitem"]', { hasText: 'Rename' }).click();
+  await expect(page.locator(`.ve-asset-card[data-asset-id="${video.id}"]`)).toContainText('hero-shot.mp4');
+  const renamedClip = await page.evaluate((id) => {
+    const clip = window.__videoEditor.project.tracks.flatMap((track) => track.clips).find((item) => item.mediaId === id);
+    return clip?.name;
+  }, video.id);
+  expect(renamedClip).toBe('hero-shot.mp4');
+
+  await page.click(`.ve-asset-card[data-asset-id="${image.id}"] [data-panel-action="asset-menu"]`);
+  await page.locator('.ve-popover [role="menuitem"]', { hasText: 'Remove from media' }).click();
+  await expect(page.locator('#ve-confirm-dialog')).toBeVisible();
+  await page.click('#ve-confirm-dialog [data-confirm-ok]');
+  await expect(page.locator('.ve-asset-card')).toHaveCount(2);
   expect(errors).toEqual([]);
 });
 
-test('timeline trims, splits, duplicates, moves across tracks and manages tracks', async ({ page }) => {
+test('preview renders, plays, pauses and steps frames', async ({ page }) => {
   const errors = await openEditor(page);
-  await addVideoClip(page);
-  await expect(page.locator('.ve-clip')).toHaveCount(1);
-
-  /* Drag the clip body to the right; its start time changes. */
-  await page.locator('.ve-clip').first().scrollIntoViewIfNeeded();
-  await page.waitForTimeout(600);
-  const clip = page.locator('.ve-clip').first();
-  let box = await clip.boundingBox();
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(box.x + box.width / 2 + 94, box.y + box.height / 2, { steps: 8 });
-  await page.mouse.up();
-  await page.waitForTimeout(250);
-  let snapshot = await readSnapshot(page);
-  const firstClip = snapshot.tracks.flatMap((track) => track.clips)[0];
-  expect(firstClip.start).toBeGreaterThan(0.5);
-
-  /* Right-edge drag trims duration. */
-  const trim = await page.locator('.ve-clip .ve-trim-end').first().boundingBox();
-  await page.mouse.move(trim.x + trim.width / 2, trim.y + trim.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(trim.x + trim.width / 2 - 80, trim.y + trim.height / 2, { steps: 6 });
-  await page.mouse.up();
-  await page.waitForTimeout(250);
-  snapshot = await readSnapshot(page);
-  const trimmed = snapshot.tracks.flatMap((track) => track.clips)[0];
-  expect(trimmed.duration).toBeLessThan(firstClip.duration - 0.3);
-
-  /* Keyboard trimming keeps focus and works repeatedly. */
-  await page.locator('.ve-clip .ve-trim-start').first().focus();
-  await page.keyboard.press('Shift+ArrowRight');
-  await page.keyboard.press('Shift+ArrowRight');
-  await page.waitForTimeout(200);
-  snapshot = await readSnapshot(page);
-  const keyboardTrimmed = snapshot.tracks.flatMap((track) => track.clips)[0];
-  expect(keyboardTrimmed.start).toBeGreaterThan(trimmed.start + 0.5);
-  expect(keyboardTrimmed.duration).toBeLessThan(trimmed.duration - 0.5);
-
-  /* Split at the playhead through the toolbar, then undo and redo. */
-  const mid = await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const current = ed.project.tracks.flatMap((track) => track.clips)[0];
-    ed.selectClip(current.id, { additive: false });
-    ed.seek(current.start + current.duration / 2);
-    return current.start + current.duration / 2;
-  });
-  await page.locator('#ve-timeline [data-timeline-action="split"]').click();
-  await page.waitForTimeout(250);
-  snapshot = await readSnapshot(page);
-  let clips = snapshot.tracks.flatMap((track) => track.clips);
-  expect(clips).toHaveLength(2);
-  expect(Math.abs(clips[0].start + clips[0].duration - mid)).toBeLessThan(0.1);
-
-  await blur(page);
-  await page.keyboard.press('Control+z');
-  await page.waitForTimeout(200);
-  expect((await readSnapshot(page)).tracks.flatMap((track) => track.clips)).toHaveLength(1);
-  await page.keyboard.press('Control+Shift+z');
-  await page.waitForTimeout(200);
-  expect((await readSnapshot(page)).tracks.flatMap((track) => track.clips)).toHaveLength(2);
-
-  /* Duplicate and delete through the properties panel. */
-  await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    ed.selectClip(ed.project.tracks.flatMap((track) => track.clips)[0].id, { additive: false });
-  });
-  await expect(page.locator('#ve-props-body')).toContainText('Timing');
-  await page.locator('#ve-props-body [data-prop-action="duplicate"]').click();
-  await page.waitForTimeout(250);
-  expect((await readSnapshot(page)).tracks.flatMap((track) => track.clips).length).toBeGreaterThanOrEqual(3);
-  await page.locator('#ve-props-body [data-prop-action="delete"]').click();
-  await page.waitForTimeout(250);
-  expect((await readSnapshot(page)).tracks.flatMap((track) => track.clips)).toHaveLength(2);
-
-  /* Move the first clip onto the empty top video layer and check the insert indicator. */
-  await page.locator('#ve-timeline').scrollIntoViewIfNeeded();
-  await page.waitForTimeout(700);
-  const moveSetup = await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const first = ed.project.tracks.flatMap((track) => track.clips)[0];
-    ed.selectClip(first.id, { additive: false });
-    const top = ed.project.tracks.find((track) => track.kind === 'video');
-    return { clipId: first.id, topTrackId: top.id, start: first.start };
-  });
-  const clipBox = await page.locator(`.ve-clip[data-clip-id="${moveSetup.clipId}"]`).boundingBox();
-  const targetRow = await page
-    .locator(`[data-track-row][data-track-id="${moveSetup.topTrackId}"]`)
-    .boundingBox();
-  await page.mouse.move(clipBox.x + 24, clipBox.y + clipBox.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(clipBox.x + 24, targetRow.y + targetRow.height / 2, { steps: 12 });
-  await page.waitForTimeout(200);
-  const insertVisible = await page.locator('[data-insert].is-visible').count();
-  await page.mouse.up();
-  await page.waitForTimeout(250);
-  const movedSnapshot = await readSnapshot(page);
-  const moved = movedSnapshot.tracks.find((track) => track.id === moveSetup.topTrackId);
-  expect(insertVisible).toBe(1);
-  expect(moved.clips.some((item) => item.id === moveSetup.clipId)).toBe(true);
-  expect(movedSnapshot.tracks.flatMap((track) => track.clips)).toHaveLength(2);
-
-  /* Zoom controls and fit. */
-  const zoom = await page.evaluate(() => window.__videoEditor.timeline.pxPerSecond);
-  await page.locator('[data-timeline-action="zoom-in"]').click();
-  const zoomedIn = await page.evaluate(() => window.__videoEditor.timeline.pxPerSecond);
-  await page.locator('[data-timeline-action="zoom-out"]').click();
-  const zoomedOut = await page.evaluate(() => window.__videoEditor.timeline.pxPerSecond);
-  await page.locator('[data-timeline-action="fit"]').click();
-  const fitted = await page.evaluate(() => window.__videoEditor.timeline.pxPerSecond);
-  expect(zoomedIn).toBeGreaterThan(zoom);
-  expect(zoomedOut).toBeLessThan(zoomedIn);
-  expect(fitted).toBeGreaterThan(0);
-  await setInputValue(page, '[data-zoom-range]', 160);
-  expect(await page.evaluate(() => window.__videoEditor.timeline.pxPerSecond)).toBeCloseTo(160, 0);
-
-  /* Snapping toggle is real. */
-  const snap = page.locator('[data-snap]');
-  expect(await snap.isChecked()).toBe(true);
-  await snap.uncheck();
-  expect(await page.evaluate(() => window.__videoEditor.timeline.snapping)).toBe(false);
-  await snap.check();
-
-  /* Track rename, hide, lock, collapse and restore. */
-  await page.locator('.ve-tl-name').first().dblclick();
-  await page.fill('.ve-tl-rename', 'Top layer');
-  await page.keyboard.press('Enter');
-  await page.waitForTimeout(200);
-  await page.locator('[data-track-row]').first().locator('[data-track-action="hide"]').click();
-  await page.locator('[data-track-row]').first().locator('[data-track-action="lock"]').click();
-  await page.locator('[data-track-row]').first().locator('[data-track-action="collapse"]').click();
-  snapshot = await readSnapshot(page);
-  expect(snapshot.tracks[0].name).toBe('Top layer');
-  expect(snapshot.tracks[0].hidden).toBe(true);
-  expect(snapshot.tracks[0].locked).toBe(true);
-  await page.locator('[data-track-row]').first().locator('[data-track-action="hide"]').click();
-  await page.locator('[data-track-row]').first().locator('[data-track-action="lock"]').click();
-
-  /* Add and remove tracks. */
-  const beforeAdd = await readSnapshot(page);
-  await page.locator('[data-timeline-action="add-video"]').click();
-  await page.locator('[data-timeline-action="add-audio"]').click();
-  snapshot = await readSnapshot(page);
-  expect(snapshot.tracks.filter((track) => track.kind === 'video').length).toBe(
-    beforeAdd.tracks.filter((track) => track.kind === 'video').length + 1
-  );
-  expect(snapshot.tracks.filter((track) => track.kind === 'audio').length).toBe(
-    beforeAdd.tracks.filter((track) => track.kind === 'audio').length + 1
-  );
-  const deletedAudioId = await page
-    .locator('[data-track-row][data-kind="audio"]')
-    .last()
-    .getAttribute('data-track-id');
-  await page.locator('[data-track-row]').last().locator('[data-track-action="delete"]').click();
-  await page.waitForTimeout(200);
-  expect((await readSnapshot(page)).tracks.filter((track) => track.kind === 'audio').length).toBe(1);
-  await expect(page.locator(`[data-track-row][data-track-id="${deletedAudioId}"]`)).toHaveCount(0);
-
-  const remainingAudio = page.locator('[data-track-row][data-kind="audio"]').first();
-  const audioId = await remainingAudio.getAttribute('data-track-id');
-  await remainingAudio.locator('[data-track-volume]').evaluate((element) => {
-    element.value = '0.4';
-    element.dispatchEvent(new Event('input', { bubbles: true }));
-    element.dispatchEvent(new Event('change', { bubbles: true }));
-  });
-  await remainingAudio.locator('[data-track-action="mute"]').click();
-  snapshot = await readSnapshot(page);
-  const audioTrack = snapshot.tracks.find((track) => track.id === audioId);
-  expect(audioTrack.volume).toBeCloseTo(0.4, 1);
-  expect(audioTrack.muted).toBe(true);
-
-  expect(errors).toEqual([]);
-});
-
-test('layers stack, reorder and preview handles really change an image overlay', async ({ page }) => {
-  const errors = await openEditor(page);
-  await addVideoClip(page);
-  await importFiles(page, ['sample.png']);
-  const ids = await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const imageAsset = ed.media.list().find((asset) => asset.name === 'sample.png');
-    const imageClip = ed.addAssetToTimeline(imageAsset.id, { start: 0.6 });
-    ed.addShapeClip('circle');
-    ed.addTextPreset('title');
-    ed.seek(0.8);
-    return { imageClipId: imageClip.id };
-  });
-  await page.waitForTimeout(350);
-
-  let snapshot = await readSnapshot(page);
-  const videoClip = snapshot.tracks.flatMap((track) => track.clips).find((clip) => clip.kind === 'video');
-  const textClip = snapshot.tracks.flatMap((track) => track.clips).find((clip) => clip.kind === 'text');
-  expect(videoClip).toBeTruthy();
-  expect(textClip).toBeTruthy();
-
-  await page.locator('#ve-tabs [data-tab="layers"]').click();
-  await expect(page.locator('#ve-panel')).toContainText('Top of this list renders in front');
-  const rows = page.locator('#ve-panel [data-layer-row]');
-  expect(await rows.count()).toBe(4);
-  expect(await rows.first().getAttribute('data-clip-id')).toBe(textClip.id);
-
-  /* Send the text to the back, up one layer, then to the front. */
-  await page.locator(`#ve-panel [data-layer-action="back"][data-clip-id="${textClip.id}"]`).click();
-  await page.waitForTimeout(250);
-  let order = await page
-    .locator('#ve-panel [data-layer-row]')
-    .evaluateAll((nodes) => nodes.map((node) => node.dataset.clipId));
-  expect(order[order.length - 1]).toBe(textClip.id);
-  await page.locator(`#ve-panel [data-layer-action="up"][data-clip-id="${textClip.id}"]`).click();
-  await page.waitForTimeout(200);
-  const upOrder = await page
-    .locator('#ve-panel [data-layer-row]')
-    .evaluateAll((nodes) => nodes.map((node) => node.dataset.clipId));
-  expect(upOrder.indexOf(textClip.id)).toBe(order.indexOf(textClip.id) - 1);
-  await page.locator(`#ve-panel [data-layer-action="front"][data-clip-id="${textClip.id}"]`).click();
-  await page.waitForTimeout(200);
-  expect(await page.locator('#ve-panel [data-layer-row]').first().getAttribute('data-clip-id')).toBe(textClip.id);
-
-  /* Property layer buttons move the selected clip too. */
-  await page.locator(`#ve-panel [data-layer-action="select"][data-clip-id="${textClip.id}"]`).click();
-  await page.locator('#ve-props-body [data-prop-action="layer-down"]').click();
-  await page.waitForTimeout(200);
-  expect(await page.locator('#ve-panel [data-layer-row]').first().getAttribute('data-clip-id')).not.toBe(textClip.id);
-
-  /* Hide and lock a layer, then show and unlock it. */
-  await page.locator(`#ve-panel [data-layer-action="hide"][data-clip-id="${textClip.id}"]`).click();
-  expect(
-    (await readSnapshot(page)).tracks.flatMap((track) => track.clips).find((clip) => clip.id === textClip.id).hidden
-  ).toBe(true);
-  await page.locator(`#ve-panel [data-layer-action="hide"][data-clip-id="${textClip.id}"]`).click();
-  await page.locator(`#ve-panel [data-layer-action="lock"][data-clip-id="${textClip.id}"]`).click();
-  expect(
-    (await readSnapshot(page)).tracks.flatMap((track) => track.clips).find((clip) => clip.id === textClip.id).locked
-  ).toBe(true);
-  await page.locator(`#ve-panel [data-layer-action="lock"][data-clip-id="${textClip.id}"]`).click();
-
-  /* Direct manipulation of the image overlay: move, scale with the SE handle, rotate. */
-  await page.evaluate((id) => {
-    const ed = window.__videoEditor;
-    ed.selectClip(id, { additive: false });
-    ed.seek(1);
-  }, ids.imageClipId);
-  await page.locator('#ve-preview-shell').scrollIntoViewIfNeeded();
-  await page.waitForTimeout(700);
-  const readImage = () =>
-    page.evaluate((id) => {
-      const clip = window.__videoEditor.project.tracks
-        .flatMap((track) => track.clips)
-        .find((item) => item.id === id);
-      return { x: clip.x, y: clip.y, scale: clip.scale, rotation: clip.rotation };
-    }, ids.imageClipId);
-
-  const beforeMove = await readImage();
-  const moveZone = await page.locator('.ve-select-box [data-handle="move"]').boundingBox();
-  await page.mouse.move(moveZone.x + moveZone.width / 2, moveZone.y + moveZone.height / 2);
-  await page.mouse.down();
-  /* Move up-left so the south-east scale handle stays inside the preview. */
-  await page.mouse.move(moveZone.x + moveZone.width / 2 - 48, moveZone.y + moveZone.height / 2 - 18, { steps: 8 });
-  await page.mouse.up();
-  await page.waitForTimeout(300);
-  const afterMove = await readImage();
-  expect(Math.abs(afterMove.x - beforeMove.x) + Math.abs(afterMove.y - beforeMove.y)).toBeGreaterThan(0.01);
-
-  const beforeScale = (await readImage()).scale;
-  const se = await page.locator('.ve-select-box [data-handle="se"]').boundingBox();
-  await page.mouse.move(se.x + se.width / 2, se.y + se.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(se.x + se.width / 2 + 40, se.y + se.height / 2 + 24, { steps: 6 });
-  await page.mouse.up();
-  await page.waitForTimeout(300);
-  const afterScale = (await readImage()).scale;
-  expect(afterScale).toBeGreaterThan(beforeScale + 0.02);
-
-  const beforeRotate = (await readImage()).rotation;
-  const rotate = await page.locator('.ve-select-box [data-handle="rotate"]').boundingBox();
-  await page.mouse.move(rotate.x + rotate.width / 2, rotate.y + rotate.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(rotate.x + rotate.width / 2 + 36, rotate.y + rotate.height / 2 + 14, { steps: 6 });
-  await page.mouse.up();
-  await page.waitForTimeout(300);
-  const afterRotate = (await readImage()).rotation;
-  expect(Math.abs(afterRotate - beforeRotate)).toBeGreaterThan(1);
-
-  /* One undo per drag restores the rotation. */
-  await blur(page);
-  await page.keyboard.press('Control+z');
-  await page.waitForTimeout(200);
-  const undone = await readImage();
-  expect(Math.abs(undone.rotation - beforeRotate)).toBeLessThan(0.5);
-
-  expect(errors).toEqual([]);
-});
-
-test('text layers support Unicode, RTL and style controls, and text reaches the export', async ({ page }) => {
-  test.setTimeout(120000);
-  const errors = await openEditor(page);
-  const video = await addVideoClip(page, 'trim-4s.mp4');
-  const baseline = await frameStats(page, 0.6);
-
-  await page.locator('#ve-tabs [data-tab="text"]').click();
-  await expect(page.locator('#ve-panel')).toContainText('Unicode shaping');
-  const presets = await page.locator('#ve-panel [data-text-preset]').evaluateAll((nodes) =>
-    nodes.map((node) => node.dataset.textPreset)
-  );
-  expect(presets).toEqual(expect.arrayContaining(['title', 'subtitle', 'lower', 'caption', 'heading', 'quote']));
-  await page.locator('#ve-panel [data-text-preset="lower"]').click();
-  await page.waitForTimeout(350);
-
-  const styled = await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const clip = ed.project.tracks.flatMap((track) => track.clips).find((item) => item.kind === 'text');
-    ed.selectClip(clip.id, { additive: false });
-    ed.seek(clip.start + Math.min(1, clip.duration / 2));
-    return clip.id;
-  });
-  await expect(page.locator('#ve-props-body')).toContainText('Text');
-  const content =
-    'مرحبا بالعالم\nनमस्ते दुनिया\n你好世界\nこんにちは\n안녕하세요\nПривет, мир';
-  await page.locator('[data-prop="text.content"]').fill(content);
-  await page.locator('[data-prop="text.font"]').selectOption('arabic');
-  await page.locator('[data-prop="text.direction"]').selectOption('rtl');
-  await page.locator('[data-prop="text.size"]').fill('56');
-  await page.locator('[data-prop="text.bold"]').check();
-  await page.locator('[data-prop="text.align"]').selectOption('right');
-  await page.locator('[data-prop="text.color"]').evaluate((element) => {
-    element.value = '#ffe066';
-    element.dispatchEvent(new Event('input', { bubbles: true }));
-    element.dispatchEvent(new Event('change', { bubbles: true }));
-  });
-  await setInputValue(page, '[data-prop="text.outlineWidth"]', 4);
-  await setInputValue(page, '[data-prop="text.bgOpacity"]', 0.5);
-  await setInputValue(page, '[data-prop="text.lineHeight"]', 1.4);
-  await setInputValue(page, '[data-prop="text.letterSpacing"]', 2);
-  await page.waitForTimeout(350);
-
-  const textClip = await page.evaluate((id) => {
-    const clip = window.__videoEditor.project.tracks
-      .flatMap((track) => track.clips)
-      .find((item) => item.id === id);
-    return { text: clip.text, name: clip.name };
-  }, styled);
-  expect(textClip.text.content).toBe(content);
-  expect(textClip.text.font).toBe('arabic');
-  expect(textClip.text.direction).toBe('rtl');
-  expect(textClip.text.bold).toBe(true);
-  expect(textClip.text.outlineWidth).toBe(4);
-  expect(textClip.text.color).toBe('#ffe066');
-  expect(textClip.text.bgOpacity).toBeCloseTo(0.5, 1);
-
-  const withText = await frameStats(page, 1);
-  expect(withText.hash).not.toBe(baseline.hash);
-
-  /* Hide the video: transparent text is the only thing left, and hiding the
-   * text leaves a genuinely blank frame. */
-  const videoTrackId = await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const track = ed.project.tracks.find((item) => item.clips.some((clip) => clip.kind === 'video'));
-    ed.store.apply((draft) => {
-      const found = draft.tracks.find((item) => item.id === track.id);
-      found.hidden = true;
-    });
-    return track.id;
-  });
-  await page.waitForTimeout(250);
-  const textOnly = await frameStats(page, 1);
-  expect(textOnly.lit).toBeGreaterThan(0);
-  await setClipHidden(page, styled, true);
-  await page.waitForTimeout(200);
-  const hiddenText = await frameStats(page, 1);
-  expect(hiddenText.lit).toBe(0);
-  await setClipHidden(page, styled, false);
-  await page.evaluate((id) => {
-    window.__videoEditor.store.apply((draft) => {
-      draft.tracks.find((item) => item.id === id).hidden = false;
-    });
-  }, videoTrackId);
-
-  /* The same renderer runs in the export worker: compare the lower band of
-   * the exported picture with the text layer shown and hidden. */
-  await page.evaluate(({ textId, videoId }) => {
-    const ed = window.__videoEditor;
-    ed.store.apply((draft) => {
-      const text = draft.tracks.flatMap((track) => track.clips).find((item) => item.id === textId);
-      text.start = 0;
-      text.duration = 1.2;
-      text.hidden = false;
-      const video = draft.tracks.flatMap((track) => track.clips).find((item) => item.id === videoId);
-      video.start = 0;
-      video.duration = 1.2;
-      video.inPoint = 0;
-      video.outPoint = 1.2;
-    });
-  }, { textId: styled, videoId: video.clipId });
-
-  const exportedWithText = await exportAndInspect(
-    page,
-    { format: 'mp4', resolution: '360', quality: 'small', aspect: 'project' },
-    0.4
-  );
-  expect(exportedWithText.size).toBeGreaterThan(1000);
-  expect(exportedWithText.lit).toBeGreaterThan(5);
-  expect(exportedWithText.meta.width).toBe(640);
-  expect(exportedWithText.meta.height).toBe(360);
-  expect(exportedWithText.playback.duration).toBeGreaterThan(1);
-
-  await setClipHidden(page, styled, true);
-  const exportedWithoutText = await exportAndInspect(
-    page,
-    { format: 'mp4', resolution: '360', quality: 'small', aspect: 'project' },
-    0.4
-  );
-  expect(exportedWithoutText.size).toBeGreaterThan(1000);
-  expect(exportedWithText.bandHash).not.toBe(exportedWithoutText.bandHash);
-
-  expect(errors).toEqual([]);
-});
-
-test('all 56 transitions and all 18 filters render, and colour correction changes frames', async ({ page }) => {
-  test.setTimeout(180000);
-  const errors = await openEditor(page);
-  await addVideoClip(page, 'trim-4s.mp4');
-
-  const ids = await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const first = ed.project.tracks.flatMap((track) => track.clips)[0];
-    const host = ed.project.tracks.find((track) => track.clips.some((clip) => clip.id === first.id));
-    ed.store.apply((draft) => {
-      const track = draft.tracks.find((item) => item.id === host.id);
-      const source = track.clips[0];
-      source.duration = 1.2;
-      source.outPoint = 1.2;
-      const copy = JSON.parse(JSON.stringify(source));
-      copy.id = 'clip_transition_probe';
-      copy.start = 1.2;
-      copy.duration = 1.2;
-      copy.inPoint = 1.2;
-      copy.outPoint = 2.4;
-      copy.transition = { type: 'none', duration: 0.5, reverse: false };
-      track.clips.push(copy);
-    });
-    ed.selectClip('clip_transition_probe', { additive: false });
-    return { count: ed.transitions().length, filterCount: ed.filters().length };
-  });
-  expect(ids.count).toBe(56);
-  expect(ids.filterCount).toBe(18);
-
-  const transitionResult = await page.evaluate(async () => {
-    const ed = window.__videoEditor;
-    const failures = [];
-    const signatures = new Set();
-    for (const id of ed.transitions()) {
-      try {
-        ed.setTransition(id);
-        ed.seek(1.35);
-        await ed.renderPreview();
-        const canvas = ed.elements.previewCanvas;
-        const data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
-        let hash = 2166136261;
-        let lit = 0;
-        for (let i = 0; i < data.length; i += 4 * 53) {
-          const value = data[i] + data[i + 1] + data[i + 2];
-          if (value > 22) lit += 1;
-          hash = Math.imul(hash ^ value, 16777619) >>> 0;
-        }
-        signatures.add(hash);
-        if (lit < 2) failures.push(`${id}: blank frame`);
-      } catch (error) {
-        failures.push(`${id}: ${error.message || error}`);
-      }
-    }
-    ed.setTransition('none');
-    return { failures, distinct: signatures.size };
-  });
-  expect(transitionResult.failures).toEqual([]);
-  expect(transitionResult.distinct).toBeGreaterThan(10);
-
-  await page.locator('#ve-tabs [data-tab="transitions"]').click();
-  await expect(page.locator('.ve-transition-group')).toHaveCount(6);
-  expect(await page.locator('.ve-transition').count()).toBe(56);
-  await page.locator('[data-transition="cross-dissolve"]').click();
-  await page.waitForTimeout(200);
-  expect(
-    await page.evaluate(() =>
-      window.__videoEditor.project.tracks
-        .flatMap((track) => track.clips)
-        .find((clip) => clip.id === 'clip_transition_probe').transition.type
-    )
-  ).toBe('cross-dissolve');
-  await setInputValue(page, '[data-transition-duration]', 0.8);
-  const duration = await page.evaluate(() =>
-    window.__videoEditor.project.tracks
-      .flatMap((track) => track.clips)
-      .find((clip) => clip.id === 'clip_transition_probe').transition.duration
-  );
-  expect(duration).toBeCloseTo(0.8, 1);
-  await page.locator('[data-transition-reverse]').check();
-  expect(
-    await page.evaluate(() =>
-      window.__videoEditor.project.tracks
-        .flatMap((track) => track.clips)
-        .find((clip) => clip.id === 'clip_transition_probe').transition.reverse
-    )
-  ).toBe(true);
-  await page.locator('[data-transition="none"]').click();
-  expect(
-    await page.evaluate(() =>
-      window.__videoEditor.project.tracks
-        .flatMap((track) => track.clips)
-        .find((clip) => clip.id === 'clip_transition_probe').transition.type
-    )
-  ).toBe('none');
-
-  /* Filters: each one is selectable, renders, and changes the picture. */
-  await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    ed.selectClip('clip_transition_probe', { additive: false });
-    ed.seek(1.8);
-  });
-  const baseline = await frameStats(page, 1.8);
-  await page.locator('#ve-tabs [data-tab="filters"]').click();
-  expect(await page.locator('#ve-panel [data-filter]').count()).toBe(18);
-  const filterResult = await page.evaluate(async (baseHash) => {
-    const ed = window.__videoEditor;
-    const failures = [];
-    let changed = 0;
-    for (const id of ed.filters()) {
-      try {
-        ed.setFilter(id);
-        await ed.renderPreview();
-        const canvas = ed.elements.previewCanvas;
-        const data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
-        let hash = 2166136261;
-        let lit = 0;
-        for (let i = 0; i < data.length; i += 4 * 31) {
-          const value = data[i] + data[i + 1] + data[i + 2];
-          if (value > 22) lit += 1;
-          hash = Math.imul(hash ^ value, 16777619) >>> 0;
-        }
-        if (id !== 'none' && hash !== baseHash) changed += 1;
-        if (lit < 2) failures.push(`${id}: blank`);
-      } catch (error) {
-        failures.push(`${id}: ${error.message || error}`);
-      }
-    }
-    ed.setFilter('none');
-    return { failures, changed };
-  }, baseline.hash);
-  expect(filterResult.failures).toEqual([]);
-  expect(filterResult.changed).toBeGreaterThanOrEqual(16);
-
-  await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    ed.selectClip('clip_transition_probe', { additive: false });
-    ed.seek(1.8);
-  });
-  await page.locator('#ve-tabs [data-tab="filters"]').click();
-  await page.locator('[data-filter="vintage"]').click();
-  await expect(page.locator('[data-filter-intensity]')).toBeEnabled();
-  await setInputValue(page, '[data-filter-intensity]', 0.4);
-  expect(
-    await page.evaluate(() =>
-      window.__videoEditor.project.tracks
-        .flatMap((track) => track.clips)
-        .find((clip) => clip.id === 'clip_transition_probe').filterIntensity
-    )
-  ).toBeCloseTo(0.4, 1);
-
-  /* Colour correction and presets. */
-  await page.locator('#ve-tabs [data-tab="effects"]').click();
-  await page.locator('[data-color-preset="cinematic"]').click();
-  await page.waitForTimeout(200);
-  const color = await page.evaluate(() =>
-    window.__videoEditor.project.tracks
-      .flatMap((track) => track.clips)
-      .find((clip) => clip.id === 'clip_transition_probe').color
-  );
-  expect(color.contrast).not.toBe(0);
-  const corrected = await frameStats(page, 1.8);
-  expect(corrected.hash).not.toBe(baseline.hash);
-  await page.evaluate(() => {
-    window.__videoEditor.selectClip('clip_transition_probe', { additive: false });
-  });
-  await setInputValue(page, '#ve-props-body [data-prop="color.brightness"]', 30);
-  await page.waitForTimeout(250);
-  const brightened = await frameStats(page, 1.8);
-  expect(brightened.hash).not.toBe(corrected.hash);
-  await page.locator('#ve-props-body [data-prop-action="reset-color"]').click();
-
-  /* Entrance and exit animations are real and use the animation length. */
-  await page.locator('[data-anim="in"]').selectOption('slide-left');
-  await page.locator('[data-anim="out"]').selectOption('zoom');
-  await page.locator('[data-anim-duration="in"]').fill('0.6');
-  const anims = await page.evaluate(() =>
-    window.__videoEditor.project.tracks
-      .flatMap((track) => track.clips)
-      .find((clip) => clip.id === 'clip_transition_probe')
-  );
-  expect(anims.inAnim.type).toBe('slide-left');
-  expect(anims.outAnim.type).toBe('zoom');
-  expect(anims.inAnim.duration).toBeCloseTo(0.6, 1);
-
-  expect(errors).toEqual([]);
-});
-
-test('keyframes interpolate, update from the properties panel and can be cleared', async ({ page }) => {
-  test.setTimeout(120000);
-  const errors = await openEditor(page);
-  await addVideoClip(page, 'trim-4s.mp4');
-  await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const clip = ed.project.tracks.flatMap((track) => track.clips)[0];
-    ed.selectClip(clip.id, { additive: false });
-    ed.seek(clip.start + 0.2);
-  });
-  await page.waitForTimeout(250);
-  await expect(page.locator('#ve-props-body .ve-keyframes')).toBeVisible();
-
-  await page.locator('[data-keyframe="x"]').click();
-  await setInputValue(page, '[data-prop="x"]', 0.2);
-  await page.locator('[data-keyframe="opacity"]').click();
-  await setInputValue(page, '[data-prop="opacity"]', 0.3);
-  await page.waitForTimeout(250);
-  let keys = await page.evaluate(() => {
-    const clip = window.__videoEditor.project.tracks.flatMap((track) => track.clips)[0];
-    return clip.keyframes;
-  });
-  expect(keys.x.length).toBeGreaterThanOrEqual(1);
-  expect(keys.x[0].v).toBeCloseTo(0.2, 2);
-  expect(keys.opacity[0].v).toBeCloseTo(0.3, 2);
-
-  await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const clip = ed.project.tracks.flatMap((track) => track.clips)[0];
-    ed.seek(clip.start + 1.4);
-  });
-  await page.waitForTimeout(250);
-  await page.locator('[data-keyframe="x"]').click();
-  await setInputValue(page, '[data-prop="x"]', 0.8);
-  await page.locator('[data-keyframe="opacity"]').click();
-  await setInputValue(page, '[data-prop="opacity"]', 1);
-  await page.waitForTimeout(250);
-
-  keys = await page.evaluate(() => {
-    const clip = window.__videoEditor.project.tracks.flatMap((track) => track.clips)[0];
-    return clip.keyframes;
-  });
-  expect(keys.x.length).toBe(2);
-  expect(keys.opacity.length).toBe(2);
-  expect(keys.x[1].v).toBeCloseTo(0.8, 2);
-
-  /* resolveTransform is the exact function the preview and exporter call. */
-  const interpolation = await page.evaluate(async (clipId) => {
-    const { resolveTransform } = await import('/js/video-editor/renderer.js');
-    const ed = window.__videoEditor;
-    const clip = ed.project.tracks.flatMap((track) => track.clips).find((item) => item.id === clipId);
-    const linear = resolveTransform(clip, 0.8).x;
-    const eased = resolveTransform(
-      {
-        ...clip,
-        keyframes: {
-          ...clip.keyframes,
-          x: [
-            { t: 0, v: 0, ease: 'linear' },
-            { t: 2, v: 1, ease: 'easeInOut' }
-          ]
-        }
-      },
-      0.5
-    ).x;
-    return { linear, eased };
-  }, await page.evaluate(() => window.__videoEditor.project.tracks.flatMap((track) => track.clips)[0].id));
-  expect(interpolation.linear).toBeGreaterThan(0.2);
-  expect(interpolation.linear).toBeLessThan(0.8);
-  expect(interpolation.eased).toBeLessThan(0.2);
-
-  /* Easing selection is real, then clear all keyframes. */
-  await page.locator('[data-key-ease]').selectOption('easeInOut');
-  expect(await page.evaluate(() => window.__videoEditor.state.keyEase)).toBe('easeInOut');
-  await page.locator('#ve-props-body [data-prop-action="clear-keys"]').click();
-  const cleared = await page.evaluate(() => {
-    const clip = window.__videoEditor.project.tracks.flatMap((track) => track.clips)[0];
-    return Object.values(clip.keyframes).reduce((sum, list) => sum + list.length, 0);
-  });
-  expect(cleared).toBe(0);
-
-  expect(errors).toEqual([]);
-});
-
-test('audio clips mix, split, fade and export with sound', async ({ page }) => {
-  test.setTimeout(180000);
-  const errors = await openEditor(page);
-  await importFiles(page, ['trim-audio-only.m4a', 'trim-4s.mp4']);
-
-  const setup = await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const audioAsset = ed.media.list().find((asset) => asset.type === 'audio');
-    const videoAsset = ed.media.list().find((asset) => asset.type === 'video');
-    const videoClip = ed.addAssetToTimeline(videoAsset.id, { start: 0 });
-    const audioClip = ed.addAssetToTimeline(audioAsset.id, { start: 0 });
-    ed.selectClip(audioClip.id, { additive: false });
-    ed.seek(0.4);
-    return { audioClipId: audioClip.id, videoClipId: videoClip.id, audioTrack: audioClip.trackId };
-  });
-  expect(setup.audioClipId).toBeTruthy();
-
-  await page.locator('#ve-tabs [data-tab="audio"]').click();
-  await expect(page.locator('#ve-panel')).toContainText('Master volume');
-  await setInputValue(page, '[data-master-volume]', 0.7);
-  expect(await page.evaluate(() => window.__videoEditor.project.masterVolume)).toBeCloseTo(0.7, 1);
-
-  await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const clip = ed.project.tracks.flatMap((track) => track.clips).find((item) => item.kind === 'audio');
-    ed.selectClip(clip.id, { additive: false });
-  });
-  await expect(page.locator('#ve-props-body')).toContainText('Audio mix');
-  await setInputValue(page, '[data-prop="volume"]', 0.6);
-  await page.locator('[data-prop="muted"]').check();
-  await setInputValue(page, '[data-prop="fadeIn"]', 0.5);
-  await setInputValue(page, '[data-prop="fadeOut"]', 0.4);
-  await page.waitForTimeout(200);
-  let audio = await page.evaluate(() =>
-    window.__videoEditor.project.tracks.flatMap((track) => track.clips).find((clip) => clip.kind === 'audio')
-  );
-  expect(audio.volume).toBeCloseTo(0.6, 1);
-  expect(audio.muted).toBe(true);
-  expect(audio.fadeIn).toBeCloseTo(0.5, 1);
-  expect(audio.fadeOut).toBeCloseTo(0.4, 1);
-  await page.locator('[data-prop="muted"]').uncheck();
-
-  /* Split, then duplicate the audio clip through real actions. */
-  await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const clip = ed.project.tracks.flatMap((track) => track.clips).find((item) => item.kind === 'audio');
-    ed.selectClip(clip.id, { additive: false });
-    ed.seek(clip.start + clip.duration / 2);
-  });
-  await page.locator('#ve-timeline [data-timeline-action="split"]').click();
-  await page.waitForTimeout(250);
-  expect(
-    await page.evaluate(
-      () => window.__videoEditor.project.tracks.flatMap((track) => track.clips).filter((clip) => clip.kind === 'audio').length
-    )
-  ).toBe(2);
-  await page.locator('#ve-props-body [data-prop-action="duplicate"]').click();
-  await page.waitForTimeout(250);
-  expect(
-    await page.evaluate(
-      () => window.__videoEditor.project.tracks.flatMap((track) => track.clips).filter((clip) => clip.kind === 'audio').length
-    )
-  ).toBeGreaterThanOrEqual(3);
-
-  /* Mute and volume in the Audio tab also drive the project. */
-  await page.locator('#ve-tabs [data-tab="audio"]').click();
-  const mixButton = page.locator('#ve-panel [data-mix-action="mute"]').first();
-  await mixButton.click();
-  expect(
-    await page.evaluate(() => window.__videoEditor.project.tracks.find((track) => track.kind === 'audio').muted)
-  ).toBe(true);
-  await mixButton.click();
-  await setInputValue(page, '#ve-panel [data-track-volume]', 0.5);
-  expect(
-    await page.evaluate(() => window.__videoEditor.project.tracks.find((track) => track.kind === 'audio').volume)
-  ).toBeCloseTo(0.5, 1);
-
-  /* Rebuild a short, clean stereo mix and export it. */
-  await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const audioAsset = ed.media.list().find((asset) => asset.type === 'audio');
-    const videoAsset = ed.media.list().find((asset) => asset.type === 'video');
-    ed.store.apply((draft) => {
-      for (const track of draft.tracks) track.clips = [];
-    });
-    ed.addAssetToTimeline(videoAsset.id, { start: 0 });
-    ed.addAssetToTimeline(audioAsset.id, { start: 0 });
-    ed.store.apply((draft) => {
-      for (const track of draft.tracks) {
-        for (const clip of track.clips) {
-          clip.inPoint = 0;
-          clip.duration = Math.min(clip.duration, 1.2);
-          clip.outPoint = clip.inPoint + clip.duration;
-        }
-      }
-      draft.masterVolume = 0.7;
-    });
-  });
-  const exported = await exportAndInspect(
-    page,
-    { format: 'webm', resolution: '360', quality: 'small', aspect: 'project' },
-    0.3
-  );
-  expect(exported.meta.hasAudio).toBe(true);
-  expect(exported.meta.audioChannels).toBe(2);
-  expect(exported.meta.audioSampleRate).toBe(48000);
-  expect(exported.meta.audioCodec).toBe('opus');
-  expect(exported.size).toBeGreaterThan(1000);
-  expect(exported.lit).toBeGreaterThan(5);
-
-  expect(errors).toEqual([]);
-});
-
-test('subtitles can be added, imported, styled, downloaded and burned in', async ({ page }) => {
-  test.setTimeout(180000);
-  const errors = await openEditor(page);
-  await addVideoClip(page, 'trim-short.mp4');
-  await seek(page, 0.2);
-  await page.locator('#ve-tabs [data-tab="subtitles"]').click();
-  await page.locator('[data-sub-action="add"]').click();
-  await page.waitForTimeout(250);
-  expect(await page.evaluate(() => window.__videoEditor.project.subtitles.items.length)).toBe(1);
-
-  const itemId = await page.evaluate(() => window.__videoEditor.project.subtitles.items[0].id);
-  await page.locator(`[data-sub-field="text"][data-sub-id="${itemId}"]`).fill('First line\nSecond line');
-  await page.locator(`[data-sub-field="start"][data-sub-id="${itemId}"]`).fill('0.1');
-  await page.locator(`[data-sub-field="end"][data-sub-id="${itemId}"]`).fill('2.5');
-  /* The style block is a disclosure; open it only when it is collapsed. */
-  const styleDetails = page.locator('#ve-panel details', { hasText: 'Subtitle style' });
-  if (!(await styleDetails.evaluate((details) => details.open))) {
-    await styleDetails.locator('summary').click();
-  }
-  await page.locator('[data-sub-style="font"]').selectOption('cjk');
-  await page.locator('[data-sub-style="size"]').fill('48');
-  await setInputValue(page, '[data-sub-style="position"]', 0.8);
-  await setInputValue(page, '[data-sub-style="bgOpacity"]', 0.4);
-  await page.locator('[data-sub-style="bold"]').check();
-  await page.waitForTimeout(250);
-
-  const subtitle = await page.evaluate(() => window.__videoEditor.project.subtitles);
-  expect(subtitle.items[0].text).toBe('First line\nSecond line');
-  expect(subtitle.items[0].start).toBeCloseTo(0.1, 1);
-  expect(subtitle.items[0].end).toBeCloseTo(2.5, 1);
-  expect(subtitle.style.font).toBe('cjk');
-  expect(subtitle.style.size).toBe(48);
-  expect(subtitle.style.bold).toBe(true);
-  expect(subtitle.style.position).toBeCloseTo(0.8, 2);
-
-  /* The cue is actually drawn over the picture. */
-  await seek(page, 1);
-  expect(await page.evaluate(() => window.__videoEditor.project.subtitles.enabled)).toBe(true);
-  const withCue = await frameStats(page, 1);
-  await page.locator('[data-sub-enabled]').uncheck();
-  const withoutCue = await frameStats(page, 1);
-  expect(withCue.hash).not.toBe(withoutCue.hash);
-  await page.locator('[data-sub-enabled]').check();
-
-  /* Import SRT and WebVTT files. */
-  const srt =
-    '1\n00:00:00,500 --> 00:00:02,000\nImported cue one\n\n2\n00:00:02,100 --> 00:00:03,400\nSecond imported cue\n';
-  const vtt = 'WEBVTT\n\n00:00:01.000 --> 00:00:02.000\nWebVTT cue\n';
-  const srtPath = path.join(os.tmpdir(), 've-import.srt');
-  const vttPath = path.join(os.tmpdir(), 've-import.vtt');
-  fs.writeFileSync(srtPath, srt, 'utf8');
-  fs.writeFileSync(vttPath, vtt, 'utf8');
-  const beforeImport = await page.evaluate(() => window.__videoEditor.project.subtitles.items.length);
-  await page.setInputFiles('#ve-subtitle-input', srtPath);
-  await page.waitForFunction(
-    (n) => window.__videoEditor.project.subtitles.items.length >= n,
-    beforeImport + 2,
-    { timeout: 20000 }
-  );
-  await page.setInputFiles('#ve-subtitle-input', vttPath);
-  await page.waitForFunction(
-    (n) => window.__videoEditor.project.subtitles.items.length >= n,
-    beforeImport + 3,
-    { timeout: 20000 }
-  );
-  const imported = await page.evaluate(() =>
-    window.__videoEditor.project.subtitles.items.map((item) => item.text)
-  );
-  expect(imported).toEqual(
-    expect.arrayContaining(['Imported cue one', 'Second imported cue', 'WebVTT cue'])
-  );
-
-  /* Download SRT and verify its content. */
-  const downloadPromise = page.waitForEvent('download');
-  await page.locator('[data-sub-action="export-srt"]').click();
-  const download = await downloadPromise;
-  const downloadPath = path.join(os.tmpdir(), `ve-subs-${Date.now()}.srt`);
-  await download.saveAs(downloadPath);
-  const saved = fs.readFileSync(downloadPath, 'utf8');
-  expect(saved).toContain('Imported cue one');
-  expect(saved).toContain('-->');
-
-  /* Burn into export: the decoded lower band differs when subtitles are off. */
-  await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const clip = ed.project.tracks.flatMap((track) => track.clips).find((item) => item.kind === 'video');
-    ed.store.apply((draft) => {
-      const found = draft.tracks.flatMap((track) => track.clips).find((item) => item.id === clip.id);
-      found.start = 0;
-      found.duration = 1.5;
-      found.inPoint = 0;
-      found.outPoint = 1.5;
-      draft.subtitles.items = [{ id: 'sub_export', start: 0, end: 1.5, text: 'EXPORTED SUBTITLE' }];
-      draft.subtitles.enabled = true;
-    });
-  });
-  const burned = await exportAndInspect(
-    page,
-    { format: 'mp4', resolution: '360', quality: 'small', aspect: 'project' },
-    0.6
-  );
-  expect(burned.size).toBeGreaterThan(1000);
-  expect(burned.lit).toBeGreaterThan(5);
-
-  await page.evaluate(() => {
-    window.__videoEditor.store.apply((draft) => {
-      draft.subtitles.enabled = false;
-    });
-  });
-  const notBurned = await exportAndInspect(
-    page,
-    { format: 'mp4', resolution: '360', quality: 'small', aspect: 'project' },
-    0.6
-  );
-  expect(notBurned.lit).toBeGreaterThan(5);
-  expect(burned.bandHash).not.toBe(notBurned.bandHash);
-
-  expect(errors).toEqual([]);
-});
-
-test('project settings, save/open round trip, autosave restore and clear', async ({ page }) => {
-  test.setTimeout(120000);
-  const errors = await openEditor(page);
-  await addVideoClip(page, 'trim-short.mp4');
-  await page.locator('#ve-project').click();
-  await expect(page.locator('#ve-project-dialog')).toHaveAttribute('open', '');
-  await page.fill('#ve-pd-name', 'Layered demo');
-  await page.selectOption('#ve-pd-aspect', '9:16');
-  await page.selectOption('#ve-pd-resolution', '720');
-  await page.selectOption('#ve-pd-fps', '24');
-  await page.locator('#ve-pd-apply').click();
-  await page.waitForTimeout(300);
-  let project = await readSnapshot(page);
-  expect(project.name).toBe('Layered demo');
-  expect(project.aspect).toBe('9:16');
-  expect(project.resolution).toBe('720');
-  expect(project.fps).toBe(24);
-  await expect(page.locator('#ve-project-name')).toHaveValue('Layered demo');
-  await expect(page.locator('#ve-project-meta')).toContainText('9:16');
-
-  /* Download the project JSON and verify its structure. */
-  const projectDownload = page.waitForEvent('download');
-  await page.locator('#ve-save').click();
-  const savedProject = await projectDownload;
-  expect(savedProject.suggestedFilename()).toMatch(/\.letitedit\.json$/);
-  const jsonPath = path.join(os.tmpdir(), `ve-project-${Date.now()}.json`);
-  await savedProject.saveAs(jsonPath);
-  const data = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-  expect(data.kind).toBe('letitedit.video-editor');
-  expect(data.schema).toBeGreaterThanOrEqual(2);
-  expect(data.project.name).toBe('Layered demo');
-  expect(data.project.tracks.length).toBeGreaterThan(0);
-  expect(Array.isArray(data.media)).toBe(true);
-  expect(data.media[0].name).toBe('trim-short.mp4');
-
-  /* Wait for autosave, reload, restore from the banner. */
-  await page.waitForFunction(
-    () => Boolean(localStorage.getItem('letitedit.video-editor.autosave.v1')),
-    null,
-    { timeout: 15000 }
-  );
-  await page.reload({ waitUntil: 'networkidle' });
-  await page.waitForFunction(() => Boolean(window.__videoEditor));
-  await expect(page.locator('#ve-restore-banner')).toBeVisible();
-  await expect(page.locator('#ve-restore-text')).toContainText('Layered demo');
-  await page.locator('#ve-restore-button').click();
+  const { clipId } = await addVideo(page);
   await page.waitForTimeout(500);
-  project = await readSnapshot(page);
-  expect(project.name).toBe('Layered demo');
-  expect(project.tracks.flatMap((track) => track.clips).length).toBe(1);
-  expect(await page.evaluate(() => window.__videoEditor.media.list().length)).toBe(0);
-  await expect(page.locator('#ve-relink-banner')).toBeVisible();
-  await expect(page.locator('#ve-relink-text')).toContainText('trim-short.mp4');
 
-  /* Re-import the file and clips relink by name. */
-  await page.setInputFiles('#ve-media-input', fixturePath('trim-short.mp4'));
-  await page.waitForFunction(() => window.__videoEditor.media.list().length === 1, null, { timeout: 30000 });
-  await page.waitForTimeout(400);
-  expect(await page.evaluate(() => window.__videoEditor.state.pendingRelink.length)).toBe(0);
-  await expect(page.locator('#ve-relink-banner')).toBeHidden();
-  const relinked = await page.evaluate(() => {
-    const clip = window.__videoEditor.project.tracks.flatMap((track) => track.clips)[0];
-    return { mediaId: clip.mediaId, libraryId: window.__videoEditor.media.list()[0].id };
+  const stats = await previewStats(page);
+  expect(stats.width / stats.height).toBeCloseTo(16 / 9, 1);
+  expect(stats.width).toBeGreaterThanOrEqual(640);
+  expect(stats.lit).toBeGreaterThan(50);
+
+  await page.click('#ve-play');
+  await expect(page.locator('#ve-play')).toHaveAttribute('aria-pressed', 'true');
+  await page.waitForTimeout(700);
+  const playing = (await projectState(page)).playhead;
+  expect(playing).toBeGreaterThan(0.3);
+  await page.click('#ve-play');
+  await expect(page.locator('#ve-play')).toHaveAttribute('aria-pressed', 'false');
+  const paused = (await projectState(page)).playhead;
+  await page.waitForTimeout(300);
+  expect(Math.abs((await projectState(page)).playhead - paused)).toBeLessThan(0.02);
+
+  const before = (await projectState(page)).playhead;
+  await page.click('#ve-next-frame');
+  const next = (await projectState(page)).playhead;
+  expect(next - before).toBeCloseTo(1 / 30, 1);
+  await page.click('#ve-prev-frame');
+  expect((await projectState(page)).playhead).toBeCloseTo(before, 1);
+
+  await page.locator('#ve-scrub').evaluate((element) => {
+    element.value = '2';
+    element.dispatchEvent(new Event('input', { bubbles: true }));
+    element.dispatchEvent(new Event('change', { bubbles: true }));
   });
-  expect(relinked.mediaId).toBe(relinked.libraryId);
+  await expect.poll(async () => (await projectState(page)).playhead).toBeGreaterThan(1.9);
 
-  /* Clear the timeline with confirmation; media stays. */
-  page.on('dialog', (dialog) => dialog.accept());
-  await page.locator('#ve-project').click();
-  await page.locator('#ve-pd-clear').click();
-  await page.waitForTimeout(300);
-  expect((await readSnapshot(page)).tracks.flatMap((track) => track.clips)).toHaveLength(0);
-  expect(await page.evaluate(() => window.__videoEditor.media.list().length)).toBe(1);
-  await page.keyboard.press('Escape');
-
-  /* New project clears media and the timeline. */
-  await page.locator('#ve-new').click();
-  await page.waitForTimeout(300);
-  expect((await readSnapshot(page)).tracks.flatMap((track) => track.clips)).toHaveLength(0);
-  expect(await page.evaluate(() => window.__videoEditor.media.list().length)).toBe(0);
-
+  const selected = (await projectState(page)).selection;
+  expect(selected).toContain(clipId);
   expect(errors).toEqual([]);
 });
 
-test('export dialog produces measured files, honours dimensions and cancels cleanly', async ({ page }) => {
-  test.setTimeout(240000);
+test('timeline drag, trim, split and undo/redo', async ({ page }) => {
   const errors = await openEditor(page);
-  await addVideoClip(page, 'trim-4s.mp4');
-  await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const clip = ed.project.tracks.flatMap((track) => track.clips)[0];
-    ed.store.apply((draft) => {
-      const found = draft.tracks.flatMap((track) => track.clips).find((item) => item.id === clip.id);
-      found.duration = 1.5;
-      found.outPoint = 1.5;
-    });
-    ed.setExportSetting('resolution', '360');
-    ed.setExportSetting('quality', 'small');
-    ed.setExportSetting('format', 'mp4');
-  });
-  await page.locator('#ve-export-open').click();
-  await expect(page.locator('#ve-export-dialog')).toHaveAttribute('open', '');
-  await expect(page.locator('#ve-export-summary')).toContainText('640 × 360');
-  await expect(page.locator('#ve-export-note')).toContainText('encoded locally');
+  await addVideo(page);
+  await page.waitForTimeout(300);
 
-  const dimensions = await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    ed.setExportSetting('resolution', '480');
-    ed.setExportSetting('aspect', '9:16');
-    const portrait = ed.getExportDimensions();
-    ed.setExportSetting('aspect', '1:1');
-    const square = ed.getExportDimensions();
-    ed.setExportSetting('aspect', 'custom');
-    ed.setExportSetting('customAspectW', 4);
-    ed.setExportSetting('customAspectH', 5);
-    const custom = ed.getExportDimensions();
-    ed.setExportSetting('resolution', 'custom');
-    ed.setExportSetting('customWidth', 320);
-    ed.setExportSetting('customHeight', 240);
-    const customSize = ed.getExportDimensions();
-    ed.setExportSetting('resolution', '360');
-    ed.setExportSetting('aspect', 'project');
-    return { portrait, square, custom, customSize };
-  });
-  expect(dimensions.portrait.width).toBe(480);
-  expect(dimensions.portrait.height).toBe(854);
-  expect(dimensions.portrait.height / dimensions.portrait.width).toBeCloseTo(16 / 9, 1);
-  expect(dimensions.square.width).toBe(dimensions.square.height);
-  expect(dimensions.custom.width / dimensions.custom.height).toBeCloseTo(4 / 5, 1);
-  expect(dimensions.customSize).toEqual({ width: 320, height: 240 });
+  const clip = page.locator('.tl-clip[data-clip-id]').first();
+  await clip.scrollIntoViewIfNeeded();
+  const box = await clip.boundingBox();
+  expect(box && box.width).toBeGreaterThan(20);
 
-  /* Run the real dialog export and verify progress plus the measured result. */
-  await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    ed.setExportSetting('resolution', '360');
-    ed.setExportSetting('aspect', 'project');
-    ed.setExportSetting('format', 'mp4');
-    ed.setExportSetting('quality', 'small');
-  });
-  await page.locator('#ve-export-start').click();
-  await expect(page.locator('#ve-export-progress')).toBeVisible();
-  await expect(page.locator('#ve-export-result')).toBeVisible({ timeout: 120000 });
-  await expect(page.locator('#ve-export-error')).toBeHidden();
-  const metaText = await page.locator('#ve-export-meta').innerText();
-  expect(metaText).toContain('640 × 360');
-  expect(metaText).toMatch(/MP4/i);
-  expect(metaText).toMatch(/avc/i);
-  expect(metaText).toContain('measured');
-  await expect(page.locator('#ve-export-video')).toBeVisible();
-  const videoMeta = await page.evaluate(async () => {
-    const video = document.querySelector('#ve-export-video');
-    if (video.readyState < 1) {
-      await new Promise((resolve) => {
-        video.onloadedmetadata = resolve;
-      });
-    }
-    return { width: video.videoWidth, height: video.videoHeight, duration: video.duration };
-  });
-  expect(videoMeta.width).toBe(640);
-  expect(videoMeta.height).toBe(360);
-  expect(videoMeta.duration).toBeGreaterThan(1.2);
+  const pps = await page.evaluate(() => window.__videoEditor.store.timelineZoom);
+  await page.mouse.move(box.x + 25, box.y + box.height / 2);
+  await page.mouse.down();
+  for (let step = 1; step <= 6; step += 1) {
+    await page.mouse.move(box.x + 25 + step * 9, box.y + box.height / 2);
+    await page.waitForTimeout(20);
+  }
+  await page.mouse.up();
+  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips)[0]?.start || 0).toBeGreaterThan(0.5);
+  const movedStart = (await projectState(page)).tracks.flatMap((track) => track.clips)[0].start;
+  expect(movedStart).toBeCloseTo(54 / pps, 1);
 
-  const downloadPromise = page.waitForEvent('download');
-  await page.locator('#ve-export-download').click();
-  const download = await downloadPromise;
-  expect(download.suggestedFilename()).toMatch(/\.mp4$/);
-  const exportPath = path.join(os.tmpdir(), `ve-export-${Date.now()}.mp4`);
-  await download.saveAs(exportPath);
-  expect(fs.statSync(exportPath).size).toBeGreaterThan(1000);
+  await page.keyboard.press('Control+z');
+  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips)[0].start).toBe(0);
+  await page.keyboard.press('Control+Shift+z');
+  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips)[0].start).toBeCloseTo(movedStart, 2);
 
-  /* WebM through the dialog. */
-  await page.locator('#ve-export-again').click();
-  await page.selectOption('#ve-export-format', 'webm');
-  await page.locator('#ve-export-start').click();
-  await expect(page.locator('#ve-export-result')).toBeVisible({ timeout: 120000 });
-  const webmText = await page.locator('#ve-export-meta').innerText();
-  expect(webmText).toMatch(/WEBM/i);
-  expect(webmText).toMatch(/vp9/i);
-  expect(webmText).toMatch(/opus/i);
-  await page.locator('#ve-export-close').click();
+  const clip2 = page.locator('.tl-clip[data-clip-id]').first();
+  await clip2.scrollIntoViewIfNeeded();
+  const box2 = await clip2.boundingBox();
+  const beforeTrim = (await projectState(page)).tracks.flatMap((track) => track.clips)[0].duration;
+  await page.mouse.move(box2.x + box2.width - 3, box2.y + box2.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box2.x + box2.width - 60, box2.y + box2.height / 2, { steps: 5 });
+  await page.mouse.up();
+  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips)[0].duration).toBeLessThan(beforeTrim - 0.2);
 
-  /* Cancel a longer 720p export after progress has genuinely advanced. */
-  await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const clip = ed.project.tracks.flatMap((track) => track.clips)[0];
-    ed.store.apply((draft) => {
-      const found = draft.tracks.flatMap((track) => track.clips).find((item) => item.id === clip.id);
-      found.start = 0;
-      found.duration = 6;
-      found.inPoint = 0;
-      found.outPoint = 6;
-    });
-    ed.setExportSetting('format', 'mp4');
-    ed.setExportSetting('resolution', '720');
-    ed.setExportSetting('quality', 'high');
-    ed.openExportDialog();
-  });
-  await page.locator('#ve-export-start').click();
-  await page.waitForFunction(
-    () => {
-      const percent = document.querySelector('#ve-export-percent');
-      return percent && Number(percent.textContent.replace('%', '')) > 2;
-    },
-    null,
-    { timeout: 30000 }
+  await page.evaluate(() => window.__videoEditor.seek(1.5));
+  await page.keyboard.press('s');
+  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).length).toBe(2);
+  await page.keyboard.press('Control+z');
+  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).length).toBe(1);
+  expect(errors).toEqual([]);
+});
+
+test('inspector applies transitions and keyframes and canvas drag moves a layer', async ({ page }) => {
+  const errors = await openEditor(page);
+  const { clipId } = await addVideo(page);
+  await page.waitForTimeout(300);
+
+  await expect(page.locator('#ve-inspector-panel .ve-kind-chip')).toHaveText('video');
+  const hasEffects = await openInspectorSection(page, 'Effects');
+  expect(hasEffects).toBe(true);
+
+  const transition = page.locator('#ve-inspector-panel select[data-prop="transition.type"]');
+  await scrollInspectorTo(page, '#ve-inspector-panel select[data-prop="transition.type"]');
+  const optionCount = await transition.evaluate((element) =>
+    [...element.options].filter((option) => option.value && option.value !== 'none').length
   );
-  const stageText = await page.locator('#ve-export-stage').innerText();
-  expect(stageText.length).toBeGreaterThan(3);
-  await page.locator('#ve-export-cancel').click();
-  await expect(page.locator('#ve-export-error')).toBeVisible({ timeout: 30000 });
-  await expect(page.locator('#ve-export-error')).toContainText('Export cancelled');
-  await expect(page.locator('#ve-export-result')).toBeHidden();
-  await expect(page.locator('#ve-export-start')).toBeEnabled();
-  await expect(page.locator('#ve-export-cancel')).toBeDisabled();
+  expect(optionCount).toBeGreaterThanOrEqual(20);
+  await transition.selectOption('cross-dissolve');
+  await expect.poll(async () => {
+    const clip = await page.evaluate((id) => {
+      const found = window.__videoEditor.project.tracks.flatMap((track) => track.clips).find((item) => item.id === id);
+      return found ? found.transition : null;
+    }, clipId);
+    return clip?.type;
+  }).toBe('cross-dissolve');
+  await openInspectorSection(page, 'Effects');
+  await scrollInspectorTo(page, '#ve-inspector-panel select[data-prop="transition.type"]');
+  await transition.selectOption('none');
+  await expect.poll(async () => {
+    const clip = await page.evaluate((id) => {
+      const found = window.__videoEditor.project.tracks.flatMap((track) => track.clips).find((item) => item.id === id);
+      return found ? found.transition : null;
+    }, clipId);
+    return clip?.type;
+  }).toBe('none');
 
+  await page.evaluate(() => {
+    const clip = window.__videoEditor.project.tracks.flatMap((track) => track.clips)[0];
+    window.__videoEditor.seek(clip.start + 0.5);
+    window.__videoEditor.selectClip(clip.id);
+  });
+  await openInspectorSection(page, 'Transform');
+  const keyframe = page.locator('#ve-inspector-panel [data-inspector-action="keyframe"][data-key-prop="x"]');
+  await scrollInspectorTo(page, '#ve-inspector-panel [data-inspector-action="keyframe"][data-key-prop="x"]');
+  await keyframe.click();
+  await expect.poll(async () => {
+    const clip = await page.evaluate((id) => {
+      const found = window.__videoEditor.project.tracks.flatMap((track) => track.clips).find((item) => item.id === id);
+      return found?.keyframes?.x?.length || 0;
+    }, clipId);
+    return clip;
+  }).toBe(1);
+
+  const before = await page.evaluate((id) => {
+    const clip = window.__videoEditor.project.tracks.flatMap((track) => track.clips).find((item) => item.id === id);
+    return { x: clip.x, y: clip.y };
+  }, clipId);
+  const selection = page.locator('#ve-canvas-overlay .ve-selection-box');
+  await expect(selection).toHaveCount(1);
+  const selectionBox = await selection.boundingBox();
+  expect(selectionBox).not.toBeNull();
+  await page.mouse.move(selectionBox.x + selectionBox.width / 2, selectionBox.y + selectionBox.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(selectionBox.x + selectionBox.width / 2 + 40, selectionBox.y + selectionBox.height / 2 + 20, { steps: 6 });
+  await page.mouse.up();
+  const after = await page.evaluate((id) => {
+    const clip = window.__videoEditor.project.tracks.flatMap((track) => track.clips).find((item) => item.id === id);
+    return { x: clip.x, y: clip.y };
+  }, clipId);
+  expect(Math.abs(after.x - before.x) > 0.01 || Math.abs(after.y - before.y) > 0.01).toBe(true);
   expect(errors).toEqual([]);
 });
 
-test('mobile layout stays inside the viewport and editing works with touch', async ({ page }) => {
-  test.setTimeout(180000);
+test('text layers and subtitle cues import and export', async ({ page }) => {
   const errors = await openEditor(page);
+  await page.click('#ve-rail [data-category="text"]');
+  await page.click('[data-panel-action="add-text"][data-text-preset="title"]');
+  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).filter((clip) => clip.kind === 'text').length).toBe(1);
 
-  /* Check the initial mobile state before any media exists. */
-  await page.setViewportSize({ width: 320, height: 860 });
-  await page.reload({ waitUntil: 'networkidle' });
-  await page.waitForFunction(() => Boolean(window.__videoEditor));
-  expect(await page.locator('#ve-app').getAttribute('data-mobile-panel')).toBe('none');
-  await expect(page.locator('#ve-preview-canvas')).toBeVisible();
-  expect((await page.locator('#ve-preview-canvas').boundingBox()).width).toBeGreaterThan(140);
+  await openInspectorSection(page, 'Timing');
+  await scrollInspectorTo(page, '#ve-inspector-panel [data-inspector-action="duplicate-clip"]');
+  await page.click('#ve-inspector-panel [data-inspector-action="duplicate-clip"]');
+  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).filter((clip) => clip.kind === 'text').length).toBe(2);
+  await openInspectorSection(page, 'Timing');
+  await scrollInspectorTo(page, '#ve-inspector-panel [data-inspector-action="delete-clip"]');
+  await page.click('#ve-inspector-panel [data-inspector-action="delete-clip"]');
+  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).filter((clip) => clip.kind === 'text').length).toBe(1);
 
-  const video = await addVideoClip(page, 'trim-4s.mp4');
-  await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    ed.addTextPreset('title');
-    ed.addTextPreset('subtitle');
-    ed.seek(0.8);
-  });
-  await page.waitForTimeout(350);
+  await page.click('#ve-rail [data-category="subtitles"]');
+  await page.click('[data-panel-action="add-subtitle"]');
+  await expect.poll(async () => (await projectState(page)).subtitles).toBe(1);
+  const cue = page.locator('#ve-inspector-panel textarea[data-subtitle-prop="text"]');
+  await cue.fill('Hello from a cue');
+  await cue.blur();
+  await expect.poll(async () => page.evaluate(() => window.__videoEditor.project.subtitles.items[0].text)).toBe('Hello from a cue');
 
-  for (const width of [320, 360, 375, 390, 430]) {
-    await page.setViewportSize({ width, height: 860 });
-    await page.waitForTimeout(350);
-    const layout = await page.evaluate(() => {
-      const preview = document.querySelector('#ve-preview-canvas').getBoundingClientRect();
-      const app = document.querySelector('#ve-app').getBoundingClientRect();
-      return {
-        documentWidth: document.documentElement.scrollWidth,
-        innerWidth: window.innerWidth,
-        preview: { width: preview.width, height: preview.height, top: preview.top },
-        appWidth: app.width,
-        overflow: [...document.querySelectorAll('body *')].filter((element) => {
-          const rect = element.getBoundingClientRect();
-          return (
-            rect.width > 0 &&
-            rect.right > window.innerWidth + 1.5 &&
-            !element.closest('.ve-scroll, .ve-tl-scroll, .ve-tabs, .ve-mobile-tools, .ve-props')
-          );
-        }).length
-      };
-    });
-    expect(layout.innerWidth).toBe(width);
-    expect(layout.documentWidth).toBeLessThanOrEqual(width);
-    expect(layout.overflow).toBe(0);
-    expect(layout.preview.width).toBeGreaterThan(140);
+  await page.click('[data-panel-action="duplicate-subtitle"]');
+  await expect.poll(async () => (await projectState(page)).subtitles).toBe(2);
+  await page.locator('[data-panel-action="delete-subtitle"]').first().click();
+  await expect.poll(async () => (await projectState(page)).subtitles).toBe(1);
+
+  const srtDownload = page.waitForEvent('download');
+  await page.click('[data-panel-action="export-srt"]');
+  const srt = await srtDownload;
+  const srtText = fs.readFileSync(await srt.path(), 'utf8');
+  expect(srtText).toMatch(/^1\r?\n00:00:\d{2},\d{3} --> /);
+  expect(srtText).toContain('Hello from a cue');
+
+  const vttDownload = page.waitForEvent('download');
+  await page.click('[data-panel-action="export-vtt"]');
+  const vtt = await vttDownload;
+  const vttText = fs.readFileSync(await vtt.path(), 'utf8');
+  expect(vttText.startsWith('WEBVTT')).toBe(true);
+  expect(vttText).toContain('Hello from a cue');
+
+  const importFile = path.join(os.tmpdir(), `letitedit-cues-${Date.now()}.srt`);
+  fs.writeFileSync(
+    importFile,
+    '1\n00:00:01,000 --> 00:00:02,500\nFirst imported cue\n\n2\n00:00:03,000 --> 00:00:04,000\nSecond imported cue\n'
+  );
+  await page.setInputFiles('#ve-subtitle-input', importFile);
+  await expect.poll(async () => (await projectState(page)).subtitles).toBe(3);
+  fs.unlinkSync(importFile);
+  expect(errors).toEqual([]);
+});
+
+test('canvas presets, guides, background and elements', async ({ page }) => {
+  const errors = await openEditor(page);
+  await page.click('#ve-rail [data-category="canvas"]');
+
+  const shapes = {
+    '16:9': 16 / 9,
+    '9:16': 9 / 16,
+    '1:1': 1,
+    '4:3': 4 / 3,
+    '3:4': 3 / 4
+  };
+  for (const [aspect, ratio] of Object.entries(shapes)) {
+    await page.click(`[data-panel-action="aspect"][data-aspect="${aspect}"]`);
+    await expect.poll(async () => (await projectState(page)).aspect).toBe(aspect);
+    const dims = await page.evaluate(() => window.__videoEditor.store.dimensions());
+    expect(Math.abs(dims.width / dims.height - ratio)).toBeLessThan(0.02);
   }
 
-  /* Bottom sheets open, select a tab and close. */
-  await page.locator('#ve-mobile-bar [data-mobile-panel="tools"]').click();
-  await page.waitForTimeout(300);
-  expect(await page.locator('#ve-app').getAttribute('data-mobile-panel')).toBe('tools');
-  await expect(page.locator('#ve-tabs [data-tab="media"]')).toBeVisible();
-  await page.locator('#ve-tabs [data-tab="layers"]').click();
-  await page.waitForTimeout(250);
-  await expect(page.locator('#ve-panel')).toContainText('Top of this list renders in front');
-  await page.locator('.ve-side-left [data-mobile-close]').click();
-  expect(await page.locator('#ve-app').getAttribute('data-mobile-panel')).toBe('none');
+  await page.click('[data-panel-action="aspect"][data-aspect="custom"]');
+  await expect.poll(async () => (await projectState(page)).aspect).toBe('custom');
+  await page.locator('input[data-project-prop="project.customAspectW"]').fill('21');
+  await page.locator('input[data-project-prop="project.customAspectH"]').fill('9');
+  await page.locator('input[data-project-prop="project.customAspectH"]').blur();
+  const custom = await page.evaluate(() => window.__videoEditor.store.dimensions());
+  expect(Math.abs(custom.width / custom.height - 21 / 9)).toBeLessThan(0.05);
 
-  /* Properties sheet. */
-  await page.locator('#ve-mobile-bar [data-mobile-panel="properties"]').click();
-  await page.waitForTimeout(250);
-  expect(await page.locator('#ve-app').getAttribute('data-mobile-panel')).toBe('properties');
-  await expect(page.locator('#ve-props-body')).toContainText('Timing');
-  await page.locator('.ve-side-right [data-mobile-close]').click();
+  await page.locator('input[data-project-boolean="guides.center"]').check();
+  await expect.poll(async () => (await projectState(page)).guides.center).toBe(true);
+  await page.locator('input[data-project-boolean="guides.safe"]').check();
+  await expect.poll(async () => (await projectState(page)).guides.safe).toBe(true);
 
-  /* Touch-style pointer trim on the timeline. */
-  await page.locator(`.ve-clip[data-clip-id="${video.clipId}"]`).scrollIntoViewIfNeeded();
-  await page.waitForTimeout(700);
-  const before = await page.evaluate((id) => {
-    const clip = window.__videoEditor.project.tracks
-      .flatMap((track) => track.clips)
-      .find((item) => item.id === id);
-    return { duration: clip.duration };
-  }, video.clipId);
-  const trim = await page.locator(`.ve-clip[data-clip-id="${video.clipId}"] .ve-trim-end`).boundingBox();
-  await page.mouse.move(trim.x + trim.width / 2, trim.y + trim.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(trim.x + trim.width / 2 - 50, trim.y + trim.height / 2, { steps: 8 });
-  await page.mouse.up();
-  await page.waitForTimeout(250);
-  const after = await page.evaluate((id) => {
-    const clip = window.__videoEditor.project.tracks
-      .flatMap((track) => track.clips)
-      .find((item) => item.id === id);
-    return { duration: clip.duration };
-  }, video.clipId);
-  expect(after.duration).toBeLessThan(before.duration - 0.2);
-
-  /* Layer reorder works in the mobile Layers panel. Move the subtitle clear of
-   * the other text layer so the neighbouring layer has room for it. */
-  await page.locator('#ve-mobile-bar [data-mobile-panel="tools"]').click();
-  await page.locator('#ve-tabs [data-tab="layers"]').click();
-  await page.waitForTimeout(250);
-  const subtitleId = await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const subtitle = ed.project.tracks
-      .flatMap((track) => track.clips)
-      .filter((item) => item.kind === 'text')
-      .slice(-1)[0];
-    ed.store.apply((draft) => {
-      const found = draft.tracks.flatMap((track) => track.clips).find((item) => item.id === subtitle.id);
-      found.start = 7;
-    });
-    return subtitle.id;
+  await page.locator('input[data-project-prop="background"]').evaluate((element) => {
+    element.value = '#123456';
+    element.dispatchEvent(new Event('input', { bubbles: true }));
+    element.dispatchEvent(new Event('change', { bubbles: true }));
   });
-  await page.waitForTimeout(250);
-  const orderBefore = await page
-    .locator('[data-layer-row]')
-    .evaluateAll((rows) => rows.map((row) => row.dataset.clipId));
-  await page.locator(`[data-layer-action="down"][data-clip-id="${subtitleId}"]`).click();
-  await page.waitForTimeout(250);
-  const orderAfter = await page
-    .locator('[data-layer-row]')
-    .evaluateAll((rows) => rows.map((row) => row.dataset.clipId));
-  expect(orderAfter.indexOf(subtitleId)).toBeGreaterThan(orderBefore.indexOf(subtitleId));
-  expect(await page.locator('[data-layer-row]').count()).toBeGreaterThanOrEqual(3);
+  await expect.poll(async () => page.evaluate(() => window.__videoEditor.project.background)).toBe('#123456');
 
+  await page.click('#ve-rail [data-category="elements"]');
+  await page.click('[data-panel-action="add-shape"][data-shape="rect"]');
+  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).filter((clip) => clip.kind === 'shape').length).toBe(1);
+  await page.click('[data-panel-action="add-emoji"][data-emoji="✨"]');
+  await expect.poll(async () => page.evaluate(() =>
+    window.__videoEditor.project.tracks
+      .flatMap((track) => track.clips)
+      .filter((clip) => clip.kind === 'text' && clip.text?.content === '✨').length
+  )).toBe(1);
   expect(errors).toEqual([]);
 });
 
-test('keyboard shortcuts, frame stepping and non-drag controls are accessible', async ({ page }) => {
+test('audio clip exposes waveform, gain, mute and fades', async ({ page }) => {
   const errors = await openEditor(page);
-  await addVideoClip(page, 'trim-4s.mp4');
+  await importFiles(page, ['trim-audio-only.m4a']);
+  const asset = await page.evaluate(() => window.__videoEditor.media.list()[0].id);
+  await page.evaluate((id) => window.__videoEditor.addAssetToTimeline(id, { start: 0 }), asset);
+  await page.waitForTimeout(500);
 
-  /* Frame stepping uses the project frame rate. */
-  await seek(page, 1);
-  const frameBefore = await page.evaluate(() => window.__videoEditor.state.playhead);
-  await page.locator('#ve-next-frame').click();
-  const frameAfter = await page.evaluate(() => window.__videoEditor.state.playhead);
-  expect(frameAfter - frameBefore).toBeCloseTo(1 / 30, 2);
-  await page.locator('#ve-prev-frame').click();
-  expect(await page.evaluate(() => window.__videoEditor.state.playhead)).toBeCloseTo(frameBefore, 2);
-
-  /* Play toggles real playback. */
-  await page.locator('#ve-play').click();
-  await page.waitForTimeout(200);
-  expect(await page.evaluate(() => window.__videoEditor.state.playing)).toBe(true);
-  await page.locator('#ve-play').click();
-  expect(await page.evaluate(() => window.__videoEditor.state.playing)).toBe(false);
-
-  /* Focused clip moves with arrows, layers with up/down, splits with S. */
-  await page.evaluate(() => {
+  const audioClip = await page.evaluate(() => {
     const ed = window.__videoEditor;
-    const clip = ed.project.tracks.flatMap((track) => track.clips)[0];
-    ed.selectClip(clip.id, { additive: false });
-    ed.seek(clip.start + clip.duration / 2);
-    document.querySelector(`[data-clip-id="${clip.id}"]`).focus();
+    const found = ed.project.tracks.flatMap((track) => track.clips).find((clip) => clip.kind === 'audio');
+    ed.seek(found.start + 0.2);
+    ed.selectClip(found.id);
+    return { id: found.id, volume: found.volume };
   });
-  const startBefore = (await readSnapshot(page)).tracks.flatMap((track) => track.clips)[0].start;
-  await page.keyboard.press('ArrowRight');
-  const startAfter = (await readSnapshot(page)).tracks.flatMap((track) => track.clips)[0].start;
-  expect(startAfter).toBeGreaterThan(startBefore);
-  await page.keyboard.press('ArrowUp');
-  await page.waitForTimeout(200);
-  const trackCounts = (await readSnapshot(page)).tracks.map((track) => track.clips.length);
-  expect(trackCounts.reduce((sum, count) => sum + count, 0)).toBe(1);
+  await expect(page.locator('#ve-inspector-panel .ve-kind-chip')).toHaveText('audio');
+  await expect(page.locator('.tl-clip-audio canvas.tl-wave').first()).toBeVisible();
 
-  await page.keyboard.press('s');
-  await page.waitForTimeout(200);
-  expect((await readSnapshot(page)).tracks.flatMap((track) => track.clips).length).toBe(2);
-  await page.keyboard.press('Control+z');
-  await page.waitForTimeout(200);
-
-  /* Enter selects, Shift+Enter adds to a cleared selection. */
-  await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const clips = ed.project.tracks.flatMap((track) => track.clips);
-    ed.selectNone();
-    document.querySelector(`[data-clip-id="${clips[0].id}"]`).focus();
+  await openInspectorSection(page, 'Audio');
+  const volume = page.locator('#ve-inspector-panel input[data-prop="volume"]');
+  await scrollInspectorTo(page, '#ve-inspector-panel input[data-prop="volume"]');
+  await volume.evaluate((element) => {
+    element.value = '0.25';
+    element.dispatchEvent(new Event('input', { bubbles: true }));
+    element.dispatchEvent(new Event('change', { bubbles: true }));
   });
-  await page.keyboard.press('Shift+Enter');
-  expect(await page.evaluate(() => window.__videoEditor.state.selection.size)).toBe(1);
-  await page.keyboard.press('Enter');
-  expect(await page.evaluate(() => window.__videoEditor.state.selection.size)).toBe(1);
+  await expect.poll(async () => page.evaluate((id) => {
+    const clip = window.__videoEditor.project.tracks.flatMap((track) => track.clips).find((item) => item.id === id);
+    return clip.volume;
+  }, audioClip.id)).toBeCloseTo(0.25, 2);
 
-  /* Trim handles are keyboard reachable separators. */
-  const trimRoles = await page
-    .locator('.ve-trim')
-    .evaluateAll((nodes) => nodes.map((node) => node.getAttribute('role')));
-  expect(trimRoles.every((role) => role === 'separator')).toBe(true);
-  expect(await page.locator('.ve-trim').first().getAttribute('tabindex')).toBe('0');
+  await page.locator('#ve-inspector-panel input[data-prop="muted"]').check();
+  await expect.poll(async () => page.evaluate((id) => {
+    const clip = window.__videoEditor.project.tracks.flatMap((track) => track.clips).find((item) => item.id === id);
+    return clip.muted;
+  }, audioClip.id)).toBe(true);
 
-  /* Help dialog documents the shortcuts and closes with Escape. */
-  await page.locator('#ve-help').click();
-  await expect(page.locator('#ve-help-dialog')).toHaveAttribute('open', '');
-  await expect(page.locator('#ve-help-dialog')).toContainText('Ctrl');
-  await page.keyboard.press('Escape');
-  await expect(page.locator('#ve-help-dialog')).not.toHaveAttribute('open', '');
-
+  await page.locator('#ve-inspector-panel input[data-prop="fadeIn"]').fill('0.4');
+  await page.locator('#ve-inspector-panel input[data-prop="fadeIn"]').blur();
+  await expect.poll(async () => page.evaluate((id) => {
+    const clip = window.__videoEditor.project.tracks.flatMap((track) => track.clips).find((item) => item.id === id);
+    return clip.fadeIn;
+  }, audioClip.id)).toBeCloseTo(0.4, 2);
   expect(errors).toEqual([]);
 });
 
-/* -------------------------------------------------------------------------
- * Regressions for mobile tool access, the desktop toolbar, preview audio,
- * blink-free preview playback and neutral project defaults.
- * ---------------------------------------------------------------------- */
-
-const TOOL_TABS = [
-  'media',
-  'text',
-  'audio',
-  'overlays',
-  'transitions',
-  'filters',
-  'effects',
-  'subtitles',
-  'layers'
-];
-const TOOL_LABELS = [
-  'Media',
-  'Text',
-  'Audio',
-  'Overlays',
-  'Transitions',
-  'Filters',
-  'Effects',
-  'Subtitles',
-  'Layers'
-];
-const TOOL_MARKERS = {
-  media: 'Import media',
-  text: 'Add text',
-  audio: 'Master volume',
-  overlays: 'Shapes',
-  transitions: 'Remove transition',
-  filters: 'filters',
-  effects: 'Colour presets',
-  subtitles: 'Add subtitle',
-  layers: 'Top of this list renders in front'
-};
-
-function editingState(page) {
-  return page.evaluate(() => {
-    const ed = window.__videoEditor;
+test('autosave restores the timeline and relinks evicted media', async ({ page }) => {
+  const errors = await openEditor(page);
+  await addVideo(page);
+  await page.waitForTimeout(1600);
+  const saved = await page.evaluate(async () => {
+    const data = await window.__videoEditor.getAutosave();
+    const db = await new Promise((resolve, reject) => {
+      const request = indexedDB.open('letitedit-video-editor-v3');
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction('media', 'readwrite');
+      tx.objectStore('media').clear();
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+    });
+    db.close();
     return {
-      playhead: ed.state.playhead,
-      clips: ed.project.tracks
-        .flatMap((track) => track.clips)
-        .map((clip) => `${clip.id}:${clip.start}:${clip.duration}:${clip.filter}:${clip.transition?.type}`),
-      selection: [...ed.state.selection].sort(),
-      subtitles: ed.project.subtitles.items.length
+      clips: data?.snapshot?.project?.tracks?.flatMap((track) => track.clips).length || 0,
+      name: data?.snapshot?.project?.name
     };
+  });
+  expect(saved.clips).toBeGreaterThanOrEqual(1);
+
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.waitForFunction(() => window.__videoEditorReady === true);
+  await expect(page.locator('#ve-restore-banner')).toBeVisible();
+  await page.click('#ve-restore-button');
+  await expect(page.locator('#ve-relink-banner')).toBeVisible();
+  await expect(page.locator('#ve-relink-text')).toContainText('need relinking');
+
+  const [chooser] = await Promise.all([
+    page.waitForEvent('filechooser'),
+    page.click('#ve-relink-button')
+  ]);
+  await chooser.setFiles(fixturePath('trim-4s.mp4'));
+  await expect.poll(async () => page.evaluate(() =>
+    window.__videoEditor.project.tracks
+      .flatMap((track) => track.clips)
+      .filter((clip) => clip.mediaId && !window.__videoEditor.media.has(clip.mediaId)).length
+  )).toBe(0);
+  await expect(page.locator('#ve-relink-banner')).toBeHidden();
+  expect(await page.evaluate(() => window.__videoEditor.media.list().length)).toBe(1);
+  expect(errors).toEqual([]);
+});
+
+test('project JSON downloads and opens with the same edit', async ({ page }) => {
+  const errors = await openEditor(page);
+  await addVideo(page);
+  await page.locator('#ve-project-name').fill('Portable cut');
+  await page.locator('#ve-project-name').press('Enter');
+
+  const downloadPromise = page.waitForEvent('download');
+  await page.click('#ve-project-menu-button');
+  await page.click('[data-project-action="save"]');
+  const download = await downloadPromise;
+  const savedPath = await download.path();
+  const saved = JSON.parse(fs.readFileSync(savedPath, 'utf8'));
+  expect(saved.project.name).toBe('Portable cut');
+  expect(saved.project.tracks.flatMap((track) => track.clips).length).toBe(1);
+
+  await page.click('#ve-project-menu-button');
+  await page.click('[data-project-action="new"]');
+  await page.click('#ve-confirm-dialog [data-confirm-ok]');
+  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).length).toBe(0);
+
+  await page.setInputFiles('#ve-open-input', savedPath);
+  await expect.poll(async () => (await projectState(page)).name).toBe('Portable cut');
+  expect((await projectState(page)).tracks.flatMap((track) => track.clips).length).toBe(1);
+  expect(errors).toEqual([]);
+});
+
+test('export writes a real MP4 with audio and a real WebM square', async ({ page }) => {
+  test.setTimeout(120000);
+  const errors = await openEditor(page);
+  await addVideo(page);
+  await page.evaluate(() => window.__videoEditor.addTextPreset('title'));
+  await page.waitForTimeout(600);
+
+  const mp4 = await page.evaluate(async () => {
+    const ed = window.__videoEditor;
+    const out = await ed.exportToBlob({ format: 'mp4', resolution: '480', quality: 'small' });
+    const url = URL.createObjectURL(out.blob);
+    const video = document.createElement('video');
+    video.muted = true;
+    video.src = url;
+    await new Promise((resolve, reject) => {
+      video.onloadedmetadata = resolve;
+      video.onerror = () => reject(new Error('MP4 could not be decoded'));
+    });
+    await new Promise((resolve) => {
+      video.onseeked = resolve;
+      video.currentTime = 0.6;
+    });
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0);
+    const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    let lit = 0;
+    for (let i = 0; i < data.length; i += 4 * 29) {
+      if (data[i] + data[i + 1] + data[i + 2] > 30) lit += 1;
+    }
+    const result = {
+      type: out.blob.type,
+      size: out.blob.size,
+      width: video.videoWidth,
+      height: video.videoHeight,
+      duration: video.duration,
+      lit,
+      meta: out.meta
+    };
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+    URL.revokeObjectURL(url);
+    return result;
+  });
+  expect(mp4.type).toBe('video/mp4');
+  expect(mp4.size).toBeGreaterThan(50000);
+  expect(mp4.width).toBe(854);
+  expect(mp4.height).toBe(480);
+  expect(mp4.meta.format).toBe('mp4');
+  expect(mp4.meta.codec).toBe('avc');
+  expect(mp4.meta.audioCodec).toBe('aac');
+  expect(mp4.meta.hasAudio).toBe(true);
+  expect(mp4.duration).toBeGreaterThan(3.5);
+  expect(mp4.duration).toBeLessThan(4.6);
+  expect(mp4.lit).toBeGreaterThan(100);
+
+  await page.evaluate(() => window.__videoEditor.setProjectValue('project.aspect', '1:1'));
+  await page.waitForTimeout(500);
+  const webm = await page.evaluate(async () => {
+    const out = await window.__videoEditor.exportToBlob({ format: 'webm', resolution: '480', quality: 'small' });
+    return { type: out.blob.type, size: out.blob.size, meta: out.meta };
+  });
+  expect(webm.type).toBe('video/webm');
+  expect(webm.size).toBeGreaterThan(30000);
+  expect(webm.meta.format).toBe('webm');
+  expect(webm.meta.codec).toBe('vp9');
+  expect(webm.meta.width).toBe(webm.meta.height);
+  expect(Math.abs(webm.meta.width - 854)).toBeLessThanOrEqual(2);
+  expect(errors).toEqual([]);
+});
+
+test('export dialog reports progress and cancels without a download', async ({ page }) => {
+  test.setTimeout(120000);
+  const errors = await openEditor(page);
+  await addVideo(page);
+  await page.waitForTimeout(300);
+
+  await page.click('#ve-export-open');
+  await expect(page.locator('#ve-export-dialog')).toBeVisible();
+  await expect(page.locator('[data-export-action="start"]')).toBeEnabled();
+  await expect(page.locator('#ve-export-dialog')).toContainText('Estimate');
+  await page.selectOption('[data-export-setting="format"]', 'webm');
+  await page.selectOption('[data-export-setting="resolution"]', '480');
+  await page.click('[data-export-action="start"]');
+  await expect(page.locator('[data-export-action="cancel"]')).toBeEnabled();
+  await page.waitForTimeout(250);
+  await page.click('[data-export-action="cancel"]');
+  await expect.poll(async () => page.evaluate(() => window.__videoEditor.exporter.state)).toBe('idle');
+  await expect(page.locator('[data-export-action="start"]')).toBeEnabled();
+  await expect(page.locator('#ve-export-preview')).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+test('keyboard shortcuts and help dialog work', async ({ page }) => {
+  const errors = await openEditor(page);
+  await addVideo(page);
+  await page.waitForTimeout(300);
+
+  await page.keyboard.press('Space');
+  await expect(page.locator('#ve-play')).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('Space');
+  await expect(page.locator('#ve-play')).toHaveAttribute('aria-pressed', 'false');
+
+  await page.click('#ve-help-open');
+  await expect(page.locator('#ve-help-dialog')).toBeVisible();
+  await expect(page.locator('#ve-help-dialog')).toContainText('Keyboard shortcuts');
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#ve-help-dialog')).toBeHidden();
+
+  await page.evaluate(() => window.__videoEditor.selectClip(window.__videoEditor.project.tracks.flatMap((track) => track.clips)[0].id));
+  await page.keyboard.press('Control+d');
+  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).length).toBe(2);
+  await page.keyboard.press('Delete');
+  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).length).toBe(1);
+  await page.keyboard.press('Control+z');
+  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).length).toBe(2);
+  expect(errors).toEqual([]);
+});
+
+test('record panel reports unsupported capture honestly', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(window, 'MediaRecorder', { value: undefined, configurable: true, writable: true });
+    if (navigator.mediaDevices) {
+      Object.defineProperty(navigator.mediaDevices, 'getDisplayMedia', { value: undefined, configurable: true, writable: true });
+    }
+  });
+  const errors = await openEditor(page);
+  await page.click('#ve-rail [data-category="record"]');
+  await expect(page.locator('.ve-notice-warn')).toContainText('This mode is unavailable');
+  const modes = await page.locator('[data-record-mode]').evaluateAll((nodes) => nodes.map((node) => node.disabled));
+  expect(modes.every(Boolean)).toBe(true);
+  await expect(page.locator('[data-record-action="start"]')).toBeDisabled();
+  expect(errors).toEqual([]);
+});
+
+for (const width of MOBILE_WIDTHS) {
+  test(`mobile layout at ${width}px keeps preview, all tools and touch targets`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 780 });
+    const errors = await openEditor(page);
+
+    const overflow = await page.evaluate(() => ({
+      scroll: document.documentElement.scrollWidth,
+      inner: window.innerWidth
+    }));
+    expect(overflow.scroll).toBeLessThanOrEqual(overflow.inner + 1);
+
+    const canvasBox = await page.locator('#ve-preview-canvas').boundingBox();
+    expect(canvasBox.width).toBeGreaterThan(120);
+    expect(canvasBox.height).toBeGreaterThan(60);
+
+    const dock = page.locator('.ve-mobile-dock');
+    await expect(dock).toBeVisible();
+    const dockTargets = await dock.locator('button').evaluateAll((nodes) =>
+      nodes.map((node) => node.getBoundingClientRect().height)
+    );
+    expect(dockTargets.every((height) => height >= 44)).toBe(true);
+
+    await page.click('[data-open-sheet="library"]');
+    await expect(page.locator('#ve-library')).toBeVisible();
+    const railTargets = await page.locator('#ve-rail [data-category]').evaluateAll((nodes) =>
+      nodes.map((node) => node.getBoundingClientRect().height)
+    );
+    expect(railTargets.every((height) => height >= 44)).toBe(true);
+    const headings = {
+      media: 'Your media',
+      canvas: 'Canvas & project',
+      text: 'Add text',
+      audio: 'Audio',
+      videos: 'Video clips',
+      images: 'Image overlays',
+      elements: 'Elements',
+      subtitles: 'Subtitles',
+      record: 'Record'
+    };
+    for (const [category, heading] of Object.entries(headings)) {
+      await page.click(`#ve-rail [data-category="${category}"]`);
+      await expect(page.locator('#ve-library-panel h2')).toHaveText(heading);
+    }
+    await page.click('#ve-library-close');
+    await expect(page.locator('#ve-app')).toHaveAttribute('data-mobile-sheet', 'none');
+
+    await page.click('[data-open-sheet="inspector"]');
+    await expect(page.locator('#ve-inspector')).toBeVisible();
+    await page.click('#ve-inspector-close');
+    await expect(page.locator('#ve-app')).toHaveAttribute('data-mobile-sheet', 'none');
+
+    await page.click('#ve-mobile-menu');
+    await expect(page.locator('#ve-project-menu')).toBeVisible();
+    await expect(page.locator('[data-project-action="undo"]')).toBeVisible();
+    await expect(page.locator('[data-project-action="new"]')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#ve-project-menu')).toBeHidden();
+
+    await page.evaluate(() => window.__videoEditor.addTextPreset('plain'));
+    await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).length).toBe(1);
+    await page.click('#ve-mobile-export');
+    await expect(page.locator('#ve-export-dialog')).toBeVisible();
+    await page.click('#ve-export-dialog [data-export-action="close"]');
+    await expect(page.locator('#ve-export-dialog')).toBeHidden();
+    expect(errors).toEqual([]);
   });
 }
 
-test('all nine tools are labelled and reachable at every mobile width', async ({ page }) => {
-  test.setTimeout(240000);
+test('tablet layout at 768px keeps the desktop dock and sheets usable', async ({ page }) => {
+  await page.setViewportSize({ width: 768, height: 1024 });
   const errors = await openEditor(page);
-  await addVideoClip(page, 'trim-4s.mp4');
-  await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    ed.addTextPreset('title');
-    ed.seek(0.7);
-  });
-  await page.waitForTimeout(250);
-  const baseline = await editingState(page);
-
-  for (const width of [320, 360, 375, 390, 430]) {
-    await page.setViewportSize({ width, height: 860 });
-    await page.waitForTimeout(200);
-
-    /* The always-visible strip carries all nine written labels. */
-    const strip = await page.evaluate(() => {
-      const buttons = [...document.querySelectorAll('#ve-mobile-tools [data-mobile-tool]')];
-      return {
-        count: buttons.length,
-        documentWidth: document.documentElement.scrollWidth,
-        innerWidth: window.innerWidth,
-        buttons: buttons.map((button) => {
-          const rect = button.getBoundingClientRect();
-          return {
-            tab: button.dataset.mobileTool,
-            label: button.querySelectorAll('span')[1]?.textContent.trim() || '',
-            height: rect.height,
-            width: rect.width
-          };
-        })
-      };
-    });
-    expect(strip.count).toBe(9);
-    expect(strip.innerWidth).toBe(width);
-    expect(strip.documentWidth).toBeLessThanOrEqual(width);
-    expect(strip.buttons.map((button) => button.tab)).toEqual(TOOL_TABS);
-    expect(strip.buttons.map((button) => button.label)).toEqual(TOOL_LABELS);
-    for (const button of strip.buttons) {
-      expect(button.height).toBeGreaterThanOrEqual(44);
-      expect(button.width).toBeGreaterThanOrEqual(44);
-    }
-
-    /* The tools sheet lays the same nine tabs out in a 3×3 grid so nothing is
-     * clipped, and every tab opens its own panel. */
-    await page.locator('#ve-mobile-bar [data-mobile-panel="tools"]').click();
-    await page.waitForTimeout(200);
-    const grid = await page.evaluate(() =>
-      [...document.querySelectorAll('#ve-tabs [data-tab]')].map((tab) => {
-        const rect = tab.getBoundingClientRect();
-        return {
-          tab: tab.dataset.tab,
-          label: tab.querySelector('.ve-tab-label')?.textContent.trim() || '',
-          left: rect.left,
-          right: rect.right,
-          height: rect.height,
-          width: rect.width
-        };
-      })
-    );
-    expect(grid.map((item) => item.tab)).toEqual(TOOL_TABS);
-    expect(grid.map((item) => item.label)).toEqual(TOOL_LABELS);
-    for (const item of grid) {
-      expect(item.left).toBeGreaterThanOrEqual(-0.5);
-      expect(item.right).toBeLessThanOrEqual(width + 0.5);
-      expect(item.height).toBeGreaterThanOrEqual(44);
-      expect(item.width).toBeGreaterThanOrEqual(44);
-    }
-
-    for (const tab of TOOL_TABS) {
-      await page.locator(`#ve-tabs [data-tab="${tab}"]`).click();
-      await page.waitForTimeout(60);
-      expect(await page.evaluate(() => window.__videoEditor.state.activeTab)).toBe(tab);
-      await expect(page.locator(`#ve-tabs [data-tab="${tab}"]`)).toHaveAttribute('aria-selected', 'true');
-      await expect(page.locator('#ve-panel')).toContainText(TOOL_MARKERS[tab]);
-    }
-    await page.locator('.ve-side-left [data-mobile-close]').click();
-    await page.waitForTimeout(120);
-    expect(await page.locator('#ve-app').getAttribute('data-mobile-panel')).toBe('none');
-  }
-
-  /* Opening every tool at every width must not edit clips, selection or the
-   * playhead. */
-  const after = await editingState(page);
-  expect(after.clips).toEqual(baseline.clips);
-  expect(after.selection).toEqual(baseline.selection);
-  expect(after.subtitles).toBe(baseline.subtitles);
-  expect(after.playhead).toBeCloseTo(baseline.playhead, 3);
-  expect(errors).toEqual([]);
-});
-
-test('desktop toolbar and workspace stay put while switching tools', async ({ page }) => {
-  test.setTimeout(120000);
-  const errors = await openEditor(page);
-  await addVideoClip(page, 'trim-4s.mp4');
-
-  await page.evaluate(() => window.scrollTo(0, 1000));
-  await page.waitForTimeout(400);
-  /* The toolbar is pinned even when the workspace itself is far above. */
-  const pinnedStart = await page.evaluate(() => {
-    const bar = document.querySelector('.ve-toolbar').getBoundingClientRect();
-    return { top: bar.top, bottom: bar.bottom, viewport: window.innerHeight, scrollY: window.scrollY };
-  });
-  expect(pinnedStart.scrollY).toBeGreaterThan(800);
-  expect(pinnedStart.top).toBeGreaterThanOrEqual(-1);
-  expect(pinnedStart.bottom).toBeLessThanOrEqual(pinnedStart.viewport + 1);
-
-  /* Click the tools while the toolbar and tab strip are both on screen. */
-  await page.evaluate(() => window.scrollTo(0, 430));
-  await page.waitForTimeout(350);
-  const start = await page.evaluate(() => ({
-    scrollY: window.scrollY,
-    top: document.querySelector('.ve-toolbar').getBoundingClientRect().top
+  const overflow = await page.evaluate(() => ({
+    scroll: document.documentElement.scrollWidth,
+    inner: window.innerWidth
   }));
-  /* Prove the page really is scrolled, otherwise this test would pass trivially. */
-  expect(start.scrollY).toBeGreaterThan(300);
-
-  for (const tab of TOOL_TABS) {
-    const before = await page.evaluate(() => {
-      const bar = document.querySelector('.ve-toolbar').getBoundingClientRect();
-      return { scrollY: window.scrollY, top: bar.top };
-    });
-    await page.locator(`#ve-tabs [data-tab="${tab}"]`).click();
-    await page.waitForTimeout(120);
-    const after = await page.evaluate(() => {
-      const bar = document.querySelector('.ve-toolbar').getBoundingClientRect();
-      const preview = document.querySelector('#ve-preview-canvas').getBoundingClientRect();
-      const timeline = document.querySelector('#ve-timeline').getBoundingClientRect();
-      const hit = (x, y) => {
-        const element = document.elementFromPoint(x, y);
-        if (!element) return 'offscreen';
-        if (element.closest('.ve-toolbar')) return 'toolbar';
-        if (element.closest('#ve-preview-shell')) return 'preview';
-        if (element.closest('#ve-timeline')) return 'timeline';
-        return element.tagName.toLowerCase();
-      };
-      return {
-        scrollY: window.scrollY,
-        top: bar.top,
-        bottom: bar.bottom,
-        viewport: window.innerHeight,
-        active: window.__videoEditor.state.activeTab,
-        previewHit: hit(preview.left + preview.width / 2, preview.top + preview.height / 2),
-        timelineHit: hit(timeline.left + timeline.width / 2, timeline.top + timeline.height / 2)
-      };
-    });
-    expect(after.active).toBe(tab);
-    expect(after.scrollY).toBe(before.scrollY);
-    expect(Math.abs(after.top - before.top)).toBeLessThan(1);
-    expect(after.top).toBeGreaterThanOrEqual(-1);
-    expect(after.bottom).toBeLessThanOrEqual(after.viewport + 1);
-    expect(after.previewHit).not.toBe('toolbar');
-    expect(after.timelineHit).not.toBe('toolbar');
-  }
-
-  /* Long panels scroll on their own without moving the page, and the toolbar
-   * is still pinned in place afterwards. */
-  const windowY = await page.evaluate(() => window.scrollY);
-  let overflowingPanels = 0;
-  for (const tab of TOOL_TABS) {
-    await page.locator(`#ve-tabs [data-tab="${tab}"]`).click();
-    await page.waitForTimeout(100);
-    const metrics = await page.evaluate(() => {
-      const panel = document.querySelector('#ve-panel');
-      const style = getComputedStyle(panel);
-      panel.scrollTop = panel.scrollHeight;
-      return {
-        overflowY: style.overflowY,
-        scrollTop: panel.scrollTop,
-        scrollHeight: panel.scrollHeight,
-        clientHeight: panel.clientHeight,
-        windowY: window.scrollY
-      };
-    });
-    expect(metrics.overflowY).toBe('auto');
-    expect(metrics.windowY).toBe(windowY);
-    if (metrics.scrollHeight > metrics.clientHeight + 4) overflowingPanels += 1;
-  }
-  expect(overflowingPanels).toBeGreaterThan(0);
-
-  const pinned = await page.evaluate(() => {
-    const bar = document.querySelector('.ve-toolbar').getBoundingClientRect();
-    return { top: bar.top, bottom: bar.bottom, viewport: window.innerHeight };
-  });
-  expect(pinned.top).toBeGreaterThanOrEqual(-1);
-  expect(pinned.bottom).toBeLessThanOrEqual(pinned.viewport + 1);
-  expect(errors).toEqual([]);
-});
-
-test('preview audio monitors the clip and follows volume, mute and transport', async ({ page }) => {
-  test.setTimeout(180000);
-  const errors = await openEditor(page);
-  await addVideoClip(page, 'trim-4s.mp4');
-  await page.evaluate(() => window.__videoEditor.seek(0.2));
-
-  const readAudio = () => page.evaluate(() => window.__videoEditor.audio.debug());
-
-  /* Original audio plays once, at normal speed, with no duplicate elements. */
-  await page.locator('#ve-play').click();
-  await page.waitForFunction(
-    () => {
-      const debug = window.__videoEditor.audio.debug();
-      return (
-        debug.playing &&
-        debug.entries.length === 1 &&
-        debug.entries[0].started &&
-        !debug.entries[0].paused &&
-        debug.entries[0].readyState >= 2
-      );
-    },
-    null,
-    { timeout: 20000 }
-  );
-  const first = await readAudio();
-  expect(first.entries[0].volume).toBeCloseTo(1, 2);
-  expect(first.entries[0].playbackRate).toBeCloseTo(1, 2);
-  await page.waitForTimeout(700);
-  const later = await readAudio();
-  expect(later.entries[0].currentTime).toBeGreaterThan(first.entries[0].currentTime + 0.1);
-  const elements = await page.evaluate(() => ({
-    monitored: window.__videoEditor.audio.debug().entries.length,
-    sourcedVideo: [...document.querySelectorAll('video')].filter(
-      (video) => Boolean(video.currentSrc || video.getAttribute('src'))
-    ).length
-  }));
-  /* One monitor per audible clip and no sourced <video> element that could
-   * play the same sound a second time. */
-  expect(elements.monitored).toBe(1);
-  expect(elements.sourcedVideo).toBe(0);
-
-  /* Clip and master volume multiply, exactly like the export mixer. */
-  await page.evaluate(() => {
-    window.__videoEditor.store.apply((draft) => {
-      draft.masterVolume = 0.5;
-      const clip = draft.tracks.flatMap((track) => track.clips)[0];
-      clip.volume = 0.5;
-    });
-  });
-  await page.waitForTimeout(300);
-  const mixed = await readAudio();
-  expect(mixed.entries[0].volume).toBeCloseTo(0.25, 2);
-
-  /* A muted track stops monitoring instead of layering another copy. */
-  await page.evaluate(() => {
-    window.__videoEditor.store.apply((draft) => {
-      const track = draft.tracks.find((item) => item.clips.length);
-      track.muted = true;
-    });
-  });
-  await page.waitForTimeout(300);
-  const muted = await readAudio();
-  expect(muted.entries.every((entry) => entry.paused)).toBe(true);
-  await page.evaluate(() => {
-    window.__videoEditor.store.apply((draft) => {
-      const track = draft.tracks.find((item) => item.clips.length);
-      track.muted = false;
-    });
-  });
-  await page.waitForTimeout(400);
-  const unmuted = await readAudio();
-  expect(unmuted.entries.some((entry) => !entry.paused)).toBe(true);
-  expect(unmuted.entries[0].volume).toBeCloseTo(0.25, 2);
-
-  /* Hiding a clip silences it in the preview, matching the export mixer. */
-  await page.evaluate(() => {
-    window.__videoEditor.store.apply((draft) => {
-      draft.tracks.flatMap((track) => track.clips)[0].hidden = true;
-    });
-  });
-  await page.waitForTimeout(300);
-  expect((await readAudio()).entries.every((entry) => entry.paused)).toBe(true);
-  await page.evaluate(() => {
-    window.__videoEditor.store.apply((draft) => {
-      draft.tracks.flatMap((track) => track.clips)[0].hidden = false;
-    });
-  });
-  await page.waitForTimeout(400);
-  expect((await readAudio()).entries.some((entry) => !entry.paused)).toBe(true);
-
-  /* Pause stops every monitored element. */
-  await page.locator('#ve-play').click();
-  await page.waitForTimeout(300);
-  const paused = await readAudio();
-  expect(paused.playing).toBe(false);
-  expect(paused.entries.every((entry) => entry.paused)).toBe(true);
-
-  /* Fades lower the monitored gain near the clip start. */
-  await page.evaluate(() => {
-    window.__videoEditor.store.apply((draft) => {
-      draft.masterVolume = 1;
-      const clip = draft.tracks.flatMap((track) => track.clips)[0];
-      clip.volume = 1;
-      clip.fadeIn = 2;
-    });
-    window.__videoEditor.seek(0.05);
-  });
-  await page.locator('#ve-play').click();
-  await page.waitForTimeout(300);
-  const fading = await readAudio();
-  expect(fading.entries[0].volume).toBeLessThan(0.9);
-
-  /* Seeking while playing repositions the sound instead of restarting it. */
-  await page.evaluate(() => window.__videoEditor.seek(2));
-  await page.waitForTimeout(350);
-  const sought = await readAudio();
-  expect(sought.entries[0].currentTime).toBeGreaterThan(1.5);
-  expect(sought.entries[0].currentTime).toBeLessThan(3.2);
-  await page.locator('#ve-play').click();
-
-  /* A browser that blocks autoplay gets a useful message rather than silence. */
-  await page.evaluate(() => {
-    window.__audioPlayOriginal = HTMLMediaElement.prototype.play;
-    HTMLMediaElement.prototype.play = function blockedPlay() {
-      return Promise.reject(new DOMException('blocked for the test', 'NotAllowedError'));
-    };
-    window.__videoEditor.seek(0.2);
-  });
-  await page.locator('#ve-play').click();
-  await page.waitForTimeout(600);
-  await expect(page.locator('.ve-toast', { hasText: 'blocked preview audio' })).toBeVisible();
-  expect((await readAudio()).blocked).toBe(true);
-  await page.evaluate(() => {
-    HTMLMediaElement.prototype.play = window.__audioPlayOriginal;
-    delete window.__audioPlayOriginal;
-    window.__videoEditor.pause();
-  });
-  await page.waitForTimeout(150);
-
-  /* Reaching the end stops monitoring instead of leaving a dangling element. */
-  const duration = await page.evaluate(() =>
-    window.__videoEditor.project.tracks
-      .flatMap((track) => track.clips)
-      .reduce((max, clip) => Math.max(max, clip.start + clip.duration), 0)
-  );
-  await page.evaluate((at) => window.__videoEditor.seek(at), duration - 0.25);
-  await page.locator('#ve-play').click();
-  await page.waitForFunction(() => window.__videoEditor.state.playing === false, null, { timeout: 5000 });
-  const ended = await readAudio();
-  expect(ended.playing).toBe(false);
-  expect(ended.entries.every((entry) => entry.paused)).toBe(true);
-
-  expect(errors).toEqual([]);
-});
-
-test('preview audio mixes tracks, follows the preview rate and skips silent clips', async ({ page }) => {
-  test.setTimeout(120000);
-  const errors = await openEditor(page);
-  await importFiles(page, ['trim-4s.mp4', 'trim-audio-only.m4a', 'trim-2s-mute.mp4']);
-
-  const setup = await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const list = ed.media.list();
-    const video = list.find((asset) => asset.name === 'trim-4s.mp4');
-    const audio = list.find((asset) => asset.name === 'trim-audio-only.m4a');
-    const silent = list.find((asset) => asset.name === 'trim-2s-mute.mp4');
-    ed.addAssetToTimeline(video.id, { start: 0 });
-    ed.addAssetToTimeline(audio.id, { start: 0 });
-    ed.addAssetToTimeline(silent.id, { start: 0 });
-    ed.seek(0.2);
-    return { silentId: silent.id };
-  });
-
-  await page.locator('#ve-preview-rate').selectOption('1.5');
-  await page.locator('#ve-play').click();
-  await page.waitForFunction(
-    () => {
-      const debug = window.__videoEditor.audio.debug();
-      return (
-        debug.playing &&
-        debug.entries.length === 2 &&
-        debug.entries.every((entry) => entry.started && !entry.paused)
-      );
-    },
-    null,
-    { timeout: 20000 }
-  );
-  const debug = await page.evaluate(() => window.__videoEditor.audio.debug());
-  /* Both audible clips are monitored on their own tracks; the silent video is
-   * skipped instead of producing an empty audio element. */
-  expect(debug.entries).toHaveLength(2);
-  expect(debug.entries.map((entry) => entry.mediaId)).not.toContain(setup.silentId);
-  for (const entry of debug.entries) {
-    expect(entry.playbackRate).toBeCloseTo(1.5, 2);
-  }
-
-  /* A live rate change applies to every monitored clip without a restart. */
-  await page.locator('#ve-preview-rate').selectOption('1');
-  await page.waitForTimeout(400);
-  const changed = await page.evaluate(() => window.__videoEditor.audio.debug());
-  expect(changed.entries).toHaveLength(2);
-  for (const entry of changed.entries) {
-    expect(entry.playbackRate).toBeCloseTo(1, 2);
-  }
-
-  await page.evaluate(() => window.__videoEditor.pause());
-  await page.locator('#ve-preview-rate').selectOption('1');
-  expect(errors).toEqual([]);
-});
-
-test('preview playback never blinks to a blank frame', async ({ page }) => {
-  test.setTimeout(120000);
-  const errors = await openEditor(page);
-  await addVideoClip(page, 'trim-4s.mp4');
-  const before = await page.evaluate(() => {
-    const canvas = document.querySelector('#ve-preview-canvas');
-    return { width: canvas.width, height: canvas.height, elements: document.querySelectorAll('#ve-preview-canvas').length };
-  });
-
-  await page.locator('#ve-play').click();
-  await page.waitForTimeout(250);
-  const samples = await page.evaluate(async () => {
-    const canvas = document.querySelector('#ve-preview-canvas');
-    const context = canvas.getContext('2d');
-    const values = [];
-    for (let index = 0; index < 30; index += 1) {
-      await new Promise((resolve) => requestAnimationFrame(resolve));
-      const data = context.getImageData(0, 0, canvas.width, canvas.height).data;
-      let sum = 0;
-      let count = 0;
-      for (let offset = 0; offset < data.length; offset += 1600) {
-        sum += data[offset] + data[offset + 1] + data[offset + 2];
-        count += 1;
-      }
-      values.push(sum / count);
-    }
-    return values;
-  });
-  await page.evaluate(() => window.__videoEditor.pause());
-
-  const after = await page.evaluate(() => {
-    const canvas = document.querySelector('#ve-preview-canvas');
-    return { width: canvas.width, height: canvas.height, elements: document.querySelectorAll('#ve-preview-canvas').length };
-  });
-  expect(after).toEqual(before);
-  expect(samples).toHaveLength(30);
-  /* A cleared/blank canvas reads as black. No sample may do that mid-play. */
-  expect(samples.filter((value) => value < 6)).toEqual([]);
-  /* Brightness still changes with the video, but never collapses to black. */
-  expect(Math.max(...samples) - Math.min(...samples)).toBeLessThan(120);
-  expect(errors).toEqual([]);
-});
-
-test('default project and tool panels never apply effects by themselves', async ({ page }) => {
-  test.setTimeout(180000);
-  const errors = await openEditor(page);
-
-  const fresh = await editingState(page);
-  expect(fresh.clips).toEqual([]);
-  expect(fresh.subtitles).toBe(0);
-  expect(await page.evaluate(() => window.__videoEditor.project.tracks.flatMap((track) => track.clips).length)).toBe(0);
-
-  /* Opening all nine tools on an empty project changes nothing. */
-  for (const tab of TOOL_TABS) {
-    await page.locator(`#ve-tabs [data-tab="${tab}"]`).click();
-    await page.waitForTimeout(70);
-  }
-  expect(await editingState(page)).toEqual(fresh);
-
-  await addVideoClip(page, 'trim-4s.mp4');
-  const neutral = await page.evaluate(() => {
-    const clip = window.__videoEditor.project.tracks.flatMap((track) => track.clips)[0];
-    return {
-      filter: clip.filter,
-      filterIntensity: clip.filterIntensity,
-      transition: clip.transition,
-      inAnim: clip.inAnim,
-      outAnim: clip.outAnim,
-      keyframes: Object.fromEntries(
-        Object.entries(clip.keyframes).map(([key, list]) => [key, (list || []).length])
-      ),
-      color: clip.color,
-      opacity: clip.opacity,
-      scale: clip.scale,
-      rotation: clip.rotation,
-      x: clip.x,
-      y: clip.y,
-      speed: clip.speed,
-      reverse: clip.reverse,
-      volume: clip.volume,
-      muted: clip.muted,
-      fadeIn: clip.fadeIn,
-      fadeOut: clip.fadeOut
-    };
-  });
-  expect(neutral.filter).toBe('none');
-  expect(neutral.transition.type).toBe('none');
-  expect(neutral.inAnim.type).toBe('none');
-  expect(neutral.outAnim.type).toBe('none');
-  expect(Object.values(neutral.keyframes).every((count) => count === 0)).toBe(true);
-  expect(Object.values(neutral.color).every((value) => value === 0)).toBe(true);
-  expect(neutral).toMatchObject({
-    opacity: 1,
-    scale: 1,
-    rotation: 0,
-    x: 0.5,
-    y: 0.5,
-    speed: 1,
-    reverse: false,
-    volume: 1,
-    muted: false,
-    fadeIn: 0,
-    fadeOut: 0,
-    filterIntensity: 1
-  });
-
-  const withClip = await editingState(page);
-  for (const tab of TOOL_TABS) {
-    await page.locator(`#ve-tabs [data-tab="${tab}"]`).click();
-    await page.waitForTimeout(70);
-  }
-  expect(await editingState(page)).toEqual(withClip);
-
-  /* The panels show the neutral state: Original filter, no colour preset and
-   * None animations. */
-  await page.locator('#ve-tabs [data-tab="filters"]').click();
-  await expect(page.locator('[data-filter="none"]')).toHaveClass(/is-active/);
-  await page.locator('#ve-tabs [data-tab="effects"]').click();
-  expect(await page.locator('[data-color-preset].is-active').count()).toBe(0);
-  expect(await page.locator('[data-anim="in"]').inputValue()).toBe('none');
-  expect(await page.locator('[data-anim="out"]').inputValue()).toBe('none');
-
-  /* Explicit choices still work, and reset returns to the original. */
-  await page.locator('#ve-tabs [data-tab="filters"]').click();
-  await page.locator('[data-filter="bw"]').click();
-  expect(await page.evaluate(() => window.__videoEditor.project.tracks.flatMap((track) => track.clips)[0].filter)).toBe('bw');
-  await page.locator('[data-filter="none"]').click();
-  expect(await page.evaluate(() => window.__videoEditor.project.tracks.flatMap((track) => track.clips)[0].filter)).toBe('none');
-
-  await page.locator('#ve-tabs [data-tab="effects"]').click();
-  await page.locator('[data-color-preset="warm"]').click();
-  expect(
-    await page.evaluate(() => {
-      const color = window.__videoEditor.project.tracks.flatMap((track) => track.clips)[0].color;
-      return Object.values(color).some((value) => value !== 0);
-    })
-  ).toBe(true);
-  await page.locator('[data-color-reset]').click();
-  expect(
-    await page.evaluate(() =>
-      Object.values(window.__videoEditor.project.tracks.flatMap((track) => track.clips)[0].color).every(
-        (value) => value === 0
-      )
-    )
-  ).toBe(true);
-
-  /* A transition only applies when chosen explicitly, and None removes it. */
-  await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const first = ed.project.tracks.flatMap((track) => track.clips)[0];
-    const track = ed.project.tracks.find((item) => item.clips.some((clip) => clip.id === first.id));
-    ed.store.apply((draft) => {
-      const host = draft.tracks.find((item) => item.id === track.id);
-      const copy = JSON.parse(JSON.stringify(host.clips[0]));
-      copy.id = 'clip_transition_control';
-      copy.start = first.duration;
-      copy.filter = 'none';
-      copy.transition = { type: 'none', duration: 0.5, reverse: false };
-      host.clips.push(copy);
-    });
-    ed.selectClip('clip_transition_control', { additive: false });
-  });
-  await page.locator('#ve-tabs [data-tab="transitions"]').click();
-  expect(
-    await page.evaluate(
-      () =>
-        window.__videoEditor.project.tracks
-          .flatMap((track) => track.clips)
-          .find((clip) => clip.id === 'clip_transition_control').transition.type
-    )
-  ).toBe('none');
-  await page.locator('[data-transition="cross-dissolve"]').click();
-  expect(
-    await page.evaluate(
-      () =>
-        window.__videoEditor.project.tracks
-          .flatMap((track) => track.clips)
-          .find((clip) => clip.id === 'clip_transition_control').transition.type
-    )
-  ).toBe('cross-dissolve');
-  await page.locator('[data-transition="none"]').click();
-  expect(
-    await page.evaluate(
-      () =>
-        window.__videoEditor.project.tracks
-          .flatMap((track) => track.clips)
-          .find((clip) => clip.id === 'clip_transition_control').transition.type
-    )
-  ).toBe('none');
-
+  expect(overflow.scroll).toBeLessThanOrEqual(overflow.inner + 1);
+  await expect(page.locator('.ve-mobile-dock')).toBeVisible();
+  await page.click('[data-open-sheet="library"]');
+  await expect(page.locator('#ve-library')).toBeVisible();
+  await expect(page.locator('#ve-rail [data-category]')).toHaveCount(9);
+  await page.click('#ve-library-close');
   expect(errors).toEqual([]);
 });

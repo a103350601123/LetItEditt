@@ -46,8 +46,8 @@
         "18 filters plus brightness, contrast, saturation, temperature, tint, exposure, highlights, shadows, gamma, sharpness, fade and vignette",
         "Multiple independent text layers with Unicode shaping and right-to-left support",
         "Manual subtitles and SRT or WebVTT import and export",
-        "Music, voiceover and sound-effect tracks with volume, fades and mute",
-        "Keyframes for position, scale, rotation, opacity and text",
+        "Music, voiceover and sound-effect tracks with real preview monitoring, clip and track gain, fades and mute",
+        "Keyframes for position, scale, rotation and opacity, rendered into the export",
         "Real MP4 (H.264 + AAC) and WebM (VP9 + Opus) export with measured metadata",
         "Local processing with no upload and no account"
       ]
@@ -78,12 +78,12 @@
         {
           "@type": "Question",
           "name": "Does my project survive a page reload?",
-          "acceptedAnswer": { "@type": "Answer", "text": "The timeline is autosaved to this browser and a restore banner appears after a reload. Imported media is deliberately not persisted: video files can be very large, so the browser does not keep them. You re-import the original files and the editor relinks clips by file name. You can also download a project JSON file and open it later." }
+          "acceptedAnswer": { "@type": "Answer", "text": "The timeline is autosaved to this browser in IndexedDB and a restore banner appears after a reload. Original media files are stored separately in the same browser when storage quota allows, under a bounded budget. If the browser evicted them, the editor lists the missing files and relinks each clip when you re-import the original by name. You can also download a project JSON file and open it later." }
         },
         {
           "@type": "Question",
           "name": "How do layers and tracks relate?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Each video track is a visual layer. The top track in the timeline and the Layers panel renders in front; lower tracks render behind it. Horizontal position on a track is timing. Moving a clip up or down changes stacking only, and the preview and exported file use the same order." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Each video track is a visual layer. The top track in the timeline renders in front; lower tracks render behind it, and the layer controls in the properties panel move a clip forward, backward, to the front or to the back. Horizontal position on a track is timing. Moving a clip up or down changes stacking only, and the preview and exported file use the same order." }
         },
         {
           "@type": "Question",
@@ -103,7 +103,7 @@
         {
           "@type": "Question",
           "name": "Can I edit on a phone?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes. The workspace reflows to a single column with a visible preview, a touch-friendly scrollable timeline, a Layers panel and bottom sheets for tools and properties. Trim handles and clip dragging use pointer events, and the layout is tested down to a 320 px viewport." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. The workspace reflows to a single column with a visible preview, a touch-friendly scrollable timeline, a tools drawer with all nine categories, a properties sheet and a bottom dock. Trim handles and clip dragging use pointer events, and the layout is tested down to a 320 px viewport." }
         }
       ]
     }
@@ -175,6 +175,9 @@
           <div class="ve-menu-wrap">
             <button type="button" class="ve-btn ve-btn-ghost" id="ve-project-menu-button" aria-expanded="false" aria-controls="ve-project-menu">Project</button>
             <div class="ve-menu" id="ve-project-menu" role="menu" aria-label="Project actions" hidden>
+              <button type="button" role="menuitem" data-project-action="undo">Undo</button>
+              <button type="button" role="menuitem" data-project-action="redo">Redo</button>
+              <hr>
               <button type="button" role="menuitem" data-project-action="new">New project</button>
               <button type="button" role="menuitem" data-project-action="open">Open project file…</button>
               <button type="button" role="menuitem" data-project-action="save">Download project JSON</button>
@@ -403,7 +406,7 @@
         <li><strong>Import your media.</strong> Choose video, images and audio from your device, or drop them onto the page. Thumbnails and measured metadata appear in the Media tab.</li>
         <li><strong>Place clips.</strong> Tap Add to put a file at the playhead, or drag a card onto a compatible track. A new track is created when the existing ones are full.</li>
         <li><strong>Arrange and trim.</strong> Drag clip bodies to change timing, drag either edge to trim, and press Split to cut at the playhead. Snapping lines clips up with neighbours, the playhead and zero.</li>
-        <li><strong>Build layers.</strong> Add text, shapes, backgrounds, logos or stickers on their own tracks. Use the Layers tab or the up and down arrows to change what sits in front.</li>
+        <li><strong>Build layers.</strong> Add text, shapes, backgrounds, logos or stickers on their own tracks. Use the layer controls in the properties panel to bring a clip forward, send it backward, or move it to the front or back.</li>
         <li><strong>Style and animate.</strong> Apply a transition at the start of a clip, a filter and colour grade, an entrance or exit animation, or keyframes for position, scale, rotation and opacity.</li>
         <li><strong>Mix audio.</strong> Set clip gain, fades and mute, then balance tracks and the master volume. Audio is mixed from every audible clip at export time.</li>
         <li><strong>Export.</strong> Choose MP4 or WebM, resolution, aspect and quality, then watch real progress. The finished file is read back and its measured metadata is shown before you download it.</li>
@@ -411,7 +414,7 @@
 
       <h2>Tracks, clips and layer stacking</h2>
       <p>Clips on one track cannot overlap in time; the editor refuses a move that would collide and explains why. That constraint is what makes the stacking model predictable. Moving a clip up a track brings it forward in the composition; moving it down sends it backward. Bring to Front and Send to Back move it to the extreme video layer. If the neighbouring track is occupied at that moment, the editor gives the clip its own layer rather than silently dropping other clips.</p>
-      <p>Horizontal position is always timing, never stacking. A clip that starts later does not move in front of an earlier one. This is the same distinction professional timelines make, and it is why the Layers panel can describe a single vertical order while the timeline describes time.</p>
+      <p>Horizontal position is always timing, never stacking. A clip that starts later does not move in front of an earlier one. This is the same distinction professional timelines make, and it is why the layer controls can describe a single vertical order while the timeline describes time.</p>
 
       <h2>Transitions, filters and colour correction</h2>
       <p>There are 56 named transitions in six categories: basic blends, slide and push, wipe and reveal, zoom, motion and stylised effects. A transition is attached to the incoming clip and blends its first seconds with the moving tail of the previous clip on the same track. Duration is limited by both clips, the direction can be reversed, and choosing None removes it. Because the blend is drawn by the shared compositor, an exported file contains the same mixed frames.</p>
@@ -423,21 +426,21 @@
 
       <h2>Audio: music, voiceover and effects</h2>
       <p>Audio clips live on audio tracks. Trim, split, move, duplicate, replace, mute and fade them like video clips, with a waveform drawn from decoded samples where one is available. Each track has its own volume and mute, and the project has a master volume. On export every audible clip is resampled to a 48 kHz stereo mix, with clip gain and fades applied sample by sample.</p>
-      <p>Speed changes also change pitch because the same samples are resampled. Pitch-preserving time stretching is not part of this browser-only build, and the interface states that rather than pretending otherwise. Audio is not monitored during preview yet; use the exported file to check the final mix.</p>
+      <p>Speed changes also change pitch because the same samples are resampled. Pitch-preserving time stretching is not part of this browser-only build, and the interface states that rather than pretending otherwise. Preview audio runs through a Web Audio mixer with clip, track and master gain, so the mix can be checked before export.</p>
 
       <h2>Export formats, resolutions and limits</h2>
-      <p>MP4 output uses H.264 video and AAC audio; WebM uses VP9 and Opus. Available resolutions run from 4K to 360p plus custom dimensions, and the frame rate follows the project setting. Each frame is composed at the export size, so text and vector shapes are re-rendered sharply rather than upscaled. Quality presets choose a target video bitrate; audio bitrate follows the preset.</p>
+      <p>MP4 output uses H.264 video and AAC audio; WebM uses VP9 video and Opus audio. Exports are tested at 480p, 720p and 1080p in both orientations, plus custom dimensions that the device encoder accepts, and the frame rate follows the project setting. Each frame is composed at the export size, so text and vector shapes are re-rendered sharply rather than upscaled. Quality presets choose a target video bitrate; audio bitrate follows the preset.</p>
       <p>The exporter checks that the browser can encode the chosen codec at the chosen size before starting. Progress reports the real frame loop, audio mix and container finalisation, and Cancel stops the worker and leaves no partial download. When the file is finished it is opened again with a media parser, and the displayed duration, size, resolution, codec and bitrate come from that read-back. A duration mismatch aborts the export instead of presenting a broken file.</p>
 
       <h2>Project files, autosave and media</h2>
-      <p>The project is plain JSON: canvas settings, tracks, clips, effects, keyframes, layers, subtitles and audio levels. It autosaves to this browser after changes and can be downloaded or opened manually. Media is intentionally different. Video files can be hundreds of megabytes, so imported files stay in memory only and are never written into the project file. After a reload you re-import them by name and the editor relinks the clips. The interface says this before and after the fact.</p>
+      <p>The project is plain JSON: canvas settings, tracks, clips, effects, keyframes, layers, subtitles and audio levels. It autosaves to this browser after changes and can be downloaded or opened manually. Original media files are stored separately in IndexedDB when the browser's storage quota allows, under a bounded budget, and are never embedded in the project file. If they are missing after a reload, the editor lists them and relinks the clips when you re-import the originals by name.</p>
 
       <h2>Mobile editing at 320 pixels and up</h2>
-      <p>The workspace reflows into one column on phones: preview first, then the timeline, with Tools and Properties available as bottom sheets and a bar to jump between preview and timeline. Track headers stay pinned while the timeline scrolls horizontally, trim handles grow for touch, and clip dragging uses pointer events rather than desktop-only drag and drop. Every control keeps a visible label or an accessible name, and the layout is tested at 320, 360, 375, 390 and 430 pixel widths.</p>
+      <p>The workspace reflows into one column on phones: preview first, then the timeline, with Tools and Properties available as bottom sheets and a dock for tools, properties, project actions and export. Track headers stay pinned while the timeline scrolls horizontally, trim handles grow for touch, and clip dragging uses pointer events rather than desktop-only drag and drop. Every control keeps a visible label or an accessible name, and the layout is tested at 320, 360, 375, 390 and 430 pixel widths.</p>
 
       <h2>Privacy, performance and file limits</h2>
       <p>Files are read with local file APIs, decoded by the browser's own media engine through Mediabunny, composed on canvas and encoded with WebCodecs. No media, project or frame is uploaded. Object URLs are released when media is removed or the page closes. The heaviest work is kept off the main thread during export, thumbnails are generated as small JPEGs, and decoded frames are cached in resolution buckets so scrubbing does not re-decode every time.</p>
-      <p>Large projects are limited by device memory, not by a server quota. A practical ceiling is a few minutes of 1080p source at a time; 4K sources and long timelines need more memory and export time. The Media tab warns when the loaded library passes 750 MB or the timeline passes five minutes.</p>
+      <p>Large projects are limited by device memory and browser storage, not by a server quota. A practical ceiling is a few minutes of 1080p source at a time; 4K sources and long timelines need more memory and export time. Autosaved media is capped so the editor can report when the browser refuses to store another file instead of silently failing.</p>
 
       <h2>Troubleshooting</h2>
       <ul class="vc-list">
@@ -464,7 +467,7 @@
       </details>
       <details class="vc-faq">
         <summary>Can I keep working after a reload?</summary>
-        <p>The timeline autosaves locally and offers to restore. Media has to be re-imported because the browser does not persist the original files. Download a project file for a portable copy of the edit.</p>
+        <p>The timeline autosaves locally and offers to restore. Original media files are also kept in browser storage when quota allows; if they were evicted, re-import them by name and the clips relink. Download a project file for a portable copy of the edit.</p>
       </details>
       <details class="vc-faq">
         <summary>Does speed editing preserve pitch?</summary>
@@ -483,7 +486,8 @@
           <div><dt>Transitions</dt><dd>56 in 6 categories</dd></div>
           <div><dt>Filters</dt><dd>18 plus 12 colour controls</dd></div>
           <div><dt>Export</dt><dd>MP4 H.264 / WebM VP9</dd></div>
-          <div><dt>Resolutions</dt><dd>4K to 360p and custom</dd></div>
+          <div><dt>Resolutions</dt><dd>480p, 720p, 1080p and custom</dd></div>
+          <div><dt>Preview audio</dt><dd>Web Audio mix with gain and fades</dd></div>
           <div><dt>Audio</dt><dd>48 kHz stereo mix</dd></div>
           <div><dt>Privacy</dt><dd>Local, no upload</dd></div>
           <div><dt>Mobile</dt><dd>From 320 px wide</dd></div>

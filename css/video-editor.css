@@ -1460,7 +1460,25 @@
   .ve-inspector-panel { padding: 12px 12px 22px; }
   .ve-sheet-head { display: flex; }
   .ve-only-mobile { display: inline-flex !important; }
-  .ve-sheet-head .ve-icon-btn { min-width: 40px; height: 40px; font-size: 17px; }
+  .ve-sheet-head .ve-icon-btn { min-width: 44px; height: 44px; font-size: 17px; }
+
+  /* The desktop project menu becomes a labelled sheet reachable from the
+     mobile dock, so New, Open, Save, Undo and Help stay available on phones. */
+  .ve-menu-wrap.is-mobile-open {
+    display: block !important;
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    bottom: calc(64px + env(safe-area-inset-bottom));
+    z-index: 130;
+  }
+  .ve-menu-wrap.is-mobile-open .ve-menu {
+    position: static;
+    width: 100%;
+    max-height: 70svh;
+    overflow-y: auto;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .55);
+  }
 
   .ve-resizer { display: none; }
 
@@ -1509,16 +1527,16 @@
   .ve-export-meta { grid-template-columns: 1fr 1fr; }
   .ve-shortcuts { grid-template-columns: 1fr; }
   .ve-dialog-actions { padding: 9px 12px calc(9px + env(safe-area-inset-bottom)); }
-  .ve-dialog-actions .ve-btn { flex: 1; min-height: 40px; }
+  .ve-dialog-actions .ve-btn { flex: 1; min-height: 44px; }
   .ve-aspect-grid { grid-template-columns: repeat(4, 1fr); }
   .ve-emoji-grid { grid-template-columns: repeat(8, 1fr); }
   .ve-shape-grid { grid-template-columns: repeat(4, 1fr); }
   .ve-bg-grid { grid-template-columns: repeat(3, 1fr); }
   .ve-record-mode { min-height: 44px; }
   .ve-record-start { min-height: 44px; }
-  .ve-btn { min-height: 36px; }
-  .ve-btn-sm { min-height: 34px; }
-  .ve-icon-mini, .ve-mini-btn { min-height: 30px; }
+  .ve-btn { min-height: 40px; }
+  .ve-btn-sm { min-height: 38px; }
+  .ve-icon-mini, .ve-mini-btn { min-height: 34px; }
 }
 
 @media (max-width: 430px) {
