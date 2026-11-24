@@ -152,95 +152,130 @@
 
 <section class="ve-section" aria-labelledby="editor-title">
   <div class="container">
-    <div class="ve-app" id="ve-app" data-mobile-panel="none">
+    <div class="ve-app" id="ve-app" data-mobile-sheet="none" data-category="media">
 
-      <header class="ve-toolbar" role="toolbar" aria-label="Project controls">
-        <div class="ve-toolbar-group ve-toolbar-project">
-          <label class="ve-project-name">
-            <span class="visually-hidden">Project name</span>
-            <input type="text" id="ve-project-name" maxlength="80" value="Untitled project" autocomplete="off">
-          </label>
-          <span class="ve-meta" id="ve-project-meta">16:9 · 1920×1080 · 30 fps</span>
+      <header class="ve-topbar" role="toolbar" aria-label="Project controls">
+        <div class="ve-topbar-start">
+          <span class="ve-mark" aria-hidden="true">LE</span>
+          <div class="ve-title-wrap">
+            <label class="ve-project-name">
+              <span class="visually-hidden">Project name</span>
+              <input type="text" id="ve-project-name" maxlength="80" value="Untitled project" autocomplete="off">
+            </label>
+            <span class="ve-project-meta" id="ve-project-meta">16:9 · 1920×1080 · 30 fps</span>
+          </div>
         </div>
-        <div class="ve-toolbar-group ve-toolbar-actions">
-          <button type="button" class="ve-btn ve-btn-ghost ve-btn-xs" id="ve-undo" title="Undo (Ctrl+Z)">Undo</button>
-          <button type="button" class="ve-btn ve-btn-ghost ve-btn-xs" id="ve-redo" title="Redo (Ctrl+Shift+Z)">Redo</button>
-          <button type="button" class="ve-btn ve-btn-ghost ve-btn-xs" id="ve-project">Project</button>
-          <button type="button" class="ve-btn ve-btn-ghost ve-btn-xs" id="ve-save" title="Download the project JSON (Ctrl+S)">Save</button>
-          <button type="button" class="ve-btn ve-btn-ghost ve-btn-xs" id="ve-open">Open</button>
-          <button type="button" class="ve-btn ve-btn-ghost ve-btn-xs" id="ve-new">New</button>
-          <button type="button" class="ve-btn ve-btn-ghost ve-btn-xs" id="ve-help">Help</button>
-          <span class="ve-autosave" id="ve-autosave" role="status" aria-live="polite">Autosave ready</span>
+        <div class="ve-topbar-end">
+          <span class="ve-save-status" id="ve-save-status" role="status" aria-live="polite">Autosave ready</span>
+          <div class="ve-history" role="group" aria-label="History">
+            <button type="button" id="ve-undo" title="Undo (Ctrl+Z)" aria-label="Undo">↶</button>
+            <button type="button" id="ve-redo" title="Redo (Ctrl+Shift+Z)" aria-label="Redo">↷</button>
+          </div>
+          <button type="button" class="ve-icon-btn" id="ve-help-open" title="Keyboard shortcuts" aria-label="Keyboard shortcuts">?</button>
+          <div class="ve-menu-wrap">
+            <button type="button" class="ve-btn ve-btn-ghost" id="ve-project-menu-button" aria-expanded="false" aria-controls="ve-project-menu">Project</button>
+            <div class="ve-menu" id="ve-project-menu" role="menu" aria-label="Project actions" hidden>
+              <button type="button" role="menuitem" data-project-action="new">New project</button>
+              <button type="button" role="menuitem" data-project-action="open">Open project file…</button>
+              <button type="button" role="menuitem" data-project-action="save">Download project JSON</button>
+              <hr>
+              <button type="button" role="menuitem" data-project-action="canvas">Canvas settings</button>
+              <button type="button" role="menuitem" data-project-action="help">Keyboard shortcuts</button>
+              <hr>
+              <button type="button" role="menuitem" class="is-danger" data-project-action="clear-autosave">Clear autosave</button>
+            </div>
+          </div>
           <button type="button" class="ve-btn ve-btn-primary" id="ve-export-open">Export</button>
         </div>
       </header>
 
-      <div class="ve-banner" id="ve-restore-banner" hidden role="status">
-        <div>
-          <strong>Autosave found.</strong>
-          <p id="ve-restore-text"></p>
+      <div class="ve-banners">
+        <div class="ve-banner" id="ve-restore-banner" hidden role="status">
+          <div>
+            <strong>Autosave found.</strong>
+            <p id="ve-restore-text"></p>
+          </div>
+          <div class="ve-banner-actions">
+            <button type="button" class="ve-btn ve-btn-primary ve-btn-sm" id="ve-restore-button">Restore timeline</button>
+            <button type="button" class="ve-btn ve-btn-ghost ve-btn-sm" id="ve-restore-discard">Discard</button>
+          </div>
         </div>
-        <div class="ve-banner-actions">
-          <button type="button" class="ve-btn ve-btn-primary ve-btn-xs" id="ve-restore-button">Restore timeline</button>
-          <button type="button" class="ve-btn ve-btn-ghost ve-btn-xs" id="ve-restore-discard">Discard</button>
-        </div>
-      </div>
 
-      <div class="ve-banner ve-banner-warn" id="ve-relink-banner" hidden role="status">
-        <div>
-          <strong>Media needed.</strong>
-          <p id="ve-relink-text"></p>
-        </div>
-        <div class="ve-banner-actions">
-          <button type="button" class="ve-btn ve-btn-primary ve-btn-xs" id="ve-relink-button">Re-import media</button>
+        <div class="ve-banner ve-banner-warn" id="ve-relink-banner" hidden role="status">
+          <div>
+            <strong>Media needed.</strong>
+            <p id="ve-relink-text"></p>
+          </div>
+          <div class="ve-banner-actions">
+            <button type="button" class="ve-btn ve-btn-primary ve-btn-sm" id="ve-relink-button">Re-import media</button>
+          </div>
         </div>
       </div>
 
       <h2 class="visually-hidden" id="editor-title">Video editing workspace</h2>
 
-      <div class="ve-main">
-        <aside class="ve-side ve-side-left" aria-label="Media, effects and layers">
-          <div class="ve-sheet-head ve-only-mobile">
-            <strong>Tools</strong>
-            <button type="button" class="ve-icon-btn" data-mobile-close aria-label="Close tools panel">✕</button>
+      <div class="ve-workspace">
+        <aside class="ve-library" id="ve-library" aria-label="Media, effects and elements">
+          <div class="ve-rail" id="ve-rail" role="tablist" aria-label="Tool categories"></div>
+          <div class="ve-library-panel-wrap">
+            <div class="ve-sheet-head ve-only-mobile">
+              <strong>Tools</strong>
+              <button type="button" class="ve-icon-btn" id="ve-library-close" data-mobile-close-panel aria-label="Close tools panel">✕</button>
+            </div>
+            <div class="ve-library-panel" id="ve-library-panel" role="tabpanel" aria-live="polite"></div>
           </div>
-          <div class="ve-tabs" id="ve-tabs" role="tablist" aria-label="Assets, effects and layers"></div>
-          <div class="ve-panel" id="ve-panel" role="tabpanel" aria-live="polite"></div>
+          <div class="ve-resizer ve-resizer-library" data-resizer="library" role="separator" aria-orientation="vertical" aria-label="Resize tools panel" tabindex="0"></div>
         </aside>
 
-        <section class="ve-stage" aria-label="Preview monitor">
-          <div class="ve-stage-head">
-            <span class="ve-badge" id="ve-selection-count">Nothing selected</span>
-            <span class="ve-badge ve-badge-quiet" id="ve-duration-badge">00:00.0</span>
-            <span class="ve-badge ve-badge-quiet" id="ve-clip-count">0 clips</span>
-            <div class="ve-stage-tools">
+        <div class="ve-center">
+          <div class="ve-monitor-head">
+            <div class="ve-monitor-meta">
+              <span id="ve-selection-label">Nothing selected</span>
+              <span id="ve-clip-count">0 clips</span>
+            </div>
+            <div class="ve-monitor-tools">
               <label class="ve-inline-select">
                 <span class="visually-hidden">Preview quality</span>
-                <select id="ve-preview-quality">
-                  <option value="low">Fast · 540p</option>
-                  <option value="standard" selected>Standard · 720p</option>
-                  <option value="high">Sharp · 1080p</option>
+                <select id="ve-preview-quality" title="Preview quality">
+                  <option value="low">Low</option>
+                  <option value="standard" selected>Standard</option>
+                  <option value="high">High</option>
                 </select>
               </label>
+              <button type="button" class="ve-icon-btn" id="ve-zoom-out" title="Zoom out" aria-label="Zoom out">−</button>
+              <button type="button" class="ve-icon-btn" id="ve-zoom-in" title="Zoom in" aria-label="Zoom in">+</button>
+              <button type="button" class="ve-icon-btn" id="ve-zoom-fit" title="Fit preview" aria-label="Fit preview">Fit</button>
               <button type="button" class="ve-icon-btn" id="ve-fullscreen" title="Fullscreen preview" aria-label="Fullscreen preview">⛶</button>
             </div>
           </div>
+
           <div class="ve-preview-shell" id="ve-preview-shell">
-            <div class="ve-canvas-wrap" id="ve-canvas-wrap">
-              <canvas id="ve-preview-canvas" width="1280" height="720" aria-label="Video preview. Select a layer to move, scale or rotate it."></canvas>
-              <div class="ve-overlay" id="ve-overlay" aria-hidden="true"></div>
-              <p class="ve-preview-empty" id="ve-preview-empty">Your timeline is empty. Import media or add text to begin.</p>
+            <div class="ve-preview-stage" id="ve-preview-stage">
+              <div class="ve-preview-stage-inner" id="ve-preview-stage-inner">
+                <div class="ve-canvas-frame">
+                  <canvas id="ve-preview-canvas" width="1280" height="720" aria-label="Video preview. Select a layer, then drag it to move, use the corner handles to scale and the round handle to rotate."></canvas>
+                  <div class="ve-canvas-overlay" id="ve-canvas-overlay" aria-hidden="true"></div>
+                  <div class="ve-preview-guides" id="ve-preview-guides" aria-hidden="true">
+                    <span class="ve-guide ve-guide-v"></span>
+                    <span class="ve-guide ve-guide-h"></span>
+                    <span class="ve-safe-area"></span>
+                  </div>
+                </div>
+              </div>
             </div>
+            <p class="ve-preview-empty" id="ve-preview-empty">Your timeline is empty. Import media, add a title or record a clip to begin.</p>
           </div>
+
           <div class="ve-transport" role="group" aria-label="Playback controls">
-            <button type="button" class="ve-icon-btn" id="ve-prev-frame" aria-label="Previous frame" title="Previous frame (Left arrow)">◀|</button>
+            <button type="button" class="ve-icon-btn" id="ve-prev-frame" aria-label="Previous frame" title="Previous frame (Left arrow)">⏮</button>
             <button type="button" class="ve-btn ve-btn-ghost ve-btn-sm" id="ve-play" aria-pressed="false">Play</button>
-            <button type="button" class="ve-icon-btn" id="ve-next-frame" aria-label="Next frame" title="Next frame (Right arrow)">|▶</button>
+            <button type="button" class="ve-icon-btn" id="ve-next-frame" aria-label="Next frame" title="Next frame (Right arrow)">⏭</button>
+            <span class="ve-time" id="ve-current-time">00:00:00:00</span>
             <input class="ve-scrub" type="range" id="ve-scrub" min="0" max="10" step="0.01" value="0" aria-label="Playhead position">
-            <output class="ve-time" id="ve-time">00:00.0 / 00:00.0</output>
+            <span class="ve-time" id="ve-total-time">00:00:00:00</span>
             <label class="ve-inline-select">
-              <span class="visually-hidden">Preview playback rate</span>
-              <select id="ve-preview-rate">
+              <span class="visually-hidden">Playback speed</span>
+              <select id="ve-rate" title="Playback speed">
                 <option value="0.5">0.5×</option>
                 <option value="1" selected>1×</option>
                 <option value="1.5">1.5×</option>
@@ -248,225 +283,109 @@
               </select>
             </label>
           </div>
-          <p class="ve-stage-hint">Click a layer in the preview to select it. Drag the box to move, the corners to scale and the round handle to rotate. Changes are real and reach the export.</p>
-        </section>
 
-        <aside class="ve-side ve-side-right" aria-label="Properties">
+          <p class="ve-monitor-hint">Select a layer in the preview to move, scale or rotate it. Every change is composed by the same renderer the export uses.</p>
+        </div>
+
+        <aside class="ve-inspector" id="ve-inspector" aria-label="Properties">
           <div class="ve-sheet-head ve-only-mobile">
             <strong>Properties</strong>
-            <button type="button" class="ve-icon-btn" data-mobile-close aria-label="Close properties panel">✕</button>
+            <button type="button" class="ve-icon-btn" id="ve-inspector-close" data-mobile-close-panel aria-label="Close properties panel">✕</button>
           </div>
-          <div class="ve-props-head">
-            <h2>Properties</h2>
-            <span class="ve-small">Selected clip</span>
-          </div>
-          <div class="ve-props" id="ve-props-body"></div>
-          <div class="visually-hidden" id="ve-properties"></div>
+          <div class="ve-inspector-panel" id="ve-inspector-panel"></div>
+          <div class="ve-resizer ve-resizer-inspector" data-resizer="inspector" role="separator" aria-orientation="vertical" aria-label="Resize properties panel" tabindex="0"></div>
         </aside>
       </div>
 
-      <section class="ve-timeline" id="ve-timeline" aria-label="Multi-track timeline"></section>
+      <div class="ve-timeline-dock">
+        <div class="ve-resizer ve-resizer-timeline" data-resizer="timeline" role="separator" aria-orientation="horizontal" aria-label="Resize timeline panel" tabindex="0"></div>
+        <section class="ve-timeline" id="ve-timeline" aria-label="Multi-track timeline"></section>
+      </div>
 
-      <nav class="ve-mobile-bar" id="ve-mobile-bar" aria-label="Mobile editing panels">
-        <div class="ve-mobile-tools" id="ve-mobile-tools" role="group" aria-label="Editing tools"></div>
-        <div class="ve-mobile-panels">
-          <button type="button" data-mobile-panel="tools" aria-pressed="false">
-            <span aria-hidden="true">▤</span>Tools<span class="ve-mobile-count">0</span>
-          </button>
-          <button type="button" data-mobile-panel="preview" aria-pressed="false">
-            <span aria-hidden="true">▷</span>Preview
-          </button>
-          <button type="button" data-mobile-panel="properties" aria-pressed="false">
-            <span aria-hidden="true">⚙</span>Edit<span class="ve-mobile-count">0</span>
-          </button>
-          <button type="button" data-mobile-panel="timeline" aria-pressed="false">
-            <span aria-hidden="true">▭</span>Timeline
-          </button>
-        </div>
+      <nav class="ve-mobile-dock" aria-label="Mobile editor panels">
+        <button type="button" data-open-sheet="library" aria-expanded="false" aria-controls="ve-library">
+          <b aria-hidden="true">▤</b><span>Tools</span><small id="ve-mobile-category-label">Media</small>
+        </button>
+        <button type="button" data-open-sheet="inspector" aria-expanded="false" aria-controls="ve-inspector">
+          <b aria-hidden="true">≡</b><span>Properties</span><small>Clip settings</small>
+        </button>
+        <button type="button" id="ve-mobile-menu">
+          <b aria-hidden="true">☰</b><span>Project</span><small>Save &amp; open</small>
+        </button>
+        <button type="button" id="ve-mobile-export">
+          <b aria-hidden="true">⤓</b><span>Export</span><small>MP4 / WebM</small>
+        </button>
       </nav>
 
+      <div class="ve-sheet-backdrop" id="ve-sheet-backdrop" hidden aria-hidden="true"></div>
+
       <div class="ve-dropveil" id="ve-dropveil" hidden aria-hidden="true">
-        <div>
-          <strong>Drop to import</strong>
-          <span>Video, images and audio stay in this tab.</span>
-        </div>
+        <div><strong>Drop to import</strong><span>Video, image or audio files stay on this device.</span></div>
       </div>
 
       <div class="ve-toasts" id="ve-toasts" aria-live="polite" aria-atomic="false"></div>
 
-      <input type="file" id="ve-media-input" class="visually-hidden" aria-label="Import video, image or audio files" multiple accept="video/*,image/*,audio/*,.mp4,.m4v,.mov,.webm,.mkv,.jpg,.jpeg,.png,.webp,.gif,.mp3,.wav,.m4a,.aac,.ogg">
-      <input type="file" id="ve-replace-input" class="visually-hidden" aria-label="Choose a replacement media file" accept="video/*,image/*,audio/*,.mp4,.m4v,.mov,.webm,.mkv,.jpg,.jpeg,.png,.webp,.mp3,.wav,.m4a,.aac,.ogg">
+      <input type="file" id="ve-media-input" class="visually-hidden" aria-label="Import video, image or audio files" multiple accept="video/*,image/*,audio/*,.mp4,.m4v,.mov,.webm,.mkv,.jpg,.jpeg,.png,.webp,.gif,.avif,.bmp,.mp3,.wav,.m4a,.aac,.ogg,.opus">
+      <input type="file" id="ve-replace-input" class="visually-hidden" aria-label="Choose a replacement media file" accept="video/*,image/*,audio/*,.mp4,.m4v,.mov,.webm,.mkv,.jpg,.jpeg,.png,.webp,.gif,.avif,.bmp,.mp3,.wav,.m4a,.aac,.ogg,.opus">
       <input type="file" id="ve-open-input" class="visually-hidden" aria-label="Open a LetitEdit project file" accept="application/json,.json">
       <input type="file" id="ve-subtitle-input" class="visually-hidden" aria-label="Import an SRT or WebVTT subtitle file" accept=".srt,.vtt,text/plain,text/vtt">
-    </div>
 
-    <noscript><p class="vc-alert">This video editor needs JavaScript. All decoding, editing and encoding run locally in your browser.</p></noscript>
+      <noscript><p class="ve-fatal">This video editor needs JavaScript. All decoding, editing and encoding run locally in your browser.</p></noscript>
+    </div>
   </div>
 </section>
 
-<dialog class="ve-dialog" id="ve-export-dialog" aria-labelledby="ve-export-title">
-  <div class="ve-dialog-card">
-    <div class="ve-dialog-head">
-      <div>
-        <h2 id="ve-export-title">Export video</h2>
-        <p>The renderer that draws the preview writes these frames, then WebCodecs encodes them into a real file.</p>
-      </div>
-      <button type="button" class="ve-icon-btn" id="ve-export-close" aria-label="Close export panel">✕</button>
-    </div>
-
-    <div class="ve-export-body">
-      <div class="ve-export-settings">
-        <label class="ve-field">
-          <span>Format</span>
-          <select id="ve-export-format"></select>
-        </label>
-        <label class="ve-field">
-          <span>Resolution</span>
-          <select id="ve-export-resolution"></select>
-        </label>
-        <div class="ve-prop-grid ve-export-custom" id="ve-export-custom" hidden>
-          <label class="ve-field"><span>Width</span><input type="number" id="ve-export-width" min="16" max="4096" step="2" value="1920"></label>
-          <label class="ve-field"><span>Height</span><input type="number" id="ve-export-height" min="16" max="4096" step="2" value="1080"></label>
-        </div>
-        <label class="ve-field">
-          <span>Aspect ratio</span>
-          <select id="ve-export-aspect"></select>
-        </label>
-        <div class="ve-prop-grid ve-export-custom" id="ve-export-aspect-custom" hidden>
-          <label class="ve-field"><span>Aspect width</span><input type="number" id="ve-export-aspect-w" min="1" max="100" step="1" value="16"></label>
-          <label class="ve-field"><span>Aspect height</span><input type="number" id="ve-export-aspect-h" min="1" max="100" step="1" value="9"></label>
-        </div>
-        <label class="ve-field">
-          <span>Quality</span>
-          <select id="ve-export-quality"></select>
-        </label>
-        <p class="ve-export-summary" id="ve-export-summary"></p>
-        <p class="ve-small" id="ve-export-estimate"></p>
-        <p class="ve-small" id="ve-export-note"></p>
-      </div>
-
-      <div class="ve-export-progress" id="ve-export-progress" hidden>
-        <div class="ve-progress-head">
-          <span id="ve-export-stage">Preparing</span>
-          <strong id="ve-export-percent">0%</strong>
-        </div>
-        <div class="ve-progress-track" role="progressbar" aria-label="Export progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-          <span id="ve-export-bar"></span>
-        </div>
-      </div>
-
-      <p class="ve-alert ve-alert-warn" id="ve-export-error" hidden></p>
-
-      <div class="ve-export-result" id="ve-export-result" hidden>
-        <video id="ve-export-video" controls playsinline preload="metadata"></video>
-        <dl class="ve-stats" id="ve-export-meta"></dl>
-        <div class="ve-btn-row">
-          <button type="button" class="ve-btn ve-btn-primary" id="ve-export-download">Download file</button>
-          <button type="button" class="ve-btn ve-btn-ghost" id="ve-export-again">Change settings</button>
-        </div>
-        <p class="ve-hint">The preview above plays the actual compressed file, not the timeline. The numbers are read back from that file.</p>
-      </div>
-    </div>
-
-    <div class="ve-dialog-actions">
-      <button type="button" class="ve-btn ve-btn-primary" id="ve-export-start">Start export</button>
-      <button type="button" class="ve-btn ve-btn-ghost" id="ve-export-cancel" disabled>Cancel export</button>
-    </div>
-  </div>
-</dialog>
-
-<dialog class="ve-dialog" id="ve-project-dialog" aria-labelledby="ve-project-title">
-  <form class="ve-dialog-card" id="ve-project-dialog-form">
-    <div class="ve-dialog-head">
-      <div>
-        <h2 id="ve-project-title">Project settings</h2>
-        <p>Canvas, frame rate and audio master. The canvas determines the exported picture.</p>
-      </div>
-      <button type="button" class="ve-icon-btn" data-close-dialog aria-label="Close project settings">✕</button>
-    </div>
-    <div class="ve-export-body">
-      <label class="ve-field"><span>Project name</span><input type="text" id="ve-pd-name" maxlength="80" autocomplete="off"></label>
-      <div class="ve-prop-grid">
-        <label class="ve-field"><span>Aspect ratio</span>
-          <select id="ve-pd-aspect">
-            <option value="16:9">16:9 landscape</option>
-            <option value="9:16">9:16 portrait</option>
-            <option value="1:1">1:1 square</option>
-            <option value="4:5">4:5 portrait</option>
-            <option value="4:3">4:3 classic</option>
-            <option value="3:2">3:2 photo</option>
-            <option value="custom">Custom</option>
-          </select>
-        </label>
-        <label class="ve-field"><span>Resolution</span>
-          <select id="ve-pd-resolution">
-            <option value="2160">4K · 2160p</option>
-            <option value="1440">1440p</option>
-            <option value="1080">1080p</option>
-            <option value="720">720p</option>
-            <option value="480">480p</option>
-            <option value="360">360p</option>
-            <option value="custom">Custom</option>
-          </select>
-        </label>
-      </div>
-      <div class="ve-prop-grid" id="ve-pd-aspect-custom" hidden>
-        <label class="ve-field"><span>Aspect width</span><input type="number" id="ve-pd-aspect-w" min="1" max="100" step="1" value="16"></label>
-        <label class="ve-field"><span>Aspect height</span><input type="number" id="ve-pd-aspect-h" min="1" max="100" step="1" value="9"></label>
-      </div>
-      <div class="ve-prop-grid" id="ve-pd-custom" hidden>
-        <label class="ve-field"><span>Canvas width</span><input type="number" id="ve-pd-width" min="16" max="4096" step="2" value="1920"></label>
-        <label class="ve-field"><span>Canvas height</span><input type="number" id="ve-pd-height" min="16" max="4096" step="2" value="1080"></label>
-      </div>
-      <div class="ve-prop-grid">
-        <label class="ve-field"><span>Frame rate</span>
-          <select id="ve-pd-fps">
-            <option value="24">24 fps</option>
-            <option value="25">25 fps</option>
-            <option value="30">30 fps</option>
-            <option value="50">50 fps</option>
-            <option value="60">60 fps</option>
-          </select>
-        </label>
-        <label class="ve-field"><span>Canvas background</span><input type="color" id="ve-pd-background" value="#000000"></label>
-      </div>
-      <label class="ve-field"><span>Master volume</span><input type="range" id="ve-pd-volume" min="0" max="1.5" step="0.01" value="1"></label>
-      <p class="ve-small">Project JSON and autosave store the timeline and layer settings only. Imported media is never persisted and must be re-imported after a reload.</p>
-    </div>
-    <div class="ve-dialog-actions">
-      <button type="submit" class="ve-btn ve-btn-primary" id="ve-pd-apply">Apply settings</button>
-      <button type="button" class="ve-btn ve-btn-danger" id="ve-pd-clear">Clear timeline</button>
-      <button type="button" class="ve-btn ve-btn-ghost" data-close-dialog>Close</button>
-    </div>
-  </form>
-</dialog>
+<dialog class="ve-dialog" id="ve-export-dialog" aria-label="Export video"></dialog>
 
 <dialog class="ve-dialog" id="ve-help-dialog" aria-labelledby="ve-help-title">
   <div class="ve-dialog-card">
     <div class="ve-dialog-head">
       <div>
+        <span class="ve-panel-eyebrow">Reference</span>
         <h2 id="ve-help-title">Keyboard shortcuts</h2>
-        <p>Everything here also has a visible control in the workspace.</p>
+        <p>Focus a clip first; shortcuts are ignored while you are typing in a field.</p>
       </div>
       <button type="button" class="ve-icon-btn" data-close-dialog aria-label="Close help">✕</button>
     </div>
     <div class="ve-export-body">
       <dl class="ve-shortcuts">
-        <div><dt>Space</dt><dd>Play or pause the preview</dd></div>
-        <div><dt>Left / Right</dt><dd>Step one frame backwards or forwards</dd></div>
-        <div><dt>Shift + Left / Right</dt><dd>Nudge a focused clip by one second</dd></div>
-        <div><dt>S</dt><dd>Split selected clips at the playhead</dd></div>
-        <div><dt>Delete</dt><dd>Delete selected clips</dd></div>
-        <div><dt>Ctrl / Cmd + D</dt><dd>Duplicate selected clips</dd></div>
+        <div><dt>Space</dt><dd>Play or pause</dd></div>
+        <div><dt>Left / Right</dt><dd>Step one frame</dd></div>
+        <div><dt>Home / End</dt><dd>Jump to start or end</dd></div>
+        <div><dt>S</dt><dd>Split at the playhead</dd></div>
+        <div><dt>Delete / Backspace</dt><dd>Delete the selection</dd></div>
+        <div><dt>Ctrl / Cmd + D</dt><dd>Duplicate the selection</dd></div>
+        <div><dt>Ctrl / Cmd + C / V</dt><dd>Copy or paste clips</dd></div>
+        <div><dt>Ctrl / Cmd + A</dt><dd>Select every clip</dd></div>
         <div><dt>Ctrl / Cmd + Z</dt><dd>Undo</dd></div>
         <div><dt>Ctrl / Cmd + Shift + Z</dt><dd>Redo</dd></div>
-        <div><dt>Ctrl / Cmd + S</dt><dd>Download the project file</dd></div>
+        <div><dt>Ctrl / Cmd + S</dt><dd>Download the project JSON</dd></div>
         <div><dt>Ctrl / Cmd + scroll</dt><dd>Zoom the timeline around the pointer</dd></div>
+        <div><dt>[ / ]</dt><dd>Trim the selected clip's start or end to the playhead</dd></div>
+        <div><dt>Arrow keys on a clip</dt><dd>Nudge timing by 0.1 s, or 1 s with Shift</dd></div>
       </dl>
-      <p class="ve-small">On touch screens, drag a clip body to move it and its edge handles to trim. Pinch inside the timeline to zoom. Long timelines scroll horizontally, and clips can also be nudged with the buttons in Properties.</p>
+      <p class="ve-empty-inline">On touch screens, drag a clip body to move it and its edge handles to trim. Pinch the timeline to zoom. Every button keeps a 44 px minimum target on phones.</p>
     </div>
     <div class="ve-dialog-actions">
       <button type="button" class="ve-btn ve-btn-primary" data-close-dialog>Close</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog class="ve-dialog ve-confirm-dialog" id="ve-confirm-dialog" aria-labelledby="ve-confirm-title">
+  <div class="ve-dialog-card">
+    <div class="ve-dialog-head">
+      <div>
+        <span class="ve-panel-eyebrow">Confirm</span>
+        <h2 id="ve-confirm-title" data-confirm-title>Are you sure?</h2>
+      </div>
+    </div>
+    <div class="ve-export-body">
+      <p class="ve-confirm-message" data-confirm-message></p>
+    </div>
+    <div class="ve-dialog-actions">
+      <button type="button" class="ve-btn ve-btn-primary" data-confirm-ok>Continue</button>
+      <button type="button" class="ve-btn ve-btn-ghost" data-confirm-cancel>Cancel</button>
     </div>
   </div>
 </dialog>
@@ -668,6 +587,6 @@
   </div>
 </footer>
 
-<script type="module" src="../../js/video-editor/app.js"></script>
+<script type="module" src="../../js/video-editor/next/app.js"></script>
 </body>
 </html>

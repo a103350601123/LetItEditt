@@ -372,7 +372,7 @@ async function runExport(message) {
     sampleRate: AUDIO_RATE
   }).catch(() => false);
   let audioSource = null;
-  if (audioSupported) {
+  if (audioSupported && options.includeAudio !== false) {
     audioSource = new MB.AudioSampleSource({
       codec: audioCodec,
       quality: new MB.Quality({ bitrate: quality.audio })

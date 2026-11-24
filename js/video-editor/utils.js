@@ -227,8 +227,9 @@ export const ASPECTS = [
   { id: '16:9', label: '16:9 · Landscape', ratio: 16 / 9 },
   { id: '9:16', label: '9:16 · Portrait', ratio: 9 / 16 },
   { id: '1:1', label: '1:1 · Square', ratio: 1 },
-  { id: '4:5', label: '4:5 · Portrait', ratio: 4 / 5 },
   { id: '4:3', label: '4:3 · Classic', ratio: 4 / 3 },
+  { id: '3:4', label: '3:4 · Portrait', ratio: 3 / 4 },
+  { id: '4:5', label: '4:5 · Social portrait', ratio: 4 / 5 },
   { id: '3:2', label: '3:2 · Photo', ratio: 3 / 2 },
   { id: 'custom', label: 'Custom', ratio: null }
 ];
