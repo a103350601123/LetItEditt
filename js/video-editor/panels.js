@@ -21,13 +21,30 @@ export const TABS = [
   { id: 'layers', label: 'Layers' }
 ];
 
+/* A short glyph plus the written label keeps every tool recognisable at
+ * 320 px without relying on an icon font or an image request. */
+export const TAB_ICONS = {
+  media: '▤',
+  text: 'T',
+  audio: '♪',
+  overlays: '▣',
+  transitions: '⇄',
+  filters: '◐',
+  effects: '✦',
+  subtitles: 'CC',
+  layers: '≡'
+};
+
 function tabId(tab) {
   return TABS.some((item) => item.id === tab) ? tab : 'media';
 }
 
 export function renderTabStrip(activeTab) {
   return TABS.map((tab) => `
-    <button type="button" role="tab" id="ve-tab-${tab.id}" data-tab="${tab.id}" aria-selected="${tab.id === activeTab}" aria-controls="ve-panel" tabindex="${tab.id === activeTab ? '0' : '-1'}">${tab.label}</button>
+    <button type="button" role="tab" id="ve-tab-${tab.id}" data-tab="${tab.id}" aria-selected="${tab.id === activeTab}" aria-controls="ve-panel" tabindex="${tab.id === activeTab ? '0' : '-1'}">
+      <span class="ve-tab-icon" aria-hidden="true">${TAB_ICONS[tab.id] || '•'}</span>
+      <span class="ve-tab-label">${tab.label}</span>
+    </button>
   `).join('');
 }
 

@@ -434,11 +434,28 @@ export class MediaLibrary {
     return asset && asset.peaks ? asset.peaks : null;
   }
 
+  /** A stable blob URL for preview audio monitoring.
+   *  Created once per asset and reused by every clip, so seeking or pausing
+   *  never replaces the source and never starts a second copy of the sound. */
+  audioUrl(mediaId) {
+    const asset = this.assets.get(mediaId);
+    if (!asset || !asset.hasAudio || !asset.file) return '';
+    if (!asset.audioUrl) {
+      try {
+        asset.audioUrl = URL.createObjectURL(asset.file);
+      } catch (error) {
+        return '';
+      }
+    }
+    return asset.audioUrl;
+  }
+
   remove(mediaId) {
     const asset = this.assets.get(mediaId);
     if (!asset) return;
     if (asset.thumbnail) URL.revokeObjectURL(asset.thumbnail);
     if (asset.url) URL.revokeObjectURL(asset.url);
+    if (asset.audioUrl) URL.revokeObjectURL(asset.audioUrl);
     try {
       asset.input?.dispose?.();
     } catch (error) {

@@ -268,18 +268,21 @@
       <section class="ve-timeline" id="ve-timeline" aria-label="Multi-track timeline"></section>
 
       <nav class="ve-mobile-bar" id="ve-mobile-bar" aria-label="Mobile editing panels">
-        <button type="button" data-mobile-panel="tools" aria-pressed="false">
-          <span aria-hidden="true">▤</span>Tools<span class="ve-mobile-count">0</span>
-        </button>
-        <button type="button" data-mobile-panel="preview" aria-pressed="false">
-          <span aria-hidden="true">▷</span>Preview
-        </button>
-        <button type="button" data-mobile-panel="properties" aria-pressed="false">
-          <span aria-hidden="true">⚙</span>Edit<span class="ve-mobile-count">0</span>
-        </button>
-        <button type="button" data-mobile-panel="timeline" aria-pressed="false">
-          <span aria-hidden="true">▭</span>Timeline
-        </button>
+        <div class="ve-mobile-tools" id="ve-mobile-tools" role="group" aria-label="Editing tools"></div>
+        <div class="ve-mobile-panels">
+          <button type="button" data-mobile-panel="tools" aria-pressed="false">
+            <span aria-hidden="true">▤</span>Tools<span class="ve-mobile-count">0</span>
+          </button>
+          <button type="button" data-mobile-panel="preview" aria-pressed="false">
+            <span aria-hidden="true">▷</span>Preview
+          </button>
+          <button type="button" data-mobile-panel="properties" aria-pressed="false">
+            <span aria-hidden="true">⚙</span>Edit<span class="ve-mobile-count">0</span>
+          </button>
+          <button type="button" data-mobile-panel="timeline" aria-pressed="false">
+            <span aria-hidden="true">▭</span>Timeline
+          </button>
+        </div>
       </nav>
 
       <div class="ve-dropveil" id="ve-dropveil" hidden aria-hidden="true">

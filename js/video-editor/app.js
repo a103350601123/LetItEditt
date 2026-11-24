@@ -47,7 +47,8 @@ import {
 } from './model.js';
 import { MediaLibrary, validateFile } from './media.js';
 import { TimelineView, applyTrim } from './timeline.js';
-import { TABS, renderLibraryPanel, renderTabStrip } from './panels.js';
+import { PreviewAudioMixer } from './preview-audio.js';
+import { TABS, TAB_ICONS, renderLibraryPanel, renderTabStrip } from './panels.js';
 import { renderProperties } from './properties.js';
 import {
   COLOR_PRESETS,
@@ -105,10 +106,15 @@ let store = null;
 let media = null;
 let timeline = null;
 let previewCtx = null;
+let previewFrame = null;
+let previewFrameCtx = null;
 let previewToken = 0;
 let previewScheduled = false;
+let previewPending = false;
 let previewBusy = false;
 let previewErrorShown = false;
+let previewIdleWaiters = [];
+let previewAudio = null;
 let rafId = 0;
 let lastTick = 0;
 let activeExport = null;
@@ -312,6 +318,7 @@ function cacheDom() {
     toasts: '#ve-toasts',
     dropveil: '#ve-dropveil',
     mobileBar: '#ve-mobile-bar',
+    mobileTools: '#ve-mobile-tools',
     restoreBanner: '#ve-restore-banner',
     restoreText: '#ve-restore-text',
     restoreButton: '#ve-restore-button',
@@ -404,6 +411,26 @@ function init() {
     toast('The preview canvas could not be created in this browser.', 'error', 0);
     return;
   }
+  /* Compose every frame off-screen and blit it in one operation. Drawing the
+   * composition straight into the visible canvas made the area flash the
+   * background colour while each decoded frame was awaited. */
+  previewFrame = document.createElement('canvas');
+  previewFrame.width = els.previewCanvas.width;
+  previewFrame.height = els.previewCanvas.height;
+  previewFrameCtx = previewFrame.getContext('2d', { alpha: false });
+
+  previewAudio = new PreviewAudioMixer({
+    getProject: project,
+    getTime: () => state.playhead,
+    getRate: () => state.previewRate,
+    media,
+    onStatus: (message, type) => toast(message, type || 'warn'),
+    onBlocked: () => toast(
+      'The browser blocked preview audio. Press Play again to allow sound, or check this site’s sound permission.',
+      'warn',
+      8000
+    )
+  });
 
   timeline = new TimelineView({
     root: els.timeline,
@@ -429,11 +456,13 @@ function init() {
   bindKeyboard();
   bindDialogs();
   bindMobileBar();
+  bindMobileTools();
   bindPanelRefreshFlush();
 
   store.subscribe(onStoreChange);
 
   renderTabs();
+  renderMobileTools();
   renderLibrary(true);
   renderPropertiesPanel();
   updateToolbar();
@@ -452,6 +481,7 @@ function init() {
   if (els.previewQuality) els.previewQuality.value = state.previewQuality;
   new ResizeObserver(() => layoutCanvas()).observe(els.previewShell);
   window.addEventListener('beforeunload', () => {
+    previewAudio?.dispose();
     media?.clear();
   });
 }
@@ -484,6 +514,7 @@ function onStoreChange(reason) {
   }
 
   updatePreviewEmpty();
+  previewAudio?.refresh();
   schedulePreview();
   scheduleAutosave();
   updateMobileBadges();
@@ -543,6 +574,10 @@ function updatePreviewSize() {
     els.previewCanvas.width = width;
     els.previewCanvas.height = height;
   }
+  if (previewFrame && (previewFrame.width !== width || previewFrame.height !== height)) {
+    previewFrame.width = width;
+    previewFrame.height = height;
+  }
   els.previewCanvas.dataset.ratio = String(ratio);
   layoutCanvas();
 }
@@ -565,18 +600,36 @@ function layoutCanvas() {
 }
 
 async function renderPreview() {
-  if (!previewCtx) return;
-  const token = ++previewToken;
+  if (!previewCtx || !previewFrameCtx) return;
+  /* One render at a time. A tick that arrives while a decode is in flight is
+   * merged into a single follow-up render, so frames can never interleave. */
+  if (previewBusy) {
+    previewPending = true;
+    return;
+  }
   previewBusy = true;
+  previewPending = false;
+  const token = ++previewToken;
   try {
+    if (previewFrame.width !== els.previewCanvas.width || previewFrame.height !== els.previewCanvas.height) {
+      previewFrame.width = els.previewCanvas.width;
+      previewFrame.height = els.previewCanvas.height;
+    }
     await renderComposition(
-      previewCtx,
+      previewFrameCtx,
       project(),
       sourceAdapter,
       state.playhead,
       { maxDimension: previewEdge() }
     );
     if (token !== previewToken) return;
+    /* Blit the finished composition in one synchronous draw. The visible
+     * canvas is never cleared by itself, so no blank frame can appear. */
+    previewCtx.setTransform(1, 0, 0, 1, 0, 0);
+    previewCtx.globalAlpha = 1;
+    previewCtx.globalCompositeOperation = 'source-over';
+    previewCtx.filter = 'none';
+    previewCtx.drawImage(previewFrame, 0, 0, els.previewCanvas.width, els.previewCanvas.height);
     updateOverlay();
     updatePreviewEmpty();
     previewErrorShown = false;
@@ -586,15 +639,45 @@ async function renderPreview() {
       toast(`The preview could not be drawn: ${error.message || error}`, 'error');
     }
   } finally {
-    if (token === previewToken) previewBusy = false;
+    previewBusy = false;
+    if (previewIdleWaiters.length) {
+      const waiters = previewIdleWaiters;
+      previewIdleWaiters = [];
+      for (const resolve of waiters) resolve();
+    }
+    if (previewPending) {
+      previewPending = false;
+      schedulePreview();
+    }
   }
 }
 
+function previewIdle() {
+  if (!previewBusy) return Promise.resolve();
+  return new Promise((resolve) => previewIdleWaiters.push(resolve));
+}
+
+/** Await a guaranteed, up-to-date paint. The automatic loop intentionally
+ *  coalesces overlapping ticks, but tools and tests that ask for a frame
+ *  explicitly must get one after any in-flight decode has finished. */
+async function renderPreviewNow() {
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    await previewIdle();
+    if (previewBusy) continue;
+    await renderPreview();
+    if (!previewBusy) return;
+  }
+  await previewIdle();
+}
+
 function schedulePreview() {
-  if (previewScheduled) return;
+  previewPending = true;
+  if (previewScheduled || previewBusy) return;
   previewScheduled = true;
   requestAnimationFrame(() => {
     previewScheduled = false;
+    if (!previewPending) return;
+    previewPending = false;
     renderPreview();
   });
 }
@@ -632,6 +715,7 @@ function seek(time, options = {}) {
   if (state.playing) lastTick = performance.now();
   timeline?.setTime(state.playhead);
   updateTransport();
+  previewAudio?.seek();
   schedulePreview();
   updateOverlay();
   if (!options.fromScrub) updatePreviewEmpty();
@@ -649,6 +733,9 @@ function play() {
   lastTick = performance.now();
   updateTransport();
   updateOverlay();
+  /* Start inside the click/key press so the browser treats preview audio as
+   * user-initiated. */
+  previewAudio?.start();
   rafId = requestAnimationFrame(playTick);
 }
 
@@ -661,9 +748,11 @@ function playTick(now) {
     state.playhead = Math.min(duration, state.playhead + delta);
     timeline?.setTime(state.playhead);
     updateTransport();
+    previewAudio?.update();
     schedulePreview();
     if (state.playhead >= duration - 0.002) {
       state.playing = false;
+      previewAudio?.stop();
       updateTransport();
       updateOverlay();
       return;
@@ -676,6 +765,7 @@ function pause() {
   if (!state.playing) return;
   state.playing = false;
   cancelAnimationFrame(rafId);
+  previewAudio?.stop();
   updateTransport();
   updateOverlay();
 }
@@ -931,6 +1021,7 @@ function removeMedia(mediaId) {
   if (!asset) return;
   const used = usedClipCount(mediaId);
   if (used && !window.confirm(`“${asset.name}” is used by ${used} clip${used === 1 ? '' : 's'}. Removing it will leave those clips without a picture. Continue?`)) return;
+  previewAudio?.forgetMedia(mediaId);
   media.remove(mediaId);
   renderLibrary(true);
   updateProjectMeta();
@@ -1042,6 +1133,7 @@ function addTextPreset(presetId) {
   state.selection.add(clip.id);
   state.activeTab = 'media';
   renderTabs();
+  updateMobileToolState();
   renderLibrary(true);
   renderPropertiesPanel();
   updateSelectionClasses();
@@ -1215,8 +1307,43 @@ function setActiveTab(tab) {
   state.activeTab = tab;
   renderTabs();
   renderLibrary();
-  const tabButton = els.tabs.querySelector(`[data-tab="${tab}"]`);
-  tabButton?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  revealActiveTab();
+  updateMobileToolState();
+}
+
+/** Keep the selected tab visible inside the tab strip without scrolling the
+ *  page. The previous scrollIntoView() could move the whole workspace and push
+ *  the project toolbar out of view. */
+function revealActiveTab() {
+  const strip = els.tabs;
+  const button = strip?.querySelector(`[data-tab="${state.activeTab}"]`);
+  if (!strip || !button) return;
+  const left = button.offsetLeft;
+  const right = left + button.offsetWidth;
+  if (left < strip.scrollLeft) strip.scrollLeft = left;
+  else if (right > strip.scrollLeft + strip.clientWidth) {
+    strip.scrollLeft = right - strip.clientWidth;
+  }
+}
+
+function renderMobileTools() {
+  if (!els.mobileTools) return;
+  els.mobileTools.innerHTML = TABS.map((tab) => `
+    <button type="button" data-mobile-tool="${tab.id}" aria-pressed="false" title="${tab.label}">
+      <span class="ve-mobile-tool-icon" aria-hidden="true">${TAB_ICONS[tab.id] || '•'}</span>
+      <span>${tab.label}</span>
+    </button>
+  `).join('');
+  updateMobileToolState();
+}
+
+function updateMobileToolState() {
+  if (!els.mobileTools) return;
+  for (const button of $$('[data-mobile-tool]', els.mobileTools)) {
+    const active = button.getAttribute('data-mobile-tool') === state.activeTab;
+    button.setAttribute('aria-pressed', String(active));
+    button.classList.toggle('is-active', active);
+  }
 }
 
 function updateMobilePanel() {
@@ -1227,6 +1354,7 @@ function updateMobilePanel() {
     button.setAttribute('aria-pressed', String(active));
     button.classList.toggle('is-active', active);
   }
+  updateMobileToolState();
 }
 
 function updateMobileBadges() {
@@ -1395,6 +1523,7 @@ function newProject() {
     if (!window.confirm('Start a new project? The current timeline and the imported media in this tab will be cleared. Saved project files are not affected.')) return;
   }
   pause();
+  previewAudio?.dispose();
   media.clear();
   store = new ProjectStore(createProject());
   store.subscribe(onStoreChange);
@@ -1711,6 +1840,7 @@ function handleTimelineCommand(command, payload = {}) {
   else if (command === 'edit-transition') {
     state.activeTab = 'transitions';
     renderTabs();
+    updateMobileToolState();
     renderLibrary();
   }
 }
@@ -3019,6 +3149,7 @@ function bindTransport() {
   });
   els.previewRate?.addEventListener('change', () => {
     state.previewRate = clamp(num(els.previewRate.value, 1), 0.1, 4);
+    previewAudio?.seek();
   });
 }
 
@@ -3582,6 +3713,18 @@ function bindDialogs() {
   });
 }
 
+function bindMobileTools() {
+  if (!els.mobileTools) return;
+  els.mobileTools.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-mobile-tool]');
+    if (!button) return;
+    const tab = button.getAttribute('data-mobile-tool');
+    setActiveTab(tab);
+    state.mobilePanel = 'tools';
+    updateMobilePanel();
+  });
+}
+
 function bindMobileBar() {
   if (!els.mobileBar) return;
   els.mobileBar.addEventListener('click', (event) => {
@@ -3674,6 +3817,9 @@ function exposeDebug() {
     get timeline() {
       return timeline;
     },
+    get audio() {
+      return previewAudio;
+    },
     support: () => ({ ...appSupport }),
     filters: () => FILTERS.map((filter) => filter.id),
     transitions: () => TRANSITIONS.map((entry) => entry.id),
@@ -3697,7 +3843,7 @@ function exposeDebug() {
     play,
     pause,
     getTime: () => state.playhead,
-    renderPreview,
+    renderPreview: renderPreviewNow,
     exportToBlob,
     projectFileData,
     loadProjectData,
