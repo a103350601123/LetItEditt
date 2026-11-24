@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Online Video Converter – MP4, WebM, MOV, MKV &amp; MP3 | LetitEdit</title>
+<meta name="description" content="Convert video to MP4, WebM, MOV or MKV, or extract MP3 audio in your browser. Choose codec, resolution, quality and audio settings, then download a genuinely re-encoded file. No upload, no account.">
+<meta name="theme-color" content="#2563EB">
+<link rel="canonical" href="https://letitedit.com/media-and-motion/video-converter/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Free Online Video Converter – MP4, WebM, MOV, MKV &amp; MP3 | LetitEdit">
+<meta property="og:description" content="Convert a video between MP4, WebM, MOV and MKV, or extract its audio as MP3, WAV, M4A or AAC. Real decoding and encoding on your device with honest results.">
+<meta property="og:url" content="https://letitedit.com/media-and-motion/video-converter/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="stylesheet" href="../../css/video-converter.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://letitedit.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Categories", "item": "https://letitedit.com/categories/" },
+        { "@type": "ListItem", "position": 3, "name": "Video Editing", "item": "https://letitedit.com/categories/video-editing/" },
+        { "@type": "ListItem", "position": 4, "name": "Video Converter", "item": "https://letitedit.com/media-and-motion/video-converter/" }
+      ]
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "Free Online Video Converter",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Any modern browser",
+      "url": "https://letitedit.com/media-and-motion/video-converter/",
+      "description": "Convert a video to MP4, WebM, MOV or MKV, or extract audio as MP3, WAV, M4A or AAC. Choose container, codec, resolution, quality, frame rate and audio settings. Decoding and encoding happen locally in the browser.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "featureList": [
+        "Video to video conversion for MP4, WebM, MOV and MKV",
+        "Video to audio extraction with MP3 as the primary format",
+        "H.264, HEVC, VP8, VP9 and AV1 options where the browser can encode them",
+        "Resolution presets from 4K to 360p plus custom dimensions",
+        "High Quality, Balanced and Smaller File presets with advanced rate control",
+        "Optional audio removal or re-encoding with a chosen bitrate",
+        "MP3 bitrates from 96 to 320 kbps, sample rate and mono/stereo selection",
+        "Multiple audio track selection",
+        "Real measured format, codec, duration, size and bitrate in the results",
+        "Local processing with no upload"
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Does this video converter upload my file?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The file is decoded and re-encoded inside a Web Worker in your browser tab using Mediabunny and WebCodecs. It is not sent to LetitEdit or a third-party service, and no account is required." }
+        },
+        {
+          "@type": "Question",
+          "name": "Which video formats can I convert from and to?",
+          "acceptedAnswer": { "@type": "Answer", "text": "MP4, M4V, MOV, WebM and MKV inputs are accepted when this browser can decode their video codec. Outputs are MP4, WebM, MOV and MKV, each limited to the video and audio codecs that can genuinely be muxed and encoded in this browser. AVI is not decoded by the browser engine and is rejected with an explanation." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I extract MP3 audio from a video?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Switch to Video to audio, choose MP3, pick a bitrate from 96 to 320 kbps, a sample rate and mono or stereo, then extract. The audio track is decoded and encoded with an MP3 encoder; the file is not renamed. WAV, M4A and AAC are offered when the browser can encode them." }
+        },
+        {
+          "@type": "Question",
+          "name": "Which MP3 bitrate should I choose?",
+          "acceptedAnswer": { "@type": "Answer", "text": "192 kbps is a good default for music and general listening. 320 kbps keeps the most detail and creates the largest file. 128 kbps is fine for speech and casual listening, while 96 kbps saves the most space and may sound thin. MP3 is lossy at every bitrate, so a higher value cannot restore detail the source never had." }
+        },
+        {
+          "@type": "Question",
+          "name": "Will converting change the duration or audio sync?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The tool preserves frame timestamps and encodes audio against the same timeline, so audio stays aligned with the picture. If you cap the frame rate, extra frames are dropped and the previous frame is extended rather than duplicating frames. MP3 adds a small encoder delay and padding, so its duration can be a few milliseconds longer than the source." }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is a container or codec disabled?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The tool asks the browser which codecs it can actually encode at the chosen resolution and sample rate. A container or codec that is unavailable is disabled with an explanation instead of producing a broken or mislabelled file." }
+        },
+        {
+          "@type": "Question",
+          "name": "What happens if the video has no audio track?",
+          "acceptedAnswer": { "@type": "Answer", "text": "In Video to video mode the output is simply silent. In Video to audio mode the page says there is nothing to extract and keeps the extract button disabled. The tool never creates a silent MP3 or renames a video file as audio." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does converting always make the file smaller?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. Conversion is not compression. Balanced aims to stay close to the source quality, and High Quality may produce a larger file. The result panel reports the measured size and clearly states when the output grew. Use the Video Compressor or the Smaller File preset when size is the priority." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I convert more than one file at a time?",
+          "acceptedAnswer": { "@type": "Answer", "text": "One file is converted per job so the preview, settings and result stay accurate. Remove the current file or start a new conversion to load another." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is the conversion private?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. The page loads only its own stylesheet, the self-hosted Mediabunny engine, the MP3 encoder and the worker. The file, the preview and the result stay in the browser tab, and object URLs are released when you replace the file, start another job or leave the page." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body class="vc-page cv-page">
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="topbar">
+  <nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+    <div class="nav-links" id="primary-links">
+      <a href="/categories/">Categories</a>
+      <a href="/blog/">Blog</a>
+      <a href="/news/">News</a>
+      <a href="/faq/">FAQ</a>
+    </div>
+    <div class="nav-actions">
+      <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
+    </div>
+  </nav>
+</header>
+
+<main id="main-content">
+<nav class="container breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../">Home</a><span aria-hidden="true">/</span>
+  <a href="../../categories/">Categories</a><span aria-hidden="true">/</span>
+  <a href="../../categories/video-editing/">Video Editing</a><span aria-hidden="true">/</span>
+  <span aria-current="page">Video Converter</span>
+</nav>
+
+<section class="vc-hero">
+  <div class="container">
+    <span class="eyebrow">Media &amp; Motion · Video Editing · Live tool</span>
+    <h1>Free Online Video Converter</h1>
+    <p>Convert a video to MP4, WebM, MOV or MKV, or extract its soundtrack as MP3. Choose the container, codec, resolution, quality and audio settings, then download a file that was genuinely decoded and re-encoded. Everything runs on your device and nothing is uploaded.</p>
+    <ul class="vc-hero-points">
+      <li>Video to video and video to audio</li>
+      <li>MP3, WAV, M4A and AAC extraction</li>
+      <li>Real codec and container filtering</li>
+      <li>Runs on your device</li>
+    </ul>
+  </div>
+</section>
+
+<section class="vc-section" aria-labelledby="converter-title">
+  <div class="container vc-workspace">
+    <div class="vc-panel" data-app>
+      <div class="vc-panel-head">
+        <div>
+          <h2 id="converter-title">Convert your video</h2>
+          <p>Add one clip, choose video or audio output, then download the converted result.</p>
+        </div>
+        <span class="vc-privacy">Local processing</span>
+      </div>
+
+      <div class="cv-mode-tabs" role="radiogroup" aria-label="Conversion mode">
+        <label class="cv-mode-tab">
+          <input type="radio" name="cv-tool-mode" value="video" checked>
+          <span><strong>Video to video</strong><small>MP4, WebM, MOV or MKV</small></span>
+        </label>
+        <label class="cv-mode-tab">
+          <input type="radio" name="cv-tool-mode" value="audio">
+          <span><strong>Video to audio</strong><small>MP3, WAV, M4A or AAC</small></span>
+        </label>
+      </div>
+
+      <div class="vc-drop" data-dropzone>
+        <span class="vc-drop-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+        </span>
+        <p class="vc-drop-title" data-drop-title>Drag and drop your video here</p>
+        <p class="vc-drop-sub" data-drop-sub>Select an MP4, WebM, MOV, M4V or MKV file. Up to 2 GB. AVI is not decoded by the browser engine.</p>
+        <button class="vc-btn vc-btn-primary" type="button" data-browse>Browse video</button>
+        <p class="vc-drop-note">No upload. The file stays in this browser tab.</p>
+        <input type="file" hidden data-file-input aria-label="Choose a video file" accept="video/mp4,video/webm,video/quicktime,video/x-m4v,video/x-matroska,.mp4,.m4v,.mov,.webm,.mkv">
+      </div>
+
+      <p class="vc-alert" data-global-error role="alert" hidden></p>
+      <p class="vc-warning" data-warning hidden></p>
+
+      <div class="vc-loading" data-loading hidden>
+        <span class="vc-spinner" aria-hidden="true"></span>
+        <p data-loading-text role="status" aria-live="polite">Reading the video…</p>
+      </div>
+
+      <div class="vc-editor" data-editor hidden>
+        <div class="vc-filebar">
+          <div class="vc-file-thumb"><img data-file-thumb alt="" hidden></div>
+          <div class="vc-file-info">
+            <strong data-file-name>—</strong>
+            <p data-file-meta>—</p>
+          </div>
+          <div class="vc-file-actions">
+            <button class="vc-btn vc-btn-secondary vc-btn-small" type="button" data-replace>Replace video</button>
+            <button class="vc-btn vc-btn-ghost vc-btn-small" type="button" data-remove-video>Remove</button>
+          </div>
+        </div>
+
+        <div class="vc-layout">
+          <div class="vc-main">
+            <div class="vc-preview-card">
+              <div class="vc-preview-head">
+                <span class="vc-preview-label">Source video</span>
+                <span class="vc-preview-dims" data-source-dims>—</span>
+              </div>
+              <div class="vc-player" data-player tabindex="0" aria-label="Source video player">
+                <div class="vc-stage" data-stage>
+                  <video data-video playsinline preload="metadata" aria-label="Source video preview"></video>
+                  <p class="vc-video-error" data-video-error hidden></p>
+                  <button class="vc-big-play" type="button" data-big-play aria-label="Play video">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>
+                  </button>
+                </div>
+                <div class="vc-controls">
+                  <div class="vc-seek-row">
+                    <span class="vc-time" data-current>00:00</span>
+                    <input class="vc-range vc-seek" type="range" data-seek min="0" max="1000" step="1" value="0" aria-label="Seek through the video">
+                    <span class="vc-time" data-total>00:00</span>
+                  </div>
+                  <div class="vc-button-row">
+                    <button class="vc-icon-btn" type="button" data-play aria-label="Play video" title="Play">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>
+                    </button>
+                    <div class="vc-volume-group">
+                      <button class="vc-icon-btn" type="button" data-mute aria-label="Mute video" title="Mute">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                      </button>
+                      <input class="vc-range vc-volume" type="range" data-volume min="0" max="1" step="0.01" value="1" aria-label="Volume">
+                    </div>
+                    <span class="vc-controls-spacer"></span>
+                    <button class="vc-icon-btn" type="button" data-fullscreen aria-label="Enter fullscreen" title="Fullscreen">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="vc-meta" aria-label="Source video details">
+              <div class="vc-meta-item"><span>Duration</span><strong data-meta-duration>—</strong></div>
+              <div class="vc-meta-item"><span>Resolution</span><strong data-meta-resolution>—</strong></div>
+              <div class="vc-meta-item"><span>Aspect</span><strong data-meta-aspect>—</strong></div>
+              <div class="vc-meta-item"><span>Frame rate</span><strong data-meta-fps>—</strong></div>
+              <div class="vc-meta-item"><span>Video codec</span><strong data-meta-video>—</strong></div>
+              <div class="vc-meta-item"><span>Audio</span><strong data-meta-audio>—</strong></div>
+              <div class="vc-meta-item"><span>Audio tracks</span><strong data-meta-tracks>—</strong></div>
+              <div class="vc-meta-item"><span>Container</span><strong data-meta-container>—</strong></div>
+              <div class="vc-meta-item"><span>File size</span><strong data-meta-size>—</strong></div>
+              <div class="vc-meta-item"><span>Source bitrate</span><strong data-meta-bitrate>—</strong></div>
+            </div>
+
+            <div class="vc-plan" aria-label="Conversion plan">
+              <h3>Conversion plan</h3>
+              <dl>
+                <div><dt>Source</dt><dd data-plan-source>—</dd></div>
+                <div><dt>Output</dt><dd data-plan-output>—</dd></div>
+                <div><dt data-plan-third-label>Video</dt><dd data-plan-third>—</dd></div>
+                <div><dt data-plan-fourth-label>Audio</dt><dd data-plan-fourth>—</dd></div>
+              </dl>
+              <p class="vc-hint">Targets are shown before export. The real size, codec and duration are measured after the file is written.</p>
+            </div>
+
+            <p class="vc-keyhint">Keyboard: Space or K play/pause · ←/→ seek 5 s · M mute · F fullscreen.</p>
+          </div>
+
+          <aside class="vc-side" aria-labelledby="settings-title">
+            <h3 id="settings-title">Conversion settings</h3>
+
+            <div data-video-settings>
+              <fieldset class="vc-fieldset">
+                <legend>Quality preset</legend>
+                <div class="vc-modes" role="radiogroup" aria-label="Quality preset">
+                  <label class="vc-mode"><input type="radio" name="cv-preset" value="high"><span><strong>High Quality</strong><small>Keeps the most detail. The output may be larger than the source.</small></span></label>
+                  <label class="vc-mode"><input type="radio" name="cv-preset" value="balanced" checked><span><strong>Balanced <em>Recommended</em></strong><small>Quality close to the source at a practical bitrate.</small></span></label>
+                  <label class="vc-mode"><input type="radio" name="cv-preset" value="smaller"><span><strong>Smaller File</strong><small>Spends less data. Fine texture and fast motion may soften.</small></span></label>
+                </div>
+                <p class="vc-hint" data-mode-note>Balanced is recommended for most conversions.</p>
+              </fieldset>
+
+              <fieldset class="vc-fieldset">
+                <legend>Output</legend>
+                <div class="vc-field">
+                  <label for="cv-format">Container</label>
+                  <select id="cv-format" data-format>
+                    <option value="mp4" selected>MP4</option>
+                    <option value="webm">WebM</option>
+                    <option value="mov">MOV</option>
+                    <option value="mkv">MKV</option>
+                  </select>
+                  <p class="vc-hint" data-format-note>Containers are enabled only when this browser can encode them at the chosen size.</p>
+                </div>
+
+                <div class="vc-field">
+                  <label for="cv-codec">Video codec</label>
+                  <select id="cv-codec" data-codec>
+                    <option value="avc" selected>H.264 (AVC)</option>
+                  </select>
+                  <p class="vc-hint" data-codec-note>Codecs are limited to the ones this container and browser can genuinely encode.</p>
+                </div>
+
+                <div class="vc-field">
+                  <label for="cv-resolution">Resolution</label>
+                  <select id="cv-resolution" data-resolution>
+                    <option value="original" selected>Keep original resolution</option>
+                    <option value="2160">4K · 3840 × 2160</option>
+                    <option value="1440">1440p · 2560 × 1440</option>
+                    <option value="1080">1080p · 1920 × 1080</option>
+                    <option value="720">720p · 1280 × 720</option>
+                    <option value="480">480p · 854 × 480</option>
+                    <option value="360">360p · 640 × 360</option>
+                    <option value="custom">Custom dimensions</option>
+                  </select>
+                </div>
+
+                <div class="vc-custom-size" data-custom-size hidden>
+                  <div class="vc-fields">
+                    <div class="vc-field">
+                      <label for="cv-width">Output width</label>
+                      <input id="cv-width" data-width type="number" min="2" max="4096" step="2" inputmode="numeric" value="">
+                    </div>
+                    <div class="vc-field">
+                      <label for="cv-height">Output height</label>
+                      <input id="cv-height" data-height type="number" min="2" max="4096" step="2" inputmode="numeric" value="">
+                    </div>
+                  </div>
+                  <label class="vc-check">
+                    <input type="checkbox" data-aspect-lock checked>
+                    <span><strong>Keep source aspect ratio</strong><small>Changing one side updates the other. Unlocked sizes are letterboxed, never stretched.</small></span>
+                  </label>
+                </div>
+
+                <p class="vc-hint" data-size-note>Original resolution keeps the source size.</p>
+                <p class="vc-warning-inline" data-upscale hidden></p>
+                <p class="vc-validation" data-size-validation role="alert" hidden></p>
+              </fieldset>
+
+              <fieldset class="vc-fieldset">
+                <legend>Audio</legend>
+                <label class="vc-check">
+                  <input type="checkbox" data-audio-keep checked>
+                  <span><strong>Keep the audio track</strong><small>Uncheck to export a silent video.</small></span>
+                </label>
+                <div class="vc-field vc-audio-field" data-audio-field>
+                  <label for="cv-audio-bitrate">Audio bitrate</label>
+                  <select id="cv-audio-bitrate" data-audio-bitrate>
+                    <option value="64">64 kbps</option>
+                    <option value="96">96 kbps</option>
+                    <option value="128">128 kbps</option>
+                    <option value="160" selected>160 kbps</option>
+                    <option value="192">192 kbps</option>
+                    <option value="256">256 kbps</option>
+                    <option value="320">320 kbps</option>
+                  </select>
+                </div>
+                <p class="vc-hint" data-audio-codec>Audio is re-encoded to match the container and keeps its timing.</p>
+              </fieldset>
+
+              <details class="cv-advanced" data-advanced>
+                <summary>Advanced settings</summary>
+                <div class="cv-advanced-body">
+                  <fieldset class="vc-fieldset">
+                    <legend>Rate control</legend>
+                    <label class="vc-check">
+                      <input type="checkbox" data-bitrate-override>
+                      <span><strong>Override the preset bitrate</strong><small>Enter an exact video bitrate instead of the preset target.</small></span>
+                    </label>
+                    <div class="vc-field" data-bitrate-field>
+                      <label for="cv-bitrate">Video bitrate (Mbps)</label>
+                      <input id="cv-bitrate" data-bitrate type="number" min="0.02" max="100" step="0.1" inputmode="decimal" value="4">
+                      <p class="vc-hint">A higher bitrate keeps more detail and makes a larger file.</p>
+                      <p class="vc-validation" data-bitrate-validation role="alert" hidden></p>
+                    </div>
+                    <label class="vc-check">
+                      <input type="checkbox" data-crf-enabled>
+                      <span><strong>Use constant quality (CRF)</strong><small>Lower values keep more detail. Falls back to the bitrate above when the encoder does not accept a quantizer.</small></span>
+                    </label>
+                    <div class="vc-field vc-crf-field" data-crf-field hidden>
+                      <label for="cv-crf">Constant quality value</label>
+                      <input id="cv-crf" data-crf type="number" min="0" max="51" step="1" inputmode="numeric" value="28">
+                      <p class="vc-hint" data-crf-note>Typical H.264 values are 18–28. Higher values mean more compression.</p>
+                    </div>
+                  </fieldset>
+
+                  <fieldset class="vc-fieldset">
+                    <legend>Frame rate</legend>
+                    <div class="vc-field">
+                      <label for="cv-fps-cap">Maximum frame rate</label>
+                      <select id="cv-fps-cap" data-fps-cap>
+                        <option value="0" selected>Keep original frame rate</option>
+                        <option value="60">60 fps</option>
+                        <option value="50">50 fps</option>
+                        <option value="30">30 fps</option>
+                        <option value="25">25 fps</option>
+                        <option value="24">24 fps</option>
+                      </select>
+                      <p class="vc-hint" data-fps-note>Extra frames above the cap are dropped. Frames are never duplicated.</p>
+                    </div>
+                  </fieldset>
+
+                  <p class="vc-hint" data-advanced-note>The preset target is active. Enable the override to enter an exact bitrate.</p>
+                </div>
+              </details>
+            </div>
+
+            <div data-audio-settings hidden>
+              <p class="vc-alert vc-alert-inline" data-audio-missing hidden></p>
+
+              <fieldset class="vc-fieldset">
+                <legend>Audio format</legend>
+                <div class="vc-field">
+                  <label for="cv-audio-format">Output format</label>
+                  <select id="cv-audio-format" data-audio-format>
+                    <option value="mp3" selected>MP3 · most compatible</option>
+                    <option value="wav">WAV · uncompressed PCM</option>
+                    <option value="m4a">M4A · AAC in MP4</option>
+                    <option value="aac">AAC · raw ADTS</option>
+                  </select>
+                  <p class="vc-hint" data-audio-format-note>MP3 is the most compatible audio format and the recommended choice.</p>
+                </div>
+
+                <div class="vc-field" data-audio-quality-field>
+                  <label for="cv-audio-quality">Bitrate</label>
+                  <select id="cv-audio-quality" data-audio-quality>
+                    <option value="320">320 kbps · highest quality</option>
+                    <option value="256">256 kbps</option>
+                    <option value="192" selected>192 kbps · recommended</option>
+                    <option value="128">128 kbps</option>
+                    <option value="96">96 kbps · smallest</option>
+                  </select>
+                  <p class="vc-hint" data-audio-quality-note>192 kbps is a good default for music and speech.</p>
+                </div>
+              </fieldset>
+
+              <fieldset class="vc-fieldset">
+                <legend>Audio track</legend>
+                <div class="vc-field">
+                  <label for="cv-sample-rate">Sample rate</label>
+                  <select id="cv-sample-rate" data-sample-rate>
+                    <option value="48000" selected>48 kHz</option>
+                    <option value="44100">44.1 kHz</option>
+                  </select>
+                </div>
+                <div class="vc-field">
+                  <label for="cv-channels">Channels</label>
+                  <select id="cv-channels" data-channels>
+                    <option value="2" selected>Stereo (2 channels)</option>
+                    <option value="1">Mono (1 channel)</option>
+                  </select>
+                </div>
+                <div class="vc-field" data-track-field hidden>
+                  <label for="cv-track">Audio track</label>
+                  <select id="cv-track" data-track></select>
+                </div>
+                <p class="vc-hint" data-track-note></p>
+                <p class="vc-hint" data-audio-support-note>Audio formats are enabled only when this browser can genuinely encode them.</p>
+              </fieldset>
+            </div>
+
+            <div class="vc-export-action">
+              <button class="vc-btn vc-btn-primary vc-export-button" type="button" data-export disabled>Convert video</button>
+              <button class="vc-btn vc-btn-secondary" type="button" data-cancel hidden>Cancel conversion</button>
+              <p class="vc-export-note" data-export-note>Upload a video to enable conversion.</p>
+              <p class="vc-hint" data-output-summary>Add a video to see the conversion plan.</p>
+            </div>
+          </aside>
+        </div>
+
+        <div class="vc-progress" data-progress hidden>
+          <div class="vc-progress-track" data-progress-track role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Conversion progress"><div class="vc-progress-bar" data-progress-bar></div></div>
+          <p class="vc-progress-label" data-progress-label role="status" aria-live="polite">Preparing the conversion…</p>
+          <p class="vc-progress-timing" data-progress-timing></p>
+        </div>
+
+        <div class="vc-result" data-result hidden aria-live="polite">
+          <div class="vc-result-head">
+            <span class="vc-result-check" aria-hidden="true">✓</span>
+            <div>
+              <h3 data-result-title>Your converted file is ready</h3>
+              <p data-result-note>Measured locally. The source video was never uploaded.</p>
+            </div>
+          </div>
+          <div class="vc-compare" data-compare>
+            <div class="vc-compare-item"><span>Source</span><strong data-result-before>—</strong><small data-result-before-detail>—</small></div>
+            <div class="vc-compare-arrow" aria-hidden="true">→</div>
+            <div class="vc-compare-item vc-compare-after"><span>Result</span><strong data-result-after>—</strong><small data-result-after-detail>—</small></div>
+            <div class="vc-compare-saved"><span data-result-saved>—</span><strong data-result-percent>—</strong></div>
+          </div>
+          <p class="vc-result-warning" data-result-warning hidden></p>
+          <video class="vc-result-video" data-result-video controls playsinline aria-label="Converted video preview"></video>
+          <audio class="cv-result-audio" data-result-audio controls aria-label="Extracted audio preview"></audio>
+          <dl class="vc-result-meta" data-result-meta></dl>
+          <div class="vc-result-actions">
+            <button class="vc-btn vc-btn-primary" type="button" data-download disabled>Download file</button>
+            <button class="vc-btn vc-btn-secondary" type="button" data-convert-again>Convert again</button>
+            <button class="vc-btn vc-btn-ghost" type="button" data-new-video>Start with another video</button>
+          </div>
+          <p class="vc-hint">The download is a local blob. Nothing was sent to a server.</p>
+        </div>
+      </div>
+
+      <noscript><p class="vc-alert">This video converter needs JavaScript. All processing runs locally in your browser.</p></noscript>
+    </div>
+  </div>
+</section>
+
+<section class="section vc-content">
+  <div class="container vc-content-layout">
+    <article class="article-card vc-article">
+      <span class="eyebrow" style="color:#2563eb">Guide</span>
+      <h2>What a real video converter does</h2>
+      <p>Changing a file extension does not convert a video. A genuine conversion decodes the compressed frames back into pictures, optionally resizes them, encodes those pictures with a video codec, encodes the audio with an audio codec, and writes both streams into a new container. This tool performs that whole chain inside a Web Worker in your browser using Mediabunny and WebCodecs. Nothing is uploaded, and nothing is faked.</p>
+      <p>Because the work is real, the result panel reports measured facts: the container, the codec that was written, the encoded resolution, the duration, the file size and the bitrate read back from the finished file. If the browser cannot encode a combination, the option is disabled instead of producing a file that claims to be something it is not.</p>
+
+      <h2>How to convert a video in your browser</h2>
+      <ol>
+        <li><strong>Choose a mode.</strong> Use <em>Video to video</em> to change container, codec, resolution or quality, or <em>Video to audio</em> to extract a soundtrack.</li>
+        <li><strong>Add one video.</strong> Drag a file onto the upload area or choose Browse video. MP4, M4V, MOV, WebM and MKV are accepted when this browser can decode them.</li>
+        <li><strong>Check the source details.</strong> The workspace shows duration, resolution, aspect ratio, frame rate, video and audio codecs, audio track count, container, size and source bitrate.</li>
+        <li><strong>Set the output.</strong> In video mode pick a preset, container, codec and resolution. In audio mode pick MP3, WAV, M4A or AAC, then the bitrate, sample rate, channels and audio track.</li>
+        <li><strong>Review the plan.</strong> The plan panel shows the exact output size, codecs and bitrates that will be requested before anything is encoded.</li>
+        <li><strong>Convert.</strong> The worker reports encoding and finalizing progress. Cancel at any time; the partial file is discarded and encoder resources are released.</li>
+        <li><strong>Verify and download.</strong> Preview the result, read the measured metadata, then download the file. Object URLs are cleaned up when you start another job.</li>
+      </ol>
+
+      <h2>Video to video: containers and codecs</h2>
+      <p>A container is a box that holds video, audio and metadata. A codec is the method used to compress each stream. They are different decisions, and a container only accepts certain codecs. This tool offers the following combinations, and each one is filtered again by what the current browser can actually encode at the chosen resolution.</p>
+      <div class="cv-table-wrap">
+        <table class="cv-table">
+          <caption>Container and codec combinations exposed by this tool</caption>
+          <thead><tr><th scope="col">Container</th><th scope="col">Video codecs</th><th scope="col">Audio codec</th><th scope="col">Typical use</th></tr></thead>
+          <tbody>
+            <tr><td>MP4</td><td>H.264 (AVC), HEVC (H.265) when encodable</td><td>AAC</td><td>Broad playback, phones, social platforms, editing apps</td></tr>
+            <tr><td>WebM</td><td>VP9, VP8, AV1 when encodable</td><td>Opus</td><td>Web pages, open formats, efficient streaming</td></tr>
+            <tr><td>MOV</td><td>H.264, HEVC when encodable</td><td>AAC</td><td>Apple workflows and QuickTime-based editors</td></tr>
+            <tr><td>MKV</td><td>H.264, HEVC, VP9, AV1 when encodable</td><td>AAC</td><td>Flexible archival and desktop playback</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><strong>HEVC is conditional.</strong> Most desktop Chrome builds cannot encode HEVC even though they can mux it, so the option is usually disabled. It is not removed from the list, because a browser or device that can encode it should be able to use it. <strong>AV1 encoding</strong> is likewise offered only where the browser reports support. VP8 is available as a widely supported WebM fallback when VP9 or AV1 is unavailable.</p>
+      <p><strong>Input is more forgiving than output.</strong> A browser may decode H.264, VP8, VP9, AV1 and some HEVC files while being unable to encode all of them. The tool inspects the actual file and disables a conversion path when the decoder is missing. AVI is rejected because the engine used here has no AVI demuxer; remux or convert the AVI to MP4 or WebM first.</p>
+
+      <h2>Video to audio: extracting MP3 and other formats</h2>
+      <p>Audio extraction is its own job. The video stream is ignored, the chosen audio track is decoded, resampled to the selected sample rate, mapped to the selected channel count, and encoded with an audio encoder. The output is a real audio file with no video track, not a renamed video.</p>
+      <ul>
+        <li><strong>MP3</strong> is the primary and most compatible choice. It is encoded with a bundled LAME-based encoder and written with a proper MP3 container and Xing header.</li>
+        <li><strong>WAV</strong> stores uncompressed 16-bit PCM. It is lossless in the sense that it preserves the decoded samples, but it is much larger than MP3 and has no bitrate setting.</li>
+        <li><strong>M4A</strong> stores AAC audio in an MP4 container. It is efficient and widely supported by Apple devices and players.</li>
+        <li><strong>AAC</strong> writes a raw ADTS stream. Some players prefer M4A because it carries metadata and indexing more gracefully.</li>
+      </ul>
+      <p>FLAC and other lossless codecs are not offered because this browser build has no usable FLAC encoder. Offering a format the tool cannot genuinely produce would be worse than omitting it.</p>
+      <p>If the video has several audio tracks, the track selector lists them with language, name, channel count, sample rate and codec where the file provides that information. The extract button stays disabled when there is no audio track or when the selected track cannot be decoded.</p>
+
+      <h2>Choosing an MP3 bitrate</h2>
+      <p>MP3 is a lossy format. The bitrate is the amount of data stored per second, so it directly controls the size and the amount of detail that survives. The size of a constant-bitrate MP3 is roughly the bitrate multiplied by the duration, divided by eight.</p>
+      <div class="cv-table-wrap">
+        <table class="cv-table">
+          <caption>MP3 bitrate guidance for a one-minute clip</caption>
+          <thead><tr><th scope="col">Bitrate</th><th scope="col">Approx. size per minute</th><th scope="col">Best for</th></tr></thead>
+          <tbody>
+            <tr><td>320 kbps</td><td>≈ 2.4 MB</td><td>Music where detail matters and storage is not tight</td></tr>
+            <tr><td>256 kbps</td><td>≈ 1.9 MB</td><td>High-quality music listening</td></tr>
+            <tr><td>192 kbps</td><td>≈ 1.4 MB</td><td>The recommended default for music, podcasts and general use</td></tr>
+            <tr><td>128 kbps</td><td>≈ 1.0 MB</td><td>Speech, voice notes and casual listening</td></tr>
+            <tr><td>96 kbps</td><td>≈ 0.7 MB</td><td>Spoken word where the smallest file matters most</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>A higher bitrate cannot restore detail that the source audio never contained. Extracting a 128 kbps AAC track from a video to a 320 kbps MP3 produces a larger file, not better sound. Match the target to the source and the purpose. Stereo roughly doubles the data compared with mono at the same bitrate, and 44.1 kHz is the natural choice for music, while 48 kHz matches most video audio.</p>
+
+      <h2>Quality presets and advanced controls</h2>
+      <p><strong>High Quality</strong> allocates the most bits and can produce a file larger than the source. <strong>Balanced</strong> is the recommended default and aims to stay close to the source quality at a practical bitrate. <strong>Smaller File</strong> deliberately spends less data, which can soften fine texture and fast motion. The presets calculate a target from the output pixel count, the effective frame rate and the source bitrate, so the same preset behaves sensibly for a 4K clip and a 360p clip.</p>
+      <p>Advanced settings let you override the preset with an exact video bitrate, enable constant quality (CRF), and cap the frame rate. CRF asks the encoder for a consistent visual quality instead of a fixed bitrate; lower values keep more detail. Browser encoders differ, so a bitrate is always supplied as a fallback and the page says when the fallback is in use. A frame-rate cap drops extra frames and extends the previous frame, so duration and audio sync do not change and frames are never invented.</p>
+      <p>Resolution presets preserve the source aspect ratio. Custom dimensions can be locked to the source aspect or set freely; a different aspect is letterboxed inside the frame, never stretched. The page warns when an output is larger than the source, because upscaling adds pixels without adding real detail.</p>
+
+      <h2>What the results mean</h2>
+      <p>The result panel reads the finished file back and reports the real container, video codec, audio codec, resolution, duration, size and bitrate. For audio extraction it reports the codec, measured bitrate, sample rate, channel count and source track. A playable preview is shown when the browser can play the result.</p>
+      <p>Conversion is not compression. A Balanced conversion can be close to the source size, and High Quality can be larger. When the result grows, the page says so plainly instead of claiming a saving. Use the dedicated <a href="/media-and-motion/video-compressor/">Video Compressor</a> or the Smaller File preset when a smaller file is the goal.</p>
+
+      <h2>Common reasons to convert a video</h2>
+      <ul>
+        <li><strong>Device compatibility.</strong> A phone, tablet, TV or editor may prefer MP4 with H.264 and AAC over WebM or MKV.</li>
+        <li><strong>Web delivery.</strong> WebM with VP9 or AV1 and Opus is efficient for modern browsers and HTML video.</li>
+        <li><strong>Editing workflows.</strong> MOV and MP4 are widely accepted by desktop editors and Apple tools.</li>
+        <li><strong>Archiving.</strong> MKV can hold a range of codecs in one flexible container.</li>
+        <li><strong>Audio reuse.</strong> Extracting MP3 turns a recorded talk, lecture or music video into a portable audio file.</li>
+        <li><strong>Podcasts and transcripts.</strong> A mono 96 or 128 kbps MP3 is small and easy to transcribe or publish.</li>
+        <li><strong>Presentations and embeds.</strong> A smaller resolution reduces bandwidth without changing the clip's duration.</li>
+      </ul>
+
+      <h2>Privacy, performance and file limits</h2>
+      <p>The page loads only its own stylesheet, the self-hosted Mediabunny engine, the MP3 encoder and the worker. The worker starts when it is needed and is terminated when you remove the video or leave the page. Source and result object URLs are revoked when you replace the file, start another job or navigate away. There is no upload, account, paid API or server-side copy.</p>
+      <p>Conversion speed depends on clip length, resolution, frame rate, the chosen codec and the device's encoder. 4K and long videos need more time and memory. The page warns when the input is large, the clip is long or the output is very large. Output is capped at 4096 pixels per edge and dimensions are rounded to even numbers, which the encoders require. Files above 2 GB are rejected before processing.</p>
+
+      <h2>Troubleshooting</h2>
+      <ul>
+        <li><strong>The file is rejected.</strong> The browser may not decode its codecs, the file may be corrupt, or it may be an AVI. Try an MP4 or WebM that plays in the same browser.</li>
+        <li><strong>A container or codec is disabled.</strong> The browser cannot encode it at the chosen size or sample rate. Try another combination or a smaller resolution.</li>
+        <li><strong>HEVC is greyed out.</strong> Most Chrome builds cannot encode HEVC. Choose H.264 for MP4 or MOV, or VP9 for WebM or MKV.</li>
+        <li><strong>Audio extraction is disabled.</strong> The video may have no audio track, or the selected track may use a codec this browser cannot decode. Check the audio track list.</li>
+        <li><strong>The MP3 is a little longer than the video.</strong> MP3 encoders add a small delay and padding. This is normal and does not mean the audio is out of sync.</li>
+        <li><strong>The preview will not play.</strong> The browser may lack playback support even when the file is valid. Download it and open it in a media player.</li>
+        <li><strong>It runs out of memory.</strong> Try a shorter clip, a smaller resolution or fewer channels, and close other heavy tabs.</li>
+        <li><strong>The conversion is slow.</strong> Keep the tab open and avoid heavy background work. Long 4K clips are the slowest case.</li>
+      </ul>
+
+      <h2>Frequently asked questions</h2>
+      <div class="vc-faq">
+        <details class="faq-item"><summary>Does this video converter upload my file?</summary><p>No. The file is decoded and re-encoded inside a Web Worker in your browser tab using Mediabunny and WebCodecs. It is not sent to LetitEdit or a third-party service, and no account is required.</p></details>
+        <details class="faq-item"><summary>Which video formats can I convert from and to?</summary><p>MP4, M4V, MOV, WebM and MKV inputs are accepted when this browser can decode their video codec. Outputs are MP4, WebM, MOV and MKV, each limited to the video and audio codecs that can genuinely be muxed and encoded in this browser. AVI is not decoded by the browser engine and is rejected with an explanation.</p></details>
+        <details class="faq-item"><summary>Can I extract MP3 audio from a video?</summary><p>Yes. Switch to Video to audio, choose MP3, pick a bitrate from 96 to 320 kbps, a sample rate and mono or stereo, then extract. The audio track is decoded and encoded with an MP3 encoder; the file is not renamed. WAV, M4A and AAC are offered when the browser can encode them.</p></details>
+        <details class="faq-item"><summary>Which MP3 bitrate should I choose?</summary><p>192 kbps is a good default for music and general listening. 320 kbps keeps the most detail and creates the largest file. 128 kbps is fine for speech and casual listening, while 96 kbps saves the most space and may sound thin. MP3 is lossy at every bitrate, so a higher value cannot restore detail the source never had.</p></details>
+        <details class="faq-item"><summary>Will converting change the duration or audio sync?</summary><p>The tool preserves frame timestamps and encodes audio against the same timeline, so audio stays aligned with the picture. If you cap the frame rate, extra frames are dropped and the previous frame is extended rather than duplicating frames. MP3 adds a small encoder delay and padding, so its duration can be a few milliseconds longer than the source.</p></details>
+        <details class="faq-item"><summary>Why is a container or codec disabled?</summary><p>The tool asks the browser which codecs it can actually encode at the chosen resolution and sample rate. A container or codec that is unavailable is disabled with an explanation instead of producing a broken or mislabelled file.</p></details>
+        <details class="faq-item"><summary>What happens if the video has no audio track?</summary><p>In Video to video mode the output is simply silent. In Video to audio mode the page says there is nothing to extract and keeps the extract button disabled. The tool never creates a silent MP3 or renames a video file as audio.</p></details>
+        <details class="faq-item"><summary>Does converting always make the file smaller?</summary><p>No. Conversion is not compression. Balanced aims to stay close to the source quality, and High Quality may produce a larger file. The result panel reports the measured size and clearly states when the output grew. Use the Video Compressor or the Smaller File preset when size is the priority.</p></details>
+        <details class="faq-item"><summary>Can I convert more than one file at a time?</summary><p>One file is converted per job so the preview, settings and result stay accurate. Remove the current file or start a new conversion to load another.</p></details>
+        <details class="faq-item"><summary>Is the conversion private?</summary><p>Yes. The page loads only its own stylesheet, the self-hosted Mediabunny engine, the MP3 encoder and the worker. The file, the preview and the result stay in the browser tab, and object URLs are released when you replace the file, start another job or leave the page.</p></details>
+      </div>
+    </article>
+
+    <aside class="vc-side-content">
+      <div class="info-card">
+        <h2>At a glance</h2>
+        <ul class="vc-facts">
+          <li>Input <span>MP4, MOV, M4V, WebM, MKV*</span></li>
+          <li>Video output <span>MP4, WebM, MOV, MKV</span></li>
+          <li>Video codecs <span>H.264, HEVC†, VP8, VP9, AV1†</span></li>
+          <li>Audio output <span>MP3, WAV, M4A, AAC</span></li>
+          <li>MP3 bitrate <span>96, 128, 192, 256, 320 kbps</span></li>
+          <li>Resolution <span>Original, 4K–360p, custom</span></li>
+          <li>Presets <span>High Quality, Balanced, Smaller File</span></li>
+          <li>Audio tracks <span>Choose one when several exist</span></li>
+          <li>Processing <span>On your device</span></li>
+          <li>Price <span>Free</span></li>
+        </ul>
+        <p class="vc-hint">*Accepted when this browser can decode the file. AVI is not supported by the browser engine. †Only when the browser reports an encoder for it.</p>
+      </div>
+      <div class="info-card">
+        <h2>Related</h2>
+        <ul class="related-list">
+          <li><a href="/media-and-motion/video-compressor/"><span class="related-icon" aria-hidden="true">🗜️</span><span>Video Compressor</span></a></li>
+          <li><a href="/media-and-motion/video-trimmer/"><span class="related-icon" aria-hidden="true">✂️</span><span>Video Trimmer</span></a></li>
+          <li><a href="/media-and-motion/video-cropper/"><span class="related-icon" aria-hidden="true">🔲</span><span>Video Cropper</span></a></li>
+          <li><a href="/media-and-motion/video-resizer/"><span class="related-icon" aria-hidden="true">↔️</span><span>Video Resizer</span></a></li>
+          <li><a href="/media-and-motion/video-merger/"><span class="related-icon" aria-hidden="true">🔗</span><span>Video Merger</span></a></li>
+          <li><a href="/categories/video-editing/"><span class="related-icon" aria-hidden="true">🎬</span><span>Video Editing category</span></a></li>
+          <li><a href="/categories/"><span class="related-icon" aria-hidden="true">🧭</span><span>All categories</span></a></li>
+        </ul>
+        <p><a class="text-link" href="/categories/">Browse all 28 categories →</a></p>
+      </div>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="footer-logo" href="/"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+        <p>A category-led home for guides, updates and carefully built browser-side tools. The tool library is being rebuilt one focused release at a time.</p>
+        <a class="footer-contact" href="mailto:info@letitedit.com">info@letitedit.com</a>
+      </div>
+      <div class="footer-column">
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="/categories/">Categories</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/news/">News</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Trust &amp; policies</h3>
+        <ul>
+          <li><a href="/about/">About LetitEdit</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="/terms-of-service/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-categories">
+      <h3>All categories</h3>
+      <ul class="footer-category-list">
+        <li><a href="/categories/image-photo-editing/">Image &amp; Photo Editing</a></li>
+        <li><a href="/categories/video-editing/">Video Editing</a></li>
+        <li><a href="/categories/audio-music-editing/">Audio &amp; Music Editing</a></li>
+        <li><a href="/categories/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+        <li><a href="/categories/text-writing-editing/">Text &amp; Writing Editing</a></li>
+        <li><a href="/categories/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+        <li><a href="/categories/web-code-editing/">Web &amp; Code Editing</a></li>
+        <li><a href="/categories/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+        <li><a href="/categories/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
+        <li><a href="/categories/face-portrait-editing/">Face &amp; Portrait Editing</a></li>
+        <li><a href="/categories/ai-image-enhancement-restoration/">AI Image Enhancement &amp; Restoration</a></li>
+        <li><a href="/categories/3d-design-model-editing/">3D Design &amp; Model Editing</a></li>
+        <li><a href="/categories/animation-motion-graphics/">Animation &amp; Motion Graphics</a></li>
+        <li><a href="/categories/font-typography-editing/">Font &amp; Typography Editing</a></li>
+        <li><a href="/categories/color-gradient-tools/">Color &amp; Gradient Tools</a></li>
+        <li><a href="/categories/logo-branding-tools/">Logo &amp; Branding Tools</a></li>
+        <li><a href="/categories/social-media-design-tools/">Social Media Design Tools</a></li>
+        <li><a href="/categories/screenshot-screen-image-editing/">Screenshot &amp; Screen Image Editing</a></li>
+        <li><a href="/categories/data-visualization-infographic-editing/">Data Visualization &amp; Infographic Editing</a></li>
+        <li><a href="/categories/ebook-publishing-tools/">eBook &amp; Publishing Tools</a></li>
+        <li><a href="/categories/email-newsletter-design/">Email &amp; Newsletter Design</a></li>
+        <li><a href="/categories/sound-effects-voice-design/">Sound Effects &amp; Voice Design</a></li>
+        <li><a href="/categories/cad-technical-drawing/">CAD &amp; Technical Drawing</a></li>
+        <li><a href="/categories/signature-document-annotation/">Signature &amp; Document Annotation</a></li>
+        <li><a href="/categories/ui-ux-website-design-tools/">UI/UX &amp; Website Design Tools</a></li>
+        <li><a href="/categories/print-marketing-material-design/">Print &amp; Marketing Material Design</a></li>
+        <li><a href="/categories/metadata-file-information-editing/">Metadata &amp; File Information Editing</a></li>
+        <li><a href="/categories/digital-drawing-illustration/">Digital Drawing &amp; Illustration</a></li>
+      </ul>
+      <a class="footer-all-categories" href="/categories/">Browse all 28 categories →</a>
+    </div>
+    <div class="footer-promise">
+      <span aria-hidden="true">🔒</span>
+      <p><strong>Privacy by design.</strong> This tool keeps your video in your browser, reports measured results and explains exactly what the conversion does.</p>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> LetitEdit.com</span>
+      <span>Built for privacy, accuracy and plain-English tooling.</span>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="../../js/video-converter.js"></script>
+</body>
+</html>

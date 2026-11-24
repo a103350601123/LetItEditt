@@ -172,6 +172,46 @@ async function encodeAudioOnly(seconds) {
   return new Blob([target.buffer], { type: 'audio/mp4' });
 }
 
+async function encodeMultiTrackMkv() {
+  const width = 320;
+  const height = 180;
+  const fps = 30;
+  const seconds = 2;
+  const canvas = makeCanvas(width, height);
+  const target = new MB.BufferTarget();
+  const output = new MB.Output({ format: new MB.MkvOutputFormat(), target });
+  const videoSource = new MB.CanvasSource(canvas, { codec: 'avc', quality: QUALITY });
+  output.addVideoTrack(videoSource, { frameRate: fps });
+  const primaryAudio = new MB.AudioBufferSource({ codec: 'aac', quality: QUALITY });
+  const secondaryAudio = new MB.AudioBufferSource({ codec: 'aac', quality: QUALITY });
+  output.addAudioTrack(primaryAudio);
+  output.addAudioTrack(secondaryAudio);
+  await output.start();
+  const frames = Math.round(seconds * fps);
+  for (let index = 0; index < frames; index += 1) {
+    drawFrame(canvas, index, fps, 'Multi-track');
+    await videoSource.add(index / fps, 1 / fps);
+  }
+  await primaryAudio.add(makeAudioBuffer(seconds, 48000));
+
+  // A deliberately different second track: mono, 44.1 kHz and one second long,
+  // so a test can prove that track selection extracts the chosen track.
+  const context = new AudioContext();
+  const monoRate = 44100;
+  const monoSeconds = 1;
+  const mono = context.createBuffer(1, Math.ceil(monoSeconds * monoRate), monoRate);
+  const data = mono.getChannelData(0);
+  for (let i = 0; i < data.length; i += 1) {
+    const t = i / monoRate;
+    data[i] = Math.sin(2 * Math.PI * 880 * t) * 0.3;
+  }
+  context.close();
+  await secondaryAudio.add(mono);
+
+  await output.finalize();
+  return new Blob([target.buffer], { type: 'video/x-matroska' });
+}
+
 function toBase64(blob) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -198,6 +238,7 @@ window.makeFixtures = async () => {
 
   await add('trim-mov.mov', await remux(base, 'mov'));
   await add('trim-mkv.mkv', await remux(base, 'mkv'));
+  await add('trim-multi-track.mkv', await encodeMultiTrackMkv());
   await add('trim-sample.m4v', base);
   await add('trim-pcm.mov', await encodeMovAudio({ codec: 'pcm-s16', channels: 2, seconds: 1.5, label: 'PCM' }));
   await add('trim-ulaw.mov', await encodeMovAudio({ codec: 'ulaw', channels: 1, seconds: 1.5, label: 'ULAW' }));
@@ -223,6 +264,7 @@ window.makeFixtures = async () => {
 };
 
 window.fixturesReady = true;
+window.makeMultiTrackFixture = encodeMultiTrackMkv;
 </script>
 </body>
 </html>

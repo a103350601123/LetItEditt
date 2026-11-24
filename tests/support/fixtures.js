@@ -12,6 +12,7 @@ const FIXTURES = [
   'trim-3s.webm',
   'trim-mov.mov',
   'trim-mkv.mkv',
+  'trim-multi-track.mkv',
   'trim-sample.m4v',
   'trim-pcm.mov',
   'trim-ulaw.mov',
