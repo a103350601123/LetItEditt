@@ -2049,6 +2049,22 @@ test('preview audio monitors the clip and follows volume, mute and transport', a
   expect(unmuted.entries.some((entry) => !entry.paused)).toBe(true);
   expect(unmuted.entries[0].volume).toBeCloseTo(0.25, 2);
 
+  /* Hiding a clip silences it in the preview, matching the export mixer. */
+  await page.evaluate(() => {
+    window.__videoEditor.store.apply((draft) => {
+      draft.tracks.flatMap((track) => track.clips)[0].hidden = true;
+    });
+  });
+  await page.waitForTimeout(300);
+  expect((await readAudio()).entries.every((entry) => entry.paused)).toBe(true);
+  await page.evaluate(() => {
+    window.__videoEditor.store.apply((draft) => {
+      draft.tracks.flatMap((track) => track.clips)[0].hidden = false;
+    });
+  });
+  await page.waitForTimeout(400);
+  expect((await readAudio()).entries.some((entry) => !entry.paused)).toBe(true);
+
   /* Pause stops every monitored element. */
   await page.locator('#ve-play').click();
   await page.waitForTimeout(300);
@@ -2098,6 +2114,74 @@ test('preview audio monitors the clip and follows volume, mute and transport', a
   });
   await page.waitForTimeout(150);
 
+  /* Reaching the end stops monitoring instead of leaving a dangling element. */
+  const duration = await page.evaluate(() =>
+    window.__videoEditor.project.tracks
+      .flatMap((track) => track.clips)
+      .reduce((max, clip) => Math.max(max, clip.start + clip.duration), 0)
+  );
+  await page.evaluate((at) => window.__videoEditor.seek(at), duration - 0.25);
+  await page.locator('#ve-play').click();
+  await page.waitForFunction(() => window.__videoEditor.state.playing === false, null, { timeout: 5000 });
+  const ended = await readAudio();
+  expect(ended.playing).toBe(false);
+  expect(ended.entries.every((entry) => entry.paused)).toBe(true);
+
+  expect(errors).toEqual([]);
+});
+
+test('preview audio mixes tracks, follows the preview rate and skips silent clips', async ({ page }) => {
+  test.setTimeout(120000);
+  const errors = await openEditor(page);
+  await importFiles(page, ['trim-4s.mp4', 'trim-audio-only.m4a', 'trim-2s-mute.mp4']);
+
+  const setup = await page.evaluate(() => {
+    const ed = window.__videoEditor;
+    const list = ed.media.list();
+    const video = list.find((asset) => asset.name === 'trim-4s.mp4');
+    const audio = list.find((asset) => asset.name === 'trim-audio-only.m4a');
+    const silent = list.find((asset) => asset.name === 'trim-2s-mute.mp4');
+    ed.addAssetToTimeline(video.id, { start: 0 });
+    ed.addAssetToTimeline(audio.id, { start: 0 });
+    ed.addAssetToTimeline(silent.id, { start: 0 });
+    ed.seek(0.2);
+    return { silentId: silent.id };
+  });
+
+  await page.locator('#ve-preview-rate').selectOption('1.5');
+  await page.locator('#ve-play').click();
+  await page.waitForFunction(
+    () => {
+      const debug = window.__videoEditor.audio.debug();
+      return (
+        debug.playing &&
+        debug.entries.length === 2 &&
+        debug.entries.every((entry) => entry.started && !entry.paused)
+      );
+    },
+    null,
+    { timeout: 20000 }
+  );
+  const debug = await page.evaluate(() => window.__videoEditor.audio.debug());
+  /* Both audible clips are monitored on their own tracks; the silent video is
+   * skipped instead of producing an empty audio element. */
+  expect(debug.entries).toHaveLength(2);
+  expect(debug.entries.map((entry) => entry.mediaId)).not.toContain(setup.silentId);
+  for (const entry of debug.entries) {
+    expect(entry.playbackRate).toBeCloseTo(1.5, 2);
+  }
+
+  /* A live rate change applies to every monitored clip without a restart. */
+  await page.locator('#ve-preview-rate').selectOption('1');
+  await page.waitForTimeout(400);
+  const changed = await page.evaluate(() => window.__videoEditor.audio.debug());
+  expect(changed.entries).toHaveLength(2);
+  for (const entry of changed.entries) {
+    expect(entry.playbackRate).toBeCloseTo(1, 2);
+  }
+
+  await page.evaluate(() => window.__videoEditor.pause());
+  await page.locator('#ve-preview-rate').selectOption('1');
   expect(errors).toEqual([]);
 });
 

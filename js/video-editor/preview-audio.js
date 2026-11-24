@@ -111,7 +111,10 @@ export class PreviewAudioMixer {
       const trackGain = gainOf(track.volume ?? 1);
       for (const clip of track.clips) {
         if (clip.kind !== 'video' && clip.kind !== 'audio') continue;
-        if (clip.muted || clip.reverse) continue;
+        /* Keep parity with the export mixer: hidden, frozen, muted and
+         * reversed clips contribute no audio. Reverse playback is silent in
+         * the preview because browsers cannot stream audio backwards. */
+        if (clip.muted || clip.hidden || clip.freeze || clip.reverse) continue;
         if (time < clip.start - EPSILON || time >= clipEnd(clip) - EPSILON) continue;
         const asset = this.media.get(clip.mediaId);
         if (!asset || !asset.hasAudio) continue;
@@ -122,6 +125,8 @@ export class PreviewAudioMixer {
         const fadeOut = Math.max(0, Number(clip.fadeOut) || 0);
         const remaining = clip.duration - local;
         if (fadeOut > 0 && remaining < fadeOut) gain *= clamp(remaining / fadeOut, 0, 1);
+        /* Nothing to hear when master, track, clip or a fade is at zero. */
+        if (gain <= EPSILON) continue;
         const source = clipSourceTime(clip, local);
         list.push({ clip, track, asset, gain: clamp(gain, 0, 1), source });
       }
