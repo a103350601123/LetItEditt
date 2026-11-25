@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Online Screen Recorder – Record Screen, Tab or Window | LetitEdit</title>
+<meta name="description" content="Record your screen, browser tab or application window in your browser. Add microphone or system audio and a webcam overlay, pause and resume, then preview and download the recording. No upload.">
+<meta name="theme-color" content="#2563EB">
+<link rel="canonical" href="https://letitedit.com/media-and-motion/screen-recorder/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Free Online Screen Recorder – Record Screen, Tab or Window | LetitEdit">
+<meta property="og:description" content="Record your screen, a browser tab or an application window with optional microphone audio and webcam. Everything is captured locally in your browser.">
+<meta property="og:url" content="https://letitedit.com/media-and-motion/screen-recorder/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Crect x='5' y='5' width='14' height='10' rx='2' fill='none' stroke='white' stroke-width='1.8'/%3E%3Ccircle cx='12' cy='10' r='2.2' fill='white'/%3E%3Cpath d='M9 19h6' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="stylesheet" href="../../css/screen-recorder.css">
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Categories","item":"https://letitedit.com/categories/"},{"@type":"ListItem","position":3,"name":"Video Editing","item":"https://letitedit.com/categories/video-editing/"},{"@type":"ListItem","position":4,"name":"Screen Recorder","item":"https://letitedit.com/media-and-motion/screen-recorder/"}]},{"@type":"SoftwareApplication","name":"Free Online Screen Recorder","applicationCategory":"MultimediaApplication","operatingSystem":"Any modern browser","url":"https://letitedit.com/media-and-motion/screen-recorder/","description":"Record a screen, browser tab or application window in the browser with optional microphone and system audio plus a webcam overlay. Preview and download the recording locally without uploading it.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Entire screen, window or browser tab capture","Optional microphone and system or tab audio","Webcam overlay with corner position, size and shape","Pause, resume, stop and discard","Live timer and recording indicator","Local preview and download","WebM or MP4 only when the browser genuinely supports it","No upload and no account"]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is the screen recording uploaded anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. The screen, microphone and webcam streams stay in your browser tab. The recording is written by MediaRecorder on your device and downloaded directly from a local blob. There is no upload, no account and no server-side copy."}},{"@type":"Question","name":"Can I record system audio or browser-tab audio?","acceptedAnswer":{"@type":"Answer","text":"It depends on the browser and operating system. Chrome and Edge on Windows can offer system audio when you share a screen, and Chrome can offer tab audio when you share a tab. The browser decides which audio options appear in its sharing dialog, and this page cannot force an option the browser does not provide."}},{"@type":"Question","name":"Which file format will I get?","acceptedAnswer":{"@type":"Answer","text":"The page detects the formats MediaRecorder genuinely supports. Chromium-based browsers and Firefox usually produce WebM with VP9 or VP8 video and Opus audio. Some Safari versions can produce MP4 with H.264 and AAC. The download extension always matches the real bytes, and WebM is never renamed to MP4."}},{"@type":"Question","name":"Does the webcam appear in the final recording?","acceptedAnswer":{"@type":"Answer","text":"Yes. When the webcam is enabled, the screen and camera are drawn into a composition canvas and the canvas stream is recorded, so the webcam overlay is part of the downloaded file, not just a preview."}},{"@type":"Question","name":"Can I use the screen recorder on a phone?","acceptedAnswer":{"@type":"Answer","text":"Most mobile browsers do not implement screen capture with getDisplayMedia. If the API is missing the page explains that and recommends a supported desktop browser. Some Android and iOS versions may not offer any screen-capture choice at all."}},{"@type":"Question","name":"What happens if I click Stop sharing in the browser?","acceptedAnswer":{"@type":"Answer","text":"The tool detects the ended capture track, stops the recorder and keeps everything captured so far. It then shows the normal preview and download controls."}},{"@type":"Question","name":"Is there a time limit or a risk with long recordings?","acceptedAnswer":{"@type":"Answer","text":"There is no fixed time limit, but MediaRecorder keeps the recording in memory until you stop. Very long or high-resolution recordings can use a lot of memory and may fail on devices with limited RAM. Shorter takes and a lower resolution are safer."}},{"@type":"Question","name":"Why is my microphone or webcam not working?","acceptedAnswer":{"@type":"Answer","text":"Check the site permissions in your browser, make sure another application is not using the device, and choose the right microphone. If you deny the microphone, the screen recording continues without it; if you deny the camera, the recording continues with the screen only."}}]}]}
+</script>
+</head>
+<body class="sr-page">
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="topbar">
+  <nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+    <div class="nav-links" id="primary-links">
+      <a href="/categories/">Categories</a>
+      <a href="/blog/">Blog</a>
+      <a href="/news/">News</a>
+      <a href="/faq/">FAQ</a>
+    </div>
+    <div class="nav-actions">
+      <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
+    </div>
+  </nav>
+</header>
+
+<main id="main-content">
+<nav class="container breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../">Home</a><span aria-hidden="true">/</span>
+  <a href="../../categories/">Categories</a><span aria-hidden="true">/</span>
+  <a href="../../categories/video-editing/">Video Editing</a><span aria-hidden="true">/</span>
+  <span aria-current="page">Screen Recorder</span>
+</nav>
+
+<section class="sr-hero">
+  <div class="container">
+    <span class="eyebrow">Media &amp; Motion · Video Editing · Live tool</span>
+    <h1>Free Online Screen Recorder</h1>
+    <p>Record your screen, a browser tab or an application window, add a microphone and a webcam overlay, then preview and download the real recording. The capture runs in this browser tab and the file never leaves your device.</p>
+    <ul class="sr-hero-points">
+      <li>Screen, window or tab</li>
+      <li>Microphone and system audio</li>
+      <li>Webcam overlay</li>
+      <li>Pause and resume</li>
+      <li>No upload</li>
+    </ul>
+  </div>
+</section>
+
+<section class="sr-section" aria-labelledby="recorder-title">
+  <div class="container sr-workspace">
+    <div class="sr-panel" data-panel data-state="idle">
+      <div class="sr-panel-head">
+        <h2 id="recorder-title">Record your screen</h2>
+        <p>Choose your settings, click Start recording, then pick a screen, window or tab in the browser dialog. Nothing is captured until you allow it.</p>
+      </div>
+
+      <div class="sr-support" data-support id="sr-support-note" hidden>
+        <strong>Screen recording is not available in this browser</strong>
+        <ul data-support-list></ul>
+      </div>
+
+      <div class="sr-layout">
+        <div class="sr-main">
+          <div data-stage-section>
+            <div class="sr-stage" data-stage>
+              <video class="sr-screen" data-screen-preview muted playsinline autoplay hidden aria-label="Live screen preview"></video>
+              <div class="sr-placeholder" data-placeholder>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="2.5" y="4" width="19" height="13" rx="2.5"/>
+                  <path d="M8 21h8M12 17v4"/>
+                  <circle cx="12" cy="10.5" r="2.6"/>
+                </svg>
+                <strong>Your screen preview appears here</strong>
+                <span>Click Start recording to choose a screen, window or browser tab. The browser asks for your permission first.</span>
+              </div>
+              <div class="sr-webcam-preview" data-webcam-preview hidden aria-hidden="true">
+                <video muted playsinline autoplay></video>
+              </div>
+              <div class="sr-rec-badge" data-rec-badge hidden>
+                <span class="sr-dot" aria-hidden="true"></span>
+                <span>REC</span>
+                <span class="sr-timer" data-timer>00:00</span>
+              </div>
+              <div class="sr-paused-badge" data-paused-badge hidden>Paused</div>
+            </div>
+            <p class="sr-captured" data-captured hidden></p>
+          </div>
+
+          <div class="sr-transport" data-transport>
+            <button class="sr-btn sr-btn-primary sr-btn-record" type="button" data-start>
+              <span class="sr-record-dot" aria-hidden="true"></span>
+              Start recording
+            </button>
+            <button class="sr-btn sr-btn-secondary" type="button" data-pause hidden>Pause</button>
+            <button class="sr-btn sr-btn-secondary" type="button" data-resume hidden>Resume</button>
+            <button class="sr-btn sr-btn-stop" type="button" data-stop hidden>Stop</button>
+            <button class="sr-btn sr-btn-ghost" type="button" data-cancel hidden>Cancel</button>
+            <button class="sr-btn sr-btn-secondary" type="button" data-mute-mic aria-pressed="false" hidden>Mute mic</button>
+            <span class="sr-status" data-status role="status" aria-live="polite">Ready to record</span>
+          </div>
+
+          <p class="sr-alert" data-error role="alert" hidden></p>
+          <p class="sr-notice" data-notice role="status" aria-live="polite" hidden></p>
+
+          <div class="sr-result" data-result hidden aria-live="polite">
+            <div class="sr-result-head">
+              <span class="sr-result-check" aria-hidden="true">✓</span>
+              <div>
+                <h3>Your recording is ready</h3>
+                <p data-result-note>Saved locally in this tab. Nothing was uploaded.</p>
+              </div>
+            </div>
+            <video class="sr-result-video" data-result-video controls playsinline aria-label="Recording preview"></video>
+            <dl class="sr-result-meta">
+              <div><dt>File</dt><dd data-result-name>—</dd></div>
+              <div><dt>Format</dt><dd data-result-format>—</dd></div>
+              <div><dt>Duration</dt><dd data-result-duration>—</dd></div>
+              <div><dt>Size</dt><dd data-result-size>—</dd></div>
+              <div><dt>Resolution</dt><dd data-result-resolution>—</dd></div>
+              <div><dt>Audio</dt><dd data-result-audio>—</dd></div>
+            </dl>
+            <div class="sr-result-actions">
+              <a class="sr-btn sr-btn-primary" data-download download aria-disabled="true">Download recording</a>
+              <button class="sr-btn sr-btn-secondary" type="button" data-record-again>Record again</button>
+              <button class="sr-btn sr-btn-ghost" type="button" data-discard>Discard</button>
+            </div>
+          </div>
+        </div>
+
+        <aside class="sr-settings" data-settings aria-label="Recording settings">
+          <fieldset class="sr-fieldset">
+            <legend>Recording settings</legend>
+            <div class="sr-field-grid">
+              <div class="sr-field">
+                <label for="sr-resolution">Resolution</label>
+                <select id="sr-resolution" data-resolution>
+                  <option value="source" selected>Original / source</option>
+                  <option value="1080">1080p</option>
+                  <option value="720">720p</option>
+                  <option value="480">480p</option>
+                </select>
+              </div>
+              <div class="sr-field">
+                <label for="sr-fps">Frame rate</label>
+                <select id="sr-fps" data-fps>
+                  <option value="24">24 FPS</option>
+                  <option value="30" selected>30 FPS</option>
+                  <option value="60">60 FPS</option>
+                </select>
+              </div>
+              <div class="sr-field sr-field-full">
+                <label for="sr-quality">Quality</label>
+                <select id="sr-quality" data-quality>
+                  <option value="high">High – largest file, most detail</option>
+                  <option value="medium" selected>Medium – balanced</option>
+                  <option value="low">Low – smaller file</option>
+                </select>
+              </div>
+            </div>
+            <p class="sr-hint">The tool never upscales. A 720p display stays 720p even if 1080p is selected. A browser may also keep the source size when it cannot resize a live capture; the actual size is shown once recording starts.</p>
+            <p class="sr-hint" data-format-note>Checking which recording format this browser supports…</p>
+          </fieldset>
+
+          <fieldset class="sr-fieldset">
+            <legend>Audio</legend>
+            <div class="sr-checks">
+              <label class="sr-check">
+                <input type="checkbox" data-system-audio checked>
+                <span>System or tab audio
+                  <small>The browser offers this in its sharing dialog when the selected source and operating system support it.</small>
+                </span>
+              </label>
+              <label class="sr-check">
+                <input type="checkbox" data-mic>
+                <span>Microphone
+                  <small>Mixed with system audio when both are available. Microphone permission is requested when recording starts.</small>
+                </span>
+              </label>
+            </div>
+            <div class="sr-field" style="margin-top:10px">
+              <label for="sr-mic-device">Microphone device</label>
+              <select id="sr-mic-device" data-mic-device>
+                <option value="">Default microphone</option>
+              </select>
+            </div>
+            <div class="sr-field" style="margin-top:10px">
+              <label for="sr-mic-volume">Microphone volume</label>
+              <div class="sr-range-row">
+                <input id="sr-mic-volume" data-mic-volume type="range" min="0" max="100" step="5" value="100">
+                <span class="sr-range-value" data-mic-volume-label>100%</span>
+              </div>
+            </div>
+            <div class="sr-level" data-level aria-hidden="true"><span data-level-bar></span></div>
+            <p class="sr-hint" data-audio-support>Microphone capture is supported here. System or tab audio can only be offered by the browser's own sharing dialog and varies by browser and operating system. If no audio track is provided, the page says so instead of claiming sound was recorded.</p>
+          </fieldset>
+
+          <fieldset class="sr-fieldset">
+            <legend>Webcam overlay</legend>
+            <label class="sr-check">
+              <input type="checkbox" data-webcam>
+              <span>Include webcam
+                <small>The camera is drawn into the recording, not just shown as a preview. Audio from the camera is captured only when Microphone is enabled.</small>
+              </span>
+            </label>
+            <div data-webcam-fields>
+              <span class="sr-field-label" style="margin-top:10px">Position</span>
+              <div class="sr-positions">
+                <button class="sr-position" type="button" data-position="top-left" aria-pressed="false"><span class="sr-position-dot" aria-hidden="true"></span>Top left</button>
+                <button class="sr-position" type="button" data-position="top-right" aria-pressed="true"><span class="sr-position-dot" aria-hidden="true"></span>Top right</button>
+                <button class="sr-position" type="button" data-position="bottom-left" aria-pressed="false"><span class="sr-position-dot" aria-hidden="true"></span>Bottom left</button>
+                <button class="sr-position" type="button" data-position="bottom-right" aria-pressed="false"><span class="sr-position-dot" aria-hidden="true"></span>Bottom right</button>
+              </div>
+              <div class="sr-field" style="margin-top:10px">
+                <label for="sr-webcam-size">Overlay size</label>
+                <div class="sr-range-row">
+                  <input id="sr-webcam-size" data-webcam-size type="range" min="18" max="45" step="1" value="28">
+                  <span class="sr-range-value" data-webcam-size-label>28% of frame height</span>
+                </div>
+              </div>
+              <div class="sr-field" style="margin-top:10px">
+                <label for="sr-webcam-shape">Shape</label>
+                <select id="sr-webcam-shape" data-webcam-shape>
+                  <option value="circle" selected>Circle</option>
+                  <option value="rectangle">Rounded rectangle</option>
+                </select>
+              </div>
+            </div>
+            <p class="sr-hint">When the webcam overlay is enabled, the screen and camera are combined on a canvas. Keep this tab visible while recording so the composition keeps repainting; browsers pause background animation.</p>
+          </fieldset>
+
+          <p class="sr-warning">Long recordings are held in memory until you stop. A long or 1080p recording on a phone or a low-memory computer can use a lot of storage and may fail. Record in shorter takes and choose a lower resolution when in doubt.</p>
+          <p class="sr-privacy">Everything stays on your device. There is no upload, account or paid API. Microphone, camera and screen tracks are stopped when the recording ends or is discarded.</p>
+        </aside>
+      </div>
+
+      <noscript><p class="sr-alert">This screen recorder needs JavaScript. All capture and processing run locally in your browser.</p></noscript>
+    </div>
+  </div>
+</section>
+
+<section class="section sr-content">
+  <div class="container sr-content-layout">
+    <article class="article-card sr-article">
+      <span class="eyebrow" style="color:#2563eb">Guide</span>
+      <h2>What this screen recorder does</h2>
+      <p>A screen recorder captures what happens on a display and saves it as a video file. This tool uses the browser's own Screen Capture API to ask which screen, application window or browser tab you want to share, then records that stream with MediaRecorder. You can add a microphone, system or tab audio, and a webcam overlay before you start.</p>
+      <p>The recorder is intentionally narrow: it records, previews and downloads. It is not a video editor and does not add filters, cuts, transitions or subtitles. If you need to trim the result or combine it with other clips, open the <a href="/media-and-motion/video-trimmer/">Video Trimmer</a> or the <a href="/media-and-motion/video-editor/">Professional Video Editor</a> after downloading.</p>
+
+      <h2>How to record your screen</h2>
+      <ol>
+        <li><strong>Choose your settings.</strong> Pick a resolution, frame rate and quality. Original resolution is the safest choice because the source is never enlarged.</li>
+        <li><strong>Select audio.</strong> Leave system or tab audio on if you need sound from the shared source. Enable Microphone and choose the right device if you want narration.</li>
+        <li><strong>Add a webcam if you want one.</strong> Enable Include webcam, allow camera access, then position and size the overlay. The webcam is burned into the final recording.</li>
+        <li><strong>Click Start recording.</strong> The browser opens its own sharing dialog. Choose Entire Screen, Window or Chrome Tab. This page cannot choose for you and cannot bypass the permission prompt.</li>
+        <li><strong>Record, pause or stop.</strong> The timer and REC badge show that capture is live. Pause hides the paused time from the file; Resume continues the same recording; Stop finishes and prepares the download.</li>
+        <li><strong>Preview and download.</strong> Check the preview, the measured duration, size and resolution, then download the real file. Record again discards the current take and starts clean.</li>
+      </ol>
+
+      <h2>How to record a browser tab</h2>
+      <p>In Chrome and Edge, choose <strong>Chrome Tab</strong> (or the equivalent tab option) in the browser dialog, then pick the tab. When the system audio option is available, enable <em>Share tab audio</em> in the same dialog. Tab audio is the most reliable way to capture sound from a browser page because it does not depend on the operating system's loopback device.</p>
+      <p>If you record a tab that is playing video, keep that tab open and audible for the whole take. Switching the tab to mute, pausing the media or closing it ends the sound but not the screen capture. Some browsers stop the whole capture when the shared tab is closed; in that case the tool keeps everything recorded up to that point.</p>
+
+      <h2>How to record microphone audio</h2>
+      <p>Enable <strong>Microphone</strong> before you start. The first time, the browser asks for microphone permission. Pick a device from the microphone list and adjust the volume slider; the level meter shows the mixed signal that is being recorded. If you enable both system audio and microphone, the Web Audio API mixes them into one track with a small headroom trim so a loud source does not clip.</p>
+      <p>If you deny microphone permission, the recording still continues with system audio or no audio, and the page tells you what happened. Use the <strong>Mute mic</strong> button during a recording to silence the microphone without losing it; the button toggles back to Unmute. Microphone tracks are stopped when the recording ends.</p>
+
+      <h2>How to use the webcam overlay</h2>
+      <p>Enable <strong>Include webcam</strong>, allow camera access and check the preview. Choose one of the four corners, drag the size slider and pick a circle or a rounded rectangle. The preview uses the same geometry as the recorded composition, so what you see is what the file contains.</p>
+      <p>When the webcam is enabled, the screen and camera are drawn into a canvas and the canvas stream is recorded. That is why the overlay survives the download instead of disappearing. Keep the recorder tab visible during this mode: browsers pause animation in hidden tabs, which can reduce the composition frame rate. Webcam audio is never captured on its own; enable Microphone if you want the camera microphone to be heard.</p>
+
+      <h2>Supported formats and real limitations</h2>
+      <p>The page checks <code>MediaRecorder.isTypeSupported()</code> before offering a recording format. Chromium-based browsers and Firefox typically produce <strong>WebM</strong> with VP9 or VP8 video and Opus audio. Some Safari versions can produce a genuine <strong>MP4</strong> with H.264 and AAC. The download extension always matches the actual bytes; a WebM file is never renamed to MP4, and no conversion is attempted.</p>
+      <ul>
+        <li><strong>No upscaling.</strong> A 720p source is not enlarged to 1080p. Live screen tracks also cannot always be resized by the browser; the actual captured size is displayed.</li>
+        <li><strong>System audio is conditional.</strong> It depends on the browser, operating system and the source you share. The page cannot add an option that the browser does not offer.</li>
+        <li><strong>Frame rate is a request.</strong> The browser and the shared application decide what is actually delivered. The recorder reports the measured composition rate when it can.</li>
+        <li><strong>Mobile support is limited.</strong> Most mobile browsers do not expose screen capture at all. The page detects a missing API and explains that a desktop browser is required.</li>
+        <li><strong>Long takes use memory.</strong> MediaRecorder holds the recording until you stop. Very long or high-resolution takes can exhaust memory on small devices.</li>
+      </ul>
+
+      <h2>Privacy and local processing</h2>
+      <p>The screen, microphone and camera streams are read directly by this page. The recording is assembled in memory with MediaRecorder and offered as a local blob download. Nothing is sent to LetitEdit or any third party, there is no account and no paid API. The page does not store recordings on a server or in remote storage.</p>
+      <p>When you stop, cancel or leave the page, the capture tracks are stopped and the camera and microphone are released. Object URLs are revoked when a take is discarded or replaced. Closing the tab ends every stream immediately.</p>
+
+      <h2>Troubleshooting</h2>
+      <ul>
+        <li><strong>The sharing dialog does not appear.</strong> Use a supported desktop browser, open the page over HTTPS or localhost, and make sure another screen-sharing application is not holding the display.</li>
+        <li><strong>I denied permission by mistake.</strong> Click Start recording again. Browser dialogs often do not show a permanent block for screen capture; if they do, reset the site permission in the browser's address bar.</li>
+        <li><strong>There is no system audio option.</strong> Share a browser tab with tab audio enabled, or share an entire screen on Windows with Chrome or Edge. macOS and some Linux setups do not offer system audio through the browser.</li>
+        <li><strong>The microphone is silent.</strong> Check the device selection, the operating system input level and the Mute mic button. A recording with an included but silent track is labelled "no sound detected" rather than claimed as working audio.</li>
+        <li><strong>The webcam is missing from the file.</strong> Make sure Include webcam was enabled before you clicked Start. The camera is only requested when you enable it, and the overlay is burned into the canvas recording.</li>
+        <li><strong>Screen sharing stopped by itself.</strong> Closing the shared window, unplugging a display or clicking Stop sharing ends the track. The recorder stops cleanly and keeps the material captured so far.</li>
+        <li><strong>The download does not open.</strong> The file uses the format your browser actually recorded. Try VLC or another player, and use the other browser format if your editor does not accept WebM.</li>
+      </ul>
+
+      <h2>Frequently asked questions</h2>
+      <div class="sr-faq">
+        <details class="faq-item"><summary>Is the screen recording uploaded anywhere?</summary><p>No. The screen, microphone and webcam streams stay in your browser tab. The recording is written by MediaRecorder on your device and downloaded directly from a local blob. There is no upload, no account and no server-side copy.</p></details>
+        <details class="faq-item"><summary>Can I record system audio or browser-tab audio?</summary><p>It depends on the browser and operating system. Chrome and Edge on Windows can offer system audio when you share a screen, and Chrome can offer tab audio when you share a tab. The browser decides which audio options appear in its sharing dialog, and this page cannot force an option the browser does not provide.</p></details>
+        <details class="faq-item"><summary>Which file format will I get?</summary><p>The page detects the formats MediaRecorder genuinely supports. Chromium-based browsers and Firefox usually produce WebM with VP9 or VP8 video and Opus audio. Some Safari versions can produce MP4 with H.264 and AAC. The download extension always matches the real bytes, and WebM is never renamed to MP4.</p></details>
+        <details class="faq-item"><summary>Does the webcam appear in the final recording?</summary><p>Yes. When the webcam is enabled, the screen and camera are drawn into a composition canvas and the canvas stream is recorded, so the webcam overlay is part of the downloaded file, not just a preview.</p></details>
+        <details class="faq-item"><summary>Can I use the screen recorder on a phone?</summary><p>Most mobile browsers do not implement screen capture with getDisplayMedia. If the API is missing the page explains that and recommends a supported desktop browser. Some Android and iOS versions may not offer any screen-capture choice at all.</p></details>
+        <details class="faq-item"><summary>What happens if I click Stop sharing in the browser?</summary><p>The tool detects the ended capture track, stops the recorder and keeps everything captured so far. It then shows the normal preview and download controls.</p></details>
+        <details class="faq-item"><summary>Is there a time limit or a risk with long recordings?</summary><p>There is no fixed time limit, but MediaRecorder keeps the recording in memory until you stop. Very long or high-resolution recordings can use a lot of memory and may fail on devices with limited RAM. Shorter takes and a lower resolution are safer.</p></details>
+        <details class="faq-item"><summary>Why is my microphone or webcam not working?</summary><p>Check the site permissions in your browser, make sure another application is not using the device, and choose the right microphone. If you deny the microphone, the screen recording continues without it; if you deny the camera, the recording continues with the screen only.</p></details>
+      </div>
+    </article>
+
+    <aside class="sr-side">
+      <div class="info-card">
+        <h2>At a glance</h2>
+        <ul class="sr-facts">
+          <li><span>Capture</span><span>Screen, window or tab</span></li>
+          <li><span>Audio</span><span>Microphone, system or tab</span></li>
+          <li><span>Webcam</span><span>Optional overlay</span></li>
+          <li><span>Controls</span><span>Pause, resume, stop, cancel</span></li>
+          <li><span>Output</span><span>WebM or MP4 as supported</span></li>
+          <li><span>Processing</span><span>On your device</span></li>
+          <li><span>Price</span><span>Free</span></li>
+        </ul>
+        <p class="sr-hint">Format, audio sources and mobile support depend on the browser and operating system, not on this page.</p>
+      </div>
+      <div class="info-card">
+        <h2>Related video tools</h2>
+        <ul class="related-list">
+          <li><a href="/categories/video-editing/"><span class="related-icon" aria-hidden="true">🎬</span><span>Video Editing category</span></a></li>
+          <li><a href="/media-and-motion/video-trimmer/"><span class="related-icon" aria-hidden="true">✂️</span><span>Video Trimmer</span></a></li>
+          <li><a href="/media-and-motion/video-cropper/"><span class="related-icon" aria-hidden="true">🔲</span><span>Video Cropper</span></a></li>
+          <li><a href="/media-and-motion/video-resizer/"><span class="related-icon" aria-hidden="true">📐</span><span>Video Resizer</span></a></li>
+          <li><a href="/media-and-motion/video-compressor/"><span class="related-icon" aria-hidden="true">🗜️</span><span>Video Compressor</span></a></li>
+          <li><a href="/media-and-motion/video-converter/"><span class="related-icon" aria-hidden="true">🔄</span><span>Video Converter</span></a></li>
+          <li><a href="/media-and-motion/video-merger/"><span class="related-icon" aria-hidden="true">🔗</span><span>Video Merger</span></a></li>
+          <li><a href="/media-and-motion/video-editor/"><span class="related-icon" aria-hidden="true">🎞️</span><span>Professional Video Editor</span></a></li>
+        </ul>
+        <p><a class="text-link" href="/categories/">Browse all 28 categories →</a></p>
+      </div>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="footer-logo" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+        <p>A category-led home for guides, updates and carefully built browser-side tools. The tool library is being rebuilt one focused release at a time.</p>
+        <a class="footer-contact" href="mailto:info@letitedit.com">info@letitedit.com</a>
+      </div>
+      <div class="footer-column">
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="/categories/">Categories</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/news/">News</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Trust &amp; policies</h3>
+        <ul>
+          <li><a href="/about/">About LetitEdit</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="/terms-of-service/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-categories">
+      <h3>All categories</h3>
+      <ul class="footer-category-list">
+        <li><a href="/categories/image-photo-editing/">Image &amp; Photo Editing</a></li>
+        <li><a href="/categories/video-editing/">Video Editing</a></li>
+        <li><a href="/categories/audio-music-editing/">Audio &amp; Music Editing</a></li>
+        <li><a href="/categories/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+        <li><a href="/categories/text-writing-editing/">Text &amp; Writing Editing</a></li>
+        <li><a href="/categories/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+        <li><a href="/categories/web-code-editing/">Web &amp; Code Editing</a></li>
+        <li><a href="/categories/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+        <li><a href="/categories/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
+        <li><a href="/categories/face-portrait-editing/">Face &amp; Portrait Editing</a></li>
+        <li><a href="/categories/ai-image-enhancement-restoration/">AI Image Enhancement &amp; Restoration</a></li>
+        <li><a href="/categories/3d-design-model-editing/">3D Design &amp; Model Editing</a></li>
+        <li><a href="/categories/animation-motion-graphics/">Animation &amp; Motion Graphics</a></li>
+        <li><a href="/categories/font-typography-editing/">Font &amp; Typography Editing</a></li>
+        <li><a href="/categories/color-gradient-tools/">Color &amp; Gradient Tools</a></li>
+        <li><a href="/categories/logo-branding-tools/">Logo &amp; Branding Tools</a></li>
+        <li><a href="/categories/social-media-design-tools/">Social Media Design Tools</a></li>
+        <li><a href="/categories/screenshot-screen-image-editing/">Screenshot &amp; Screen Image Editing</a></li>
+        <li><a href="/categories/data-visualization-infographic-editing/">Data Visualization &amp; Infographic Editing</a></li>
+        <li><a href="/categories/ebook-publishing-tools/">eBook &amp; Publishing Tools</a></li>
+        <li><a href="/categories/email-newsletter-design/">Email &amp; Newsletter Design</a></li>
+        <li><a href="/categories/sound-effects-voice-design/">Sound Effects &amp; Voice Design</a></li>
+        <li><a href="/categories/cad-technical-drawing/">CAD &amp; Technical Drawing</a></li>
+        <li><a href="/categories/signature-document-annotation/">Signature &amp; Document Annotation</a></li>
+        <li><a href="/categories/ui-ux-website-design-tools/">UI/UX &amp; Website Design Tools</a></li>
+        <li><a href="/categories/print-marketing-material-design/">Print &amp; Marketing Material Design</a></li>
+        <li><a href="/categories/metadata-file-information-editing/">Metadata &amp; File Information Editing</a></li>
+        <li><a href="/categories/digital-drawing-illustration/">Digital Drawing &amp; Illustration</a></li>
+      </ul>
+      <a class="footer-all-categories" href="/categories/">Browse all 28 categories →</a>
+    </div>
+    <div class="footer-promise">
+      <span aria-hidden="true">🔒</span>
+      <p><strong>Privacy by design.</strong> This tool keeps your screen recording in your browser, avoids accounts and explains exactly what the capture does.</p>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> LetitEdit.com</span>
+      <span>Built for privacy, accuracy and plain-English tooling.</span>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="../../js/screen-recorder.js"></script>
+</body>
+</html>
