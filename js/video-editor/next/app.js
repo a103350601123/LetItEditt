@@ -1495,9 +1495,27 @@ class VideoEditorApp {
     return window.matchMedia('(max-width: 899px)').matches;
   }
 
+  positionSheet() {
+    if (!this.isMobile()) return;
+    const dock = this.app.querySelector('.ve-mobile-dock');
+    if (!dock) return;
+    const rect = dock.getBoundingClientRect();
+    /* If the page was scrolled past the editor the dock is no longer a usable
+       anchor, so close the sheet instead of parking it off-screen. */
+    if (rect.bottom <= 0 || rect.top >= window.innerHeight) {
+      this.closeSheet();
+      return;
+    }
+    const offset = clamp(window.innerHeight - rect.top, 0, window.innerHeight - 120);
+    const available = Math.max(180, window.innerHeight - offset - 70);
+    this.app.style.setProperty('--ve-sheet-bottom', `${Math.round(offset)}px`);
+    this.app.style.setProperty('--ve-sheet-max', `${Math.round(available)}px`);
+  }
+
   openSheet(name) {
     this.closeProjectMenu();
     this.sheetTrigger = document.activeElement;
+    this.positionSheet();
     this.app.dataset.mobileSheet = name;
     this.sheetBackdrop.hidden = false;
     this.app.querySelectorAll('[data-open-sheet]').forEach((button) => {
@@ -1535,8 +1553,12 @@ class VideoEditorApp {
     this.sheetBackdrop.addEventListener('click', () => this.closeSheet());
     window.addEventListener('resize', () => {
       if (!this.isMobile()) this.closeSheet();
+      else if (this.app.dataset.mobileSheet !== 'none') this.positionSheet();
       this.preview.layout();
     });
+    window.addEventListener('scroll', () => {
+      if (this.app.dataset.mobileSheet !== 'none') this.positionSheet();
+    }, { passive: true });
   }
 
   bindResizers() {

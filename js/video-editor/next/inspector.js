@@ -34,11 +34,11 @@ function section(title, body, open = true, badge = '') {
   </details>`;
 }
 
-function numberField(label, prop, value, { min = -9999, max = 9999, step = 1, suffix = '', hint = '' } = {}) {
+function numberField(label, prop, value, { min = -9999, max = 9999, step = 1, suffix = '', hint = '', disabled = false } = {}) {
   return `<label class="ve-field ve-field-compact">
     <span>${escapeHtml(label)}</span>
     <div class="ve-number-unit">
-      <input type="number" data-prop="${prop}" value="${Number(value).toFixed(step < 1 ? 2 : 0)}" min="${min}" max="${max}" step="${step}" aria-label="${escapeHtml(label)}">
+      <input type="number" data-prop="${prop}" value="${Number(value).toFixed(step < 1 ? 2 : 0)}" min="${min}" max="${max}" step="${step}" aria-label="${escapeHtml(label)}" ${disabled ? 'disabled aria-disabled="true"' : ''}>
       ${suffix ? `<em>${escapeHtml(suffix)}</em>` : ''}
     </div>
     ${hint ? `<small>${escapeHtml(hint)}</small>` : ''}
@@ -60,17 +60,17 @@ function colorField(label, prop, value) {
   </label>`;
 }
 
-function toggleField(label, prop, checked, hint = '') {
+function toggleField(label, prop, checked, hint = '', disabled = false) {
   return `<label class="ve-toggle-row">
     <span><strong>${escapeHtml(label)}</strong>${hint ? `<small>${escapeHtml(hint)}</small>` : ''}</span>
-    <input type="checkbox" data-prop="${prop}" ${checked ? 'checked' : ''}>
+    <input type="checkbox" data-prop="${prop}" ${checked ? 'checked' : ''} ${disabled ? 'disabled aria-disabled="true"' : ''}>
   </label>`;
 }
 
-function selectField(label, prop, value, options, hint = '') {
+function selectField(label, prop, value, options, hint = '', disabled = false) {
   return `<label class="ve-field">
     <span>${escapeHtml(label)}</span>
-    <select data-prop="${prop}">${options}</select>
+    <select data-prop="${prop}" ${disabled ? 'disabled aria-disabled="true"' : ''}>${options}</select>
     ${hint ? `<small>${escapeHtml(hint)}</small>` : ''}
   </label>`;
 }
@@ -269,10 +269,14 @@ export class Inspector {
       ).join('');
       const fadeOptions = optionList(ANIMATIONS, clip.inAnim?.type || 'none');
       const outOptions = optionList(ANIMATIONS, clip.outAnim?.type || 'none');
+      const filterActive = Boolean(clip.filter && clip.filter !== 'none');
+      const transitionActive = Boolean(clip.transition?.type && clip.transition.type !== 'none');
+      const inActive = Boolean(clip.inAnim?.type && clip.inAnim.type !== 'none');
+      const outActive = Boolean(clip.outAnim?.type && clip.outAnim.type !== 'none');
       html += section('Effects', `
         <div class="ve-grid-2">
           ${selectField('Filter', 'filter', clip.filter || 'none', filterOptions)}
-          ${numberField('Filter strength', 'filterIntensity', Math.round((clip.filterIntensity ?? 1) * 100), { min: 0, max: 100, step: 1, suffix: '%' })}
+          ${numberField('Filter strength', 'filterIntensity', Math.round((clip.filterIntensity ?? 1) * 100), { min: 0, max: 100, step: 1, suffix: '%', disabled: !filterActive })}
         </div>
         <div class="ve-preset-chips">
           ${COLOR_PRESETS.map((preset) => `<button type="button" class="ve-chip" data-inspector-action="color-preset" data-preset="${preset.id}">${escapeHtml(preset.label)}</button>`).join('')}
@@ -280,14 +284,14 @@ export class Inspector {
         </div>
         <div class="ve-grid-2">
           ${selectField('Transition in', 'transition.type', clip.transition?.type || 'none', transitionOptions)}
-          ${numberField('Transition seconds', 'transition.duration', clip.transition?.duration || 0.5, { min: 0.1, max: 5, step: 0.1, suffix: 's' })}
+          ${numberField('Transition seconds', 'transition.duration', clip.transition?.duration || 0.5, { min: 0.1, max: 5, step: 0.1, suffix: 's', disabled: !transitionActive })}
         </div>
-        ${toggleField('Reverse transition', 'transition.reverse', clip.transition?.reverse || false)}
+        ${toggleField('Reverse transition', 'transition.reverse', clip.transition?.reverse || false, '', !transitionActive)}
         <div class="ve-grid-2">
           ${selectField('Animate in', 'inAnim.type', clip.inAnim?.type || 'none', fadeOptions)}
-          ${numberField('In duration', 'inAnim.duration', clip.inAnim?.duration || 0.5, { min: 0.1, max: 5, step: 0.1, suffix: 's' })}
+          ${numberField('In duration', 'inAnim.duration', clip.inAnim?.duration || 0.5, { min: 0.1, max: 5, step: 0.1, suffix: 's', disabled: !inActive })}
           ${selectField('Animate out', 'outAnim.type', clip.outAnim?.type || 'none', outOptions)}
-          ${numberField('Out duration', 'outAnim.duration', clip.outAnim?.duration || 0.5, { min: 0.1, max: 5, step: 0.1, suffix: 's' })}
+          ${numberField('Out duration', 'outAnim.duration', clip.outAnim?.duration || 0.5, { min: 0.1, max: 5, step: 0.1, suffix: 's', disabled: !outActive })}
         </div>
       `, false);
     }

@@ -7,7 +7,7 @@
 
 import { clamp, ease, isRTLText, withAlpha } from './utils.js';
 import { applyGrade, drawTransition } from './effects.js';
-import { FONT_STACKS, clipAtTime, previousClip } from './model.js';
+import { FONT_STACKS, clipAtTime, clipEnd, previousClip } from './model.js';
 
 const BASE_HEIGHT = 1080;
 
@@ -552,10 +552,15 @@ async function renderTrack(ctx, project, track, source, time, width, height, opt
   const hasTransition = transition && transition.type && transition.type !== 'none' && Number(transition.duration) > 0;
   if (hasTransition && local < Number(transition.duration)) {
     const prev = previousClip(track, clip);
-    if (prev && !prev.hidden) {
-      const progress = clamp(local / Number(transition.duration), 0, 1);
-      const outgoing = tempCanvas(width, height);
-      const incoming = tempCanvas(width, height);
+    /* A transition is only valid at a real boundary. At the start of the
+       first clip (or after a gap) the outgoing frame is the canvas background,
+       so "Transition in" still fades/reveals from black instead of doing
+       nothing. */
+    const adjacent = prev && !prev.hidden && Math.abs(clip.start - clipEnd(prev)) <= 0.02;
+    const progress = clamp(local / Number(transition.duration), 0, 1);
+    const outgoing = tempCanvas(width, height);
+    const incoming = tempCanvas(width, height);
+    if (adjacent) {
       const outgoingTime = Math.max(0, prev.duration - Number(transition.duration)) + local;
       await drawClipInto(
         outgoing.getContext('2d'),
@@ -568,20 +573,24 @@ async function renderTrack(ctx, project, track, source, time, width, height, opt
         options,
         1
       );
-      await drawClipInto(
-        incoming.getContext('2d'),
-        project,
-        clip,
-        source,
-        local,
-        width,
-        height,
-        options,
-        1
-      );
-      drawTransition(ctx, outgoing, incoming, transition.reverse ? 1 - progress : progress, transition.type);
-      return;
+    } else {
+      const outgoingCtx = outgoing.getContext('2d');
+      outgoingCtx.fillStyle = '#000';
+      outgoingCtx.fillRect(0, 0, width, height);
     }
+    await drawClipInto(
+      incoming.getContext('2d'),
+      project,
+      clip,
+      source,
+      local,
+      width,
+      height,
+      options,
+      1
+    );
+    drawTransition(ctx, outgoing, incoming, transition.reverse ? 1 - progress : progress, transition.type);
+    return;
   }
 
   await drawClipInto(ctx, project, clip, source, local, width, height, options);
