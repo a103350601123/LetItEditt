@@ -53,6 +53,15 @@ test('rich project export matches preview', async ({ page }) => {
         second.filter = 'vivid';
         second.filterIntensity = 0.8;
       }
+      const text = project.tracks
+        .flatMap((item) => item.clips)
+        .find((clip) => clip.kind === 'text' && clip.text?.content === 'Your title');
+      if (text) {
+        text.x = 0.3;
+        text.y = 0.28;
+        text.scale = 0.72;
+        text.rotation = -12;
+      }
     });
     return {
       duration: ve.store.duration(),

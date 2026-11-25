@@ -774,3 +774,198 @@ test('tablet and desktop keep the preview and layers usable side by side', async
     expect(errors).toEqual([]);
   }
 });
+
+test('playback with video, text and a second layer never shows a black frame', async ({ page }) => {
+  test.setTimeout(120000);
+  const errors = await openEditor(page);
+  await uploadVideo(page);
+  await page.setInputFiles('#se-file-input', fixturePath('trim-2s-mute.mp4'));
+  await page.waitForFunction(() => window.__VE__.state().layerCount === 2, null, { timeout: 30000 });
+  await page.evaluate(() => {
+    window.__VE__.addText('title');
+    window.__VE__.addShape('circle');
+    window.__VE__.seek(0);
+  });
+  await page.waitForTimeout(700);
+
+  const result = await page.evaluate(async () => {
+    const samples = [];
+    const canvas = document.getElementById('se-canvas');
+    const ctx = canvas.getContext('2d');
+    const brightness = () => {
+      try {
+        const data = ctx.getImageData(canvas.width * 0.5, canvas.height * 0.5, 1, 1).data;
+        return (data[0] + data[1] + data[2]) / 3;
+      } catch (error) {
+        return -1;
+      }
+    };
+    window.__VE__.play();
+    const started = performance.now();
+    while (performance.now() - started < 3200) {
+      const debug = window.__VE__.preview.debug();
+      samples.push({
+        lag: debug.renderLag,
+        brightness: brightness(),
+        videoElements: debug.videoElements
+      });
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+    window.__VE__.pause();
+    return samples;
+  });
+
+  const black = result.filter((sample) => sample.brightness >= 0 && sample.brightness < 6);
+  const lags = result.map((sample) => sample.lag).filter((value) => typeof value === 'number');
+  expect(black).toEqual([]);
+  expect(Math.max(...lags)).toBeLessThan(0.2);
+  expect(result[result.length - 1].videoElements).toBe(2);
+  expect(errors).toEqual([]);
+});
+
+test('export keeps cuts, text, filters, transitions and audio edits matching the preview', async ({ page }) => {
+  test.setTimeout(240000);
+  const errors = await openEditor(page);
+  await uploadVideo(page);
+  await page.setInputFiles('#se-file-input', fixturePath('trim-2s-mute.mp4'));
+  await page.waitForFunction(() => window.__VE__.state().layerCount === 2, null, { timeout: 30000 });
+
+  const built = await page.evaluate(() => {
+    const ve = window.__VE__;
+    ve.addText('title');
+    ve.addShape('circle');
+    ve.seek(2);
+    const baseId = ve.store.baseTrack().clips[0].id;
+    ve.select(baseId);
+    ve.split(baseId);
+    ve.store.apply((project) => {
+      const track = project.tracks.find((item) => item.id === project.baseTrackId);
+      const first = track.clips.find((clip) => clip.start < 1);
+      const second = track.clips.find((clip) => clip.start >= 1.9);
+      if (first) {
+        first.fadeIn = 1.2;
+        first.volume = 0.9;
+      }
+      if (second) {
+        second.transition = { type: 'cross-dissolve', duration: 0.6, reverse: false };
+        second.fadeOut = 0.6;
+        second.filter = 'vivid';
+        second.filterIntensity = 0.8;
+      }
+      const text = project.tracks
+        .flatMap((item) => item.clips)
+        .find((clip) => clip.kind === 'text' && clip.text?.content === 'Your title');
+      if (text) {
+        text.x = 0.3;
+        text.y = 0.28;
+        text.scale = 0.72;
+        text.rotation = -12;
+      }
+    });
+    return { duration: ve.store.duration(), layers: ve.store.layerEntries().length };
+  });
+  expect(built.layers).toBe(5);
+
+  await page.evaluate(() => window.__VE__.seek(1.2));
+  await page.waitForTimeout(600);
+
+  const wallMs = await page.evaluate(async () => {
+    const started = performance.now();
+    const result = await window.__VE__.exportNow({
+      format: 'mp4',
+      resolution: '720',
+      quality: 'balanced',
+      includeAudio: true
+    });
+    window.__VE__.app.lastExportWallMs = performance.now() - started;
+    return window.__VE__.app.lastExportWallMs;
+  });
+  expect(wallMs).toBeGreaterThan(0);
+
+  const comparison = await page.evaluate(async (times) => {
+    const result = window.__VE__.app.lastExport;
+    const url = URL.createObjectURL(result.blob);
+    const video = document.createElement('video');
+    video.muted = true;
+    video.src = url;
+    await new Promise((resolve, reject) => {
+      video.onloadedmetadata = resolve;
+      video.onerror = () => reject(new Error('The exported file did not decode.'));
+    });
+
+    const width = 160;
+    const height = 90;
+    const shot = document.createElement('canvas');
+    shot.width = width;
+    shot.height = height;
+    const shotCtx = shot.getContext('2d');
+    const preview = document.getElementById('se-canvas');
+    const previewShot = document.createElement('canvas');
+    previewShot.width = width;
+    previewShot.height = height;
+    const previewCtx = previewShot.getContext('2d');
+
+    const differences = [];
+    for (const time of times) {
+      window.__VE__.seek(time);
+      await new Promise((resolve) => setTimeout(resolve, 450));
+      previewCtx.drawImage(preview, 0, 0, width, height);
+      const previewData = previewCtx.getImageData(0, 0, width, height).data;
+
+      let best = Infinity;
+      for (const offset of [0, -1 / 30, 1 / 30]) {
+        video.currentTime = Math.max(0, Math.min(video.duration - 0.001, time + offset));
+        await new Promise((resolve) => {
+          video.onseeked = resolve;
+        });
+        shotCtx.drawImage(video, 0, 0, width, height);
+        const exportedData = shotCtx.getImageData(0, 0, width, height).data;
+        let sum = 0;
+        for (let index = 0; index < exportedData.length; index += 4) {
+          sum += Math.abs(exportedData[index] - previewData[index]);
+          sum += Math.abs(exportedData[index + 1] - previewData[index + 1]);
+          sum += Math.abs(exportedData[index + 2] - previewData[index + 2]);
+        }
+        best = Math.min(best, sum / ((exportedData.length / 4) * 3));
+      }
+      differences.push({ time, meanAbs: best });
+    }
+
+    const audioBuffer = await new OfflineAudioContext(2, 48000, 48000).decodeAudioData(
+      await result.blob.arrayBuffer()
+    );
+    const channel = audioBuffer.getChannelData(0);
+    const windowRms = (start, length) => {
+      const from = Math.max(0, Math.floor(start * audioBuffer.sampleRate));
+      const to = Math.min(channel.length, Math.floor((start + length) * audioBuffer.sampleRate));
+      let sum = 0;
+      for (let index = from; index < to; index += 1) sum += channel[index] * channel[index];
+      return Math.sqrt(sum / Math.max(1, to - from));
+    };
+
+    URL.revokeObjectURL(url);
+    return {
+      duration: video.duration,
+      width: video.videoWidth,
+      height: video.videoHeight,
+      differences,
+      audio: {
+        start: windowRms(0.02, 0.25),
+        middle: windowRms(1.6, 0.25),
+        end: windowRms(audioBuffer.duration - 0.3, 0.25)
+      },
+      meta: result.meta
+    };
+  }, [0.4, 2.25, 3.4]);
+
+  expect(comparison.duration).toBeCloseTo(built.duration, 0);
+  expect(comparison.width).toBe(1280);
+  expect(comparison.height).toBe(720);
+  expect(comparison.meta.hasAudio).toBe(true);
+  console.log('EXPORT_PARITY', JSON.stringify(comparison.differences), JSON.stringify(comparison.audio));
+  for (const diff of comparison.differences) expect(diff.meanAbs).toBeLessThan(22);
+  expect(comparison.audio.middle).toBeGreaterThan(0.02);
+  expect(comparison.audio.start).toBeLessThan(comparison.audio.middle);
+  expect(comparison.audio.end).toBeLessThan(comparison.audio.middle);
+  expect(errors).toEqual([]);
+});

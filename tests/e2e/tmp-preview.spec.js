@@ -127,3 +127,69 @@ test('preview stability with video and text overlay', async ({ page }) => {
   );
   console.log('PREVIEW_ERRORS', JSON.stringify(errors));
 });
+
+test('multi-layer playback stays stable', async ({ page }) => {
+  test.setTimeout(300000);
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`));
+  page.on('console', (message) => {
+    if (message.type() === 'error') errors.push(`console: ${message.text()}`);
+  });
+
+  await openEditor(page);
+  await uploadVideo(page, 'trim-4s.mp4');
+  await page.waitForFunction(() => window.__VE__.state().baseClips.length > 0, null, { timeout: 60000 });
+  await page.setInputFiles('#se-file-input', fixturePath('trim-2s-mute.mp4'));
+  await page.waitForFunction(() => window.__VE__.state().layerCount === 2, null, { timeout: 30000 });
+  await page.evaluate(() => {
+    window.__VE__.addText('title');
+    window.__VE__.addShape('circle');
+    window.__VE__.seek(0);
+  });
+  await page.waitForTimeout(700);
+
+  const result = await page.evaluate(async () => {
+    const samples = [];
+    const canvas = document.getElementById('se-canvas');
+    const ctx = canvas.getContext('2d');
+    const brightness = () => {
+      try {
+        const data = ctx.getImageData(canvas.width * 0.5, canvas.height * 0.5, 1, 1).data;
+        return (data[0] + data[1] + data[2]) / 3;
+      } catch (error) {
+        return -1;
+      }
+    };
+    window.__VE__.play();
+    const started = performance.now();
+    while (performance.now() - started < 3600) {
+      const debug = window.__VE__.preview.debug();
+      samples.push({
+        lag: debug.renderLag,
+        renderMs: debug.renderMs,
+        brightness: brightness(),
+        videoElements: debug.videoElements
+      });
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+    window.__VE__.pause();
+    return samples;
+  });
+
+  const black = result.filter((sample) => sample.brightness >= 0 && sample.brightness < 6);
+  const lags = result.map((sample) => sample.lag).filter((value) => typeof value === 'number');
+  const renders = result.map((sample) => sample.renderMs).filter((value) => value > 0);
+  const summary = {
+    samples: result.length,
+    blackFrames: black.length,
+    maxLag: lags.length ? Math.max(...lags) : null,
+    avgRenderMs: renders.length ? renders.reduce((a, b) => a + b, 0) / renders.length : null,
+    maxRenderMs: renders.length ? Math.max(...renders) : null,
+    videoElements: result[result.length - 1]?.videoElements
+  };
+  console.log('PREVIEW_MULTI', JSON.stringify(summary));
+  console.log('PREVIEW_MULTI_ERRORS', JSON.stringify(errors));
+  expect(summary.blackFrames).toBe(0);
+  expect(summary.videoElements).toBe(2);
+  expect(errors).toEqual([]);
+});

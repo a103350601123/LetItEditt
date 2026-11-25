@@ -129,7 +129,9 @@ function bucketSize(value) {
   if (value <= 480) return 480;
   if (value <= 720) return 720;
   if (value <= 1080) return 1080;
+  if (value <= 1280) return 1280;
   if (value <= 1440) return 1440;
+  if (value <= 1920) return 1920;
   return 2160;
 }
 
@@ -203,7 +205,9 @@ class WorkerSource {
         fit: 'contain',
         alpha: false,
         poolSize: 2,
-        decoderOptions: { hardwareAcceleration: 'prefer-hardware', optimizeForLatency: true }
+        /* Offline export wants throughput, not presentation latency, so no
+           optimizeForLatency hint here. */
+        decoderOptions: { hardwareAcceleration: 'prefer-hardware' }
       });
       asset.sinks.set(bucket, sink);
     }

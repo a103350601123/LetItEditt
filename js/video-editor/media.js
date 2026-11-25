@@ -52,7 +52,9 @@ function bucketSize(value) {
   if (value <= 480) return 480;
   if (value <= 720) return 720;
   if (value <= 1080) return 1080;
+  if (value <= 1280) return 1280;
   if (value <= 1440) return 1440;
+  if (value <= 1920) return 1920;
   return 2160;
 }
 
@@ -512,7 +514,13 @@ export class MediaLibrary {
     if (!asset || asset.type !== 'video' || !asset.file) return null;
     const key = `${mediaId}\u0001${clipKey || 'main'}`;
     let entry = this.previewVideos.get(key);
-    if (entry && entry.assetId === mediaId) return entry;
+    if (entry && entry.assetId === mediaId) {
+      /* Refresh insertion order so trimming evicts the least recently used
+         clip, never the one currently on screen. */
+      this.previewVideos.delete(key);
+      this.previewVideos.set(key, entry);
+      return entry;
+    }
     if (entry) this.destroyPreviewVideo(key);
 
     const url = this.fileUrl(mediaId);
@@ -524,10 +532,11 @@ export class MediaLibrary {
     el.setAttribute('playsinline', '');
     el.preload = 'auto';
     el.src = url;
-    /* Keep the element in the document (some browsers will not present frames
-       for a detached video) but out of the layout and out of sight. */
+    /* Keep the element in the document and technically on screen (some
+       browsers stop presenting frames for fully detached or off-screen
+       videos) but visually invisible and out of the way. */
     el.style.cssText =
-      'position:fixed;left:-10000px;top:0;width:2px;height:2px;opacity:0;pointer-events:none;';
+      'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0.01;pointer-events:none;z-index:-1;';
     (document.body || document.documentElement).appendChild(el);
 
     entry = {
@@ -694,9 +703,10 @@ export class MediaLibrary {
         const promise = el.play();
         if (promise && typeof promise.catch === 'function') promise.catch(() => {});
       }
-      /* Correct large drift only; small corrections would seek every frame
-         and cause the stutter this change is meant to remove. */
-      if (Math.abs(el.currentTime - time) > 0.35) {
+      /* Correct real drift only; small corrections would seek every frame
+         and cause the stutter this change is meant to remove. 0.2 s keeps
+         the picture close to the audio without visible correction seeks. */
+      if (Math.abs(el.currentTime - time) > 0.2) {
         /* Keep the picture that is on screen right now. Chromium can paint
            black for a moment while a seek is in flight, and this snapshot is
            what the monitor shows until the new frame is presented. */
@@ -722,8 +732,11 @@ export class MediaLibrary {
         /* already paused */
       }
     }
-    if (el.readyState < 1) await waitForEvent(el, 'loadedmetadata', 2500);
+    if (el.readyState < 1) await waitForEvent(el, 'loadedmetadata', 1200);
+    if (entry.failed) return this.frameAt(mediaId, time, 1280);
     if (!el.videoWidth) return this.frameAt(mediaId, time, 1280);
+    if (el.readyState < 2) await waitForEvent(el, 'loadeddata', 1200);
+    if (entry.failed) return this.frameAt(mediaId, time, 1280);
     if (Math.abs(el.currentTime - time) > 0.03) {
       this.capturePreviewFrame(entry);
       try {
