@@ -23,7 +23,14 @@ export class Preview {
     this.onSelect = onSelect || (() => {});
     this.onRequestEdit = onRequestEdit || (() => {});
     this.source = {
-      getFrame: (id, time, maxDimension) => media.frameAt(id, time, maxDimension),
+      getFrame: (id, time, maxDimension, hint) =>
+        media.frameForPreview(id, hint?.clipId, time, {
+          playing: this.playing,
+          rate: this.rate,
+          speed: hint?.speed,
+          reverse: hint?.reverse,
+          freeze: hint?.freeze
+        }),
       getImage: (id) => media.getImage(id)
     };
     this.canvas = null;
@@ -39,6 +46,11 @@ export class Preview {
     this.renderPending = false;
     this.lastRenderedTime = null;
     this.lastRenderMs = 0;
+    this.lastVideoFrameAt = 0;
+    this.frameCallbackSeen = false;
+    this.missingRetries = 0;
+    this.missingTimer = 0;
+    this.frameSize = { width: 0, height: 0 };
     this.raf = 0;
     this.playStart = 0;
     this.playFrom = 0;
@@ -70,6 +82,11 @@ export class Preview {
     this.stage = root.id === 'se-stage' ? root : root.querySelector('#se-stage');
     this.overlay = root.querySelector('#se-overlay');
     this.empty = root.querySelector('#se-empty');
+    this.media.onPreviewFrame = () => {
+      this.frameCallbackSeen = true;
+      this.lastVideoFrameAt = performance.now();
+      if (this.playing) this.scheduleRender();
+    };
     this.overlay.addEventListener('pointerdown', this.onPointerDown.bind(this));
     this._resize = this.layout.bind(this);
     this._visibility = () => {
@@ -113,6 +130,10 @@ export class Preview {
     }
     this.frame.style.width = `${Math.max(120, Math.round(width))}px`;
     this.frame.style.height = `${Math.max(80, Math.round(height))}px`;
+    this.frameSize = {
+      width: Math.max(120, Math.round(width)),
+      height: Math.max(80, Math.round(height))
+    };
 
     const edge = Math.min(MAX_PREVIEW_EDGE, QUALITY_EDGE[this.quality] || QUALITY_EDGE.standard, Math.max(dims.width, dims.height));
     let bw;
@@ -127,10 +148,30 @@ export class Preview {
     const roundedW = Math.max(2, Math.round(bw / 2) * 2);
     const roundedH = Math.max(2, Math.round(bh / 2) * 2);
     if (this.canvas.width !== roundedW || this.canvas.height !== roundedH) {
+      /* Resizing a canvas clears it. Keep the last valid frame on screen while
+         the new size is prepared instead of flashing black. */
+      let snapshot = null;
+      if (this.canvas.width > 0 && this.canvas.height > 0 && this.lastRenderedTime !== null) {
+        try {
+          snapshot = document.createElement('canvas');
+          snapshot.width = this.canvas.width;
+          snapshot.height = this.canvas.height;
+          snapshot.getContext('2d').drawImage(this.canvas, 0, 0);
+        } catch (error) {
+          snapshot = null;
+        }
+      }
       this.canvas.width = roundedW;
       this.canvas.height = roundedH;
       this.back.width = roundedW;
       this.back.height = roundedH;
+      if (snapshot) {
+        try {
+          this.ctx.drawImage(snapshot, 0, 0, roundedW, roundedH);
+        } catch (error) {
+          /* the next render replaces it */
+        }
+      }
       this.scheduleRender();
     }
     this.frame.dataset.width = String(dims.width);
@@ -177,10 +218,19 @@ export class Preview {
     const time = this.store.playhead;
     const startedAt = performance.now();
     try {
-      await renderComposition(this.back.getContext('2d'), this.store.project, this.source, time, {
+      const result = await renderComposition(this.back.getContext('2d'), this.store.project, this.source, time, {
         maxDimension: Math.max(this.canvas.width, this.canvas.height)
       });
       if (token !== this.renderToken) return;
+      if (result && result.missingMedia && this.lastRenderedTime !== null && this.missingRetries < 4) {
+        /* A layer is still decoding. Keep the last complete frame on screen
+           and retry shortly instead of publishing a black flash. */
+        this.missingRetries += 1;
+        clearTimeout(this.missingTimer);
+        this.missingTimer = setTimeout(() => this.scheduleRender(), 90);
+        return;
+      }
+      this.missingRetries = 0;
       this.ctx.save();
       this.ctx.setTransform(1, 0, 0, 1, 0, 0);
       this.ctx.globalAlpha = 1;
@@ -270,6 +320,9 @@ export class Preview {
     this.store.playing = true;
     this.playFrom = this.store.playhead;
     this.playStart = performance.now();
+    this.lastVideoFrameAt = 0;
+    this.frameCallbackSeen = false;
+    this.missingRetries = 0;
     const generation = ++this.playToken;
     this.audio.start();
     this.onTime(this.store.playhead);
@@ -287,7 +340,15 @@ export class Preview {
       this.store.playhead = next;
       this.audio.update();
       this.onTime(next);
-      this.scheduleRender();
+      /* When requestVideoFrameCallback is driving the monitor we render once
+         per presented video frame. If no frame has arrived for 220 ms (audio
+         only, buffering, or no video layer) fall back to the clock loop so
+         overlays and the last valid frame still update. */
+      const frameDriven =
+        this.frameCallbackSeen &&
+        this.lastVideoFrameAt > 0 &&
+        now - this.lastVideoFrameAt < 220;
+      if (!frameDriven) this.scheduleRender();
       this.raf = requestAnimationFrame(tick);
     };
     this.raf = requestAnimationFrame(tick);
@@ -300,6 +361,7 @@ export class Preview {
     this.playToken += 1;
     cancelAnimationFrame(this.raf);
     this.audio.stop();
+    this.media.pausePreview();
     this.invalidateRender();
     this.onTime(this.store.playhead);
     this.scheduleRender();
@@ -312,6 +374,9 @@ export class Preview {
 
   dispose() {
     this.pause();
+    clearTimeout(this.missingTimer);
+    if (this.media.onPreviewFrame) this.media.onPreviewFrame = null;
+    this.media.disposePreview();
     this.audio.dispose();
     this.observer?.disconnect();
     window.removeEventListener('resize', this._resize);
@@ -363,8 +428,10 @@ export class Preview {
     const clip = selected.clip;
     const base = this.store.isBaseClip(clip);
     const bounds = this.boundsFor(clip);
-    const scaleX = this.frame.clientWidth / this.canvas.width;
-    const scaleY = this.frame.clientHeight / this.canvas.height;
+    const frameWidth = this.frameSize.width || this.frame.clientWidth || 1;
+    const frameHeight = this.frameSize.height || this.frame.clientHeight || 1;
+    const scaleX = frameWidth / this.canvas.width;
+    const scaleY = frameHeight / this.canvas.height;
     const width = Math.max(20, bounds.width * scaleX);
     const height = Math.max(20, bounds.height * scaleY);
     const left = bounds.x * scaleX;
@@ -590,6 +657,8 @@ export class Preview {
       renderMs: this.lastRenderMs,
       renderInFlight: this.renderInFlight,
       renderPending: this.renderPending,
+      frameCallbackSeen: this.frameCallbackSeen,
+      videoElements: this.media.previewVideos.size,
       audio: this.audio.debug(),
       canvas: { width: this.canvas.width, height: this.canvas.height },
       selection: this.store.selectedId

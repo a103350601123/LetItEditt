@@ -6,7 +6,7 @@
  */
 
 import { clamp, ease, isRTLText, withAlpha } from './utils.js';
-import { applyGrade, drawTransition } from './effects.js';
+import { applyGrade, drawTransition, hasGrade } from './effects.js';
 import { FONT_STACKS, clipAtTime, clipEnd, previousClip } from './model.js';
 
 const BASE_HEIGHT = 1080;
@@ -41,11 +41,26 @@ function tempCanvas(width, height) {
 
 /* Keyframes & animation -------------------------------------------------- */
 
+/* Keyframe lists are mutated in place by the editor (values change, entries
+ * are added). A per-list cache keeps the hot render path from filtering and
+ * sorting the same array on every frame. The array identity and length are
+ * enough to invalidate it; entry values are read through the same objects. */
+const sortedKeyframes = new WeakMap();
+
+function sortedList(list) {
+  let sorted = sortedKeyframes.get(list);
+  if (!sorted || sorted.length !== list.length) {
+    sorted = list
+      .filter((key) => Number.isFinite(key.t) && Number.isFinite(key.v))
+      .sort((a, b) => a.t - b.t);
+    sortedKeyframes.set(list, sorted);
+  }
+  return sorted;
+}
+
 function interpolateKeyframes(list, time, base) {
   if (!Array.isArray(list) || list.length === 0) return base;
-  const sorted = list
-    .filter((key) => Number.isFinite(key.t) && Number.isFinite(key.v))
-    .sort((a, b) => a.t - b.t);
+  const sorted = sortedList(list);
   if (!sorted.length) return base;
   if (time <= sorted[0].t) return sorted[0].v;
   if (time >= sorted[sorted.length - 1].t) return sorted[sorted.length - 1].v;
@@ -192,17 +207,58 @@ function gradientForBackground(ctx, background, width, height) {
 
 /* Text ------------------------------------------------------------------- */
 
-export function textLines(clip, width, height) {
+/* One measuring context for the whole renderer. Creating a canvas and
+ * re-measuring every text layer on every frame was a measurable cost in the
+ * preview and in the export worker. */
+let measureContext = null;
+
+function textMeasureContext() {
+  if (!measureContext) {
+    measureContext = typeof OffscreenCanvas !== 'undefined'
+      ? new OffscreenCanvas(4, 4)
+      : document.createElement('canvas');
+    measureContext.width = 4;
+    measureContext.height = 4;
+  }
+  return measureContext.getContext('2d');
+}
+
+function fontString(text, size) {
+  return `${text.italic ? 'italic ' : ''}${text.bold ? '700 ' : '400 '}${size}px ${FONT_STACKS[text.font] || FONT_STACKS.sans}`;
+}
+
+const textLayoutCache = new WeakMap();
+
+function layoutText(clip, width, height) {
   const text = clip.text || {};
-  const scale = 1;
   const unit = height / BASE_HEIGHT;
-  const fontSize = Math.max(6, (Number(text.size) || 72) * unit * scale);
+  const fontSize = Math.max(6, (Number(text.size) || 72) * unit);
   const content = String(text.content || '');
   const maxWidth = Number(text.maxWidth) > 0 ? Number(text.maxWidth) * width : width * 0.9;
+  const spacing = (Number(text.letterSpacing) || 0) * unit;
+  const signature = [
+    content,
+    width,
+    height,
+    fontSize,
+    maxWidth,
+    spacing,
+    text.font || '',
+    text.bold ? 1 : 0,
+    text.italic ? 1 : 0
+  ].join('\u0001');
+  const cached = textLayoutCache.get(clip);
+  if (cached && cached.signature === signature) return cached.value;
+
+  const ctx = textMeasureContext();
+  ctx.font = fontString(text, fontSize);
+  try {
+    ctx.letterSpacing = `${spacing}px`;
+  } catch (error) {
+    /* not supported */
+  }
   const raw = content.split('\n');
   const lines = [];
-  const ctx = new OffscreenCanvas(4, 4).getContext('2d');
-  ctx.font = `${text.italic ? 'italic ' : ''}${text.bold ? '700 ' : '400 '}${fontSize}px ${FONT_STACKS[text.font] || FONT_STACKS.sans}`;
   for (const paragraph of raw) {
     if (!paragraph) {
       lines.push('');
@@ -225,7 +281,21 @@ export function textLines(clip, width, height) {
     }
     lines.push(line);
   }
-  return { lines, fontSize, maxWidth };
+  const lineWidths = lines.map((line) => ctx.measureText(line || ' ').width);
+  const value = {
+    lines,
+    lineWidths,
+    fontSize,
+    maxWidth,
+    spacing,
+    maxLineWidth: lineWidths.reduce((max, valueWidth) => Math.max(max, valueWidth), 0)
+  };
+  textLayoutCache.set(clip, { signature, value });
+  return value;
+}
+
+export function textLines(clip, width, height) {
+  return layoutText(clip, width, height);
 }
 
 function drawTextClip(ctx, clip, localTime, width, height, forcedOpacity = null) {
@@ -234,27 +304,14 @@ function drawTextClip(ctx, clip, localTime, width, height, forcedOpacity = null)
   if (opacity <= 0.001) return;
 
   const text = clip.text || {};
-  const { lines, fontSize } = textLines(clip, width, height);
+  const { lines, lineWidths, fontSize, maxLineWidth } = layoutText(clip, width, height);
   const unit = height / BASE_HEIGHT;
-  const fontStack = FONT_STACKS[text.font] || FONT_STACKS.sans;
   const scaleFactor = transform.scale;
   const size = fontSize * scaleFactor;
   const lineHeight = size * (Number(text.lineHeight) || 1.25);
   const letterSpacing = (Number(text.letterSpacing) || 0) * unit * scaleFactor;
   const padding = size * 0.28;
-
-  const measure = new OffscreenCanvas(4, 4).getContext('2d');
-  measure.font = `${text.italic ? 'italic ' : ''}${text.bold ? '700 ' : '400 '}${size}px ${fontStack}`;
-  try {
-    measure.letterSpacing = `${letterSpacing}px`;
-  } catch (error) {
-    /* not supported */
-  }
-  let maxLine = 0;
-  for (const line of lines) {
-    const metrics = measure.measureText(line || ' ');
-    maxLine = Math.max(maxLine, metrics.width);
-  }
+  const maxLine = maxLineWidth * scaleFactor;
 
   const boxWidth = maxLine + padding * 2;
   const boxHeight = lines.length * lineHeight + padding * 1.4;
@@ -265,7 +322,7 @@ function drawTextClip(ctx, clip, localTime, width, height, forcedOpacity = null)
   ctx.globalAlpha = opacity;
   ctx.translate(centerX, centerY);
   ctx.rotate(((Number(transform.rotation) || 0) * Math.PI) / 180);
-  ctx.font = `${text.italic ? 'italic ' : ''}${text.bold ? '700 ' : '400 '}${size}px ${fontStack}`;
+  ctx.font = fontString(text, size);
   ctx.textBaseline = 'top';
   ctx.direction = text.direction === 'rtl' || (text.direction === 'auto' && isRTLText(text.content)) ? 'rtl' : 'ltr';
   try {
@@ -304,14 +361,14 @@ function drawTextClip(ctx, clip, localTime, width, height, forcedOpacity = null)
     ctx.fillStyle = text.color || '#ffffff';
     ctx.fillText(line || ' ', startX, y);
     if (text.underline) {
-      const metrics = ctx.measureText(line || ' ');
+      const lineWidth = (lineWidths[index] || 0) * scaleFactor;
       const underlineY = y + size * 1.02;
-      const left = align === 'left' ? startX : align === 'right' ? startX - metrics.width : startX - metrics.width / 2;
+      const left = align === 'left' ? startX : align === 'right' ? startX - lineWidth : startX - lineWidth / 2;
       ctx.strokeStyle = text.color || '#ffffff';
       ctx.lineWidth = Math.max(1, size * 0.05);
       ctx.beginPath();
       ctx.moveTo(left, underlineY);
-      ctx.lineTo(left + metrics.width, underlineY);
+      ctx.lineTo(left + lineWidth, underlineY);
       ctx.stroke();
     }
   });
@@ -403,7 +460,7 @@ async function drawMediaClip(ctx, clip, source, localTime, width, height, option
   if (!mediaId) return false;
   const transform = resolveTransform(clip, localTime);
   const opacity = forcedOpacity === null ? transform.opacity : forcedOpacity;
-  if (opacity <= 0.001) return false;
+  if (opacity <= 0.001) return true;
 
   let media = null;
   let srcW = 16;
@@ -421,14 +478,18 @@ async function drawMediaClip(ctx, clip, source, localTime, width, height, option
       sourceTime = clipSourceTime(clip, localTime);
     }
     const previewSize = options.maxDimension || 1280;
-    media = await source.getFrame(mediaId, sourceTime, previewSize);
+    media = await source.getFrame(mediaId, sourceTime, previewSize, {
+      clipId: clip.id,
+      speed: clip.speed,
+      reverse: clip.reverse,
+      freeze: clip.freeze
+    });
     if (!media) return false;
-    srcW = media.width;
-    srcH = media.height;
+    /* HTMLVideoElement exposes the decoded frame size as videoWidth/videoHeight,
+       while canvases and ImageBitmaps use width/height. */
+    srcW = media.videoWidth || media.width;
+    srcH = media.videoHeight || media.height;
   }
-
-  const layer = tempCanvas(width, height);
-  const layerCtx = layer.getContext('2d');
 
   const crop = clip.crop || { top: 0, right: 0, bottom: 0, left: 0 };
   const left = clamp(Number(crop.left) || 0, 0, 0.45);
@@ -444,18 +505,30 @@ async function drawMediaClip(ctx, clip, source, localTime, width, height, option
   const drawW = sw * base * transform.scale;
   const drawH = sh * base * transform.scale;
 
-  layerCtx.save();
-  layerCtx.translate(transform.x * width, transform.y * height);
-  layerCtx.rotate(((Number(transform.rotation) || 0) * Math.PI) / 180);
-  layerCtx.scale(clip.flipH ? -1 : 1, clip.flipV ? -1 : 1);
-  layerCtx.drawImage(media, sx, sy, sw, sh, -drawW / 2, -drawH / 2, drawW, drawH);
-  layerCtx.restore();
+  /* Filters and colour grading need a private layer canvas. Everything else
+     (position, scale, rotation, flip, crop, opacity) can be drawn straight
+     into the target, which removes a full-frame allocation and copy per layer
+     per frame. This is the common case for the main video. */
+  const filterActive = clip.filter && clip.filter !== 'none' && Number(clip.filterIntensity ?? 1) > 0;
+  const needsLayer = filterActive || hasGrade(clip.color);
+  const target = needsLayer ? tempCanvas(width, height) : ctx;
+  const targetCtx = needsLayer ? target.getContext('2d') : ctx;
 
-  const graded = applyGrade(layer, clip);
-  ctx.save();
-  ctx.globalAlpha = opacity;
-  ctx.drawImage(graded, 0, 0);
-  ctx.restore();
+  targetCtx.save();
+  targetCtx.globalAlpha = needsLayer ? 1 : opacity;
+  targetCtx.translate(transform.x * width, transform.y * height);
+  targetCtx.rotate(((Number(transform.rotation) || 0) * Math.PI) / 180);
+  targetCtx.scale(clip.flipH ? -1 : 1, clip.flipV ? -1 : 1);
+  targetCtx.drawImage(media, sx, sy, sw, sh, -drawW / 2, -drawH / 2, drawW, drawH);
+  targetCtx.restore();
+
+  if (needsLayer) {
+    const graded = applyGrade(target, clip);
+    ctx.save();
+    ctx.globalAlpha = opacity;
+    ctx.drawImage(graded, 0, 0);
+    ctx.restore();
+  }
   return true;
 }
 
@@ -532,20 +605,26 @@ function drawSubtitles(ctx, project, time, width, height) {
 async function drawClipInto(ctx, project, clip, source, localTime, width, height, options, forcedOpacity = null) {
   if (clip.kind === 'text') {
     drawTextClip(ctx, clip, localTime, width, height, forcedOpacity);
-  } else if (clip.kind === 'shape') {
-    drawShapeClip(ctx, clip, localTime, width, height, forcedOpacity);
-  } else if (clip.kind === 'background') {
-    drawBackgroundClip(ctx, clip, localTime, width, height, forcedOpacity);
-  } else {
-    await drawMediaClip(ctx, clip, source, localTime, width, height, options, forcedOpacity);
+    return true;
   }
+  if (clip.kind === 'shape') {
+    drawShapeClip(ctx, clip, localTime, width, height, forcedOpacity);
+    return true;
+  }
+  if (clip.kind === 'background') {
+    drawBackgroundClip(ctx, clip, localTime, width, height, forcedOpacity);
+    return true;
+  }
+  return drawMediaClip(ctx, clip, source, localTime, width, height, options, forcedOpacity);
 }
 
-/** Render a single track's contribution to the frame. */
+/** Render a single track's contribution to the frame. Returns false when an
+ *  active media layer could not produce a frame, so the caller can avoid
+ *  publishing a frame that would look like a black flash. */
 async function renderTrack(ctx, project, track, source, time, width, height, options) {
-  if (track.kind !== 'video' || track.hidden) return;
+  if (track.kind !== 'video' || track.hidden) return true;
   const clip = clipAtTime(track, time);
-  if (!clip || clip.hidden) return;
+  if (!clip || clip.hidden) return true;
   const local = time - clip.start;
 
   const transition = clip.transition;
@@ -560,9 +639,10 @@ async function renderTrack(ctx, project, track, source, time, width, height, opt
     const progress = clamp(local / Number(transition.duration), 0, 1);
     const outgoing = tempCanvas(width, height);
     const incoming = tempCanvas(width, height);
+    let complete = true;
     if (adjacent) {
       const outgoingTime = Math.max(0, prev.duration - Number(transition.duration)) + local;
-      await drawClipInto(
+      const drawn = await drawClipInto(
         outgoing.getContext('2d'),
         project,
         prev,
@@ -573,12 +653,13 @@ async function renderTrack(ctx, project, track, source, time, width, height, opt
         options,
         1
       );
+      if (drawn === false) complete = false;
     } else {
       const outgoingCtx = outgoing.getContext('2d');
       outgoingCtx.fillStyle = '#000';
       outgoingCtx.fillRect(0, 0, width, height);
     }
-    await drawClipInto(
+    const drawn = await drawClipInto(
       incoming.getContext('2d'),
       project,
       clip,
@@ -589,11 +670,12 @@ async function renderTrack(ctx, project, track, source, time, width, height, opt
       options,
       1
     );
+    if (drawn === false) complete = false;
     drawTransition(ctx, outgoing, incoming, transition.reverse ? 1 - progress : progress, transition.type);
-    return;
+    return complete;
   }
 
-  await drawClipInto(ctx, project, clip, source, local, width, height, options);
+  return drawClipInto(ctx, project, clip, source, local, width, height, options);
 }
 
 function clipSourceLocal(clip, local) {
@@ -614,14 +696,17 @@ export async function renderComposition(ctx, project, source, time, options = {}
   ctx.fillStyle = project.background || '#000000';
   ctx.fillRect(0, 0, width, height);
 
+  let missingMedia = false;
   const tracks = project.tracks || [];
   for (let index = tracks.length - 1; index >= 0; index -= 1) {
     const track = tracks[index];
     if (track.kind !== 'video' || track.hidden) continue;
-    await renderTrack(ctx, project, track, source, time, width, height, options);
+    const complete = await renderTrack(ctx, project, track, source, time, width, height, options);
+    if (complete === false) missingMedia = true;
   }
 
   drawSubtitles(ctx, project, time, width, height);
+  return { missingMedia };
 }
 
 /** Bounds of a visual clip in composition pixels (used for the on-canvas box). */
@@ -630,14 +715,10 @@ export function clipBounds(clip, localTime, width, height, sourceWidth, sourceHe
   let w;
   let h;
   if (clip.kind === 'text') {
-    const { lines, fontSize } = textLines(clip, width, height);
-    const measure = new OffscreenCanvas(4, 4).getContext('2d');
+    const { lines, fontSize, maxLineWidth } = textLines(clip, width, height);
     const text = clip.text || {};
     const size = fontSize * transform.scale;
-    measure.font = `${text.italic ? 'italic ' : ''}${text.bold ? '700 ' : '400 '}${size}px ${FONT_STACKS[text.font] || FONT_STACKS.sans}`;
-    let maxLine = 0;
-    for (const line of lines) maxLine = Math.max(maxLine, measure.measureText(line || ' ').width);
-    w = maxLine + size * 0.56;
+    w = maxLineWidth * transform.scale + size * 0.56;
     h = lines.length * size * (Number(text.lineHeight) || 1.25) + size * 0.4;
   } else if (clip.kind === 'shape') {
     w = (Number(clip.shape?.width) || 0.45) * width * transform.scale;

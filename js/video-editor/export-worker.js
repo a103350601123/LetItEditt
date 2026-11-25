@@ -85,13 +85,34 @@ function checkCancel() {
   if (cancelRequested) throw new Error('Conversion canceled.');
 }
 
-function postProgress(id, progress, phase) {
-  self.postMessage({
-    type: 'progress',
-    id,
-    progress: clamp(progress, 0, 1),
-    phase
-  });
+/* Progress messages used to be posted once per encoded frame. At 60 fps that
+ * is 60 structured-clone round trips per second into the UI thread, which the
+ * worker does not need to pay while it is also encoding. Coalesce to ~12 Hz;
+ * phase changes and the final value are always delivered. */
+let lastProgressAt = 0;
+let lastProgressValue = -1;
+let lastProgressPhase = '';
+
+function postProgress(id, progress, phase, force = false) {
+  const value = clamp(progress, 0, 1);
+  const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+  const phaseChanged = phase !== lastProgressPhase;
+  if (!force && !phaseChanged && now - lastProgressAt < 80 && Math.abs(value - lastProgressValue) < 0.01) {
+    return;
+  }
+  lastProgressAt = now;
+  lastProgressValue = value;
+  lastProgressPhase = phase;
+  self.postMessage({ type: 'progress', id, progress: value, phase });
+}
+
+const HARDWARE_HINT_OPTIONS = ['no-preference', 'prefer-hardware', 'prefer-software'];
+
+/** Ask WebCodecs whether this exact configuration is supported. The
+ *  `prefer-hardware` hint is advisory only: a true result means the browser
+ *  accepted the configuration, not that a GPU encoder was actually used. */
+async function canEncodeWith(codec, width, height, hardwareAcceleration) {
+  return MB.canEncodeVideo(codec, { width, height, hardwareAcceleration }).catch(() => false);
 }
 
 async function finishOutput() {
@@ -115,6 +136,10 @@ function bucketSize(value) {
 class WorkerSource {
   constructor() {
     this.assets = new Map();
+    /* One sequential decoder per clip. Export renders frames in order, so a
+     * streaming sink avoids a random-access seek to the previous keyframe on
+     * every single frame, which was the dominant export cost. */
+    this.streams = new Map();
   }
 
   async add(file, type, name) {
@@ -159,10 +184,7 @@ class WorkerSource {
     this.assets.set(file.id, { type: 'audio', input, audioTrack });
   }
 
-  async getFrame(id, time, maxDimension) {
-    const asset = this.assets.get(id);
-    if (!asset || asset.type !== 'video') return null;
-    const bucket = bucketSize(maxDimension);
+  sinkFor(asset, bucket) {
     let sink = asset.sinks.get(bucket);
     if (!sink) {
       const ratio = asset.width > 0 && asset.height > 0 ? asset.width / asset.height : 16 / 9;
@@ -180,13 +202,96 @@ class WorkerSource {
         height,
         fit: 'contain',
         alpha: false,
-        poolSize: 2
+        poolSize: 2,
+        decoderOptions: { hardwareAcceleration: 'prefer-hardware', optimizeForLatency: true }
       });
       asset.sinks.set(bucket, sink);
     }
+    return sink;
+  }
+
+  async restartStream(stream, time, asset) {
+    try {
+      await stream.iterator?.return?.();
+    } catch (error) {
+      /* iterator already finished */
+    }
+    const first = await stream.sink.getCanvas(time);
+    stream.done = false;
+    if (!first) {
+      stream.current = null;
+      return;
+    }
+    stream.current = first;
+    stream.iterator = stream.sink.canvases(time, asset.duration || Infinity);
+  }
+
+  async getFrame(id, time, maxDimension, hint = {}) {
+    const asset = this.assets.get(id);
+    if (!asset || asset.type !== 'video') return null;
+    const bucket = bucketSize(maxDimension);
+    const sink = this.sinkFor(asset, bucket);
     const clamped = Math.max(0, Math.min(time, Math.max(0, (asset.duration || 0) - 0.002)));
-    const result = await sink.getCanvas(clamped);
-    return result ? result.canvas : null;
+    const key = `${id}\u0001${bucket}\u0001${hint.clipId || 'main'}`;
+    let stream = this.streams.get(key);
+    const tolerance = 0.0015;
+
+    if (!stream) {
+      const first = await sink.getCanvas(clamped);
+      if (!first) return null;
+      stream = { sink, current: first, iterator: null, done: false };
+      const next = Math.min(Math.max(0, (asset.duration || 0) - 0.001), clamped + 1e-4);
+      stream.iterator = sink.canvases(next, asset.duration || Infinity);
+      this.streams.set(key, stream);
+      return first.canvas;
+    }
+
+    const current = stream.current;
+    if (!current) {
+      await this.restartStream(stream, clamped, asset);
+      return stream.current ? stream.current.canvas : null;
+    }
+    if (
+      clamped >= current.timestamp - tolerance &&
+      clamped <= current.timestamp + (current.duration || 0) + tolerance
+    ) {
+      return current.canvas;
+    }
+
+    if (clamped < current.timestamp - tolerance) {
+      await this.restartStream(stream, clamped, asset);
+      return stream.current ? stream.current.canvas : null;
+    }
+
+    /* Forward. Advance until a frame covers the requested time. The canvas
+       pool rotates, but the frame immediately before an overshoot is still
+       intact, which is exactly the frame we keep. */
+    while (!stream.done) {
+      let next;
+      try {
+        next = await stream.iterator.next();
+      } catch (error) {
+        stream.done = true;
+        break;
+      }
+      if (next.done) {
+        stream.done = true;
+        break;
+      }
+      const previous = stream.current;
+      stream.current = next.value;
+      if (
+        clamped >= stream.current.timestamp - tolerance &&
+        clamped <= stream.current.timestamp + (stream.current.duration || 0) + tolerance
+      ) {
+        return stream.current.canvas;
+      }
+      if (stream.current.timestamp > clamped + tolerance) {
+        stream.current = previous;
+        return previous.canvas;
+      }
+    }
+    return stream.current ? stream.current.canvas : null;
   }
 
   getImage(id) {
@@ -195,6 +300,14 @@ class WorkerSource {
   }
 
   dispose() {
+    for (const stream of this.streams.values()) {
+      try {
+        stream.iterator?.return?.();
+      } catch (error) {
+        /* already closed */
+      }
+    }
+    this.streams.clear();
     for (const asset of this.assets.values()) {
       try {
         asset.input?.dispose?.();
@@ -333,7 +446,10 @@ async function runExport(message) {
   const fps = Math.max(1, Math.min(120, Math.round(options.fps) || 30));
   const duration = Math.max(0.1, Number(options.duration) || 0);
 
-  postProgress(message.id, 0.01, 'prepare');
+  postProgress(message.id, 0.01, 'prepare', true);
+  lastProgressAt = 0;
+  lastProgressValue = -1;
+  lastProgressPhase = '';
 
   for (const entry of media) {
     checkCancel();
@@ -342,7 +458,14 @@ async function runExport(message) {
 
   const videoCodec = formatKey === 'webm' ? 'vp9' : 'avc';
   const audioCodec = formatKey === 'webm' ? 'opus' : 'aac';
-  const videoEncodable = await MB.canEncodeVideo(videoCodec, { width, height }).catch(() => false);
+  /* Prefer hardware only when the browser says the hardware-hinted config is
+     encodable. Otherwise fall back to the default configuration instead of
+     failing the export on machines with no hardware encoder. */
+  let hardwareAcceleration = 'no-preference';
+  if (await canEncodeWith(videoCodec, width, height, 'prefer-hardware')) {
+    hardwareAcceleration = 'prefer-hardware';
+  }
+  const videoEncodable = await canEncodeWith(videoCodec, width, height, hardwareAcceleration);
   if (!videoEncodable) {
     throw new Error(
       `${formatKey.toUpperCase()} ${videoCodec.toUpperCase()} ${width}×${height} is not encodable in this browser. Try a smaller resolution or the other format.`
@@ -363,7 +486,9 @@ async function runExport(message) {
   const videoSource = new MB.CanvasSource(canvas, {
     codec: videoCodec,
     quality: new MB.Quality({ bitrate }),
-    keyFrameInterval: 2
+    keyFrameInterval: 2,
+    hardwareAcceleration,
+    latencyMode: 'quality'
   });
   output.addVideoTrack(videoSource);
 
@@ -391,19 +516,19 @@ async function runExport(message) {
     const length = Math.max(0.0005, Math.min(frameDuration, duration - time));
     await renderComposition(ctx, project, source, time, { maxDimension: Math.max(width, height) });
     await videoSource.add(time, length);
-    postProgress(message.id, 0.05 + 0.78 * ((frame + 1) / totalFrames), 'video');
+    postProgress(message.id, 0.05 + 0.78 * ((frame + 1) / totalFrames), 'video', frame === totalFrames - 1);
   }
 
   /* Audio --------------------------------------------------------------- */
   if (audioSource) {
-    postProgress(message.id, 0.86, 'audio');
+    postProgress(message.id, 0.86, 'audio', true);
     const { mix, totalFrames: audioFrames, hasAudio } = await mixAudio(project, source, duration);
     if (hasAudio) {
       await addMixedAudio(audioSource, mix, audioFrames);
     }
   }
 
-  postProgress(message.id, 0.96, 'finalize');
+  postProgress(message.id, 0.96, 'finalize', true);
   checkCancel();
   await output.finalize();
   activeOutput = null;
@@ -459,7 +584,12 @@ async function runExport(message) {
           audioChannels,
           bitrate: Math.round((blob.size * 8) / Math.max(0.001, outputDuration)),
           videoBitrate: bitrate,
-          quality: qualityKey
+          quality: qualityKey,
+          /* `prefer-hardware` is an encoder hint. The browser is allowed to
+             fall back to software, so this is reported as requested, not as
+             a guarantee that a GPU encoder ran. */
+          hardwareAccelerationRequested: hardwareAcceleration,
+          hardwareAccelerationHintAccepted: hardwareAcceleration === 'prefer-hardware'
         }
       },
       [buffer]

@@ -56,6 +56,28 @@ function bucketSize(value) {
   return 2160;
 }
 
+function clampNumber(value, min, max) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return min;
+  return Math.min(max, Math.max(min, number));
+}
+
+/** Resolve on the next event, or after `timeout` ms, whichever comes first. */
+function waitForEvent(target, name, timeout = 2500) {
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      target.removeEventListener(name, finish);
+      clearTimeout(timer);
+      resolve();
+    };
+    const timer = setTimeout(finish, timeout);
+    target.addEventListener(name, finish, { once: true });
+  });
+}
+
 /** Encode a canvas to a Blob on either the main thread (HTMLCanvasElement)
  *  or in a worker/OffscreenCanvas. */
 function canvasToBlob(canvas, options) {
@@ -73,6 +95,13 @@ export class MediaLibrary {
   constructor() {
     this.assets = new Map();
     this.decodeContext = null;
+    /* Persistent <video> elements used only by the preview monitor. The
+     * browser's own pipeline decodes and presents these frames, so ordinary
+     * playback no longer performs a random-access decode per composition
+     * frame. Elements are keyed by clip so a split clip can show its own
+     * moment of the same file. */
+    this.previewVideos = new Map();
+    this.onPreviewFrame = null;
   }
 
   list() {
@@ -429,6 +458,223 @@ export class MediaLibrary {
     return asset.bitmap;
   }
 
+  /* ------------------------------------------------------------------ */
+  /* Preview video elements                                             */
+  /* ------------------------------------------------------------------ */
+
+  supportsFrameCallback() {
+    return (
+      typeof HTMLVideoElement !== 'undefined' &&
+      typeof HTMLVideoElement.prototype.requestVideoFrameCallback === 'function'
+    );
+  }
+
+  /** A stable blob URL for any file (video elements and preview audio). */
+  fileUrl(mediaId) {
+    const asset = this.assets.get(mediaId);
+    if (!asset || !asset.file) return '';
+    if (!asset.fileUrl) {
+      try {
+        asset.fileUrl = URL.createObjectURL(asset.file);
+      } catch (error) {
+        return '';
+      }
+    }
+    return asset.fileUrl;
+  }
+
+  previewElement(mediaId, clipKey) {
+    const asset = this.assets.get(mediaId);
+    if (!asset || asset.type !== 'video' || !asset.file) return null;
+    const key = `${mediaId}\u0001${clipKey || 'main'}`;
+    let entry = this.previewVideos.get(key);
+    if (entry && entry.assetId === mediaId) return entry;
+    if (entry) this.destroyPreviewVideo(key);
+
+    const url = this.fileUrl(mediaId);
+    if (!url) return null;
+    const el = document.createElement('video');
+    el.muted = true;
+    el.defaultMuted = true;
+    el.playsInline = true;
+    el.setAttribute('playsinline', '');
+    el.preload = 'auto';
+    el.src = url;
+    /* Keep the element in the document (some browsers will not present frames
+       for a detached video) but out of the layout and out of sight. */
+    el.style.cssText =
+      'position:fixed;left:-10000px;top:0;width:2px;height:2px;opacity:0;pointer-events:none;';
+    (document.body || document.documentElement).appendChild(el);
+
+    entry = {
+      key,
+      assetId: mediaId,
+      el,
+      frameHandle: null,
+      lastFrameAt: 0,
+      ready: false,
+      failed: false
+    };
+    this.previewVideos.set(key, entry);
+
+    el.addEventListener('loadeddata', () => {
+      entry.ready = true;
+      this.onPreviewFrame?.();
+    });
+    el.addEventListener('seeked', () => {
+      this.onPreviewFrame?.();
+    });
+    el.addEventListener('error', () => {
+      entry.failed = true;
+    });
+    this.attachPreviewFrameCallback(entry);
+    el.load();
+    this.trimPreviewVideos();
+    return entry;
+  }
+
+  attachPreviewFrameCallback(entry) {
+    if (!this.supportsFrameCallback()) return;
+    const el = entry.el;
+    const onFrame = () => {
+      if (this.previewVideos.get(entry.key) !== entry) return;
+      entry.frameHandle = null;
+      entry.lastFrameAt = performance.now();
+      this.onPreviewFrame?.();
+      try {
+        entry.frameHandle = el.requestVideoFrameCallback(onFrame);
+      } catch (error) {
+        entry.frameHandle = null;
+      }
+    };
+    try {
+      entry.frameHandle = el.requestVideoFrameCallback(onFrame);
+    } catch (error) {
+      entry.frameHandle = null;
+    }
+  }
+
+  destroyPreviewVideo(key) {
+    const entry = this.previewVideos.get(key);
+    if (!entry) return;
+    this.previewVideos.delete(key);
+    try {
+      if (entry.frameHandle !== null && typeof entry.el.cancelVideoFrameCallback === 'function') {
+        entry.el.cancelVideoFrameCallback(entry.frameHandle);
+      }
+    } catch (error) {
+      /* already cancelled */
+    }
+    try {
+      entry.el.pause();
+    } catch (error) {
+      /* already paused */
+    }
+    try {
+      entry.el.removeAttribute('src');
+      entry.el.load();
+    } catch (error) {
+      /* already detached */
+    }
+    entry.el.remove();
+  }
+
+  trimPreviewVideos(limit = 8) {
+    while (this.previewVideos.size > limit) {
+      const oldest = this.previewVideos.keys().next().value;
+      this.destroyPreviewVideo(oldest);
+    }
+  }
+
+  /** Pause every preview element without dropping its decoded frame. */
+  pausePreview() {
+    for (const entry of this.previewVideos.values()) {
+      try {
+        entry.el.pause();
+      } catch (error) {
+        /* already paused */
+      }
+    }
+  }
+
+  disposePreview() {
+    for (const key of [...this.previewVideos.keys()]) this.destroyPreviewVideo(key);
+  }
+
+  /**
+   * Frame source used by the preview renderer. During playback the element is
+   * kept playing at the project rate and its latest presented frame is drawn
+   * directly; when paused or seeking it is positioned exactly and awaited.
+   * Returns a drawable (the element) or null. `frameAt` is only a fallback for
+   * the first frame before the element is ready, and for reverse clips.
+   */
+  async frameForPreview(mediaId, clipKey, sourceTime, options = {}) {
+    const asset = this.assets.get(mediaId);
+    if (!asset || asset.type !== 'video') return null;
+    const time = Math.max(
+      0,
+      Math.min(Number(sourceTime) || 0, Math.max(0, (asset.duration || 0) - 0.001))
+    );
+
+    /* A media element can only move forwards; reverse clips keep the decoder
+       path. Reverse playback is rare, so this does not affect normal preview. */
+    if (options.reverse) return this.frameAt(mediaId, time, 1280);
+
+    const entry = this.previewElement(mediaId, clipKey);
+    if (!entry) return this.frameAt(mediaId, time, 1280);
+    const el = entry.el;
+    if (entry.failed) return this.frameAt(mediaId, time, 1280);
+
+    const speed = clampNumber(Number(options.speed) || 1, 0.25, 4);
+    const projectRate = clampNumber(Number(options.rate) || 1, 0.25, 4);
+    const rate = clampNumber(speed * projectRate, 0.0625, 16);
+
+    if (options.playing && !options.freeze) {
+      if (el.playbackRate !== rate) {
+        try {
+          el.playbackRate = rate;
+        } catch (error) {
+          /* unsupported rate */
+        }
+      }
+      if (el.paused) {
+        const promise = el.play();
+        if (promise && typeof promise.catch === 'function') promise.catch(() => {});
+      }
+      /* Correct large drift only; small corrections would seek every frame
+         and cause the stutter this change is meant to remove. */
+      if (Math.abs(el.currentTime - time) > 0.35) {
+        try {
+          el.currentTime = time;
+        } catch (error) {
+          /* seek refused while loading */
+        }
+      }
+      if (el.readyState >= 2 && el.videoWidth > 0) return el;
+      return this.frameAt(mediaId, time, 1280);
+    }
+
+    if (!el.paused) {
+      try {
+        el.pause();
+      } catch (error) {
+        /* already paused */
+      }
+    }
+    if (el.readyState < 1) await waitForEvent(el, 'loadedmetadata', 2500);
+    if (!el.videoWidth) return this.frameAt(mediaId, time, 1280);
+    if (Math.abs(el.currentTime - time) > 0.03) {
+      try {
+        el.currentTime = time;
+      } catch (error) {
+        /* seek refused while loading */
+      }
+      await waitForEvent(el, 'seeked', 2500);
+    }
+    if (el.readyState >= 2 && el.videoWidth > 0) return el;
+    return this.frameAt(mediaId, time, 1280);
+  }
+
   getPeaks(mediaId) {
     const asset = this.assets.get(mediaId);
     return asset && asset.peaks ? asset.peaks : null;
@@ -453,9 +699,13 @@ export class MediaLibrary {
   remove(mediaId) {
     const asset = this.assets.get(mediaId);
     if (!asset) return;
+    for (const [key, entry] of [...this.previewVideos]) {
+      if (entry.assetId === mediaId) this.destroyPreviewVideo(key);
+    }
     if (asset.thumbnail) URL.revokeObjectURL(asset.thumbnail);
     if (asset.url) URL.revokeObjectURL(asset.url);
     if (asset.audioUrl) URL.revokeObjectURL(asset.audioUrl);
+    if (asset.fileUrl) URL.revokeObjectURL(asset.fileUrl);
     try {
       asset.input?.dispose?.();
     } catch (error) {
