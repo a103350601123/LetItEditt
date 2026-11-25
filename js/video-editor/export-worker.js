@@ -214,6 +214,23 @@ class WorkerSource {
     return sink;
   }
 
+  /** Close decoders for clips that are no longer on the timeline. Export is
+   *  sequential, so only the clips active near `time` need a live iterator.
+   *  Keeping one decoder per clip for the whole export would exhaust the
+   *  browser's concurrent VideoDecoder limit on long timelines. */
+  pruneStreams(time, grace = 1) {
+    for (const [key, stream] of [...this.streams]) {
+      if (typeof stream.lastUsedAt === 'number' && time - stream.lastUsedAt > grace) {
+        try {
+          stream.iterator?.return?.();
+        } catch (error) {
+          /* already closed */
+        }
+        this.streams.delete(key);
+      }
+    }
+  }
+
   async getFrame(id, time, maxDimension, hint = {}) {
     const asset = this.assets.get(id);
     if (!asset || asset.type !== 'video') return null;
@@ -222,6 +239,7 @@ class WorkerSource {
     const clamped = Math.max(0, Math.min(time, Math.max(0, (asset.duration || 0) - 0.002)));
     const key = `${id}\u0001${bucket}\u0001${hint.clipId || 'main'}`;
     const tolerance = 0.0015;
+    const timelineTime = Number.isFinite(Number(hint.timelineTime)) ? Number(hint.timelineTime) : clamped;
     let stream = this.streams.get(key);
 
     if (stream && stream.current) {
@@ -251,10 +269,12 @@ class WorkerSource {
         sink,
         current: null,
         iterator: sink.canvases(clamped, asset.duration || Infinity),
-        done: false
+        done: false,
+        lastUsedAt: timelineTime
       };
       this.streams.set(key, stream);
     }
+    stream.lastUsedAt = timelineTime;
 
     /* Forward. Pull frames from the live iterator until one covers the
        requested moment. Consecutive frames are decoded exactly once; a
@@ -512,6 +532,7 @@ async function runExport(message) {
     const length = Math.max(0.0005, Math.min(frameDuration, duration - time));
     await renderComposition(ctx, project, source, time, { maxDimension: Math.max(width, height) });
     await videoSource.add(time, length);
+    source.pruneStreams(time);
     postProgress(message.id, 0.05 + 0.78 * ((frame + 1) / totalFrames), 'video', frame === totalFrames - 1);
   }
 

@@ -492,7 +492,8 @@ async function drawMediaClip(ctx, clip, source, localTime, width, height, option
       clipId: clip.id,
       speed: clip.speed,
       reverse: clip.reverse,
-      freeze: clip.freeze
+      freeze: clip.freeze,
+      timelineTime: options.timelineTime
     });
     if (!media) return false;
     /* HTMLVideoElement exposes the decoded frame size as videoWidth/videoHeight,
@@ -708,10 +709,11 @@ export async function renderComposition(ctx, project, source, time, options = {}
 
   let missingMedia = false;
   const tracks = project.tracks || [];
+  const renderOptions = { ...options, timelineTime: time };
   for (let index = tracks.length - 1; index >= 0; index -= 1) {
     const track = tracks[index];
     if (track.kind !== 'video' || track.hidden) continue;
-    const complete = await renderTrack(ctx, project, track, source, time, width, height, options);
+    const complete = await renderTrack(ctx, project, track, source, time, width, height, renderOptions);
     if (complete === false) missingMedia = true;
   }
 

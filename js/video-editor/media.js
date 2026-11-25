@@ -749,6 +749,12 @@ export class MediaLibrary {
          Waiting for the presented frame avoids one black flash per seek. */
       await waitForPresentedFrame(el);
     }
+    /* A previous render may still have a seek in flight even when currentTime
+       already matches (rapid scrubbing). Never draw a video mid-seek. */
+    if (el.seeking) {
+      await waitForEvent(el, 'seeked', 2500);
+      await waitForPresentedFrame(el);
+    }
     if (el.readyState >= 2 && el.videoWidth > 0) return el;
     if (entry.hasSnapshot) return entry.snapshot;
     return this.frameAt(mediaId, time, 1280);
