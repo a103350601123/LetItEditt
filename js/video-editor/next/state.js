@@ -166,7 +166,7 @@ export function sanitizeProject(input) {
         bottom: clamp(Number(rawClip.crop?.bottom) || 0, 0, 0.45),
         left: clamp(Number(rawClip.crop?.left) || 0, 0, 0.45)
       };
-      clip.keyframes = clip.keyframes || { x: [], y: [], scale: [], rotation: [], opacity: [] };
+      clip.keyframes = { x: [], y: [], scale: [], rotation: [], opacity: [], volume: [], ...(clip.keyframes || {}) };
       for (const key of Object.keys(clip.keyframes)) {
         clip.keyframes[key] = (Array.isArray(clip.keyframes[key]) ? clip.keyframes[key] : [])
           .filter((frame) => Number.isFinite(Number(frame.t)) && Number.isFinite(Number(frame.v)))
@@ -402,13 +402,17 @@ export function createMediaClip(asset, overrides = {}) {
 }
 
 export function createTextClip(preset = {}) {
-  return createClip('text', {
+  const clip = createClip('text', {
     name: preset.name || 'Text',
     duration: preset.duration || 3,
     x: preset.x ?? 0.5,
     y: preset.y ?? 0.5,
     text: { ...defaultText(), ...(preset.text || {}) }
   });
+  if (preset.inAnim) clip.inAnim = { ...clip.inAnim, ...preset.inAnim };
+  if (preset.outAnim) clip.outAnim = { ...clip.outAnim, ...preset.outAnim };
+  if (preset.keyframes) clip.keyframes = { ...clip.keyframes, ...deepClone(preset.keyframes) };
+  return clip;
 }
 
 export function createShapeClip(type = 'rect') {

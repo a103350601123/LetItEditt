@@ -6,7 +6,7 @@
  */
 
 import * as MB from '../../vendor/mediabunny/mediabunny.min.mjs';
-import { renderComposition } from './renderer.js';
+import { keyframeValue, renderComposition } from './renderer.js';
 import { clamp } from './utils.js';
 
 const AUDIO_RATE = 48000;
@@ -231,7 +231,7 @@ async function mixAudio(project, source, duration) {
       if (!asset || !asset.audioTrack) continue;
 
       hasAudio = true;
-      const clipGain = (Number.isFinite(clip.volume) ? clip.volume : 1) * trackGain;
+      const clipGain = trackGain;
       const speed = Math.max(0.05, Number(clip.speed) || 1);
       const inPoint = Number(clip.inPoint) || 0;
       const outPoint = Number.isFinite(Number(clip.outPoint)) ? Number(clip.outPoint) : inPoint + clip.duration * speed;
@@ -276,7 +276,7 @@ async function mixAudio(project, source, duration) {
           const left = leftChannel[index0] * (1 - fraction) + leftChannel[index1] * fraction;
           const right = rightChannel[index0] * (1 - fraction) + rightChannel[index1] * fraction;
 
-          let gain = clipGain;
+          let gain = clipGain * keyframeValue(clip, 'volume', local, Number.isFinite(clip.volume) ? clip.volume : 1);
           const fadeIn = Number(clip.fadeIn) || 0;
           if (fadeIn > 0 && local < fadeIn) gain *= local / fadeIn;
           const fadeOut = Number(clip.fadeOut) || 0;

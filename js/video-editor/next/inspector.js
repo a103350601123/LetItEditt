@@ -9,6 +9,7 @@ import {
 } from '../model.js';
 import { FILTERS, TRANSITION_GROUPS } from '../effects.js';
 import { ANIMATIONS, COLOR_PRESETS } from '../presets.js';
+import { keyframeValue } from '../renderer.js';
 import { escapeHtml, formatTime, num, clamp, isTypingTarget } from './dom.js';
 
 const KEY_PROPS = [
@@ -18,6 +19,93 @@ const KEY_PROPS = [
   ['rotation', 'Rotation'],
   ['opacity', 'Opacity']
 ];
+
+const VOLUME_PROPS = [['volume', 'Volume']];
+
+const KEY_EASES = [
+  { id: 'linear', label: 'Linear' },
+  { id: 'easeIn', label: 'Ease in' },
+  { id: 'easeOut', label: 'Ease out' },
+  { id: 'easeInOut', label: 'Ease in-out' }
+];
+
+const KEY_META = {
+  x: {
+    label: 'Position X',
+    unit: 'px',
+    step: 1,
+    toDisplay: (value, dims) => value * dims.width,
+    fromDisplay: (value, dims) => value / Math.max(1, dims.width)
+  },
+  y: {
+    label: 'Position Y',
+    unit: 'px',
+    step: 1,
+    toDisplay: (value, dims) => value * dims.height,
+    fromDisplay: (value, dims) => value / Math.max(1, dims.height)
+  },
+  scale: {
+    label: 'Scale',
+    unit: '%',
+    step: 1,
+    toDisplay: (value) => value * 100,
+    fromDisplay: (value) => clamp(value / 100, 0.02, 12)
+  },
+  rotation: {
+    label: 'Rotation',
+    unit: '°',
+    step: 1,
+    toDisplay: (value) => value,
+    fromDisplay: (value) => clamp(value, -720, 720)
+  },
+  opacity: {
+    label: 'Opacity',
+    unit: '%',
+    step: 1,
+    toDisplay: (value) => value * 100,
+    fromDisplay: (value) => clamp(value / 100, 0, 1)
+  },
+  volume: {
+    label: 'Volume',
+    unit: '%',
+    step: 1,
+    toDisplay: (value) => value * 100,
+    fromDisplay: (value) => clamp(value / 100, 0, 1.5)
+  }
+};
+
+function keyframeBar(clip, props, playhead) {
+  return `<div class="ve-keyframe-bar">
+    <span>Keyframes</span>
+    ${props.map(([prop, label]) => `<button type="button" class="ve-kf ${clip.keyframes?.[prop]?.length ? 'has-kf' : ''}" data-inspector-action="keyframe" data-key-prop="${prop}" title="Add or update ${escapeHtml(label)} keyframe at ${formatTime(playhead)}">${escapeHtml(prop)}<sup>${clip.keyframes?.[prop]?.length || 0}</sup></button>`).join('')}
+    <button type="button" class="ve-kf-clear" data-inspector-action="clear-keyframes" title="Clear all keyframes">Clear</button>
+  </div>`;
+}
+
+function keyframeEditor(clip, props, dims) {
+  const groups = props.map(([prop]) => {
+    const list = clip.keyframes?.[prop] || [];
+    if (!list.length) return '';
+    const meta = KEY_META[prop];
+    const rows = list.map((key, index) => {
+      const display = meta.toDisplay(Number(key.v) || 0, dims);
+      return `<div class="ve-kf-row" data-kf-prop="${prop}" data-kf-index="${index}">
+        <button type="button" class="ve-kf-jump" data-inspector-action="seek-keyframe" data-key-prop="${prop}" data-kf-index="${index}" title="Go to ${escapeHtml(meta.label)} keyframe" aria-label="Go to ${escapeHtml(meta.label)} keyframe at ${formatTime(key.t)}">◆</button>
+        <label class="ve-kf-cell"><span>Time</span><input type="number" data-kf-field="t" min="0" max="${Math.max(0, clip.duration).toFixed(2)}" step="0.01" value="${Number(key.t).toFixed(2)}" aria-label="${escapeHtml(meta.label)} keyframe time"></label>
+        <label class="ve-kf-cell"><span>Value</span><span class="ve-number-unit"><input type="number" data-kf-field="v" step="${meta.step}" value="${display.toFixed(meta.step < 1 ? 2 : 0)}" aria-label="${escapeHtml(meta.label)} keyframe value">${meta.unit ? `<em>${meta.unit}</em>` : ''}</span></label>
+        <label class="ve-kf-cell"><span>Ease</span><select data-kf-field="ease" title="Interpolation from this keyframe to the next" aria-label="${escapeHtml(meta.label)} keyframe interpolation">${optionList(KEY_EASES, key.ease || 'linear')}</select></label>
+        <button type="button" class="ve-kf-delete" data-inspector-action="delete-keyframe" data-key-prop="${prop}" data-kf-index="${index}" title="Delete keyframe" aria-label="Delete ${escapeHtml(meta.label)} keyframe at ${formatTime(key.t)}">×</button>
+      </div>`;
+    }).join('');
+    return `<div class="ve-kf-group" data-kf-group="${prop}">
+      <div class="ve-kf-group-head"><strong>${escapeHtml(meta.label)}</strong><span>${list.length} keyframe${list.length === 1 ? '' : 's'}</span></div>
+      ${rows}
+    </div>`;
+  }).filter(Boolean).join('');
+  return groups
+    ? `<div class="ve-kf-editor">${groups}</div>`
+    : '<p class="ve-micro ve-kf-empty">No keyframes yet. Move the playhead, then press a property button above to add one.</p>';
+}
 
 function optionList(items, selected, encode = true) {
   return items.map((item) => {
@@ -171,12 +259,9 @@ export class Inspector {
           <button type="button" class="ve-btn ve-btn-ghost ve-btn-sm" data-inspector-action="flip-v">Flip V</button>
           <button type="button" class="ve-btn ve-btn-ghost ve-btn-sm" data-inspector-action="reset-transform">Reset</button>
         </div>
-        <div class="ve-keyframe-bar">
-          <span>Keyframes</span>
-          ${KEY_PROPS.map(([prop, label]) => `<button type="button" class="ve-kf ${clip.keyframes?.[prop]?.length ? 'has-kf' : ''}" data-inspector-action="keyframe" data-key-prop="${prop}" title="Add ${escapeHtml(label)} keyframe at ${formatTime(this.store.playhead)}">${escapeHtml(prop)}<sup>${clip.keyframes?.[prop]?.length || 0}</sup></button>`).join('')}
-          <button type="button" class="ve-kf-clear" data-inspector-action="clear-keyframes" title="Clear all keyframes">Clear</button>
-        </div>
-        <p class="ve-micro">Keyframes animate position, scale, rotation and opacity and are rendered in the export.</p>
+        ${keyframeBar(clip, KEY_PROPS, this.store.playhead)}
+        ${keyframeEditor(clip, KEY_PROPS, dims)}
+        <p class="ve-micro">Keyframes animate position, scale, rotation and opacity independently. Edits made while a property is animated update the keyframe at the playhead. The same interpolation runs in preview and export.</p>
         ${clip.kind === 'video' || clip.kind === 'image' ? `
           <div class="ve-grid-2 ve-crop-grid">
             ${['left', 'right', 'top', 'bottom'].map((side) => `<label class="ve-field ve-field-compact"><span>Crop ${side}</span><input type="number" data-crop="${side}" min="0" max="45" step="1" value="${Math.round((clip.crop?.[side] || 0) * 100)}" aria-label="Crop ${side} percent"></label>`).join('')}
@@ -325,7 +410,9 @@ export class Inspector {
           ${numberField('Fade in', 'fadeIn', clip.fadeIn || 0, { min: 0, max: 60, step: 0.05, suffix: 's' })}
           ${numberField('Fade out', 'fadeOut', clip.fadeOut || 0, { min: 0, max: 60, step: 0.05, suffix: 's' })}
         </div>
-        <p class="ve-micro">Preview monitoring and the export mixer apply clip gain, track gain, master gain and both fades. Speed changes resample audio and change pitch.</p>
+        ${keyframeBar(clip, VOLUME_PROPS, this.store.playhead)}
+        ${keyframeEditor(clip, VOLUME_PROPS, dims)}
+        <p class="ve-micro">Preview monitoring and the export mixer apply clip gain, track gain, master gain, both fades and volume keyframes. Speed changes resample audio and change pitch.</p>
       `, false, 'Mix');
     }
 
@@ -403,20 +490,60 @@ export class Inspector {
   setPath(path, value, { live = true } = {}) {
     const found = this.primary();
     if (!found) return;
+    const animated = ['x', 'y', 'scale', 'rotation', 'opacity', 'volume'].includes(path);
+    const write = (clip) => {
+      /* Once a property is animated, editing it at the playhead must move the
+       * visible value rather than a hidden base value that interpolation
+       * overrides. This is the behaviour every keyframe editor expects. */
+      if (animated && clip.keyframes?.[path]?.length) {
+        const local = clamp(this.store.playhead - clip.start, 0, Math.max(0, clip.duration));
+        const list = clip.keyframes[path];
+        const existing = list.find((entry) => Math.abs(entry.t - local) < 0.015);
+        if (existing) existing.v = value;
+        else {
+          list.push({ t: local, v: value, ease: 'linear' });
+          list.sort((a, b) => a.t - b.t);
+        }
+      } else {
+        setDeep(clip, path, value);
+      }
+    };
     if (live) {
       this.store.begin();
       this.store.apply((draft) => {
         const located = this.findInDraft(draft, found.clip.id);
         if (!located) return;
-        setDeep(located.clip, path, value);
+        write(located.clip);
       }, { history: false, reason: 'inspector' });
       return;
     }
     this.store.apply((draft) => {
       const located = this.findInDraft(draft, found.clip.id);
       if (!located) return;
-      setDeep(located.clip, path, value);
+      write(located.clip);
     }, { reason: 'inspector-change' });
+  }
+
+  editKeyframe(input) {
+    const row = input.closest('[data-kf-prop]');
+    const found = this.primary();
+    if (!row || !found) return;
+    const prop = row.dataset.kfProp;
+    const index = Number(row.dataset.kfIndex);
+    const field = input.dataset.kfField;
+    const meta = KEY_META[prop];
+    if (!meta) return;
+    const dims = this.store.dimensions();
+    this.store.begin();
+    this.store.apply((draft) => {
+      const located = this.findInDraft(draft, found.clip.id);
+      const list = located?.clip?.keyframes?.[prop];
+      const entry = list?.[index];
+      if (!entry) return;
+      if (field === 't') entry.t = clamp(num(input.value), 0, Math.max(0, located.clip.duration));
+      else if (field === 'v') entry.v = meta.fromDisplay(num(input.value), dims);
+      else if (field === 'ease') entry.ease = KEY_EASES.some((ease) => ease.id === input.value) ? input.value : 'linear';
+    }, { history: false, reason: 'keyframe-edit' });
   }
 
   findInDraft(project, clipId) {
@@ -457,6 +584,10 @@ export class Inspector {
   onInput(event) {
     const input = event.target;
     if (!(input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement || input instanceof HTMLSelectElement)) return;
+    if (input.dataset.kfField) {
+      this.editKeyframe(input);
+      return;
+    }
     const prop = input.dataset.prop;
     const textProp = input.dataset.textProp;
     const subProp = input.dataset.subtitleProp;
@@ -511,6 +642,10 @@ export class Inspector {
   onChange(event) {
     const input = event.target;
     if (!(input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement || input instanceof HTMLSelectElement)) return;
+    if (input.dataset.kfField) {
+      this.store.end('keyframe-edit');
+      return;
+    }
     if (input.dataset.crop) {
       this.store.end('crop');
       return;
@@ -529,6 +664,23 @@ export class Inspector {
       this.store.clearSelection();
       this.store.emit('selection');
       this.onEdit('selection');
+      return;
+    }
+    if (action === 'seek-keyframe') {
+      if (!found) return;
+      const key = found.clip.keyframes?.[button.dataset.keyProp]?.[Number(button.dataset.kfIndex)];
+      if (key) this.onAction('seek-keyframe', { time: found.clip.start + Number(key.t) });
+      return;
+    }
+    if (action === 'delete-keyframe') {
+      if (!found) return;
+      const prop = button.dataset.keyProp;
+      const index = Number(button.dataset.kfIndex);
+      this.store.apply((draft) => {
+        const located = this.findInDraft(draft, found.clip.id);
+        const list = located?.clip?.keyframes?.[prop];
+        if (list && list[index]) list.splice(index, 1);
+      }, { reason: 'delete-keyframe' });
       return;
     }
     if (action.startsWith('keyframe') || action === 'clear-keyframes') {
@@ -608,12 +760,12 @@ export class Inspector {
     if (!prop) return;
     const clip = found.clip;
     const local = clamp(this.store.playhead - clip.start, 0, clip.duration);
-    let base = 0;
-    if (prop === 'x') base = clip.x ?? 0.5;
-    else if (prop === 'y') base = clip.y ?? 0.5;
-    else if (prop === 'scale') base = clip.scale ?? 1;
-    else if (prop === 'rotation') base = clip.rotation ?? 0;
-    else base = clip.opacity ?? 1;
+    const base = keyframeValue(clip, prop, local, prop === 'x' ? clip.x ?? 0.5
+      : prop === 'y' ? clip.y ?? 0.5
+        : prop === 'scale' ? clip.scale ?? 1
+          : prop === 'rotation' ? clip.rotation ?? 0
+            : prop === 'volume' ? clip.volume ?? 1
+              : clip.opacity ?? 1);
     this.store.apply((draft) => {
       const located = this.findInDraft(draft, found.clip.id);
       if (!located) return;

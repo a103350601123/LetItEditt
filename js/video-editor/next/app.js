@@ -1303,10 +1303,13 @@ class VideoEditorApp {
 
   /* Inspector actions ---------------------------------------------------- */
 
-  handleInspectorAction(action) {
+  handleInspectorAction(action, payload = {}) {
     if (action === 'split') this.splitSelection();
     else if (action === 'duplicate') this.duplicateSelection();
     else if (action === 'delete') this.deleteSelection();
+    else if (action === 'seek-keyframe') {
+      if (Number.isFinite(payload.time)) this.preview.seek(payload.time);
+    }
     else if (action === 'duplicate-subtitle') this.duplicateSubtitle(this.store.selectedSubtitle);
     else if (action === 'delete-subtitle') this.deleteSubtitle(this.store.selectedSubtitle);
     else if (['forward', 'backward', 'front', 'back', 'hide', 'lock'].includes(action)) this.layerAction(action);

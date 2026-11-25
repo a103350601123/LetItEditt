@@ -436,6 +436,117 @@ test('mobile page scroll, timeline scroll and clip dragging coexist', async ({ b
   await context.close();
 });
 
+test('multiple tracks can be added, renamed, reordered, toggled, cross-dragged, deleted and undone', async ({ page }) => {
+  test.setTimeout(180000);
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await openEditor(page);
+  const assetId = await importVideo(page, 'trim-4s.mp4');
+
+  const tracksOf = () => page.evaluate(() => window.__videoEditor.project.tracks.map((track) => ({
+    id: track.id,
+    kind: track.kind,
+    name: track.name,
+    hidden: track.hidden,
+    muted: track.muted,
+    locked: track.locked,
+    clips: track.clips.map((clip) => ({ id: clip.id, start: clip.start }))
+  })));
+
+  let tracks = await tracksOf();
+  expect(tracks.filter((track) => track.kind === 'video')).toHaveLength(2);
+  expect(tracks.filter((track) => track.kind === 'audio')).toHaveLength(1);
+
+  await page.locator('[data-tl-action="add-video-track"]').click();
+  await page.locator('[data-tl-action="add-audio-track"]').click();
+  await page.waitForTimeout(200);
+  tracks = await tracksOf();
+  expect(tracks.filter((track) => track.kind === 'video')).toHaveLength(3);
+  expect(tracks.filter((track) => track.kind === 'audio')).toHaveLength(2);
+
+  const visual = tracks.filter((track) => track.kind === 'video');
+  const addedTrackId = visual[visual.length - 1].id;
+  expect(visual[visual.length - 1].name).toBe('Visual 3');
+
+  /* Rename through the real track menu (window.prompt). */
+  page.once('dialog', (dialog) => dialog.accept('Titles'));
+  await page.locator(`[data-track-action="menu"][data-track-id="${addedTrackId}"]`).click();
+  await page.locator('.ve-popover button', { hasText: 'Rename track' }).click();
+  await page.waitForTimeout(200);
+  tracks = await tracksOf();
+  expect(tracks.find((track) => track.id === addedTrackId).name).toBe('Titles');
+
+  /* Reorder through the same menu. */
+  const orderBefore = tracks.filter((track) => track.kind === 'video').map((track) => track.id);
+  await page.locator(`[data-track-action="menu"][data-track-id="${addedTrackId}"]`).click();
+  await page.locator('.ve-popover button', { hasText: 'Move track up' }).click();
+  await page.waitForTimeout(200);
+  tracks = await tracksOf();
+  const orderAfter = tracks.filter((track) => track.kind === 'video').map((track) => track.id);
+  expect(orderAfter[orderBefore.indexOf(addedTrackId) - 1]).toBe(addedTrackId);
+  expect(orderAfter).not.toEqual(orderBefore);
+
+  /* Visibility, lock and mute are independent per track. */
+  await page.locator(`[data-track-action="hide"][data-track-id="${addedTrackId}"]`).click();
+  await page.locator(`[data-track-action="lock"][data-track-id="${addedTrackId}"]`).click();
+  const audioTrackId = tracks.find((track) => track.kind === 'audio').id;
+  await page.locator(`[data-track-action="mute"][data-track-id="${audioTrackId}"]`).click();
+  await page.waitForTimeout(200);
+  tracks = await tracksOf();
+  const toggled = tracks.find((track) => track.id === addedTrackId);
+  expect(toggled.hidden).toBe(true);
+  expect(toggled.locked).toBe(true);
+  expect(tracks.find((track) => track.id === audioTrackId).muted).toBe(true);
+
+  await page.locator(`[data-track-action="hide"][data-track-id="${addedTrackId}"]`).click();
+  await page.locator(`[data-track-action="lock"][data-track-id="${addedTrackId}"]`).click();
+  await page.waitForTimeout(150);
+
+  /* Two clips can live on one track; a second visual track stays independent. */
+  const stackedTrackId = tracks.filter((track) => track.kind === 'video' && track.id !== addedTrackId)[0].id;
+  const firstClip = await page.evaluate(({ id, trackId }) => window.__videoEditor
+    .addAssetToTimeline(id, { start: 0, trackId }).clip.id, { id: assetId, trackId: stackedTrackId });
+  const secondClip = await page.evaluate(({ id, trackId }) => window.__videoEditor
+    .addAssetToTimeline(id, { start: 4, trackId }).clip.id, { id: assetId, trackId: stackedTrackId });
+  const titleClip = await page.evaluate(({ id, trackId }) => window.__videoEditor
+    .addAssetToTimeline(id, { start: 9, trackId }).clip.id, { id: assetId, trackId: addedTrackId });
+  await page.waitForTimeout(250);
+  tracks = await tracksOf();
+  expect(tracks.find((track) => track.id === stackedTrackId).clips.map((clip) => clip.id))
+    .toEqual(expect.arrayContaining([firstClip, secondClip]));
+  expect(tracks.find((track) => track.id === addedTrackId).clips.map((clip) => clip.id)).toEqual([titleClip]);
+
+  /* Drag the second clip vertically onto the empty third visual track. */
+  const emptyTrack = tracks.filter((track) => track.kind === 'video' && !track.clips.length)[0];
+  expect(emptyTrack).toBeTruthy();
+  const clipBox = await page.locator(`[data-clip-id="${secondClip}"]`).boundingBox();
+  const laneBox = await page.locator(`.tl-lane[data-track-id="${emptyTrack.id}"]`).boundingBox();
+  expect(clipBox).not.toBeNull();
+  expect(laneBox).not.toBeNull();
+  await page.mouse.move(clipBox.x + clipBox.width / 2, clipBox.y + clipBox.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(clipBox.x + clipBox.width / 2, laneBox.y + laneBox.height / 2, { steps: 10 });
+  await page.mouse.up();
+  await page.waitForTimeout(300);
+  tracks = await tracksOf();
+  expect(tracks.find((track) => track.id === emptyTrack.id).clips.map((clip) => clip.id)).toContain(secondClip);
+
+  /* Deleting the added track removes its clip, and undo restores both. */
+  await page.locator(`[data-track-action="menu"][data-track-id="${addedTrackId}"]`).click();
+  await page.locator('.ve-popover button', { hasText: 'Delete track' }).click();
+  await page.locator('[data-confirm-ok]').click();
+  await page.waitForTimeout(300);
+  tracks = await tracksOf();
+  expect(tracks.some((track) => track.id === addedTrackId)).toBe(false);
+  expect(tracks.flatMap((track) => track.clips).some((clip) => clip.id === titleClip)).toBe(false);
+
+  await page.evaluate(() => window.__videoEditor.undo());
+  await page.waitForTimeout(300);
+  tracks = await tracksOf();
+  expect(tracks.find((track) => track.id === addedTrackId)?.clips.map((clip) => clip.id)).toEqual([titleClip]);
+  expect(errors).toEqual([]);
+});
+
 test('browser Back and Forward use page history and editor actions add no entries', async ({ page }) => {
   await page.goto('/', { waitUntil: 'networkidle' });
   const home = page.url();

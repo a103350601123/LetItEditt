@@ -28,6 +28,22 @@ function clipLabel(clip) {
   return clip.name || clip.kind;
 }
 
+const KEYFRAME_PROPS = ['x', 'y', 'scale', 'rotation', 'opacity', 'volume'];
+
+function keyframeMarkers(clip) {
+  const markers = [];
+  for (const prop of KEYFRAME_PROPS) {
+    for (const key of clip.keyframes?.[prop] || []) {
+      if (Number.isFinite(Number(key.t))) markers.push({ prop, t: Number(key.t) });
+    }
+  }
+  if (!markers.length) return '';
+  const duration = Math.max(0.01, clip.duration);
+  return `<span class="tl-kf-track" aria-hidden="true">${markers.map((key) =>
+    `<i class="tl-kf tl-kf-${key.prop}" data-kf-prop="${key.prop}" data-kf-t="${key.t}" style="left:${clamp(key.t / duration, 0, 1) * 100}%" title="${key.prop} keyframe at ${formatTime(key.t)} — drag to retime"></i>`
+  ).join('')}</span>`;
+}
+
 export class Timeline {
   constructor({ store, media, onSelect, onAction, onStatus, onEdit }) {
     this.store = store;
@@ -222,6 +238,7 @@ export class Timeline {
               ${w > 86 ? `<span class="tl-clip-time">${formatTime(clip.duration)}</span>` : ''}
             </div>
             <span class="tl-trim tl-trim-right" data-trim="right" title="Trim end" aria-hidden="true"></span>
+            ${keyframeMarkers(clip)}
           </div>`;
       }
       html += '</div>';
@@ -509,6 +526,11 @@ export class Timeline {
       this.beginSubtitleDrag(event, subtitle.dataset.subtitleId, trim || 'move');
       return;
     }
+    const marker = event.target.closest('.tl-kf');
+    if (marker) {
+      this.beginKeyframeDrag(event, marker);
+      return;
+    }
     const clipEl = event.target.closest('[data-clip-id]');
     if (!clipEl) return;
     const found = findClip(this.store.project, clipEl.dataset.clipId);
@@ -587,6 +609,37 @@ export class Timeline {
     this.capture(event);
   }
 
+  beginKeyframeDrag(event, marker) {
+    const clipEl = marker.closest('[data-clip-id]');
+    const found = clipEl ? findClip(this.store.project, clipEl.dataset.clipId) : null;
+    if (!found || found.clip.locked || found.track.locked) return;
+    const prop = marker.dataset.kfProp;
+    const time = Number(marker.dataset.kfT);
+    const list = found.clip.keyframes?.[prop] || [];
+    const index = list.findIndex((entry) => Math.abs(Number(entry.t) - time) < 1e-4);
+    if (index < 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+    this.store.begin();
+    this.drag = {
+      mode: 'keyframe',
+      pointerId: event.pointerId,
+      originX: event.clientX,
+      originY: event.clientY,
+      clipId: found.clip.id,
+      prop,
+      index,
+      originalT: time,
+      moved: false
+    };
+    this.store.selectClip(found.clip.id);
+    this.store.emit('selection');
+    this.onSelect(found.clip.id);
+    this.updateSelectionClasses();
+    this.capture(event);
+    this.root.classList.add('is-dragging');
+  }
+
   onPointerMove(event) {
     if (!this.drag || event.pointerId !== this.drag.pointerId) return;
     if (this.drag.mode === 'playhead') {
@@ -599,6 +652,21 @@ export class Timeline {
     }
     const dx = event.clientX - this.drag.originX;
     if (Math.abs(dx) > 2 || Math.abs(event.clientY - this.drag.originY) > 2) this.drag.moved = true;
+    if (this.drag.mode === 'keyframe') {
+      const found = findClip(this.store.project, this.drag.clipId);
+      const entry = found?.clip?.keyframes?.[this.drag.prop]?.[this.drag.index];
+      if (entry) {
+        const time = clamp(this.drag.originalT + dx / this.pps(), 0, Math.max(0, found.clip.duration));
+        entry.t = Math.round(time * 1000) / 1000;
+        this.store.playhead = found.clip.start + entry.t;
+        this.onEdit('seek', this.store.playhead);
+        this.syncTransport();
+      }
+      this.store.emit('live-drag');
+      this.render();
+      event.preventDefault();
+      return;
+    }
     if (this.drag.mode.startsWith('subtitle-')) {
       this.updateSubtitleDrag(dx);
       event.preventDefault();
@@ -724,6 +792,12 @@ export class Timeline {
     this.lanes?.querySelectorAll('.is-drop-target').forEach((el) => el.classList.remove('is-drop-target'));
 
     if (drag.mode === 'playhead') {
+      this.render();
+      return;
+    }
+    if (drag.mode === 'keyframe') {
+      if (drag.moved) this.store.end('keyframe-move');
+      else this.store.end({ history: false });
       this.render();
       return;
     }

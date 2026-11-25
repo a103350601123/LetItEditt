@@ -65,6 +65,39 @@ export const TEXT_PRESETS = {
       bgColor: '#111827',
       maxWidth: 0.82
     }
+  },
+  intro: {
+    label: 'Intro title',
+    description: 'Opening card with a fade',
+    name: 'Intro',
+    duration: 3.5,
+    y: 0.46,
+    text: {
+      content: 'Your story starts here',
+      size: 96,
+      bold: true,
+      bgOpacity: 0,
+      maxWidth: 0.9
+    },
+    inAnim: { type: 'fade', duration: 0.7 },
+    outAnim: { type: 'fade', duration: 0.5 }
+  },
+  outro: {
+    label: 'Outro card',
+    description: 'Closing card with a slide out',
+    name: 'Outro',
+    duration: 3.5,
+    y: 0.46,
+    text: {
+      content: 'Thanks for watching',
+      size: 82,
+      bold: true,
+      bgOpacity: 0.45,
+      bgColor: '#0f172a',
+      maxWidth: 0.9
+    },
+    inAnim: { type: 'slide-up', duration: 0.6 },
+    outAnim: { type: 'fade', duration: 0.5 }
   }
 };
 

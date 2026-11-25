@@ -54,14 +54,14 @@ function interpolateKeyframes(list, time, base) {
     const b = sorted[i + 1];
     if (time >= a.t && time <= b.t) {
       const span = b.t - a.t || 0.0001;
-      const p = ease(b.ease || 'linear', (time - a.t) / span);
+      const p = ease(a.ease || 'linear', (time - a.t) / span);
       return a.v + (b.v - a.v) * p;
     }
   }
   return base;
 }
 
-function keyframeValue(clip, prop, localTime, base) {
+export function keyframeValue(clip, prop, localTime, base) {
   const list = clip.keyframes ? clip.keyframes[prop] : null;
   if (!list || !list.length) return base;
   return interpolateKeyframes(list, localTime, base);

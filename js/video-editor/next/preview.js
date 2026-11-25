@@ -3,7 +3,7 @@
  * this monitor is produced by the same rules as the exported file.
  */
 
-import { clipBounds, renderComposition } from '../renderer.js';
+import { clipBounds, renderComposition, resolveTransform } from '../renderer.js';
 import { clipAtTime, clipEnd, projectDuration } from '../model.js';
 import { PreviewAudioMixer } from '../preview-audio.js';
 import { clamp, num } from './dom.js';
@@ -31,6 +31,13 @@ export class Preview {
     this.empty = null;
     this.back = document.createElement('canvas');
     this.renderToken = 0;
+    this.renderQueued = false;
+    this.renderInFlight = false;
+    this.renderPending = false;
+    this.lastRenderedTime = null;
+    this.lastRenderStartedAt = 0;
+    this.lastRenderFinishedAt = 0;
+    this.lastRenderMs = 0;
     this.raf = 0;
     this.playStart = 0;
     this.playFrom = 0;
@@ -149,13 +156,49 @@ export class Preview {
     this.renderQueued = true;
     requestAnimationFrame(() => {
       this.renderQueued = false;
-      this.renderNow().catch(() => {});
+      this.requestRender();
     });
+  }
+
+  /* One composition pass at a time, newest request wins.
+   *
+   * The old code started a render on every animation frame without waiting
+   * for the previous one. Each pass seeks the same MediaBunny canvas sink and
+   * draws through the same scratch canvases, so a slow file accumulated a
+   * queue of stale frame requests. The visible frame then fell seconds behind
+   * the ruler while the discarded passes kept decoding. Coalescing to a
+   * single in-flight pass keeps at most one seek alive and drops every
+   * intermediate time that is already obsolete. */
+  requestRender() {
+    if (this.renderInFlight) {
+      this.renderPending = true;
+      return Promise.resolve(false);
+    }
+    this.renderInFlight = true;
+    this.renderPending = false;
+    return this.renderNow()
+      .catch(() => {})
+      .finally(() => {
+        this.renderInFlight = false;
+        if (this.renderPending) {
+          this.renderPending = false;
+          this.requestRender();
+        }
+      });
+  }
+
+  /* Called by seeks and pauses: an in-flight pass for the old time must not
+   * paint over the new playhead when it finally resolves. */
+  invalidateRender() {
+    this.renderToken += 1;
+    if (this.renderInFlight) this.renderPending = true;
   }
 
   async renderNow() {
     const token = ++this.renderToken;
     const time = this.store.playhead;
+    const startedAt = performance.now();
+    this.lastRenderStartedAt = startedAt;
     try {
       await renderComposition(this.back.getContext('2d'), this.store.project, this.source, time, {
         maxDimension: Math.max(this.canvas.width, this.canvas.height)
@@ -168,6 +211,9 @@ export class Preview {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.ctx.drawImage(this.back, 0, 0);
       this.ctx.restore();
+      this.lastRenderedTime = time;
+      this.lastRenderFinishedAt = performance.now();
+      this.lastRenderMs = this.lastRenderFinishedAt - startedAt;
       this.empty.hidden = this.hasContentAt(time);
       this.updateOverlay();
     } catch (error) {
@@ -178,7 +224,7 @@ export class Preview {
 
   renderPreviewNow() {
     this.renderQueued = false;
-    return this.renderNow();
+    return this.requestRender();
   }
 
   hasContentAt(time) {
@@ -198,6 +244,9 @@ export class Preview {
   seek(time, { keepPlaying = false } = {}) {
     const duration = this.duration();
     this.store.playhead = clamp(time, 0, Math.max(0, duration));
+    /* A pass that was already decoding the old time must not paint over the
+       frame we are seeking to. */
+    this.invalidateRender();
     if (this.playing && !keepPlaying) {
       this.pause();
     } else if (this.playing) {
@@ -226,6 +275,7 @@ export class Preview {
   }
 
   play() {
+    if (this.playing) return true;
     const duration = this.duration();
     if (duration <= 0) {
       this.onStatus('Add something to the timeline before playing.', 'info');
@@ -236,10 +286,13 @@ export class Preview {
     this.store.playing = true;
     this.playFrom = this.store.playhead;
     this.playStart = performance.now();
+    const generation = ++this.playToken;
     this.audio.start();
     this.onTime(this.store.playhead);
     const tick = (now) => {
-      if (!this.playing) return;
+      /* A pause or a second play() invalidates this loop, so an old timer can
+         never overwrite the authoritative playhead. */
+      if (!this.playing || generation !== this.playToken) return;
       const elapsed = (now - this.playStart) / 1000;
       const next = this.playFrom + elapsed * this.rate;
       if (next >= duration) {
@@ -267,6 +320,7 @@ export class Preview {
     this.playToken += 1;
     cancelAnimationFrame(this.raf);
     this.audio.stop();
+    this.invalidateRender();
     this.onTime(this.store.playhead);
     this.scheduleRender();
   }
@@ -407,15 +461,16 @@ export class Preview {
 
   startDrag(event, found, mode, point) {
     const clip = found.clip;
+    const transform = resolveTransform(clip, clamp(this.store.playhead - clip.start, 0, Math.max(0, clip.duration)));
     this.store.begin();
     this.drag = {
       mode,
       pointerId: event.pointerId,
       clipId: clip.id,
-      startX: clip.x ?? 0.5,
-      startY: clip.y ?? 0.5,
-      startScale: clip.scale ?? 1,
-      startRotation: clip.rotation ?? 0,
+      startX: transform.x,
+      startY: transform.y,
+      startScale: transform.scale,
+      startRotation: transform.rotation,
       center: this.boundsFor(clip),
       point,
       moved: false
@@ -442,23 +497,42 @@ export class Preview {
         x = this.snap(x, 0.5, 0.012);
         y = this.snap(y, 0.5, 0.012);
       }
-      clip.x = clamp(x, -0.5, 1.5);
-      clip.y = clamp(y, -0.5, 1.5);
-      this.showGuide('v', Math.abs(clip.x - 0.5) < 0.015);
-      this.showGuide('h', Math.abs(clip.y - 0.5) < 0.015);
+      x = clamp(x, -0.5, 1.5);
+      y = clamp(y, -0.5, 1.5);
+      this.writeAnimated(clip, 'x', x);
+      this.writeAnimated(clip, 'y', y);
+      this.showGuide('v', Math.abs(x - 0.5) < 0.015);
+      this.showGuide('h', Math.abs(y - 0.5) < 0.015);
     } else if (this.drag.mode === 'rotate') {
       const angle = Math.atan2(point.y - this.drag.center.y, point.x - this.drag.center.x) * 180 / Math.PI + 90;
-      clip.rotation = Math.round(angle * 10) / 10;
+      this.writeAnimated(clip, 'rotation', Math.round(angle * 10) / 10);
     } else {
       const distanceStart = Math.hypot(this.drag.point.x - this.drag.center.x, this.drag.point.y - this.drag.center.y);
       const distanceNow = Math.hypot(point.x - this.drag.center.x, point.y - this.drag.center.y);
       const factor = distanceStart > 5 ? distanceNow / distanceStart : 1;
-      clip.scale = clamp(this.drag.startScale * factor, 0.04, 8);
+      this.writeAnimated(clip, 'scale', clamp(this.drag.startScale * factor, 0.04, 8));
     }
     this.store.emit('live-drag');
     this.updateOverlay();
     this.scheduleRender();
     event.preventDefault();
+  }
+
+  /* Dragging an animated layer writes the keyframe under the playhead instead
+   * of a base value that interpolation would immediately hide. */
+  writeAnimated(clip, prop, value) {
+    const list = clip.keyframes?.[prop];
+    if (!list || !list.length) {
+      clip[prop] = value;
+      return;
+    }
+    const local = clamp(this.store.playhead - clip.start, 0, Math.max(0, clip.duration));
+    const existing = list.find((entry) => Math.abs(entry.t - local) < 0.015);
+    if (existing) existing.v = value;
+    else {
+      list.push({ t: local, v: value, ease: 'linear' });
+      list.sort((a, b) => a.t - b.t);
+    }
   }
 
   snap(value, target, threshold) {
@@ -505,6 +579,11 @@ export class Preview {
     return {
       playing: this.playing,
       time: this.store.playhead,
+      renderedTime: this.lastRenderedTime,
+      renderLag: this.lastRenderedTime === null ? null : this.store.playhead - this.lastRenderedTime,
+      renderMs: this.lastRenderMs,
+      renderInFlight: this.renderInFlight,
+      renderPending: this.renderPending,
       audio: this.audio.debug(),
       canvas: { width: this.canvas.width, height: this.canvas.height },
       selection: this.store.firstSelected()?.clip?.id || null

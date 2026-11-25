@@ -156,7 +156,7 @@ export function createClip(kind, overrides = {}) {
     transition: { type: 'none', duration: 0.5, reverse: false },
     inAnim: { type: 'none', duration: 0.5 },
     outAnim: { type: 'none', duration: 0.5 },
-    keyframes: { x: [], y: [], scale: [], rotation: [], opacity: [] },
+    keyframes: { x: [], y: [], scale: [], rotation: [], opacity: [], volume: [] },
     text: defaultText(),
     shape: defaultShape(),
     background: defaultBackground(),
@@ -534,7 +534,7 @@ export function restoreProject(data) {
       clip.text = { ...defaultText(), ...(clip.text || {}) };
       clip.shape = { ...defaultShape(), ...(clip.shape || {}) };
       clip.background = { ...defaultBackground(), ...(clip.background || {}) };
-      clip.keyframes = clip.keyframes || { x: [], y: [], scale: [], rotation: [], opacity: [] };
+      clip.keyframes = { x: [], y: [], scale: [], rotation: [], opacity: [], volume: [], ...(clip.keyframes || {}) };
       clip.transition = { type: 'none', duration: 0.5, reverse: false, ...(clip.transition || {}) };
       clip.inAnim = { type: 'none', duration: 0.5, ...(clip.inAnim || {}) };
       clip.outAnim = { type: 'none', duration: 0.5, ...(clip.outAnim || {}) };

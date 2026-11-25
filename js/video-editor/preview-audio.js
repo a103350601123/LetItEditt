@@ -18,7 +18,7 @@
  */
 
 import { clipEnd } from './model.js';
-import { clipSourceTime } from './renderer.js';
+import { clipSourceTime, keyframeValue } from './renderer.js';
 
 const EPSILON = 1e-4;
 /* 24 M samples ≈ 96 MB of float32 audio; beyond this the preview keeps a mono
@@ -248,7 +248,8 @@ export class PreviewAudioMixer {
         const asset = this.media.get(clip.mediaId);
         if (!asset || !asset.hasAudio) continue;
         const local = time - clip.start;
-        let gain = gainOf(clip.volume ?? 1) * trackGain * master;
+        const clipVolume = keyframeValue(clip, 'volume', local, Number.isFinite(clip.volume) ? clip.volume : 1);
+        let gain = gainOf(clipVolume) * trackGain * master;
         const fadeIn = Math.max(0, Number(clip.fadeIn) || 0);
         if (fadeIn > 0 && local < fadeIn) gain *= clamp(local / fadeIn, 0, 1);
         const fadeOut = Math.max(0, Number(clip.fadeOut) || 0);
