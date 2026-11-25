@@ -1,34 +1,28 @@
 const { test } = require('@playwright/test');
 const { fixturePath, ensureFixtures } = require('../support/fixtures');
 
-test('capture main screens', async ({ page, browser, baseURL }) => {
+test('inspect text layer', async ({ page, browser, baseURL }) => {
   await ensureFixtures(browser, baseURL);
-  for (const [width, height, name] of [[375, 900, 'phone-top'], [1280, 1000, 'desktop-top']]) {
-    await page.setViewportSize({ width, height });
-    await page.goto('/media-and-motion/video-editor/');
-    await page.waitForFunction(() => Boolean(window.__VE__));
-    await page.setInputFiles('#se-file-input', fixturePath('trim-4s.mp4'));
-    await page.waitForFunction(() => window.__VE__.state().baseClips.length > 0);
-    await page.evaluate(() => window.__VE__.addText('lower'));
-    await page.waitForTimeout(300);
-    await page.evaluate(() => window.__VE__.seek(1));
-    await page.waitForTimeout(400);
-    await page.evaluate(() => {
-      const app = document.getElementById('se-app');
-      const top = app.getBoundingClientRect().top + window.scrollY;
-      window.scrollTo({ top: Math.max(0, top - 4), behavior: 'instant' });
-    });
-    await page.waitForTimeout(600);
-    const metrics = await page.evaluate(() => {
-      const f = document.getElementById('se-frame').getBoundingClientRect();
-      const c = document.getElementById('se-canvas');
-      return {
-        frame: { w: f.width, h: f.height, ratio: f.width / f.height },
-        canvas: { w: c.width, h: c.height },
-        dims: window.__VE__.state().dimensions
-      };
-    });
-    console.log(name, JSON.stringify(metrics));
-    await page.screenshot({ path: `test-results/main-${name}.png` });
-  }
+  await page.setViewportSize({ width: 375, height: 900 });
+  await page.goto('/media-and-motion/video-editor/');
+  await page.waitForFunction(() => Boolean(window.__VE__));
+  await page.setInputFiles('#se-file-input', fixturePath('trim-4s.mp4'));
+  await page.waitForFunction(() => window.__VE__.state().baseClips.length > 0);
+  const id = await page.evaluate(() => window.__VE__.addText('lower'));
+  await page.evaluate(() => window.__VE__.seek(1));
+  await page.waitForTimeout(600);
+  const info = await page.evaluate((clipId) => {
+    const found = window.__VE__.store.trackForClip(clipId);
+    const box = document.querySelector('.se-selection-box');
+    const frame = document.getElementById('se-frame').getBoundingClientRect();
+    const r = box ? box.getBoundingClientRect() : null;
+    return {
+      clip: JSON.parse(JSON.stringify(found.clip)),
+      box: r && { x: r.x - frame.x, y: r.y - frame.y, w: r.width, h: r.height },
+      frame: { w: frame.width, h: frame.height },
+      handles: [...document.querySelectorAll('[data-handle]')].map((n) => n.dataset.handle)
+    };
+  }, id);
+  console.log(JSON.stringify(info, null, 2));
+  await page.screenshot({ path: 'test-results/inspect-text.png', clip: { x: 0, y: 150, width: 375, height: 300 } });
 });
