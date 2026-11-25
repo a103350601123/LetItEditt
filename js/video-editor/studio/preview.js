@@ -215,14 +215,19 @@ export class Preview {
 
   async renderNow() {
     const token = ++this.renderToken;
-    const time = this.store.playhead;
+    const playhead = this.store.playhead;
+    const duration = this.duration();
+    /* At exactly the end of the timeline no clip is active, which would paint
+       the background (black) the instant playback stops. Show the final frame
+       instead, the way a player holds its last picture. */
+    const time = duration > 0 ? Math.min(playhead, Math.max(0, duration - 0.0001)) : playhead;
     const startedAt = performance.now();
     try {
       const result = await renderComposition(this.back.getContext('2d'), this.store.project, this.source, time, {
         maxDimension: Math.max(this.canvas.width, this.canvas.height)
       });
       if (token !== this.renderToken) return;
-      if (result && result.missingMedia && this.lastRenderedTime !== null && this.missingRetries < 4) {
+      if (result && result.missingMedia && this.lastRenderedTime !== null && this.missingRetries < 10) {
         /* A layer is still decoding. Keep the last complete frame on screen
            and retry shortly instead of publishing a black flash. */
         this.missingRetries += 1;

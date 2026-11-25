@@ -78,6 +78,30 @@ function waitForEvent(target, name, timeout = 2500) {
   });
 }
 
+/** Resolve once the element has presented a frame, or after `timeout` ms.
+ *  A seek updates `currentTime` before the new picture is composited, and
+ *  drawing the element in that window produces a black rectangle in Chromium.
+ *  `requestVideoFrameCallback` is the only reliable "the new frame is on
+ *  screen" signal, so paused/seeked rendering waits for it. */
+function waitForPresentedFrame(el, timeout = 220) {
+  if (typeof el.requestVideoFrameCallback !== 'function') return Promise.resolve();
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      resolve();
+    };
+    const timer = setTimeout(finish, timeout);
+    try {
+      el.requestVideoFrameCallback(finish);
+    } catch (error) {
+      finish();
+    }
+  });
+}
+
 /** Encode a canvas to a Blob on either the main thread (HTMLCanvasElement)
  *  or in a worker/OffscreenCanvas. */
 function canvasToBlob(canvas, options) {
@@ -513,12 +537,17 @@ export class MediaLibrary {
       frameHandle: null,
       lastFrameAt: 0,
       ready: false,
-      failed: false
+      failed: false,
+      /* Last frame known to be fully presented. Used while the element is
+         seeking, because drawing a video mid-seek can paint black. */
+      snapshot: null,
+      hasSnapshot: false
     };
     this.previewVideos.set(key, entry);
 
     el.addEventListener('loadeddata', () => {
       entry.ready = true;
+      this.capturePreviewFrame(entry);
       this.onPreviewFrame?.();
     });
     el.addEventListener('seeked', () => {
@@ -551,6 +580,30 @@ export class MediaLibrary {
       entry.frameHandle = el.requestVideoFrameCallback(onFrame);
     } catch (error) {
       entry.frameHandle = null;
+    }
+  }
+
+  /** Copy the element's currently presented picture into a small canvas.
+   *  Called before a seek and after `loadeddata`, never during a seek, so the
+   *  copy is always a real frame rather than a black intermediate. */
+  capturePreviewFrame(entry, maxEdge = 1280) {
+    const el = entry.el;
+    if (!el.videoWidth || !el.videoHeight || el.readyState < 2 || el.seeking) return false;
+    try {
+      if (!entry.snapshot) entry.snapshot = document.createElement('canvas');
+      const canvas = entry.snapshot;
+      const scale = Math.min(1, maxEdge / Math.max(el.videoWidth, el.videoHeight));
+      const width = Math.max(2, Math.round(el.videoWidth * scale));
+      const height = Math.max(2, Math.round(el.videoHeight * scale));
+      if (canvas.width !== width || canvas.height !== height) {
+        canvas.width = width;
+        canvas.height = height;
+      }
+      canvas.getContext('2d').drawImage(el, 0, 0, width, height);
+      entry.hasSnapshot = true;
+      return true;
+    } catch (error) {
+      return false;
     }
   }
 
@@ -644,13 +697,21 @@ export class MediaLibrary {
       /* Correct large drift only; small corrections would seek every frame
          and cause the stutter this change is meant to remove. */
       if (Math.abs(el.currentTime - time) > 0.35) {
+        /* Keep the picture that is on screen right now. Chromium can paint
+           black for a moment while a seek is in flight, and this snapshot is
+           what the monitor shows until the new frame is presented. */
+        this.capturePreviewFrame(entry);
         try {
           el.currentTime = time;
         } catch (error) {
           /* seek refused while loading */
         }
       }
+      if (el.seeking) return entry.hasSnapshot ? entry.snapshot : null;
       if (el.readyState >= 2 && el.videoWidth > 0) return el;
+      if (entry.hasSnapshot) return entry.snapshot;
+      /* Formats the media element cannot play (some containers) still have a
+         WebCodecs decoder; fall back to it until the element is ready. */
       return this.frameAt(mediaId, time, 1280);
     }
 
@@ -664,14 +725,19 @@ export class MediaLibrary {
     if (el.readyState < 1) await waitForEvent(el, 'loadedmetadata', 2500);
     if (!el.videoWidth) return this.frameAt(mediaId, time, 1280);
     if (Math.abs(el.currentTime - time) > 0.03) {
+      this.capturePreviewFrame(entry);
       try {
         el.currentTime = time;
       } catch (error) {
         /* seek refused while loading */
       }
       await waitForEvent(el, 'seeked', 2500);
+      /* `seeked` fires before the new picture is guaranteed to be composited.
+         Waiting for the presented frame avoids one black flash per seek. */
+      await waitForPresentedFrame(el);
     }
     if (el.readyState >= 2 && el.videoWidth > 0) return el;
+    if (entry.hasSnapshot) return entry.snapshot;
     return this.frameAt(mediaId, time, 1280);
   }
 

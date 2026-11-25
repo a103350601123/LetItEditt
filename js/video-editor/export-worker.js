@@ -210,22 +210,6 @@ class WorkerSource {
     return sink;
   }
 
-  async restartStream(stream, time, asset) {
-    try {
-      await stream.iterator?.return?.();
-    } catch (error) {
-      /* iterator already finished */
-    }
-    const first = await stream.sink.getCanvas(time);
-    stream.done = false;
-    if (!first) {
-      stream.current = null;
-      return;
-    }
-    stream.current = first;
-    stream.iterator = stream.sink.canvases(time, asset.duration || Infinity);
-  }
-
   async getFrame(id, time, maxDimension, hint = {}) {
     const asset = this.assets.get(id);
     if (!asset || asset.type !== 'video') return null;
@@ -233,39 +217,46 @@ class WorkerSource {
     const sink = this.sinkFor(asset, bucket);
     const clamped = Math.max(0, Math.min(time, Math.max(0, (asset.duration || 0) - 0.002)));
     const key = `${id}\u0001${bucket}\u0001${hint.clipId || 'main'}`;
-    let stream = this.streams.get(key);
     const tolerance = 0.0015;
+    let stream = this.streams.get(key);
+
+    if (stream && stream.current) {
+      const current = stream.current;
+      if (
+        clamped >= current.timestamp - tolerance &&
+        clamped <= current.timestamp + (current.duration || 0) + tolerance
+      ) {
+        return current.canvas;
+      }
+      if (clamped < current.timestamp - tolerance) {
+        /* Timeline went backwards (split, transition, reverse clip): restart
+           the sequential decoder at the requested moment. */
+        try {
+          await stream.iterator?.return?.();
+        } catch (error) {
+          /* iterator already finished */
+        }
+        stream.current = null;
+        stream.done = false;
+        stream.iterator = sink.canvases(clamped, asset.duration || Infinity);
+      }
+    }
 
     if (!stream) {
-      const first = await sink.getCanvas(clamped);
-      if (!first) return null;
-      stream = { sink, current: first, iterator: null, done: false };
-      const next = Math.min(Math.max(0, (asset.duration || 0) - 0.001), clamped + 1e-4);
-      stream.iterator = sink.canvases(next, asset.duration || Infinity);
+      stream = {
+        sink,
+        current: null,
+        iterator: sink.canvases(clamped, asset.duration || Infinity),
+        done: false
+      };
       this.streams.set(key, stream);
-      return first.canvas;
     }
 
-    const current = stream.current;
-    if (!current) {
-      await this.restartStream(stream, clamped, asset);
-      return stream.current ? stream.current.canvas : null;
-    }
-    if (
-      clamped >= current.timestamp - tolerance &&
-      clamped <= current.timestamp + (current.duration || 0) + tolerance
-    ) {
-      return current.canvas;
-    }
-
-    if (clamped < current.timestamp - tolerance) {
-      await this.restartStream(stream, clamped, asset);
-      return stream.current ? stream.current.canvas : null;
-    }
-
-    /* Forward. Advance until a frame covers the requested time. The canvas
-       pool rotates, but the frame immediately before an overshoot is still
-       intact, which is exactly the frame we keep. */
+    /* Forward. Pull frames from the live iterator until one covers the
+       requested moment. Consecutive frames are decoded exactly once; a
+       backwards jump is the only case that re-seeks. The canvas pool rotates,
+       so the frame immediately before an overshoot is still intact and is the
+       frame we keep. */
     while (!stream.done) {
       let next;
       try {
@@ -288,9 +279,10 @@ class WorkerSource {
       }
       if (stream.current.timestamp > clamped + tolerance) {
         stream.current = previous;
-        return previous.canvas;
+        return previous ? previous.canvas : next.value.canvas;
       }
     }
+    /* Past the end of the clip: hold the final decoded frame. */
     return stream.current ? stream.current.canvas : null;
   }
 
