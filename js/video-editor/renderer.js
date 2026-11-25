@@ -42,20 +42,30 @@ function tempCanvas(width, height) {
 /* Keyframes & animation -------------------------------------------------- */
 
 /* Keyframe lists are mutated in place by the editor (values change, entries
- * are added). A per-list cache keeps the hot render path from filtering and
- * sorting the same array on every frame. The array identity and length are
- * enough to invalidate it; entry values are read through the same objects. */
+ * are added, moved in time). A per-list cache keeps the hot render path from
+ * filtering and sorting the same array on every frame. The cache stores the
+ * source order of the timestamps; any add, remove or re-time invalidates it. */
 const sortedKeyframes = new WeakMap();
 
 function sortedList(list) {
-  let sorted = sortedKeyframes.get(list);
-  if (!sorted || sorted.length !== list.length) {
-    sorted = list
+  let cache = sortedKeyframes.get(list);
+  let valid = Boolean(cache) && cache.sorted.length === list.length;
+  if (valid) {
+    for (let i = 0; i < list.length; i += 1) {
+      if (cache.times[i] !== list[i].t) {
+        valid = false;
+        break;
+      }
+    }
+  }
+  if (!valid) {
+    const sorted = list
       .filter((key) => Number.isFinite(key.t) && Number.isFinite(key.v))
       .sort((a, b) => a.t - b.t);
-    sortedKeyframes.set(list, sorted);
+    cache = { sorted, times: list.map((key) => key.t) };
+    sortedKeyframes.set(list, cache);
   }
-  return sorted;
+  return cache.sorted;
 }
 
 function interpolateKeyframes(list, time, base) {
