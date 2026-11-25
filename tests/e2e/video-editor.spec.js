@@ -908,7 +908,19 @@ test('export keeps cuts, text, filters, transitions and audio edits matching the
     const differences = [];
     for (const time of times) {
       window.__VE__.seek(time);
-      await new Promise((resolve) => setTimeout(resolve, 450));
+      const deadline = performance.now() + 3000;
+      while (performance.now() < deadline) {
+        const debug = window.__VE__.preview.debug();
+        if (
+          !debug.renderInFlight &&
+          debug.renderedTime !== null &&
+          Math.abs(debug.renderedTime - time) < 0.05
+        ) {
+          break;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 30));
+      }
+      await new Promise((resolve) => setTimeout(resolve, 80));
       previewCtx.drawImage(preview, 0, 0, width, height);
       const previewData = previewCtx.getImageData(0, 0, width, height).data;
 
@@ -962,7 +974,6 @@ test('export keeps cuts, text, filters, transitions and audio edits matching the
   expect(comparison.width).toBe(1280);
   expect(comparison.height).toBe(720);
   expect(comparison.meta.hasAudio).toBe(true);
-  console.log('EXPORT_PARITY', JSON.stringify(comparison.differences), JSON.stringify(comparison.audio));
   for (const diff of comparison.differences) expect(diff.meanAbs).toBeLessThan(22);
   expect(comparison.audio.middle).toBeGreaterThan(0.02);
   expect(comparison.audio.start).toBeLessThan(comparison.audio.middle);
