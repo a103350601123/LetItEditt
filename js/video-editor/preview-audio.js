@@ -54,8 +54,15 @@ export class PreviewAudioMixer {
     this.nodes = new Map();
     this.buffers = new Map();
     this.playing = false;
+    this.muted = false;
     this.blockedNoticeShown = false;
     this.reportedFailures = new Set();
+  }
+
+  /** Mute only the preview monitor; export levels are untouched. */
+  setMuted(muted) {
+    this.muted = Boolean(muted);
+    if (this.playing) this.schedule();
   }
 
   /* --------------------------------------------------------------------- */
@@ -234,6 +241,7 @@ export class PreviewAudioMixer {
 
   activeClips(project, time) {
     const list = [];
+    if (this.muted) return list;
     const master = gainOf(project.masterVolume ?? 1);
     for (const track of project.tracks) {
       if (track.muted) continue;
@@ -373,6 +381,7 @@ export class PreviewAudioMixer {
     }
     return {
       playing: this.playing,
+      muted: this.muted,
       blocked: this.blockedNoticeShown,
       context: this.ctx ? this.ctx.state : 'none',
       sampleRate: this.ctx ? this.ctx.sampleRate : 0,

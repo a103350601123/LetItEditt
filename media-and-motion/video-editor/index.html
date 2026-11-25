@@ -2,14 +2,14 @@
 <html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Professional Video Editor – Multi-Track Timeline, Text, Effects &amp; Export | LetitEdit</title>
-<meta name="description" content="Edit video in your browser with a real multi-track timeline, layers, transitions, filters, text and audio mixing. Import local files, animate keyframes and export a genuine MP4 or WebM. Nothing is uploaded.">
-<meta name="theme-color" content="#2563EB">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Video Editor – Trim, Add Text, Music &amp; Export on Any Device | LetitEdit</title>
+<meta name="description" content="A simple, touch-first video editor in your browser. Upload a video, pick a moment, add text, music, filters or motion, then export a real MP4 or WebM. Files never leave your device.">
+<meta name="theme-color" content="#0b1220">
 <link rel="canonical" href="https://letitedit.com/media-and-motion/video-editor/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Professional Video Editor – Multi-Track Timeline, Text, Effects &amp; Export | LetitEdit">
-<meta property="og:description" content="A genuine browser video editor: multi-track timeline, layer stacking, 56 transitions, 18 filters, Unicode text, audio mixing, keyframes and real MP4 or WebM export.">
+<meta property="og:title" content="Video Editor – Simple Touch Editing, Real Export | LetitEdit">
+<meta property="og:description" content="Upload a video, edit any moment, add layers and export a genuine file. Local, private and designed for phones first.">
 <meta property="og:url" content="https://letitedit.com/media-and-motion/video-editor/">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary">
@@ -28,28 +28,26 @@
         { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://letitedit.com/" },
         { "@type": "ListItem", "position": 2, "name": "Categories", "item": "https://letitedit.com/categories/" },
         { "@type": "ListItem", "position": 3, "name": "Video Editing", "item": "https://letitedit.com/categories/video-editing/" },
-        { "@type": "ListItem", "position": 4, "name": "Professional Video Editor", "item": "https://letitedit.com/media-and-motion/video-editor/" }
+        { "@type": "ListItem", "position": 4, "name": "Video Editor", "item": "https://letitedit.com/media-and-motion/video-editor/" }
       ]
     },
     {
       "@type": "SoftwareApplication",
-      "name": "Professional Video Editor",
+      "name": "LetitEdit Video Editor",
       "applicationCategory": "MultimediaApplication",
       "operatingSystem": "Any modern browser with WebCodecs for export",
       "url": "https://letitedit.com/media-and-motion/video-editor/",
-      "description": "A multi-track browser video editor with layer stacking, transitions, filters, colour correction, Unicode text, subtitles, audio mixing, keyframes and real MP4 or WebM export through WebCodecs.",
+      "description": "A touch-first browser video editor. Upload a video, select a moment, add text, images, graphics, music, filters, transitions or animation, then export a real MP4 or WebM file. Processing stays on the device.",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
       "featureList": [
-        "Multi-track timeline with trimming, splitting, snapping and drag between tracks",
-        "Layer stacking with bring forward, send backward, front and back",
-        "56 transitions across six named categories",
-        "18 filters plus brightness, contrast, saturation, temperature, tint, exposure, highlights, shadows, gamma, sharpness, fade and vignette",
-        "Multiple independent text layers with Unicode shaping and right-to-left support",
-        "Manual subtitles and SRT or WebVTT import and export",
-        "Music, voiceover and sound-effect tracks with real preview monitoring, clip and track gain, fades and mute",
-        "Keyframes for position, scale, rotation and opacity, rendered into the export",
-        "Real MP4 (H.264 + AAC) and WebM (VP9 + Opus) export with measured metadata",
-        "Local processing with no upload and no account"
+        "Upload a video and edit any moment",
+        "Text, captions, stickers and shapes with direct move, resize and rotate",
+        "Multiple video, image and audio layers with layer ordering",
+        "Filters, colour adjustment, transitions and entrance or exit animation",
+        "Keyframes for position, scale, rotation, opacity and volume",
+        "Trim, split, speed, crop, volume, fades and mute",
+        "Local autosave with media stored in the browser",
+        "Real MP4 (H.264 + AAC) or WebM (VP9 + Opus) export with measured metadata"
       ]
     },
     {
@@ -57,53 +55,38 @@
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "Does this video editor upload my files?",
-          "acceptedAnswer": { "@type": "Answer", "text": "No. Files are read from your device, decoded in the browser tab and rendered by a local compositor. Export runs in a Web Worker on your own machine. Nothing is sent to LetitEdit or a third-party service, and no account is required." }
+          "name": "Does this editor upload my video?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The video is read from your device, decoded in the browser tab and rendered by a local compositor. Export runs in a Web Worker on your machine. Nothing is sent to LetitEdit or a third party, and no account is required." }
         },
         {
           "@type": "Question",
-          "name": "Which video, image and audio formats can I import?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Video is accepted as MP4, M4V, MOV, WebM and MKV when the browser can decode the codec. Images are accepted as JPG, PNG, WebP and GIF; animated GIFs are used as a single still frame. Audio is accepted as MP3, WAV, M4A, AAC and OGG when the browser can decode it. A file that cannot be decoded is rejected with a specific message." }
+          "name": "How do I edit a video here?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Upload a video, scrub or tap the progress strip to choose a moment, then use the action bar or the bottom toolbar to add text, music, an image, a filter, a transition or animation. Select any layer in the Layers panel to change it again. Save keeps the project in this browser; Export writes a real video file." }
         },
         {
           "@type": "Question",
-          "name": "Which export formats are real?",
-          "acceptedAnswer": { "@type": "Answer", "text": "MP4 uses H.264 video and AAC audio; WebM uses VP9 video and Opus audio. Both are encoded frame by frame with WebCodecs through the self-hosted Mediabunny muxer. The result panel reads the finished file back and reports the measured codec, resolution, duration, size and bitrate." }
+          "name": "Which formats can I import and export?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Video can be imported as MP4, M4V, MOV, WebM or MKV when the browser can decode the codec. Images can be JPG, PNG, WebP, GIF (first frame), AVIF or BMP. Audio can be MP3, WAV, M4A, AAC or OGG. Export produces MP4 with H.264 and AAC, or WebM with VP9 and Opus, when the browser supports WebCodecs encoding." }
         },
         {
           "@type": "Question",
-          "name": "Why is export unavailable in some browsers?",
-          "acceptedAnswer": { "@type": "Answer", "text": "The exporter needs the WebCodecs VideoEncoder API. Current Chrome and Edge provide it. Firefox and Safari support varies by version and codec. Editing still works without it, and the export panel explains the limitation instead of showing fake progress." }
-        },
-        {
-          "@type": "Question",
-          "name": "Does my project survive a page reload?",
-          "acceptedAnswer": { "@type": "Answer", "text": "The timeline is autosaved to this browser in IndexedDB and a restore banner appears after a reload. Original media files are stored separately in the same browser when storage quota allows, under a bounded budget. If the browser evicted them, the editor lists the missing files and relinks each clip when you re-import the original by name. You can also download a project JSON file and open it later." }
-        },
-        {
-          "@type": "Question",
-          "name": "How do layers and tracks relate?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Each video track is a visual layer. The top track in the timeline renders in front; lower tracks render behind it, and the layer controls in the properties panel move a clip forward, backward, to the front or to the back. Horizontal position on a track is timing. Moving a clip up or down changes stacking only, and the preview and exported file use the same order." }
-        },
-        {
-          "@type": "Question",
-          "name": "Can I edit Arabic, Urdu, Persian, Hindi, Bengali, Chinese, Japanese or Korean text?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Text layers are shaped by the browser's own canvas text engine using system font stacks for Latin, Arabic and Urdu, Devanagari and CJK. You can force right-to-left direction, and the preview and export call the same renderer, so the exported frames match what you see. Available glyphs depend on the fonts installed on the device." }
-        },
-        {
-          "@type": "Question",
-          "name": "Does the editor transcribe audio automatically?",
-          "acceptedAnswer": { "@type": "Answer", "text": "No. Subtitles are typed manually or imported from an SRT or WebVTT file you supply. This build makes no speech-recognition claim and does not upload audio to a transcription service. Finished cues can be downloaded as SRT or VTT and are burned into the export." }
-        },
-        {
-          "@type": "Question",
-          "name": "What happens to audio when I change speed?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Video and audio are resampled together, so speeding up raises pitch and slowing down lowers it. Pitch-preserving time stretching is not implemented in this browser-only build, and the interface says so where speed is edited." }
+          "name": "Does the project survive a reload?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes, when browser storage is available. The project and the imported media are saved locally in IndexedDB. A reload restores the last project. If the browser evicts the stored files or storage is full, the editor says so and lets you re-import the originals. You can also download the project as a JSON file." }
         },
         {
           "@type": "Question",
           "name": "Can I edit on a phone?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes. The workspace reflows to a single column with a visible preview, a touch-friendly scrollable timeline, a tools drawer with all nine categories, a properties sheet and a bottom dock. Trim handles and clip dragging use pointer events, and the layout is tested down to a 320 px viewport." }
+          "acceptedAnswer": { "@type": "Answer", "text": "The editor is designed for phones first: large preview, thumb-sized controls, bottom sheets and a single compact moment strip instead of a desktop timeline grid. It supports portrait and landscape layouts from 320 CSS pixels wide. Testing is performed in browser emulation; a physical device may behave differently." }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is export unavailable in some browsers?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Export needs the WebCodecs encoding API. Current Chrome and Edge provide it; support in other browsers varies by version and codec. Editing still works without it, and the export panel explains the limitation instead of showing fake progress." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does changing speed preserve pitch?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. Video and audio are resampled together, so speeding up raises pitch and slowing down lowers it. Pitch-preserving time stretching is not part of this browser-only build, and the speed control says so." }
         }
       ]
     }
@@ -111,7 +94,7 @@
 }
 </script>
 </head>
-<body class="vc-page ve-page">
+<body class="vc-page se-page">
 <a class="skip-link" href="#main-content">Skip to main content</a>
 <header class="topbar">
   <nav class="nav" aria-label="Primary navigation">
@@ -133,349 +116,202 @@
   <a href="../../">Home</a><span aria-hidden="true">/</span>
   <a href="../../categories/">Categories</a><span aria-hidden="true">/</span>
   <a href="../../categories/video-editing/">Video Editing</a><span aria-hidden="true">/</span>
-  <span aria-current="page">Professional Video Editor</span>
+  <span aria-current="page">Video Editor</span>
 </nav>
 
-<section class="vc-hero ve-hero">
+<section class="vc-hero se-hero">
   <div class="container">
     <span class="eyebrow">Media &amp; Motion · Video Editing · Live tool</span>
-    <h1>Professional Video Editor</h1>
-    <p>Build a real edit on a multi-track timeline: trim and split clips, stack layers, add text and subtitles, mix audio, animate keyframes and apply transitions or filters. Every effect is composed by the same renderer the exporter uses, then encoded into a playable MP4 or WebM on your device. Nothing is uploaded.</p>
+    <h1>Your video. Any moment. One simple edit.</h1>
+    <p>Upload a video, choose a moment and make the change you want: text, music, an image, a filter, a transition or motion. The video stays in the centre of the screen, controls stay within thumb reach, and the finished file is exported on your device.</p>
     <ul class="vc-hero-points">
-      <li>Multi-track timeline and layers</li>
-      <li>56 transitions, 18 filters</li>
-      <li>Unicode text and subtitles</li>
-      <li>Real MP4 and WebM export</li>
+      <li>Touch-first, phone-first layout</li>
+      <li>Text, layers, music and motion</li>
+      <li>Local autosave, no account</li>
+      <li>Real MP4 or WebM export</li>
     </ul>
   </div>
 </section>
 
-<section class="ve-section" aria-labelledby="editor-title">
+<section class="se-section" aria-labelledby="editor-title">
   <div class="container">
-    <div class="ve-app" id="ve-app" data-mobile-sheet="none" data-category="media">
+    <h2 class="visually-hidden" id="editor-title">Video editor workspace</h2>
 
-      <header class="ve-topbar" role="toolbar" aria-label="Project controls">
-        <div class="ve-topbar-start">
-          <span class="ve-mark" aria-hidden="true">LE</span>
-          <div class="ve-title-wrap">
-            <label class="ve-project-name">
-              <span class="visually-hidden">Project name</span>
-              <input type="text" id="ve-project-name" maxlength="80" value="Untitled project" autocomplete="off">
-            </label>
-            <span class="ve-project-meta" id="ve-project-meta">16:9 · 1920×1080 · 30 fps</span>
-          </div>
+    <div class="se-app" id="se-app">
+      <header class="se-header">
+        <div class="se-name-wrap">
+          <span class="se-mark" aria-hidden="true">LE</span>
+          <label class="se-name-label">
+            <span class="visually-hidden">Project name</span>
+            <input id="se-project-name" type="text" maxlength="80" value="Untitled video" autocomplete="off" spellcheck="false">
+          </label>
+          <span class="se-save-status" id="se-save-status" role="status" aria-live="polite">Ready</span>
         </div>
-        <div class="ve-topbar-end">
-          <span class="ve-save-status" id="ve-save-status" role="status" aria-live="polite">Autosave ready</span>
-          <div class="ve-history" role="group" aria-label="History">
-            <button type="button" id="ve-undo" title="Undo (Ctrl+Z)" aria-label="Undo">↶</button>
-            <button type="button" id="ve-redo" title="Redo (Ctrl+Shift+Z)" aria-label="Redo">↷</button>
-          </div>
-          <button type="button" class="ve-icon-btn" id="ve-help-open" title="Keyboard shortcuts" aria-label="Keyboard shortcuts">?</button>
-          <div class="ve-menu-wrap">
-            <button type="button" class="ve-btn ve-btn-ghost" id="ve-project-menu-button" aria-expanded="false" aria-controls="ve-project-menu">Project</button>
-            <div class="ve-menu" id="ve-project-menu" role="menu" aria-label="Project actions" hidden>
-              <button type="button" role="menuitem" data-project-action="undo">Undo</button>
-              <button type="button" role="menuitem" data-project-action="redo">Redo</button>
-              <hr>
-              <button type="button" role="menuitem" data-project-action="new">New project</button>
-              <button type="button" role="menuitem" data-project-action="open">Open project file…</button>
-              <button type="button" role="menuitem" data-project-action="save">Download project JSON</button>
-              <hr>
-              <button type="button" role="menuitem" data-project-action="canvas">Canvas settings</button>
-              <button type="button" role="menuitem" data-project-action="help">Keyboard shortcuts</button>
-              <hr>
-              <button type="button" role="menuitem" class="is-danger" data-project-action="clear-autosave">Clear autosave</button>
-            </div>
-          </div>
-          <button type="button" class="ve-btn ve-btn-primary" id="ve-export-open">Export</button>
+        <div class="se-header-actions">
+          <button type="button" class="se-icon-btn" id="se-undo" aria-label="Undo" title="Undo (Ctrl+Z)" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7H5v4M5.5 10.5A7 7 0 1 1 5 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button type="button" class="se-icon-btn" id="se-redo" aria-label="Redo" title="Redo (Ctrl+Shift+Z)" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 7h4v4M18.5 10.5A7 7 0 1 0 19 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button type="button" class="se-icon-btn" id="se-save" aria-label="Save project" title="Save a project file">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11l3 3v13H5zM8 4v5h7V4M8 20v-6h8v6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          </button>
+          <button type="button" class="se-primary-btn" id="se-export">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4m0 0L8 8m4-4 4 4M5 14v5h14v-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Export</span>
+          </button>
+          <button type="button" class="se-icon-btn" id="se-menu" aria-label="More project actions" aria-haspopup="menu" aria-expanded="false" title="More">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></svg>
+          </button>
         </div>
       </header>
 
-      <div class="ve-banners">
-        <div class="ve-banner" id="ve-restore-banner" hidden role="status">
-          <div>
-            <strong>Autosave found.</strong>
-            <p id="ve-restore-text"></p>
+      <div class="se-stage" id="se-stage">
+        <div class="se-frame" id="se-frame">
+          <canvas id="se-canvas" width="1280" height="720" aria-label="Video preview"></canvas>
+          <div class="se-canvas-overlay" id="se-overlay"></div>
+          <div class="se-empty" id="se-empty">
+            <div class="se-empty-art" aria-hidden="true">
+              <svg viewBox="0 0 48 48"><rect x="5" y="10" width="38" height="28" rx="6" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M20 18l10 6-10 6z" fill="currentColor"/><path d="M24 4v6M14 5l2 4M34 5l-2 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            </div>
+            <h2>Start with a video</h2>
+            <p>Drop a video here or choose one from your device. It becomes your main video and the first layer.</p>
+            <button type="button" class="se-upload-btn" id="se-upload-base">Choose video</button>
+            <p class="se-empty-note">MP4, MOV, WebM or MKV · processed only on this device</p>
           </div>
-          <div class="ve-banner-actions">
-            <button type="button" class="ve-btn ve-btn-primary ve-btn-sm" id="ve-restore-button">Restore timeline</button>
-            <button type="button" class="ve-btn ve-btn-ghost ve-btn-sm" id="ve-restore-discard">Discard</button>
-          </div>
-        </div>
-
-        <div class="ve-banner ve-banner-warn" id="ve-relink-banner" hidden role="status">
-          <div>
-            <strong>Media needed.</strong>
-            <p id="ve-relink-text"></p>
-          </div>
-          <div class="ve-banner-actions">
-            <button type="button" class="ve-btn ve-btn-primary ve-btn-sm" id="ve-relink-button">Re-import media</button>
-          </div>
+          <div class="se-stage-badge" id="se-stage-badge" hidden></div>
         </div>
       </div>
 
-      <h2 class="visually-hidden" id="editor-title">Video editing workspace</h2>
-
-      <div class="ve-workspace">
-        <aside class="ve-library" id="ve-library" aria-label="Media, effects and elements">
-          <div class="ve-rail" id="ve-rail" role="tablist" aria-label="Tool categories"></div>
-          <div class="ve-library-panel-wrap">
-            <div class="ve-sheet-head ve-only-mobile">
-              <strong>Tools</strong>
-              <button type="button" class="ve-icon-btn" id="ve-library-close" data-mobile-close-panel aria-label="Close tools panel">✕</button>
-            </div>
-            <div class="ve-library-panel" id="ve-library-panel" role="tabpanel" aria-live="polite"></div>
+      <div class="se-controls">
+        <div class="se-transport">
+          <button type="button" class="se-play-btn" id="se-play" aria-label="Play" title="Play (Space)">
+            <svg class="se-icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>
+            <svg class="se-icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM14 5h4v14h-4z" fill="currentColor"/></svg>
+          </button>
+          <div class="se-time-readout">
+            <span id="se-time">00:00.0</span>
+            <span class="se-time-sep" aria-hidden="true">/</span>
+            <span id="se-duration">00:00.0</span>
           </div>
-          <div class="ve-resizer ve-resizer-library" data-resizer="library" role="separator" aria-orientation="vertical" aria-label="Resize tools panel" tabindex="0"></div>
-        </aside>
-
-        <div class="ve-center">
-          <div class="ve-monitor-head">
-            <div class="ve-monitor-meta">
-              <span id="ve-selection-label">Nothing selected</span>
-              <span id="ve-clip-count">0 clips</span>
-            </div>
-            <div class="ve-monitor-tools">
-              <label class="ve-inline-select">
-                <span class="visually-hidden">Preview quality</span>
-                <select id="ve-preview-quality" title="Preview quality">
-                  <option value="low">Low</option>
-                  <option value="standard" selected>Standard</option>
-                  <option value="high">High</option>
-                </select>
-              </label>
-              <button type="button" class="ve-icon-btn" id="ve-zoom-out" title="Zoom out" aria-label="Zoom out">−</button>
-              <button type="button" class="ve-icon-btn" id="ve-zoom-in" title="Zoom in" aria-label="Zoom in">+</button>
-              <button type="button" class="ve-icon-btn" id="ve-zoom-fit" title="Fit preview" aria-label="Fit preview">Fit</button>
-              <button type="button" class="ve-icon-btn" id="ve-fullscreen" title="Fullscreen preview" aria-label="Fullscreen preview">⛶</button>
-            </div>
-          </div>
-
-          <div class="ve-preview-shell" id="ve-preview-shell">
-            <div class="ve-preview-stage" id="ve-preview-stage">
-              <div class="ve-preview-stage-inner" id="ve-preview-stage-inner">
-                <div class="ve-canvas-frame">
-                  <canvas id="ve-preview-canvas" width="1280" height="720" aria-label="Video preview. Select a layer, then drag it to move, use the corner handles to scale and the round handle to rotate."></canvas>
-                  <div class="ve-canvas-overlay" id="ve-canvas-overlay" aria-hidden="true"></div>
-                  <div class="ve-preview-guides" id="ve-preview-guides" aria-hidden="true">
-                    <span class="ve-guide ve-guide-v"></span>
-                    <span class="ve-guide ve-guide-h"></span>
-                    <span class="ve-safe-area"></span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <p class="ve-preview-empty" id="ve-preview-empty">Your timeline is empty. Import media, add a title or record a clip to begin.</p>
-          </div>
-
-          <div class="ve-transport" role="group" aria-label="Playback controls">
-            <button type="button" class="ve-icon-btn" id="ve-prev-frame" aria-label="Previous frame" title="Previous frame (Left arrow)">⏮</button>
-            <button type="button" class="ve-btn ve-btn-ghost ve-btn-sm" id="ve-play" aria-pressed="false">Play</button>
-            <button type="button" class="ve-icon-btn" id="ve-next-frame" aria-label="Next frame" title="Next frame (Right arrow)">⏭</button>
-            <span class="ve-time" id="ve-current-time">00:00:00:00</span>
-            <input class="ve-scrub" type="range" id="ve-scrub" min="0" max="10" step="0.01" value="0" aria-label="Playhead position">
-            <span class="ve-time" id="ve-total-time">00:00:00:00</span>
-            <label class="ve-inline-select">
-              <span class="visually-hidden">Playback speed</span>
-              <select id="ve-rate" title="Playback speed">
-                <option value="0.5">0.5×</option>
-                <option value="1" selected>1×</option>
-                <option value="1.5">1.5×</option>
-                <option value="2">2×</option>
-              </select>
-            </label>
-          </div>
-
-          <p class="ve-monitor-hint">Select a layer in the preview to move, scale or rotate it. Every change is composed by the same renderer the export uses.</p>
+          <button type="button" class="se-icon-btn se-mute-btn" id="se-mute" aria-label="Mute preview sound" aria-pressed="false" title="Mute preview sound">
+            <svg class="se-icon-sound" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <svg class="se-icon-muted" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16 9l5 5m0-5-5 5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+          </button>
+          <button type="button" class="se-icon-btn" id="se-fullscreen" aria-label="Full screen preview" title="Full screen">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
 
-        <aside class="ve-inspector" id="ve-inspector" aria-label="Properties">
-          <div class="ve-sheet-head ve-only-mobile">
-            <strong>Properties</strong>
-            <button type="button" class="ve-icon-btn" id="ve-inspector-close" data-mobile-close-panel aria-label="Close properties panel">✕</button>
+        <div class="se-seek-wrap">
+          <input type="range" id="se-seek" min="0" max="1" step="0.01" value="0" aria-label="Video position">
+        </div>
+
+        <div class="se-moment-strip" id="se-timeline" aria-label="Video moments">
+          <div class="se-filmstrip" id="se-filmstrip"></div>
+          <div class="se-overlay-lane" id="se-overlay-lane"></div>
+          <div class="se-playhead" id="se-playhead" aria-hidden="true"></div>
+        </div>
+
+        <div class="se-moment-bar">
+          <div class="se-moment-head">
+            <span class="se-moment-label" id="se-moment-label">At 00:00.0</span>
+            <span class="se-moment-hint" id="se-moment-hint">Choose an action</span>
           </div>
-          <div class="ve-inspector-panel" id="ve-inspector-panel"></div>
-          <div class="ve-resizer ve-resizer-inspector" data-resizer="inspector" role="separator" aria-orientation="vertical" aria-label="Resize properties panel" tabindex="0"></div>
-        </aside>
+          <div class="se-actions" id="se-actions" role="group" aria-label="Editing actions"></div>
+        </div>
+
+        <section class="se-layers" id="se-layers">
+          <button type="button" class="se-layers-head" id="se-layers-toggle" aria-expanded="false" aria-controls="se-layers-list">
+            <span class="se-layers-title">Layers <span class="se-count" id="se-layer-count">0</span></span>
+            <span class="se-layers-sub" id="se-layers-sub">Your video and everything on top of it</span>
+            <svg class="se-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="se-layers-body" id="se-layers-list">
+            <ul class="se-layer-list" id="se-layer-list"></ul>
+            <p class="se-layers-empty" id="se-layers-empty">No layers yet. Add a video, text, image or music to begin.</p>
+          </div>
+        </section>
       </div>
 
-      <div class="ve-timeline-dock">
-        <div class="ve-resizer ve-resizer-timeline" data-resizer="timeline" role="separator" aria-orientation="horizontal" aria-label="Resize timeline panel" tabindex="0"></div>
-        <section class="ve-timeline" id="ve-timeline" aria-label="Multi-track timeline"></section>
-      </div>
-
-      <nav class="ve-mobile-dock" aria-label="Mobile editor panels">
-        <button type="button" data-open-sheet="library" aria-expanded="false" aria-controls="ve-library">
-          <b aria-hidden="true">▤</b><span>Tools</span><small id="ve-mobile-category-label">Media</small>
+      <nav class="se-toolbar" aria-label="Editing tools">
+        <button type="button" class="se-tool" data-tool="media">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 15l5-5 4 4 3-3 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          <span>Media</span>
         </button>
-        <button type="button" data-open-sheet="inspector" aria-expanded="false" aria-controls="ve-inspector">
-          <b aria-hidden="true">≡</b><span>Properties</span><small>Clip settings</small>
+        <button type="button" class="se-tool" data-tool="text">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M12 6v13M8 19h8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+          <span>Text</span>
         </button>
-        <button type="button" id="ve-mobile-menu">
-          <b aria-hidden="true">☰</b><span>Project</span><small>Save &amp; open</small>
+        <button type="button" class="se-tool" data-tool="audio">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" fill="currentColor"/><circle cx="16.5" cy="16" r="2.5" fill="currentColor"/></svg>
+          <span>Audio</span>
         </button>
-        <button type="button" id="ve-mobile-export">
-          <b aria-hidden="true">⤓</b><span>Export</span><small>MP4 / WebM</small>
+        <button type="button" class="se-tool" data-tool="filter">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="15" cy="15" r="5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+          <span>Filters</span>
+        </button>
+        <button type="button" class="se-tool" data-tool="layers">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l8 4-8 4-8-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M4 12l8 4 8-4M4 16l8 4 8-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          <span>Layers</span>
         </button>
       </nav>
 
-      <div class="ve-sheet-backdrop" id="ve-sheet-backdrop" hidden aria-hidden="true"></div>
-
-      <div class="ve-dropveil" id="ve-dropveil" hidden aria-hidden="true">
-        <div><strong>Drop to import</strong><span>Video, image or audio files stay on this device.</span></div>
-      </div>
-
-      <div class="ve-toasts" id="ve-toasts" aria-live="polite" aria-atomic="false"></div>
-
-      <input type="file" id="ve-media-input" class="visually-hidden" aria-label="Import video, image or audio files" multiple accept="video/*,image/*,audio/*,.mp4,.m4v,.mov,.webm,.mkv,.jpg,.jpeg,.png,.webp,.gif,.avif,.bmp,.mp3,.wav,.m4a,.aac,.ogg,.opus">
-      <input type="file" id="ve-replace-input" class="visually-hidden" aria-label="Choose a replacement media file" accept="video/*,image/*,audio/*,.mp4,.m4v,.mov,.webm,.mkv,.jpg,.jpeg,.png,.webp,.gif,.avif,.bmp,.mp3,.wav,.m4a,.aac,.ogg,.opus">
-      <input type="file" id="ve-open-input" class="visually-hidden" aria-label="Open a LetitEdit project file" accept="application/json,.json">
-      <input type="file" id="ve-subtitle-input" class="visually-hidden" aria-label="Import an SRT or WebVTT subtitle file" accept=".srt,.vtt,text/plain,text/vtt">
-
-      <noscript><p class="ve-fatal">This video editor needs JavaScript. All decoding, editing and encoding run locally in your browser.</p></noscript>
+      <div class="se-sheet-root" id="se-sheet-root"></div>
+      <div class="se-toasts" id="se-toasts" role="status" aria-live="polite"></div>
+      <input type="file" id="se-file-input" accept="video/*,image/*,audio/*" hidden>
+      <input type="file" id="se-project-input" accept=".json,application/json" hidden>
     </div>
+
+    <p class="se-privacy-note"><span aria-hidden="true">🔒</span> Your video is decoded, edited and encoded in this browser. Nothing is uploaded and no account is needed.</p>
   </div>
 </section>
 
-<dialog class="ve-dialog" id="ve-export-dialog" aria-label="Export video"></dialog>
-
-<dialog class="ve-dialog" id="ve-help-dialog" aria-labelledby="ve-help-title">
-  <div class="ve-dialog-card">
-    <div class="ve-dialog-head">
-      <div>
-        <span class="ve-panel-eyebrow">Reference</span>
-        <h2 id="ve-help-title">Keyboard shortcuts</h2>
-        <p>Focus a clip first; shortcuts are ignored while you are typing in a field.</p>
-      </div>
-      <button type="button" class="ve-icon-btn" data-close-dialog aria-label="Close help">✕</button>
-    </div>
-    <div class="ve-export-body">
-      <dl class="ve-shortcuts">
-        <div><dt>Space</dt><dd>Play or pause</dd></div>
-        <div><dt>Left / Right</dt><dd>Step one frame</dd></div>
-        <div><dt>Home / End</dt><dd>Jump to start or end</dd></div>
-        <div><dt>S</dt><dd>Split at the playhead</dd></div>
-        <div><dt>Delete / Backspace</dt><dd>Delete the selection</dd></div>
-        <div><dt>Ctrl / Cmd + D</dt><dd>Duplicate the selection</dd></div>
-        <div><dt>Ctrl / Cmd + C / V</dt><dd>Copy or paste clips</dd></div>
-        <div><dt>Ctrl / Cmd + A</dt><dd>Select every clip</dd></div>
-        <div><dt>Ctrl / Cmd + Z</dt><dd>Undo</dd></div>
-        <div><dt>Ctrl / Cmd + Shift + Z</dt><dd>Redo</dd></div>
-        <div><dt>Ctrl / Cmd + S</dt><dd>Download the project JSON</dd></div>
-        <div><dt>Ctrl / Cmd + scroll</dt><dd>Zoom the timeline around the pointer</dd></div>
-        <div><dt>[ / ]</dt><dd>Trim the selected clip's start or end to the playhead</dd></div>
-        <div><dt>Arrow keys on a clip</dt><dd>Nudge timing by 0.1 s, or 1 s with Shift</dd></div>
-      </dl>
-      <p class="ve-empty-inline">On touch screens, drag a clip body to move it and its edge handles to trim. Pinch the timeline to zoom. Every button keeps a 44 px minimum target on phones.</p>
-    </div>
-    <div class="ve-dialog-actions">
-      <button type="button" class="ve-btn ve-btn-primary" data-close-dialog>Close</button>
-    </div>
-  </div>
-</dialog>
-
-<dialog class="ve-dialog ve-confirm-dialog" id="ve-confirm-dialog" aria-labelledby="ve-confirm-title">
-  <div class="ve-dialog-card">
-    <div class="ve-dialog-head">
-      <div>
-        <span class="ve-panel-eyebrow">Confirm</span>
-        <h2 id="ve-confirm-title" data-confirm-title>Are you sure?</h2>
-      </div>
-    </div>
-    <div class="ve-export-body">
-      <p class="ve-confirm-message" data-confirm-message></p>
-    </div>
-    <div class="ve-dialog-actions">
-      <button type="button" class="ve-btn ve-btn-primary" data-confirm-ok>Continue</button>
-      <button type="button" class="ve-btn ve-btn-ghost" data-confirm-cancel>Cancel</button>
-    </div>
-  </div>
-</dialog>
-
-<section class="section vc-content">
-  <div class="container vc-content-layout">
-    <article class="article-card vc-article">
-      <span class="eyebrow" style="color:#2563eb">Guide</span>
-      <h2>What makes this a real video editor</h2>
-      <p>A browser video editor is only honest if the picture you arrange is the picture that leaves the machine. This workspace keeps one compositor for both jobs: the preview canvas and the export worker call the same drawing code with the same project data. Trimming, layer order, text shaping, filters, transitions, crops, keyframes and subtitles therefore travel into the encoded file instead of existing only as interface decoration.</p>
-      <p>The timeline is the source of truth. Clips have a start, a duration and source in and out points. Trimming changes how much of the source is used; moving changes when it appears; splitting produces two clips that share one source file without re-encoding it. Layers are tracks: the top track in the list is drawn last and therefore appears in front.</p>
-
-      <h2>How to edit a video in the browser</h2>
+<section class="se-guide">
+  <div class="container se-guide-grid">
+    <article class="se-article">
+      <h2>How this editor works</h2>
+      <p>The video is the workspace. Everything else is a layer placed over it at a moment you choose.</p>
       <ol class="vc-steps">
-        <li><strong>Import your media.</strong> Choose video, images and audio from your device, or drop them onto the page. Thumbnails and measured metadata appear in the Media tab.</li>
-        <li><strong>Place clips.</strong> Tap Add to put a file at the playhead, or drag a card onto a compatible track. A new track is created when the existing ones are full.</li>
-        <li><strong>Arrange and trim.</strong> Drag clip bodies to change timing, drag either edge to trim, and press Split to cut at the playhead. Snapping lines clips up with neighbours, the playhead and zero.</li>
-        <li><strong>Build layers.</strong> Add text, shapes, backgrounds, logos or stickers on their own tracks. Use the layer controls in the properties panel to bring a clip forward, send it backward, or move it to the front or back.</li>
-        <li><strong>Style and animate.</strong> Apply a transition at the start of a clip, a filter and colour grade, an entrance or exit animation, or keyframes for position, scale, rotation and opacity.</li>
-        <li><strong>Mix audio.</strong> Set clip gain, fades and mute, then balance tracks and the master volume. Audio is mixed from every audible clip at export time.</li>
-        <li><strong>Export.</strong> Choose MP4 or WebM, resolution, aspect and quality, then watch real progress. The finished file is read back and its measured metadata is shown before you download it.</li>
+        <li><strong>Upload a video.</strong> It loads as the main video and defines the project length, aspect and frame rate.</li>
+        <li><strong>Pick a moment.</strong> Drag the progress strip, tap a thumbnail or use the arrow keys. The time under the preview is always the edit time.</li>
+        <li><strong>Choose an action.</strong> Add text, a sticker, an image, a second video, music, a filter, a transition, a speed change or a crop. Changes apply at the selected moment.</li>
+        <li><strong>Adjust the layer.</strong> Drag text or graphics directly in the preview, resize with the corner handles, rotate with the top handle, or use the precise controls in the sheet.</li>
+        <li><strong>Save and export.</strong> The project autosaves in this browser. Export renders every layer, effect and audio source into a real MP4 or WebM file.</li>
       </ol>
 
-      <h2>Tracks, clips and layer stacking</h2>
-      <p>Clips on one track cannot overlap in time; the editor refuses a move that would collide and explains why. That constraint is what makes the stacking model predictable. Moving a clip up a track brings it forward in the composition; moving it down sends it backward. Bring to Front and Send to Back move it to the extreme video layer. If the neighbouring track is occupied at that moment, the editor gives the clip its own layer rather than silently dropping other clips.</p>
-      <p>Horizontal position is always timing, never stacking. A clip that starts later does not move in front of an earlier one. This is the same distinction professional timelines make, and it is why the layer controls can describe a single vertical order while the timeline describes time.</p>
+      <h2>Designed for a phone, not shrunk from a desktop</h2>
+      <p>The preview takes the space it needs, the transport sits directly under it, and every editing control is a bottom sheet that fits the screen. The moment strip shows the video as thumbnails with a single overlay lane, not a wall of tracks. Controls are at least 44 CSS pixels where they matter, and vertical page scrolling keeps working even when a swipe starts over the preview.</p>
 
-      <h2>Transitions, filters and colour correction</h2>
-      <p>There are 56 named transitions in six categories: basic blends, slide and push, wipe and reveal, zoom, motion and stylised effects. A transition is attached to the incoming clip and blends its first seconds with the moving tail of the previous clip on the same track. Duration is limited by both clips, the direction can be reversed, and choosing None removes it. Because the blend is drawn by the shared compositor, an exported file contains the same mixed frames.</p>
-      <p>The 18 filters are complete looks: monochrome, sepia, cool, warm, vintage, noir, fade, vivid, cinematic, dream, infrared, x-ray, poster, sketch, comic, blur, vignette and none. Intensity blends each look with the original. Colour correction is separate and additive: brightness, contrast, saturation, temperature, tint, exposure, highlights, shadows, gamma, sharpness, fade and vignette. A filter replaces the previous look; the correction controls refine whatever is underneath.</p>
+      <h2>Layers without a track grid</h2>
+      <p>Each text, image, graphic, video insert or music bed is a layer with a start time and a duration. The Layers panel lists them in stacking order; use the arrow controls to bring a layer forward or send it back. The main video always sits at the back. Overlapping layers are allowed and are composited in order by the same renderer used for export.</p>
 
-      <h2>Text, titles and subtitles that survive export</h2>
-      <p>Every title, caption, lower third and sticker is an independent layer, not a single shared text box. You can change content, font stack, size, weight, italics, underline, colour, outline, shadow, background, opacity, line spacing, letter spacing, alignment, direction, position, scale and rotation. Text is shaped by the browser's own canvas engine with system font stacks for Latin, Arabic and Urdu, Devanagari and CJK. Right-to-left direction can be forced, and the same shaping call runs during export.</p>
-      <p>Subtitles are a separate track of timed cues. Type them manually, adjust the in and out points, or import SRT or WebVTT files. Style the whole track once, preview it over the picture and download the cues again as SRT or VTT. This editor does not claim automatic transcription and does not upload audio anywhere.</p>
+      <h2>Motion, filters and transitions that are real</h2>
+      <p>Filters, colour adjustments, crops, opacity, rotation, position, scale, transitions and keyframes are project data, not CSS decoration. The preview and the export worker both call the same composition code, so a frame you approve on screen is the frame that is encoded. Keyframes support linear, ease-in, ease-out and ease-in-out timing and can be added, moved, retimed or deleted.</p>
 
-      <h2>Audio: music, voiceover and effects</h2>
-      <p>Audio clips live on audio tracks. Trim, split, move, duplicate, replace, mute and fade them like video clips, with a waveform drawn from decoded samples where one is available. Each track has its own volume and mute, and the project has a master volume. On export every audible clip is resampled to a 48 kHz stereo mix, with clip gain and fades applied sample by sample.</p>
-      <p>Speed changes also change pitch because the same samples are resampled. Pitch-preserving time stretching is not part of this browser-only build, and the interface states that rather than pretending otherwise. Preview audio runs through a Web Audio mixer with clip, track and master gain, so the mix can be checked before export.</p>
+      <h2>Audio and export limits, stated plainly</h2>
+      <p>Music, voiceover and the main video's sound are mixed at export with clip volume, fades, track and master levels. Preview monitoring uses Web Audio. Speed changes also change pitch; pitch-preserving stretching is not implemented. Export requires WebCodecs encoding, available in current Chrome and Edge; other browsers can still edit but may not encode. Long or high-resolution exports are limited by device memory, and the editor reports a failure rather than pretending a file was created.</p>
 
-      <h2>Export formats, resolutions and limits</h2>
-      <p>MP4 output uses H.264 video and AAC audio; WebM uses VP9 video and Opus audio. Verified exports include 480p and 1080p landscape, 720p portrait and a square 854×854 WebM, plus custom dimensions that the device encoder accepts; the frame rate follows the project setting. Each frame is composed at the export size, so text and vector shapes are re-rendered sharply rather than upscaled. Quality presets choose a target video bitrate; audio bitrate follows the preset.</p>
-      <p>The exporter checks that the browser can encode the chosen codec at the chosen size before starting. Progress reports the real frame loop, audio mix and container finalisation, and Cancel stops the worker and leaves no partial download. When the file is finished it is opened again with a media parser, and the displayed duration, size, resolution, codec and bitrate come from that read-back. A duration mismatch aborts the export instead of presenting a broken file.</p>
-
-      <h2>Project files, autosave and media</h2>
-      <p>The project is plain JSON: canvas settings, tracks, clips, effects, keyframes, layers, subtitles and audio levels. It autosaves to this browser after changes and can be downloaded or opened manually. Original media files are stored separately in IndexedDB when the browser's storage quota allows, under a bounded budget, and are never embedded in the project file. If they are missing after a reload, the editor lists them and relinks the clips when you re-import the originals by name.</p>
-
-      <h2>Mobile editing at 320 pixels and up</h2>
-      <p>The workspace reflows into one column on phones: preview first, then the timeline, with Tools and Properties available as bottom sheets and a dock for tools, properties, project actions and export. Track headers stay pinned while the timeline scrolls horizontally, trim handles grow for touch, and clip dragging uses pointer events rather than desktop-only drag and drop. Every control keeps a visible label or an accessible name, and the layout is tested at 320, 360, 375, 390 and 430 pixel widths.</p>
-
-      <h2>Privacy, performance and file limits</h2>
-      <p>Files are read with local file APIs, decoded by the browser's own media engine through Mediabunny, composed on canvas and encoded with WebCodecs. No media, project or frame is uploaded. Object URLs are released when media is removed or the page closes. The heaviest work is kept off the main thread during export, thumbnails are generated as small JPEGs, and decoded frames are cached in resolution buckets so scrubbing does not re-decode every time.</p>
-      <p>Large projects are limited by device memory and browser storage, not by a server quota. A practical ceiling is a few minutes of 1080p source at a time; 4K sources and long timelines need more memory and export time. Autosaved media is capped so the editor can report when the browser refuses to store another file instead of silently failing.</p>
-
-      <h2>Troubleshooting</h2>
-      <ul class="vc-list">
-        <li><strong>A file is rejected.</strong> The browser could not decode its codec, or it is larger than the 2 GB per-file guard. Re-encode it with the Video Converter, or use a browser with that decoder.</li>
-        <li><strong>Export is unavailable.</strong> The browser does not expose WebCodecs VideoEncoder. Editing still works; use a current Chrome or Edge release to export.</li>
-        <li><strong>Clips look black after opening a project.</strong> The original media is not loaded. Import the same files again; the relink banner lists what is missing.</li>
-        <li><strong>A clip will not move.</strong> Another clip occupies that span, the track is locked, or the clip itself is locked. Unlock it or make room; nothing is moved silently.</li>
-        <li><strong>The preview stutters.</strong> Lower the preview quality. Preview decodes near the playhead on the main thread, while export is deliberately slower and more precise.</li>
-        <li><strong>Arabic or Hindi text shows boxes.</strong> The chosen font stack is not installed on this device. Try the dedicated Arabic, Devanagari or CJK stack, or install a font that covers the script.</li>
-      </ul>
+      <h2>Privacy and storage</h2>
+      <p>No media is uploaded. The project and its imported files are stored locally in IndexedDB so a reload can restore your work; if the browser refuses or evicts storage, the editor tells you and keeps the project JSON available for download. Object URLs are released when media is removed or the page closes.</p>
 
       <h2>Frequently asked questions</h2>
       <details class="vc-faq" open>
-        <summary>Does the editor upload anything?</summary>
-        <p>No. Import, decode, preview, composition and export all happen in this browser tab. The page loads only its own stylesheets, the self-hosted Mediabunny engine and the local export worker.</p>
+        <summary>Is there a watermark or an account?</summary>
+        <p>No. There is no account, no upload and no watermark. Export runs entirely on your device.</p>
       </details>
       <details class="vc-faq">
-        <summary>Can I use 4K source files?</summary>
-        <p>Yes, if the device can decode them. Preview uses smaller decode buckets, while export requests frames near the output size. Large 4K projects consume more memory and take longer to encode.</p>
+        <summary>Can I add more than one video?</summary>
+        <p>Yes. The first video becomes the main video. Additional videos become picture-in-picture layers that you can move, resize, rotate and place at any moment.</p>
       </details>
       <details class="vc-faq">
-        <summary>Are transitions and filters baked into the file?</summary>
-        <p>Yes. The export worker calls the same composition function as the preview, so every visible transition, filter, colour adjustment, crop, text style and keyframe is drawn into the encoded frames.</p>
+        <summary>Why does my phone not offer MP4 export?</summary>
+        <p>MP4 export needs H.264 encoding through WebCodecs. If the browser does not expose it, the export sheet offers WebM when available and otherwise explains that this browser cannot encode. Editing and saving still work.</p>
       </details>
       <details class="vc-faq">
-        <summary>Can I keep working after a reload?</summary>
-        <p>The timeline autosaves locally and offers to restore. Original media files are also kept in browser storage when quota allows; if they were evicted, re-import them by name and the clips relink. Download a project file for a portable copy of the edit.</p>
-      </details>
-      <details class="vc-faq">
-        <summary>Does speed editing preserve pitch?</summary>
-        <p>No. Audio is resampled with the video, so pitch changes with speed. Pitch-preserving time stretching is not implemented here, and the speed control says so.</p>
-      </details>
-      <details class="vc-faq">
-        <summary>Can I edit with a keyboard only?</summary>
-        <p>Yes for the main operations. Clips are focusable, arrow keys nudge timing in 0.1 second steps, Shift moves one second, and trim handles accept arrow keys. Split, delete, duplicate, undo, redo, play, pause and seeking all have keyboard routes.</p>
+        <summary>Will my project still be here tomorrow?</summary>
+        <p>It is stored in this browser's IndexedDB. Clearing site data, using private browsing or a full storage quota can remove it. Download the project file for a portable copy.</p>
       </details>
     </article>
 
@@ -483,34 +319,34 @@
       <div class="article-card">
         <h2>At a glance</h2>
         <dl class="vc-facts">
-          <div><dt>Transitions</dt><dd>56 in 6 categories</dd></div>
-          <div><dt>Filters</dt><dd>18 plus 12 colour controls</dd></div>
+          <div><dt>Workflow</dt><dd>Video first, moment based</dd></div>
+          <div><dt>Layers</dt><dd>Video, image, text, graphic, audio</dd></div>
+          <div><dt>Text</dt><dd>Move, resize and rotate directly</dd></div>
+          <div><dt>Effects</dt><dd>18 filters, colour, transitions</dd></div>
+          <div><dt>Motion</dt><dd>Presets and editable keyframes</dd></div>
           <div><dt>Export</dt><dd>MP4 H.264 / WebM VP9</dd></div>
-          <div><dt>Resolutions</dt><dd>480p, 720p, 1080p and custom</dd></div>
-          <div><dt>Preview audio</dt><dd>Web Audio mix with gain and fades</dd></div>
-          <div><dt>Audio</dt><dd>48 kHz stereo mix</dd></div>
-          <div><dt>Privacy</dt><dd>Local, no upload</dd></div>
-          <div><dt>Mobile</dt><dd>From 320 px wide</dd></div>
+          <div><dt>Storage</dt><dd>Local IndexedDB autosave</dd></div>
+          <div><dt>Mobile</dt><dd>Designed from 320 px</dd></div>
         </dl>
       </div>
       <div class="article-card">
         <h2>Related</h2>
         <ul class="vc-related">
-          <li><a href="../video-converter/">Video Converter</a><span>Re-encode a source the browser cannot decode.</span></li>
-          <li><a href="../video-trimmer/">Video Trimmer</a><span>Make a quick cut without a full project.</span></li>
-          <li><a href="../video-merger/">Video Merger</a><span>Join finished clips in order.</span></li>
-          <li><a href="../video-compressor/">Video Compressor</a><span>Reduce a file before importing it here.</span></li>
-          <li><a href="../../categories/video-editing/">Video Editing tools</a><span>Browse the full category.</span></li>
+          <li><a href="../video-trimmer/">Video Trimmer</a><span>Make one quick cut.</span></li>
+          <li><a href="../video-merger/">Video Merger</a><span>Join finished clips.</span></li>
+          <li><a href="../video-converter/">Video Converter</a><span>Re-encode a stubborn source.</span></li>
+          <li><a href="../video-compressor/">Video Compressor</a><span>Shrink a file before importing.</span></li>
+          <li><a href="../../categories/video-editing/">Video Editing tools</a><span>Browse the category.</span></li>
         </ul>
       </div>
       <div class="article-card">
-        <h2>Formats and limits</h2>
+        <h2>Formats</h2>
         <ul class="vc-list vc-list-tight">
           <li>Video in: MP4, M4V, MOV, WebM, MKV</li>
-          <li>Images in: JPG, PNG, WebP, GIF (first frame)</li>
+          <li>Images in: JPG, PNG, WebP, GIF, AVIF, BMP</li>
           <li>Audio in: MP3, WAV, M4A, AAC, OGG</li>
           <li>Video out: MP4 (H.264 + AAC), WebM (VP9 + Opus)</li>
-          <li>Per-file import guard: 2 GB</li>
+          <li>Per-file guard: 2 GB</li>
           <li>Export needs WebCodecs</li>
         </ul>
       </div>
@@ -591,6 +427,6 @@
   </div>
 </footer>
 
-<script type="module" src="../../js/video-editor/next/app.js"></script>
+<script type="module" src="../../js/video-editor/studio/app.js"></script>
 </body>
 </html>

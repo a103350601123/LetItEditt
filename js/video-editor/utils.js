@@ -35,13 +35,17 @@ export function ease(name, t) {
 
 export function formatClock(seconds, withFrames = false, fps = 30) {
   const safe = Number.isFinite(seconds) && seconds > 0 ? seconds : 0;
-  const minutes = Math.floor(safe / 60);
-  const secs = Math.floor(safe % 60);
-  const tenths = Math.floor((safe % 1) * 10);
   if (withFrames) {
+    const minutes = Math.floor(safe / 60);
+    const secs = Math.floor(safe % 60);
     const frames = Math.floor((safe % 1) * fps);
     return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}:${String(frames).padStart(2, '0')}`;
   }
+  /* Round to the nearest tenth so a seek to 2.40 s reads 2.4, not 2.3. */
+  const totalTenths = Math.round(safe * 10);
+  const minutes = Math.floor(totalTenths / 600);
+  const secs = Math.floor((totalTenths % 600) / 10);
+  const tenths = totalTenths % 10;
   return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${tenths}`;
 }
 

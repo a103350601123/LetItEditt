@@ -1,21 +1,23 @@
 'use strict';
 
-/* End-to-end suite for the rebuilt LetitEdit video editor (V3).
+/* Acceptance suite for the touch-first video editor.
  *
- * The tests drive the real workspace in Chromium: import legal fixtures,
- * edit the timeline, exercise the inspector, restore an autosave, relink
- * missing media, verify mobile layouts at every required width and read
- * exported files back through a <video> element.
+ * Every test drives the real page in Chromium. The suite covers the complete
+ * flow (upload, moment, action, save, export), direct manipulation, layers,
+ * keyframes, audio, persistence, portability and the required mobile widths.
  */
 
 const fs = require('fs');
-const os = require('os');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
 const { fixturePath, ensureFixtures } = require('../support/fixtures');
 
 const PAGE = '/media-and-motion/video-editor/';
 const MOBILE_WIDTHS = [320, 360, 375, 390, 430];
+const PNG_PIXEL = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+  'base64'
+);
 
 test.beforeAll(async ({ browser, baseURL }) => {
   test.setTimeout(300000);
@@ -33,859 +35,731 @@ function collectErrors(page) {
 
 async function openEditor(page) {
   const errors = collectErrors(page);
-  await page.goto(PAGE, { waitUntil: 'networkidle' });
-  await page.waitForFunction(() => window.__videoEditorReady === true, null, { timeout: 30000 });
-  await expect(page.locator('#ve-preview-canvas')).toBeVisible();
+  await page.goto(PAGE);
+  await page.waitForFunction(() => Boolean(window.__VE__), null, { timeout: 30000 });
+  await expect(page.locator('#se-canvas')).toBeVisible();
   return errors;
 }
 
-async function importFiles(page, names) {
-  const before = await page.evaluate(() => window.__videoEditor.media.list().length);
-  await page.setInputFiles('#ve-media-input', names.map(fixturePath));
-  await page.waitForFunction(
-    (expected) => window.__videoEditor.media.list().length >= expected,
-    before + names.length,
-    { timeout: 60000 }
+async function uploadVideo(page, name = 'trim-4s.mp4') {
+  await page.setInputFiles('#se-file-input', fixturePath(name));
+  await page.waitForFunction(() => window.__VE__.state().baseClips.length > 0, null, { timeout: 60000 });
+}
+
+async function state(page) {
+  return page.evaluate(() => window.__VE__.state());
+}
+
+async function clipById(page, id) {
+  return page.evaluate((clipId) => {
+    const found = window.__VE__.store.trackForClip(clipId);
+    return found ? JSON.parse(JSON.stringify(found.clip)) : null;
+  }, id);
+}
+
+async function addTextThroughUI(page, text) {
+  await page.click('[data-tool="text"]');
+  await expect(page.locator('.se-sheet')).toBeVisible();
+  await page.locator('.se-sheet .se-grid-2 button').first().click();
+  const area = page.locator('.se-sheet .se-textarea');
+  await area.waitFor();
+  await area.fill(text);
+  await area.blur();
+  await page.locator('.se-sheet-foot .se-btn-primary').click();
+  await expect(page.locator('.se-sheet')).toHaveCount(0);
+  const current = await state(page);
+  return current.selection;
+}
+
+async function setRange(page, label, value) {
+  await page.evaluate(
+    ({ ariaLabel, next }) => {
+      const input = [...document.querySelectorAll(`input[type="range"][aria-label="${ariaLabel}"]`)].pop();
+      if (!input) throw new Error(`No range named ${ariaLabel}`);
+      input.value = String(next);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    },
+    { ariaLabel: label, next: value }
   );
+  await page.waitForTimeout(150);
 }
 
-async function projectState(page) {
-  return page.evaluate(() => {
-    const ed = window.__videoEditor;
-    return {
-      name: ed.project.name,
-      aspect: ed.project.aspect,
-      resolution: ed.project.resolution,
-      fps: ed.project.fps,
-      guides: ed.project.guides,
-      subtitles: ed.project.subtitles.items.length,
-      tracks: ed.project.tracks.map((track) => ({
-        id: track.id,
-        kind: track.kind,
-        category: track.category,
-        clips: track.clips.map((clip) => ({
-          id: clip.id,
-          kind: clip.kind,
-          name: clip.name,
-          start: clip.start,
-          duration: clip.duration,
-          mediaId: clip.mediaId || null,
-          volume: clip.volume,
-          muted: clip.muted,
-          transition: clip.transition?.type || 'none',
-          keyframes: Object.fromEntries(
-            Object.entries(clip.keyframes || {}).map(([key, list]) => [key, (list || []).length])
-          )
-        }))
-      })),
-      selection: [...ed.store.selection],
-      playhead: ed.store.playhead
-    };
-  });
-}
-
-async function previewStats(page) {
-  return page.evaluate(() => {
-    const canvas = document.querySelector('#ve-preview-canvas');
-    const ctx = canvas.getContext('2d');
-    const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    let lit = 0;
-    let sum = 0;
-    let hash = 2166136261;
-    for (let i = 0; i < data.length; i += 4 * 31) {
-      const value = data[i] + data[i + 1] + data[i + 2];
-      if (value > 24) lit += 1;
-      sum += value;
-      hash = Math.imul(hash ^ value, 16777619) >>> 0;
-    }
-    return { lit, sum, hash, width: canvas.width, height: canvas.height };
-  });
-}
-
-async function addVideo(page, name = 'trim-4s.mp4') {
-  await importFiles(page, [name]);
-  return page.evaluate((filename) => {
-    const ed = window.__videoEditor;
-    const asset = ed.media.list().find((item) => item.name === filename);
-    const inserted = ed.addAssetToTimeline(asset.id, { start: 0 });
-    ed.seek(Math.min(0.6, inserted.clip.duration / 2));
-    return { clipId: inserted.clip.id, assetId: asset.id, duration: inserted.clip.duration };
-  }, name);
-}
-
-async function openInspectorSection(page, title) {
-  const handle = await page.evaluateHandle((name) => {
-    const sections = [...document.querySelectorAll('#ve-inspector-panel details')];
-    return sections.find((section) => section.querySelector('summary')?.textContent.trim().startsWith(name)) || null;
-  }, title);
-  const element = handle.asElement();
-  if (!element) return false;
-  await element.evaluate((section) => {
-    section.open = true;
-    section.scrollIntoView({ block: 'center' });
-  });
-  return true;
-}
-
-async function scrollInspectorTo(page, selector) {
-  await page.locator(selector).evaluate((element) => element.scrollIntoView({ block: 'center' }));
-}
-
-/* ------------------------------------------------------------------------- */
-
-test('workspace, nine categories and accessibility baseline', async ({ page }) => {
-  const errors = await openEditor(page);
-
-  await expect(page).toHaveTitle(/Professional Video Editor/);
-  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /multi-track timeline/i);
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
-    'href',
-    'https://letitedit.com/media-and-motion/video-editor/'
-  );
-  await expect(page.locator('h1')).toHaveCount(1);
-  await expect(page.locator('h1')).toHaveText('Professional Video Editor');
-  expect(await page.locator('h2').count()).toBeGreaterThanOrEqual(6);
-  await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toBeVisible();
-
-  const structured = await page.evaluate(() =>
-    [...document.querySelectorAll('script[type="application/ld+json"]')]
-      .flatMap((script) => {
-        const data = JSON.parse(script.textContent);
-        return data['@graph'] || [data];
-      })
-      .map((item) => item['@type'])
-  );
-  expect(structured).toEqual(expect.arrayContaining(['BreadcrumbList', 'SoftwareApplication', 'FAQPage']));
-
-  const initial = await projectState(page);
-  expect(initial.aspect).toBe('16:9');
-  expect(initial.guides).toEqual({ center: false, safe: false });
-  expect(initial.tracks.map((track) => track.category)).toEqual(['text', 'video', 'audio']);
-  expect(initial.tracks.every((track) => track.clips.length === 0)).toBe(true);
-  expect(initial.subtitles).toBe(0);
-  await expect(page.locator('#ve-preview-empty')).toBeVisible();
-
-  const categories = ['media', 'canvas', 'text', 'audio', 'videos', 'images', 'elements', 'subtitles', 'record'];
-  const railIds = await page.locator('#ve-rail [data-category]').evaluateAll((nodes) =>
-    nodes.map((node) => node.dataset.category)
-  );
-  expect(railIds).toEqual(categories);
-
-  for (const category of categories) {
-    await page.click(`#ve-rail [data-category="${category}"]`);
-    await expect(page.locator('#ve-library-panel h2')).not.toHaveText('');
-    const heading = (await page.locator('#ve-library-panel h2').textContent())?.trim();
-    expect(heading?.length || 0).toBeGreaterThan(2);
-  }
-  await page.click('#ve-rail [data-category="media"]');
-
-  await page.locator('#ve-project-name').fill('Launch cut');
-  await page.locator('#ve-project-name').press('Enter');
-  await expect.poll(async () => (await projectState(page)).name).toBe('Launch cut');
-
-  const unlabelled = await page.evaluate(() => {
-    const missing = [];
-    const text = (element) => (element.textContent || '').trim();
-    for (const element of document.querySelectorAll('#ve-app input, #ve-app select, #ve-app textarea')) {
-      const aria = element.getAttribute('aria-label');
-      const labelledBy = element.getAttribute('aria-labelledby');
-      const wrapping = element.closest('label');
-      const labelText = wrapping ? text(wrapping) : '';
-      const title = element.getAttribute('title') || '';
-      if (!aria && !labelledBy && !labelText && !title) {
-        missing.push(`${element.tagName.toLowerCase()}#${element.id || ''}[${element.type}]`);
-      }
-    }
-    for (const button of document.querySelectorAll('#ve-app button')) {
-      if (!text(button) && !button.getAttribute('aria-label') && !button.getAttribute('title')) {
-        missing.push(`button.${button.className}`);
-      }
-    }
-    return missing;
-  });
-  expect(unlabelled).toEqual([]);
-
-  const reducedMotion = await page.evaluate(() => {
-    const rules = [...document.styleSheets].flatMap((sheet) => {
-      try {
-        return [...sheet.cssRules];
-      } catch {
-        return [];
-      }
-    });
-    return rules.some((rule) => rule.conditionText && rule.conditionText.includes('prefers-reduced-motion'));
-  });
-  expect(reducedMotion).toBe(true);
-  expect(errors).toEqual([]);
-});
-
-test('media library imports, filters, renames and removes files', async ({ page }) => {
-  const errors = await openEditor(page);
-  await importFiles(page, ['trim-4s.mp4', 'sample.png', 'trim-audio-only.m4a']);
-
-  const assets = await page.evaluate(() =>
-    window.__videoEditor.media.list().map((asset) => ({
-      id: asset.id,
-      name: asset.name,
-      type: asset.type,
-      duration: asset.duration,
-      width: asset.width,
-      height: asset.height,
-      size: asset.size,
-      thumbnail: Boolean(asset.thumbnail)
-    }))
-  );
-  expect(assets).toHaveLength(3);
-  const video = assets.find((asset) => asset.name === 'trim-4s.mp4');
-  const image = assets.find((asset) => asset.name === 'sample.png');
-  const audio = assets.find((asset) => asset.name === 'trim-audio-only.m4a');
-  expect(video.type).toBe('video');
-  expect(video.width).toBe(640);
-  expect(video.height).toBe(360);
-  expect(video.duration).toBeGreaterThan(3.5);
-  expect(video.thumbnail).toBe(true);
-  expect(image.type).toBe('image');
-  expect(image.width).toBe(320);
-  expect(image.height).toBe(200);
-  expect(audio.type).toBe('audio');
-  expect(audio.duration).toBeGreaterThan(0.5);
-
-  await expect(page.locator('.ve-asset-card')).toHaveCount(3);
-  await expect(page.locator('.ve-asset-card', { hasText: 'trim-4s.mp4' })).toContainText('Video');
-
-  await page.locator('[data-media-search]').fill('trim');
-  await expect(page.locator('.ve-asset-card')).toHaveCount(2);
-  await page.locator('[data-media-search]').fill('audio-only');
-  await expect(page.locator('.ve-asset-card')).toHaveCount(1);
-  await page.locator('[data-media-search]').fill('');
-
-  await page.click('[data-media-filter="image"]');
-  await expect(page.locator('.ve-asset-card')).toHaveCount(1);
-  await page.click('[data-media-filter="all"]');
-
-  await page.locator(`.ve-asset-card[data-asset-id="${video.id}"] [data-panel-action="add-asset"]`).click();
-  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).length).toBe(1);
-  await expect(page.locator(`.ve-asset-card[data-asset-id="${video.id}"]`)).toContainText('1 in timeline');
-
-  await page.click('[data-media-usage="used"]');
-  await expect(page.locator('.ve-asset-card')).toHaveCount(1);
-  await page.click('[data-media-usage="unused"]');
-  await expect(page.locator('.ve-asset-card')).toHaveCount(2);
-  await page.click('[data-media-usage="all"]');
-
-  page.once('dialog', (dialog) => dialog.accept('hero-shot.mp4'));
-  await page.click(`.ve-asset-card[data-asset-id="${video.id}"] [data-panel-action="asset-menu"]`);
-  await page.locator('.ve-popover [role="menuitem"]', { hasText: 'Rename' }).click();
-  await expect(page.locator(`.ve-asset-card[data-asset-id="${video.id}"]`)).toContainText('hero-shot.mp4');
-  const renamedClip = await page.evaluate((id) => {
-    const clip = window.__videoEditor.project.tracks.flatMap((track) => track.clips).find((item) => item.mediaId === id);
-    return clip?.name;
-  }, video.id);
-  expect(renamedClip).toBe('hero-shot.mp4');
-
-  await page.click(`.ve-asset-card[data-asset-id="${image.id}"] [data-panel-action="asset-menu"]`);
-  await page.locator('.ve-popover [role="menuitem"]', { hasText: 'Remove from media' }).click();
-  await expect(page.locator('#ve-confirm-dialog')).toBeVisible();
-  await page.click('#ve-confirm-dialog [data-confirm-ok]');
-  await expect(page.locator('.ve-asset-card')).toHaveCount(2);
-  expect(errors).toEqual([]);
-});
-
-test('preview renders, plays, pauses and steps frames', async ({ page }) => {
-  const errors = await openEditor(page);
-  const { clipId } = await addVideo(page);
-  await page.waitForTimeout(500);
-
-  const stats = await previewStats(page);
-  expect(stats.width / stats.height).toBeCloseTo(16 / 9, 1);
-  expect(stats.width).toBeGreaterThanOrEqual(640);
-  expect(stats.lit).toBeGreaterThan(50);
-
-  await page.click('#ve-play');
-  await expect(page.locator('#ve-play')).toHaveAttribute('aria-pressed', 'true');
-  await page.waitForTimeout(700);
-  const playing = (await projectState(page)).playhead;
-  expect(playing).toBeGreaterThan(0.3);
-  await page.click('#ve-play');
-  await expect(page.locator('#ve-play')).toHaveAttribute('aria-pressed', 'false');
-  const paused = (await projectState(page)).playhead;
-  await page.waitForTimeout(300);
-  expect(Math.abs((await projectState(page)).playhead - paused)).toBeLessThan(0.02);
-
-  const before = (await projectState(page)).playhead;
-  await page.click('#ve-next-frame');
-  const next = (await projectState(page)).playhead;
-  expect(next - before).toBeCloseTo(1 / 30, 1);
-  await page.click('#ve-prev-frame');
-  expect((await projectState(page)).playhead).toBeCloseTo(before, 1);
-
-  await page.locator('#ve-scrub').evaluate((element) => {
-    element.value = '2';
-    element.dispatchEvent(new Event('input', { bubbles: true }));
-    element.dispatchEvent(new Event('change', { bubbles: true }));
-  });
-  await expect.poll(async () => (await projectState(page)).playhead).toBeGreaterThan(1.9);
-
-  const selected = (await projectState(page)).selection;
-  expect(selected).toContain(clipId);
-  expect(errors).toEqual([]);
-});
-
-test('timeline drag, trim, split and undo/redo', async ({ page }) => {
-  const errors = await openEditor(page);
-  await addVideo(page);
-  await page.waitForTimeout(300);
-
-  const clip = page.locator('.tl-clip[data-clip-id]').first();
-  await clip.scrollIntoViewIfNeeded();
-  const box = await clip.boundingBox();
-  expect(box && box.width).toBeGreaterThan(20);
-
-  const pps = await page.evaluate(() => window.__videoEditor.store.timelineZoom);
-  await page.mouse.move(box.x + 25, box.y + box.height / 2);
+async function dragFrom(page, box, dx, dy) {
+  const x = box.x + box.width / 2;
+  const y = box.y + box.height / 2;
+  await page.mouse.move(x, y);
   await page.mouse.down();
-  for (let step = 1; step <= 6; step += 1) {
-    await page.mouse.move(box.x + 25 + step * 9, box.y + box.height / 2);
-    await page.waitForTimeout(20);
-  }
+  await page.mouse.move(x + dx, y + dy, { steps: 10 });
   await page.mouse.up();
-  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips)[0]?.start || 0).toBeGreaterThan(0.5);
-  const movedStart = (await projectState(page)).tracks.flatMap((track) => track.clips)[0].start;
-  expect(movedStart).toBeCloseTo(54 / pps, 1);
+  await page.waitForTimeout(250);
+}
 
-  await page.keyboard.press('Control+z');
-  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips)[0].start).toBe(0);
-  await page.keyboard.press('Control+Shift+z');
-  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips)[0].start).toBeCloseTo(movedStart, 2);
-
-  const clip2 = page.locator('.tl-clip[data-clip-id]').first();
-  await clip2.scrollIntoViewIfNeeded();
-  const box2 = await clip2.boundingBox();
-  const beforeTrim = (await projectState(page)).tracks.flatMap((track) => track.clips)[0].duration;
-  await page.mouse.move(box2.x + box2.width - 3, box2.y + box2.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(box2.x + box2.width - 60, box2.y + box2.height / 2, { steps: 5 });
-  await page.mouse.up();
-  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips)[0].duration).toBeLessThan(beforeTrim - 0.2);
-
-  await page.evaluate(() => window.__videoEditor.seek(1.5));
-  await page.keyboard.press('s');
-  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).length).toBe(2);
-  await page.keyboard.press('Control+z');
-  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).length).toBe(1);
-  expect(errors).toEqual([]);
-});
-
-test('inspector applies transitions and keyframes and canvas drag moves a layer', async ({ page }) => {
-  const errors = await openEditor(page);
-  const { clipId } = await addVideo(page);
-  await page.waitForTimeout(300);
-
-  await expect(page.locator('#ve-inspector-panel .ve-kind-chip')).toHaveText('video');
-  const hasEffects = await openInspectorSection(page, 'Effects');
-  expect(hasEffects).toBe(true);
-
-  const transition = page.locator('#ve-inspector-panel select[data-prop="transition.type"]');
-  await scrollInspectorTo(page, '#ve-inspector-panel select[data-prop="transition.type"]');
-  const optionCount = await transition.evaluate((element) =>
-    [...element.options].filter((option) => option.value && option.value !== 'none').length
-  );
-  expect(optionCount).toBeGreaterThanOrEqual(20);
-  await transition.selectOption('cross-dissolve');
-  await expect.poll(async () => {
-    const clip = await page.evaluate((id) => {
-      const found = window.__videoEditor.project.tracks.flatMap((track) => track.clips).find((item) => item.id === id);
-      return found ? found.transition : null;
-    }, clipId);
-    return clip?.type;
-  }).toBe('cross-dissolve');
-  await openInspectorSection(page, 'Effects');
-  await scrollInspectorTo(page, '#ve-inspector-panel select[data-prop="transition.type"]');
-  await transition.selectOption('none');
-  await expect.poll(async () => {
-    const clip = await page.evaluate((id) => {
-      const found = window.__videoEditor.project.tracks.flatMap((track) => track.clips).find((item) => item.id === id);
-      return found ? found.transition : null;
-    }, clipId);
-    return clip?.type;
-  }).toBe('none');
-
+/* Put the preview below the sticky site header so canvas drags are inside the
+ * viewport, exactly as they would be after the person scrolls to the tool.
+ * The site stylesheet enables smooth scrolling, so this jump must be instant
+ * and the test must wait until the scroll position has settled. */
+async function focusStage(page) {
   await page.evaluate(() => {
-    const clip = window.__videoEditor.project.tracks.flatMap((track) => track.clips)[0];
-    window.__videoEditor.seek(clip.start + 0.5);
-    window.__videoEditor.selectClip(clip.id);
+    window.__seLastScrollY = -1;
+    const stage = document.getElementById('se-stage');
+    const top = stage.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: Math.max(0, top - 180), behavior: 'instant' });
   });
-  await openInspectorSection(page, 'Transform');
-  const keyframe = page.locator('#ve-inspector-panel [data-inspector-action="keyframe"][data-key-prop="x"]');
-  await scrollInspectorTo(page, '#ve-inspector-panel [data-inspector-action="keyframe"][data-key-prop="x"]');
-  await keyframe.click();
-  await expect.poll(async () => {
-    const clip = await page.evaluate((id) => {
-      const found = window.__videoEditor.project.tracks.flatMap((track) => track.clips).find((item) => item.id === id);
-      return found?.keyframes?.x?.length || 0;
-    }, clipId);
-    return clip;
-  }).toBe(1);
+  await page.waitForFunction(() => {
+    const current = window.scrollY;
+    if (window.__seLastScrollY === current) return true;
+    window.__seLastScrollY = current;
+    return false;
+  }, null, { timeout: 5000 });
+}
 
-  const before = await page.evaluate((id) => {
-    const clip = window.__videoEditor.project.tracks.flatMap((track) => track.clips).find((item) => item.id === id);
-    return { x: clip.x, y: clip.y };
-  }, clipId);
-  const selection = page.locator('#ve-canvas-overlay .ve-selection-box');
-  await expect(selection).toHaveCount(1);
-  const selectionBox = await selection.boundingBox();
-  expect(selectionBox).not.toBeNull();
-  await page.mouse.move(selectionBox.x + selectionBox.width / 2, selectionBox.y + selectionBox.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(selectionBox.x + selectionBox.width / 2 + 40, selectionBox.y + selectionBox.height / 2 + 20, { steps: 6 });
-  await page.mouse.up();
-  const after = await page.evaluate((id) => {
-    const clip = window.__videoEditor.project.tracks.flatMap((track) => track.clips).find((item) => item.id === id);
-    return { x: clip.x, y: clip.y };
-  }, clipId);
-  expect(Math.abs(after.x - before.x) > 0.01 || Math.abs(after.y - before.y) > 0.01).toBe(true);
+test('first upload becomes the main video and defines the project', async ({ page }) => {
+  const errors = await openEditor(page);
+  const empty = await state(page);
+  expect(empty.baseClips).toHaveLength(0);
+  await expect(page.locator('#se-upload-base')).toBeVisible();
+
+  await uploadVideo(page);
+  const loaded = await state(page);
+  expect(loaded.baseClips).toHaveLength(1);
+  expect(loaded.duration).toBeGreaterThan(3.5);
+  expect(loaded.duration).toBeLessThan(4.5);
+  expect(loaded.name).toBe('trim-4s');
+  expect(loaded.layerCount).toBe(1);
+  expect(loaded.tracks.filter((track) => track.kind === 'video')).toHaveLength(1);
+  expect(loaded.baseClips[0].mediaId).toBeTruthy();
+
+  await expect(page.locator('.se-layer-row')).toHaveCount(1);
+  await expect(page.locator('.se-layer-name')).toContainText('Main video');
+  await expect(page.locator('#se-duration')).toContainText('00:04');
+  await expect(page.locator('#se-export')).toBeEnabled();
+  await expect(page.locator('#se-upload-base')).toBeHidden();
   expect(errors).toEqual([]);
 });
 
-test('text layers and subtitle cues import and export', async ({ page }) => {
+test('playback, seeking and the time readout stay in sync', async ({ page }) => {
   const errors = await openEditor(page);
-  await page.click('#ve-rail [data-category="text"]');
-  await page.click('[data-panel-action="add-text"][data-text-preset="title"]');
-  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).filter((clip) => clip.kind === 'text').length).toBe(1);
+  await uploadVideo(page);
 
-  await openInspectorSection(page, 'Timing');
-  await scrollInspectorTo(page, '#ve-inspector-panel [data-inspector-action="duplicate-clip"]');
-  await page.click('#ve-inspector-panel [data-inspector-action="duplicate-clip"]');
-  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).filter((clip) => clip.kind === 'text').length).toBe(2);
-  await openInspectorSection(page, 'Timing');
-  await scrollInspectorTo(page, '#ve-inspector-panel [data-inspector-action="delete-clip"]');
-  await page.click('#ve-inspector-panel [data-inspector-action="delete-clip"]');
-  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).filter((clip) => clip.kind === 'text').length).toBe(1);
+  await page.click('#se-play');
+  await page.waitForTimeout(900);
+  let current = await state(page);
+  expect(current.playing).toBe(true);
+  expect(current.playhead).toBeGreaterThan(0.3);
+  await expect(page.locator('#se-time')).not.toHaveText('00:00.0');
 
-  await page.click('#ve-rail [data-category="subtitles"]');
-  await page.click('[data-panel-action="add-subtitle"]');
-  await expect.poll(async () => (await projectState(page)).subtitles).toBe(1);
-  const cue = page.locator('#ve-inspector-panel textarea[data-subtitle-prop="text"]');
-  await cue.fill('Hello from a cue');
-  await cue.blur();
-  await expect.poll(async () => page.evaluate(() => window.__videoEditor.project.subtitles.items[0].text)).toBe('Hello from a cue');
+  await page.click('#se-play');
+  current = await state(page);
+  expect(current.playing).toBe(false);
+  const pausedAt = current.playhead;
 
-  await page.click('[data-panel-action="duplicate-subtitle"]');
-  await expect.poll(async () => (await projectState(page)).subtitles).toBe(2);
-  await page.locator('[data-panel-action="delete-subtitle"]').first().click();
-  await expect.poll(async () => (await projectState(page)).subtitles).toBe(1);
+  await page.evaluate(() => window.__VE__.seek(2.4));
+  await page.waitForTimeout(300);
+  current = await state(page);
+  expect(current.playhead).toBeCloseTo(2.4, 1);
+  await expect(page.locator('#se-time')).toContainText('00:02.4');
+  await expect(page.locator('#se-seek')).toHaveValue(/2\.4/);
 
-  const srtDownload = page.waitForEvent('download');
-  await page.click('[data-panel-action="export-srt"]');
-  const srt = await srtDownload;
-  const srtText = fs.readFileSync(await srt.path(), 'utf8');
-  expect(srtText).toMatch(/^1\r?\n00:00:\d{2},\d{3} --> /);
-  expect(srtText).toContain('Hello from a cue');
+  await page.evaluate(() => window.__VE__.seek(999));
+  current = await state(page);
+  expect(current.playhead).toBeCloseTo(current.duration, 1);
+  expect(pausedAt).toBeLessThan(current.duration);
+  expect(errors).toEqual([]);
+});
 
-  const vttDownload = page.waitForEvent('download');
-  await page.click('[data-panel-action="export-vtt"]');
-  const vtt = await vttDownload;
-  const vttText = fs.readFileSync(await vtt.path(), 'utf8');
-  expect(vttText.startsWith('WEBVTT')).toBe(true);
-  expect(vttText).toContain('Hello from a cue');
+test('text can be moved, resized and rotated directly, including keyframes', async ({ page }) => {
+  const errors = await openEditor(page);
+  await uploadVideo(page);
+  const textId = await addTextThroughUI(page, 'Direct manipulation');
+  expect(textId).toBeTruthy();
 
-  const importFile = path.join(os.tmpdir(), `letitedit-cues-${Date.now()}.srt`);
-  fs.writeFileSync(
-    importFile,
-    '1\n00:00:01,000 --> 00:00:02,500\nFirst imported cue\n\n2\n00:00:03,000 --> 00:00:04,000\nSecond imported cue\n'
+  await page.evaluate(() => window.__VE__.seek(1));
+  await focusStage(page);
+  const box = await page.locator('.se-selection-box').boundingBox();
+  expect(box).toBeTruthy();
+  const before = await clipById(page, textId);
+
+  await dragFrom(page, box, 56, 18);
+  let after = await clipById(page, textId);
+  expect(after.x).toBeGreaterThan(before.x + 0.01);
+  expect(after.y).toBeGreaterThan(before.y + 0.005);
+  expect((await state(page)).selection).toBe(textId);
+
+  const handle = await page.locator('.se-handle-se').boundingBox();
+  await dragFrom(page, handle, 34, 26);
+  after = await clipById(page, textId);
+  expect(after.scale).toBeGreaterThan(before.scale + 0.02);
+
+  const rotate = await page.locator('.se-handle-rotate').boundingBox();
+  await dragFrom(page, rotate, 60, 70);
+  after = await clipById(page, textId);
+  expect(Math.abs(after.rotation)).toBeGreaterThan(2);
+
+  await page.evaluate((id) => {
+    const found = window.__VE__.store.trackForClip(id);
+    found.clip.keyframes.x = [
+      { t: 0, v: found.clip.x, ease: 'linear' },
+      { t: found.clip.duration, v: found.clip.x, ease: 'linear' }
+    ];
+    window.__VE__.store.emit('live-drag');
+  }, textId);
+  await page.evaluate(() => window.__VE__.seek(0.6));
+  await page.waitForTimeout(350);
+  const animatedBox = await page.locator('.se-selection-box').boundingBox();  const baseX = (await clipById(page, textId)).x;
+  await dragFrom(page, animatedBox, 42, 0);
+  const animated = await clipById(page, textId);
+  expect(animated.keyframes.x.length).toBe(3);
+  expect(animated.keyframes.x.some((entry) => Math.abs(entry.t - 0.6) < 0.08)).toBe(true);
+  expect(animated.x).toBeCloseTo(baseX, 4);
+
+  expect(errors).toEqual([]);
+});
+
+test('layers stack, reorder, hide, duplicate, delete and undo', async ({ page }) => {
+  const errors = await openEditor(page);
+  await uploadVideo(page);
+  await addTextThroughUI(page, 'Layer one');
+
+  await page.setInputFiles('#se-file-input', {
+    name: 'pixel.png',
+    mimeType: 'image/png',
+    buffer: PNG_PIXEL
+  });
+  await page.waitForFunction(() => window.__VE__.state().layerCount >= 3, null, { timeout: 30000 });
+  await page.setInputFiles('#se-file-input', fixturePath('trim-audio-only.m4a'));
+  await page.waitForFunction(
+    () => window.__VE__.state().tracks.some((track) => track.kind === 'audio' && track.clips.length > 0),
+    null,
+    { timeout: 30000 }
   );
-  await page.setInputFiles('#ve-subtitle-input', importFile);
-  await expect.poll(async () => (await projectState(page)).subtitles).toBe(3);
-  fs.unlinkSync(importFile);
-  expect(errors).toEqual([]);
-});
 
-test('canvas presets, guides, background and elements', async ({ page }) => {
-  const errors = await openEditor(page);
-  await page.click('#ve-rail [data-category="canvas"]');
+  let current = await state(page);
+  expect(current.layerCount).toBe(4);
+  expect(current.tracks.filter((track) => track.kind === 'video').length).toBe(3);
+  await expect(page.locator('.se-layer-row')).toHaveCount(4);
 
-  const shapes = {
-    '16:9': 16 / 9,
-    '9:16': 9 / 16,
-    '1:1': 1,
-    '4:3': 4 / 3,
-    '3:4': 3 / 4
-  };
-  for (const [aspect, ratio] of Object.entries(shapes)) {
-    await page.click(`[data-panel-action="aspect"][data-aspect="${aspect}"]`);
-    await expect.poll(async () => (await projectState(page)).aspect).toBe(aspect);
-    const dims = await page.evaluate(() => window.__videoEditor.store.dimensions());
-    expect(Math.abs(dims.width / dims.height - ratio)).toBeLessThan(0.02);
+  const imageId = await page.evaluate(() => {
+    const image = window.__VE__.store.project.tracks
+      .flatMap((track) => track.clips)
+      .find((clip) => clip.kind === 'image');
+    return image.id;
+  });
+  const visualBefore = await page.evaluate(() =>
+    window.__VE__.store.visualTracks().map((track) => track.clips[0]?.kind || 'empty')
+  );
+  expect(visualBefore[visualBefore.length - 1]).toBe('video');
+
+  await page.evaluate((id) => window.__VE__.select(id), imageId);
+  await page.evaluate(() => window.__VE__.open('clip', window.__VE__.store.selectedId));
+  await page.waitForSelector('.se-sheet');
+  await page.getByRole('button', { name: 'Send to back' }).click();
+  await page.locator('.se-sheet-foot .se-btn-primary').click();
+  const visualAfter = await page.evaluate(() =>
+    window.__VE__.store.visualTracks().map((track) => track.clips[0]?.kind || 'empty')
+  );
+  expect(visualAfter[visualAfter.length - 1]).toBe('video');
+  expect(visualAfter[visualAfter.length - 2]).toBe('image');
+
+  const textRow = page.locator('.se-layer-row[data-kind="text"]');
+  if ((await page.locator('#se-layers-toggle').getAttribute('aria-expanded')) !== 'true') {
+    await page.locator('#se-layers-toggle').click();
   }
+  await textRow.locator('.se-layer-btn[aria-label^="Hide"]').click();
+  const hidden = await page.evaluate(() =>
+    window.__VE__.store.project.tracks.flatMap((track) => track.clips).find((clip) => clip.kind === 'text').hidden
+  );
+  expect(hidden).toBe(true);
+  await textRow.locator('.se-layer-btn[aria-label^="Show"]').click();
 
-  await page.click('[data-panel-action="aspect"][data-aspect="custom"]');
-  await expect.poll(async () => (await projectState(page)).aspect).toBe('custom');
-  await page.locator('input[data-project-prop="project.customAspectW"]').fill('21');
-  await page.locator('input[data-project-prop="project.customAspectH"]').fill('9');
-  await page.locator('input[data-project-prop="project.customAspectH"]').blur();
-  const custom = await page.evaluate(() => window.__videoEditor.store.dimensions());
-  expect(Math.abs(custom.width / custom.height - 21 / 9)).toBeLessThan(0.05);
+  await page.evaluate(() => window.__VE__.select(window.__VE__.store.project.tracks.flatMap((t) => t.clips).find((c) => c.kind === 'text').id));
+  const duplicated = await page.evaluate(() => window.__VE__.duplicate());
+  expect(duplicated).toBeTruthy();
+  expect((await state(page)).layerCount).toBe(5);
 
-  await page.locator('input[data-project-boolean="guides.center"]').check();
-  await expect.poll(async () => (await projectState(page)).guides.center).toBe(true);
-  await page.locator('input[data-project-boolean="guides.safe"]').check();
-  await expect.poll(async () => (await projectState(page)).guides.safe).toBe(true);
+  await page.evaluate((id) => window.__VE__.remove(id), duplicated);
+  expect((await state(page)).layerCount).toBe(4);
+  await page.evaluate(() => window.__VE__.undo());
+  expect((await state(page)).layerCount).toBe(5);
+  await page.evaluate(() => window.__VE__.redo());
+  expect((await state(page)).layerCount).toBe(4);
 
-  await page.locator('input[data-project-prop="background"]').evaluate((element) => {
-    element.value = '#123456';
-    element.dispatchEvent(new Event('input', { bubbles: true }));
-    element.dispatchEvent(new Event('change', { bubbles: true }));
+  expect(errors).toEqual([]);
+});
+
+test('a second video and a shape become overlay layers above the main video', async ({ page }) => {
+  const errors = await openEditor(page);
+  await uploadVideo(page);
+  await page.setInputFiles('#se-file-input', fixturePath('trim-4s.mp4'));
+  await page.waitForFunction(() => window.__VE__.state().layerCount === 2, null, { timeout: 30000 });
+
+  let order = await page.evaluate(() =>
+    window.__VE__.store.visualTracks().map((track) => track.clips[0]?.kind || 'empty')
+  );
+  expect(order).toEqual(['video', 'video']);
+
+  const shapeId = await page.evaluate(() => window.__VE__.addShape('circle'));
+  expect(shapeId).toBeTruthy();
+  order = await page.evaluate(() =>
+    window.__VE__.store.visualTracks().map((track) => track.clips[0]?.kind || 'empty')
+  );
+  expect(order[0]).toBe('shape');
+  expect(order[order.length - 1]).toBe('video');
+  expect((await state(page)).layerCount).toBe(3);
+
+  const shape = await clipById(page, shapeId);
+  expect(shape.shape.type).toBe('circle');
+  expect(shape.duration).toBeGreaterThan(1);
+  await expect(page.locator('.se-layer-row')).toHaveCount(3);
+  await expect(page.locator('.se-layer-row').first()).toContainText('Circle');
+
+  const stickerId = await page.evaluate(() => window.__VE__.addSticker('⭐'));
+  expect(stickerId).toBeTruthy();
+  const sticker = await clipById(page, stickerId);
+  expect(sticker.kind).toBe('text');
+  expect(sticker.text.content).toBe('⭐');
+
+  await page.evaluate(() => window.__VE__.seek(1));
+  await page.waitForTimeout(300);
+  const pixels = await page.evaluate(() => {
+    const canvas = document.getElementById('se-canvas');
+    const data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+    let min = 255;
+    let max = 0;
+    for (let index = 0; index < data.length; index += 40) {
+      const value = data[index] + data[index + 1] + data[index + 2];
+      if (value < min) min = value;
+      if (value > max) max = value;
+    }
+    return max - min;
   });
-  await expect.poll(async () => page.evaluate(() => window.__videoEditor.project.background)).toBe('#123456');
+  expect(pixels).toBeGreaterThan(10);
+  expect(errors).toEqual([]);
+});
 
-  await page.click('#ve-rail [data-category="elements"]');
-  await page.click('[data-panel-action="add-shape"][data-shape="rect"]');
-  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).filter((clip) => clip.kind === 'shape').length).toBe(1);
-  await page.click('[data-panel-action="add-emoji"][data-emoji="✨"]');
-  await expect.poll(async () => page.evaluate(() =>
-    window.__videoEditor.project.tracks
+test('split, trim and speed change the real clip timing', async ({ page }) => {
+  const errors = await openEditor(page);
+  await uploadVideo(page);
+  await page.evaluate(() => window.__VE__.seek(2));
+
+  await page.getByRole('button', { name: 'Split', exact: true }).click();
+  await page.waitForFunction(() => window.__VE__.state().baseClips.length === 2);
+  const split = await state(page);
+  expect(split.baseClips[0].duration).toBeCloseTo(2, 1);
+  expect(split.baseClips[1].start).toBeCloseTo(2, 1);
+  expect(split.baseClips[1].duration).toBeCloseTo(split.duration - 2, 1);
+
+  const secondId = split.baseClips[1].id;
+  await page.evaluate((id) => {
+    window.__VE__.select(id);
+    window.__VE__.open('clip', id);
+  }, secondId);
+  await page.waitForSelector('.se-sheet');
+  const before = await clipById(page, secondId);
+  await setRange(page, 'Playback speed', 1.5);
+  const faster = await clipById(page, secondId);
+  expect(faster.speed).toBeCloseTo(1.5, 2);
+  expect(faster.duration).toBeLessThan(before.duration);
+  expect(faster.outPoint - faster.inPoint).toBeCloseTo(faster.duration * 1.5, 1);
+
+  await page.evaluate(() => window.__VE__.seek(2.5));
+  await page.getByRole('button', { name: 'Trim start here' }).click();
+  const trimmed = await clipById(page, secondId);
+  expect(trimmed.start).toBeCloseTo(2.5, 1);
+  expect(trimmed.duration).toBeLessThan(faster.duration);
+
+  await setRange(page, 'Opacity', 0.55);
+  expect((await clipById(page, secondId)).opacity).toBeCloseTo(0.55, 2);
+  await page.locator('.se-sheet-foot .se-btn-primary').click();
+
+  await page.evaluate(() => window.__VE__.undo());
+  await page.evaluate(() => window.__VE__.undo());
+  const undone = await state(page);
+  expect(undone.baseClips.length).toBe(2);
+  expect(undone.baseClips[1].start).toBeCloseTo(2, 1);
+
+  expect(errors).toEqual([]);
+});
+
+test('filters, colour, transitions and crop are stored as project data', async ({ page }) => {
+  const errors = await openEditor(page);
+  await uploadVideo(page);
+
+  await page.click('[data-tool="filter"]');
+  await expect(page.locator('.se-filter-grid')).toBeVisible();
+  await page.getByRole('button', { name: 'Sepia' }).click();
+  await setRange(page, 'Brightness', 18);
+  await page.locator('.se-sheet-foot .se-btn-primary').click();
+
+  let base = await page.evaluate(() => window.__VE__.store.baseTrack().clips[0]);
+  expect(base.filter).toBe('sepia');
+  expect(base.color.brightness).toBeCloseTo(18, 0);
+
+  await page.getByRole('button', { name: 'Transition', exact: true }).click();
+  await expect(page.locator('.se-transition-grid')).toBeVisible();
+  await page.getByRole('button', { name: 'Cross Dissolve' }).click();
+  await page.locator('.se-sheet-foot .se-btn-primary').click();
+  base = await page.evaluate(() => window.__VE__.store.baseTrack().clips[0]);
+  expect(base.transition.type).toBe('cross-dissolve');
+
+  await page.evaluate(() => window.__VE__.open('clip', window.__VE__.store.baseTrack().clips[0].id));
+  await page.waitForSelector('.se-sheet');
+  await setRange(page, 'Crop right', 0.12);
+  await setRange(page, 'Rotation', 14);
+  await setRange(page, 'Horizontal position', 0.44);
+  await page.locator('.se-sheet-foot .se-btn-primary').click();
+  base = await page.evaluate(() => window.__VE__.store.baseTrack().clips[0]);
+  expect(base.crop.right).toBeCloseTo(0.12, 2);
+  expect(base.rotation).toBeCloseTo(14, 0);
+  expect(base.x).toBeCloseTo(0.44, 2);
+
+  expect(errors).toEqual([]);
+});
+
+test('audio layers expose volume, fades, keyframes and preview mute', async ({ page }) => {
+  const errors = await openEditor(page);
+  await uploadVideo(page);
+  await page.setInputFiles('#se-file-input', fixturePath('trim-audio-only.m4a'));
+  await page.waitForFunction(
+    () => window.__VE__.state().tracks.some((track) => track.kind === 'audio' && track.clips.length > 0),
+    null,
+    { timeout: 30000 }
+  );
+  const audioId = await page.evaluate(() => {
+    const clip = window.__VE__.store.project.tracks
       .flatMap((track) => track.clips)
-      .filter((clip) => clip.kind === 'text' && clip.text?.content === '✨').length
-  )).toBe(1);
+      .find((entry) => entry.kind === 'audio');
+    return clip.id;
+  });
+
+  await page.click('[data-tool="audio"]');
+  await expect(page.locator('.se-sheet')).toBeVisible();
+  await setRange(page, 'Volume', 0.42);
+  await setRange(page, 'Fade in', 0.5);
+  await setRange(page, 'Fade out', 0.4);
+  await page.getByRole('button', { name: 'Add at playhead' }).click();
+  const audio = await clipById(page, audioId);
+  expect(audio.volume).toBeCloseTo(0.42, 2);
+  expect(audio.fadeIn).toBeCloseTo(0.5, 1);
+  expect(audio.fadeOut).toBeCloseTo(0.4, 1);
+  expect(audio.keyframes.volume.length).toBe(1);
+
+  await page.evaluate(() => window.__VE__.seek(1));
+  await setRange(page, 'Volume', 0.2);
+  const animated = await clipById(page, audioId);
+  expect(animated.volume).toBeCloseTo(0.42, 2);
+  expect(animated.keyframes.volume.length).toBe(2);
+  await page.keyboard.press('Escape');
+
+  await page.click('#se-mute');
+  expect((await state(page)).previewDebug.audio.muted).toBe(true);
+  await expect(page.locator('#se-mute')).toHaveAttribute('aria-pressed', 'true');
+  await page.click('#se-mute');
+  expect((await state(page)).previewDebug.audio.muted).toBe(false);
+
   expect(errors).toEqual([]);
 });
 
-test('audio clip exposes waveform, gain, mute and fades', async ({ page }) => {
+test('local autosave restores the edit and its media after a reload', async ({ page }) => {
   const errors = await openEditor(page);
-  await importFiles(page, ['trim-audio-only.m4a']);
-  const asset = await page.evaluate(() => window.__videoEditor.media.list()[0].id);
-  await page.evaluate((id) => window.__videoEditor.addAssetToTimeline(id, { start: 0 }), asset);
-  await page.waitForTimeout(500);
+  await uploadVideo(page);
+  await addTextThroughUI(page, 'Restored title');
+  await page.evaluate(() => window.__VE__.open('captions'));
+  await page.getByRole('button', { name: 'Add caption at playhead' }).click();
+  await page.locator('.se-sheet .se-textarea').fill('Restored caption');
+  await page.locator('.se-sheet .se-textarea').blur();
+  await page.locator('.se-sheet-foot .se-btn-primary').click();
 
-  const audioClip = await page.evaluate(() => {
-    const ed = window.__videoEditor;
-    const found = ed.project.tracks.flatMap((track) => track.clips).find((clip) => clip.kind === 'audio');
-    ed.seek(found.start + 0.2);
-    ed.selectClip(found.id);
-    return { id: found.id, volume: found.volume };
-  });
-  await expect(page.locator('#ve-inspector-panel .ve-kind-chip')).toHaveText('audio');
-  await expect(page.locator('.tl-clip-audio canvas.tl-wave').first()).toBeVisible();
+  const saved = await page.evaluate(() => window.__VE__.saveNow());
+  expect(saved.savedAt).toBeGreaterThan(0);
+  expect(saved.mediaCount).toBe(1);
 
-  await openInspectorSection(page, 'Audio');
-  const volume = page.locator('#ve-inspector-panel input[data-prop="volume"]');
-  await scrollInspectorTo(page, '#ve-inspector-panel input[data-prop="volume"]');
-  await volume.evaluate((element) => {
-    element.value = '0.25';
-    element.dispatchEvent(new Event('input', { bubbles: true }));
-    element.dispatchEvent(new Event('change', { bubbles: true }));
-  });
-  await expect.poll(async () => page.evaluate((id) => {
-    const clip = window.__videoEditor.project.tracks.flatMap((track) => track.clips).find((item) => item.id === id);
-    return clip.volume;
-  }, audioClip.id)).toBeCloseTo(0.25, 2);
-
-  await page.locator('#ve-inspector-panel input[data-prop="muted"]').check();
-  await expect.poll(async () => page.evaluate((id) => {
-    const clip = window.__videoEditor.project.tracks.flatMap((track) => track.clips).find((item) => item.id === id);
-    return clip.muted;
-  }, audioClip.id)).toBe(true);
-
-  await page.locator('#ve-inspector-panel input[data-prop="fadeIn"]').fill('0.4');
-  await page.locator('#ve-inspector-panel input[data-prop="fadeIn"]').blur();
-  await expect.poll(async () => page.evaluate((id) => {
-    const clip = window.__videoEditor.project.tracks.flatMap((track) => track.clips).find((item) => item.id === id);
-    return clip.fadeIn;
-  }, audioClip.id)).toBeCloseTo(0.4, 2);
+  await page.reload();
+  await page.waitForFunction(() => Boolean(window.__VE__), null, { timeout: 30000 });
+  await page.waitForFunction(() => window.__VE__.state().baseClips.length > 0, null, { timeout: 60000 });
+  const restored = await state(page);
+  expect(restored.layerCount).toBe(2);
+  expect(restored.subtitles.items).toHaveLength(1);
+  expect(restored.subtitles.items[0].text).toBe('Restored caption');
+  expect(restored.missingMedia).toEqual([]);
+  expect(restored.mediaCount || 1).toBe(1);
+  await expect(page.locator('.se-layer-row')).toHaveCount(2);
   expect(errors).toEqual([]);
 });
 
-test('autosave restores the timeline and relinks evicted media', async ({ page }) => {
+test('project JSON downloads, reopens and relinks media by filename', async ({ page }) => {
   const errors = await openEditor(page);
-  await addVideo(page);
-  await page.waitForTimeout(1600);
-  const saved = await page.evaluate(async () => {
-    const data = await window.__videoEditor.getAutosave();
-    const db = await new Promise((resolve, reject) => {
-      const request = indexedDB.open('letitedit-video-editor-v3');
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-    await new Promise((resolve, reject) => {
-      const tx = db.transaction('media', 'readwrite');
-      tx.objectStore('media').clear();
-      tx.oncomplete = resolve;
-      tx.onerror = () => reject(tx.error);
-    });
-    db.close();
-    return {
-      clips: data?.snapshot?.project?.tracks?.flatMap((track) => track.clips).length || 0,
-      name: data?.snapshot?.project?.name
-    };
-  });
-  expect(saved.clips).toBeGreaterThanOrEqual(1);
-
-  await page.reload({ waitUntil: 'networkidle' });
-  await page.waitForFunction(() => window.__videoEditorReady === true);
-  await expect(page.locator('#ve-restore-banner')).toBeVisible();
-  await page.click('#ve-restore-button');
-  await expect(page.locator('#ve-relink-banner')).toBeVisible();
-  await expect(page.locator('#ve-relink-text')).toContainText('need relinking');
-
-  const [chooser] = await Promise.all([
-    page.waitForEvent('filechooser'),
-    page.click('#ve-relink-button')
-  ]);
-  await chooser.setFiles(fixturePath('trim-4s.mp4'));
-  await expect.poll(async () => page.evaluate(() =>
-    window.__videoEditor.project.tracks
-      .flatMap((track) => track.clips)
-      .filter((clip) => clip.mediaId && !window.__videoEditor.media.has(clip.mediaId)).length
-  )).toBe(0);
-  await expect(page.locator('#ve-relink-banner')).toBeHidden();
-  expect(await page.evaluate(() => window.__videoEditor.media.list().length)).toBe(1);
-  expect(errors).toEqual([]);
-});
-
-test('project JSON downloads and opens with the same edit', async ({ page }) => {
-  const errors = await openEditor(page);
-  await addVideo(page);
-  await page.locator('#ve-project-name').fill('Portable cut');
-  await page.locator('#ve-project-name').press('Enter');
+  await uploadVideo(page);
+  await addTextThroughUI(page, 'Portable project');
 
   const downloadPromise = page.waitForEvent('download');
-  await page.click('#ve-project-menu-button');
-  await page.click('[data-project-action="save"]');
+  await page.click('#se-save');
   const download = await downloadPromise;
-  const savedPath = await download.path();
-  const saved = JSON.parse(fs.readFileSync(savedPath, 'utf8'));
-  expect(saved.project.name).toBe('Portable cut');
-  expect(saved.project.tracks.flatMap((track) => track.clips).length).toBe(1);
+  const downloadedPath = await download.path();
+  expect(download.suggestedFilename()).toMatch(/\.letitedit\.json$/);
+  const payload = JSON.parse(fs.readFileSync(downloadedPath, 'utf8'));
+  expect(payload.project.tracks.length).toBeGreaterThan(0);
+  expect(payload.media).toHaveLength(1);
+  expect(payload.media[0].name).toBe('trim-4s.mp4');
+  expect(payload.media[0].file).toBeUndefined();
 
-  await page.click('#ve-project-menu-button');
-  await page.click('[data-project-action="new"]');
-  await page.click('#ve-confirm-dialog [data-confirm-ok]');
-  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).length).toBe(0);
+  await page.evaluate(() => window.__VE__.app.newProject());
+  await page.setInputFiles('#se-project-input', downloadedPath);
+  await page.waitForFunction(() => window.__VE__.state().baseClips.length > 0, null, { timeout: 30000 });
+  let reopened = await state(page);
+  expect(reopened.name).toBe('trim-4s');
+  expect(reopened.layerCount).toBe(2);
+  expect(reopened.missingMedia.length).toBeGreaterThan(0);
+  if (await page.locator('.se-sheet').count()) await page.keyboard.press('Escape');
 
-  await page.setInputFiles('#ve-open-input', savedPath);
-  await expect.poll(async () => (await projectState(page)).name).toBe('Portable cut');
-  expect((await projectState(page)).tracks.flatMap((track) => track.clips).length).toBe(1);
+  await page.setInputFiles('#se-file-input', fixturePath('trim-4s.mp4'));
+  await page.waitForFunction(() => window.__VE__.state().missingMedia.length === 0, null, { timeout: 30000 });
+  reopened = await state(page);
+  expect(reopened.layerCount).toBe(2);
+  expect(reopened.mediaCount || 1).toBe(1);
   expect(errors).toEqual([]);
 });
 
-test('export writes a real MP4 with audio and a real WebM square', async ({ page }) => {
-  test.setTimeout(120000);
+test('export writes a real file that decodes with the edited duration', async ({ page }) => {
+  test.setTimeout(180000);
   const errors = await openEditor(page);
-  await addVideo(page);
-  await page.evaluate(() => window.__videoEditor.addTextPreset('title'));
-  await page.waitForTimeout(600);
+  await uploadVideo(page);
+  await addTextThroughUI(page, 'Exported title');
+  await page.evaluate(() => window.__VE__.seek(1));
+  await page.click('[data-tool="filter"]');
+  await page.locator('.se-filter-card', { hasText: 'Vivid' }).click();
+  await page.locator('.se-sheet-foot .se-btn-primary').click();
 
-  const mp4 = await page.evaluate(async () => {
-    const ed = window.__videoEditor;
-    const out = await ed.exportToBlob({ format: 'mp4', resolution: '480', quality: 'small' });
-    const url = URL.createObjectURL(out.blob);
+  const projectDuration = (await state(page)).duration;
+  await page.click('#se-export');
+  await expect(page.locator('.se-sheet-title')).toHaveText('Export video');
+  await page.waitForFunction(
+    () => {
+      const button = document.getElementById('se-export-start');
+      return button && !button.disabled;
+    },
+    null,
+    { timeout: 30000 }
+  );
+
+  const formats = page.locator('.se-sheet-body .se-seg').first().getByRole('button');
+  if (await formats.filter({ hasText: 'WebM' }).isEnabled()) {
+    await formats.filter({ hasText: 'WebM' }).click();
+  }
+  const resolutionSeg = page.locator('.se-sheet-body .se-seg').nth(1);
+  await resolutionSeg.getByRole('button', { name: '480p' }).click();
+  const qualitySeg = page.locator('.se-sheet-body .se-seg').nth(2);
+  await qualitySeg.getByRole('button', { name: 'Small' }).click();
+  await page.click('#se-export-start');
+
+  await expect(page.locator('.se-sheet-title')).toHaveText('Export complete', { timeout: 150000 });
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Download video' }).click();
+  const download = await downloadPromise;
+  const exportedPath = await download.path();
+  expect(fs.statSync(exportedPath).size).toBeGreaterThan(2000);
+
+  const verification = await page.evaluate(async () => {
+    const result = window.__VE__.app.lastExport;
+    if (!result) throw new Error('The export result was not stored.');
+    const url = URL.createObjectURL(result.blob);
     const video = document.createElement('video');
     video.muted = true;
     video.src = url;
     await new Promise((resolve, reject) => {
       video.onloadedmetadata = resolve;
-      video.onerror = () => reject(new Error('MP4 could not be decoded'));
+      video.onerror = () => reject(new Error('The exported file did not decode.'));
     });
+    video.currentTime = Math.min(0.5, Math.max(0, video.duration / 2));
     await new Promise((resolve) => {
       video.onseeked = resolve;
-      video.currentTime = 0.6;
     });
     const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    canvas.width = 160;
+    canvas.height = 90;
     const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    let lit = 0;
-    for (let i = 0; i < data.length; i += 4 * 29) {
-      if (data[i] + data[i + 1] + data[i + 2] > 30) lit += 1;
+    let min = 255;
+    let max = 0;
+    for (let index = 0; index < data.length; index += 4) {
+      const value = data[index] + data[index + 1] + data[index + 2];
+      if (value < min) min = value;
+      if (value > max) max = value;
     }
-    const result = {
-      type: out.blob.type,
-      size: out.blob.size,
+    URL.revokeObjectURL(url);
+    return {
+      duration: video.duration,
       width: video.videoWidth,
       height: video.videoHeight,
-      duration: video.duration,
-      lit,
-      meta: out.meta
+      range: max - min,
+      meta: result.meta,
+      size: result.blob.size
     };
-    video.pause();
-    video.removeAttribute('src');
-    video.load();
-    URL.revokeObjectURL(url);
-    return result;
   });
-  expect(mp4.type).toBe('video/mp4');
-  expect(mp4.size).toBeGreaterThan(50000);
-  expect(mp4.width).toBe(854);
-  expect(mp4.height).toBe(480);
-  expect(mp4.meta.format).toBe('mp4');
-  expect(mp4.meta.codec).toBe('avc');
-  expect(mp4.meta.audioCodec).toBe('aac');
-  expect(mp4.meta.hasAudio).toBe(true);
-  expect(mp4.duration).toBeGreaterThan(3.5);
-  expect(mp4.duration).toBeLessThan(4.6);
-  expect(mp4.lit).toBeGreaterThan(100);
 
-  await page.evaluate(() => window.__videoEditor.setProjectValue('project.aspect', '1:1'));
-  await page.waitForTimeout(500);
-  const webm = await page.evaluate(async () => {
-    const out = await window.__videoEditor.exportToBlob({ format: 'webm', resolution: '480', quality: 'small' });
-    return { type: out.blob.type, size: out.blob.size, meta: out.meta };
-  });
-  expect(webm.type).toBe('video/webm');
-  expect(webm.size).toBeGreaterThan(30000);
-  expect(webm.meta.format).toBe('webm');
-  expect(webm.meta.codec).toBe('vp9');
-  expect(webm.meta.width).toBe(webm.meta.height);
-  expect(Math.abs(webm.meta.width - 854)).toBeLessThanOrEqual(2);
+  expect(verification.duration).toBeCloseTo(projectDuration, 0);
+  expect(verification.width).toBe(854);
+  expect(verification.height).toBe(480);
+  expect(verification.range).toBeGreaterThan(12);
+  expect(verification.meta.hasAudio).toBe(true);
+  expect(verification.meta.size).toBeGreaterThan(2000);
+  expect(fs.statSync(exportedPath).size).toBe(verification.size);
   expect(errors).toEqual([]);
 });
 
-test('export dialog reports progress and cancels without a download', async ({ page }) => {
-  test.setTimeout(120000);
+test('keyboard shortcuts drive playback, history and selection', async ({ page }) => {
   const errors = await openEditor(page);
-  await addVideo(page);
-  await page.waitForTimeout(300);
+  await uploadVideo(page);
+  const textId = await addTextThroughUI(page, 'Shortcut layer');
 
-  await page.click('#ve-export-open');
-  await expect(page.locator('#ve-export-dialog')).toBeVisible();
-  await expect(page.locator('[data-export-action="start"]')).toBeEnabled();
-  await expect(page.locator('#ve-export-dialog')).toContainText('Estimate');
-  await page.selectOption('[data-export-setting="format"]', 'webm');
-  await page.selectOption('[data-export-setting="resolution"]', '480');
-  await page.click('[data-export-action="start"]');
-  await expect(page.locator('[data-export-action="cancel"]')).toBeEnabled();
-  await page.waitForTimeout(250);
-  await page.click('[data-export-action="cancel"]');
-  await expect.poll(async () => page.evaluate(() => window.__videoEditor.exporter.state)).toBe('idle');
-  await expect(page.locator('[data-export-action="start"]')).toBeEnabled();
-  await expect(page.locator('#ve-export-preview')).toHaveCount(0);
-  expect(errors).toEqual([]);
-});
-
-test('keyboard shortcuts and help dialog work', async ({ page }) => {
-  const errors = await openEditor(page);
-  await addVideo(page);
-  await page.waitForTimeout(300);
-
+  await page.locator('body').click({ position: { x: 4, y: 4 } });
   await page.keyboard.press('Space');
-  await expect(page.locator('#ve-play')).toHaveAttribute('aria-pressed', 'true');
+  await page.waitForTimeout(400);
+  expect((await state(page)).playing).toBe(true);
   await page.keyboard.press('Space');
-  await expect(page.locator('#ve-play')).toHaveAttribute('aria-pressed', 'false');
+  expect((await state(page)).playing).toBe(false);
 
-  await page.click('#ve-help-open');
-  await expect(page.locator('#ve-help-dialog')).toBeVisible();
-  await expect(page.locator('#ve-help-dialog')).toContainText('Keyboard shortcuts');
-  await page.keyboard.press('Escape');
-  await expect(page.locator('#ve-help-dialog')).toBeHidden();
+  await page.evaluate(() => window.__VE__.seek(0));
+  await page.keyboard.press('ArrowRight');
+  await page.waitForTimeout(120);
+  expect((await state(page)).playhead).toBeGreaterThan(0.5);
+  await page.keyboard.press('Shift+ArrowRight');
+  await page.waitForTimeout(120);
+  expect((await state(page)).playhead).toBeGreaterThan(1.5);
 
-  await page.evaluate(() => window.__videoEditor.selectClip(window.__videoEditor.project.tracks.flatMap((track) => track.clips)[0].id));
-  await page.keyboard.press('Control+d');
-  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).length).toBe(2);
+  await page.evaluate((id) => window.__VE__.select(id), textId);
   await page.keyboard.press('Delete');
-  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).length).toBe(1);
+  await page.waitForTimeout(150);
+  expect((await state(page)).layerCount).toBe(1);
   await page.keyboard.press('Control+z');
-  await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).length).toBe(2);
-  expect(errors).toEqual([]);
-});
+  await page.waitForTimeout(150);
+  expect((await state(page)).layerCount).toBe(2);
+  await page.keyboard.press('Control+Shift+z');
+  await page.waitForTimeout(150);
+  expect((await state(page)).layerCount).toBe(1);
+  await page.keyboard.press('Control+z');
+  await page.waitForTimeout(150);
 
-test('record panel reports unsupported capture honestly', async ({ page }) => {
-  await page.addInitScript(() => {
-    Object.defineProperty(window, 'MediaRecorder', { value: undefined, configurable: true, writable: true });
-    if (navigator.mediaDevices) {
-      Object.defineProperty(navigator.mediaDevices, 'getDisplayMedia', { value: undefined, configurable: true, writable: true });
-    }
-  });
-  const errors = await openEditor(page);
-  await page.click('#ve-rail [data-category="record"]');
-  await expect(page.locator('.ve-notice-warn')).toContainText('This mode is unavailable');
-  const modes = await page.locator('[data-record-mode]').evaluateAll((nodes) => nodes.map((node) => node.disabled));
-  expect(modes.every(Boolean)).toBe(true);
-  await expect(page.locator('[data-record-action="start"]')).toBeDisabled();
+  await page.evaluate((id) => window.__VE__.select(id), textId);
+  await page.keyboard.press('Escape');
+  expect((await state(page)).selection).toBe(null);
   expect(errors).toEqual([]);
 });
 
 for (const width of MOBILE_WIDTHS) {
-  test(`mobile layout at ${width}px keeps preview, all tools and touch targets`, async ({ page }) => {
-    await page.setViewportSize({ width, height: 780 });
+  test(`mobile ${width}px: no overflow, usable targets, scrolling and a fitting sheet`, async ({ page }) => {
+    test.setTimeout(120000);
+    await page.setViewportSize({ width, height: 740 });
     const errors = await openEditor(page);
-
-    const overflow = await page.evaluate(() => ({
-      scroll: document.documentElement.scrollWidth,
-      inner: window.innerWidth
-    }));
-    expect(overflow.scroll).toBeLessThanOrEqual(overflow.inner + 1);
-
-    const canvasBox = await page.locator('#ve-preview-canvas').boundingBox();
-    expect(canvasBox.width).toBeGreaterThan(120);
-    expect(canvasBox.height).toBeGreaterThan(60);
-
-    const dock = page.locator('.ve-mobile-dock');
-    await expect(dock).toBeVisible();
-    const dockTargets = await dock.locator('button').evaluateAll((nodes) =>
-      nodes.map((node) => node.getBoundingClientRect().height)
-    );
-    expect(dockTargets.every((height) => height >= 44)).toBe(true);
-
-    await page.click('[data-open-sheet="library"]');
-    await expect(page.locator('#ve-library')).toBeVisible();
-    const railTargets = await page.locator('#ve-rail [data-category]').evaluateAll((nodes) =>
-      nodes.map((node) => node.getBoundingClientRect().height)
-    );
-    expect(railTargets.every((height) => height >= 44)).toBe(true);
-    const headings = {
-      media: 'Your media',
-      canvas: 'Canvas & project',
-      text: 'Add text',
-      audio: 'Audio',
-      videos: 'Video clips',
-      images: 'Image overlays',
-      elements: 'Elements',
-      subtitles: 'Subtitles',
-      record: 'Record'
-    };
-    for (const [category, heading] of Object.entries(headings)) {
-      await page.click(`#ve-rail [data-category="${category}"]`);
-      await expect(page.locator('#ve-library-panel h2')).toHaveText(heading);
+    await uploadVideo(page);
+    await addTextThroughUI(page, 'Mobile layer');
+    if ((await page.locator('#se-layers-toggle').getAttribute('aria-expanded')) !== 'true') {
+      await page.locator('#se-layers-toggle').click();
     }
-    await page.click('#ve-library-close');
-    await expect(page.locator('#ve-app')).toHaveAttribute('data-mobile-sheet', 'none');
 
-    await page.click('[data-open-sheet="inspector"]');
-    await expect(page.locator('#ve-inspector')).toBeVisible();
-    await page.click('#ve-inspector-close');
-    await expect(page.locator('#ve-app')).toHaveAttribute('data-mobile-sheet', 'none');
+    const layout = await page.evaluate(() => {
+      const app = document.getElementById('se-app');
+      const visible = (selector) => [...document.querySelectorAll(selector)].filter((node) => node.offsetParent !== null);
+      const toolbar = visible('.se-toolbar .se-tool');
+      const actions = visible('.se-actions .se-action');
+      const icons = visible('.se-icon-btn');
+      const layers = visible('.se-layer-btn');
+      const rects = (nodes) => nodes.map((node) => {
+        const rect = node.getBoundingClientRect();
+        return { width: rect.width, height: rect.height };
+      });
+      return {
+        viewport: window.innerWidth,
+        documentWidth: document.documentElement.scrollWidth,
+        bodyWidth: document.body.scrollWidth,
+        appLeft: app.getBoundingClientRect().left,
+        appRight: app.getBoundingClientRect().right,
+        toolbar: rects(toolbar),
+        actions: rects(actions),
+        icons: rects(icons),
+        layers: rects(layers),
+        actionsScrollable: (() => {
+          const row = document.querySelector('.se-actions');
+          return row.scrollWidth >= row.clientWidth;
+        })()
+      };
+    });
 
-    await page.click('#ve-mobile-menu');
-    await expect(page.locator('#ve-project-menu')).toBeVisible();
-    await expect(page.locator('[data-project-action="undo"]')).toBeVisible();
-    await expect(page.locator('[data-project-action="new"]')).toBeVisible();
+    expect(layout.documentWidth).toBeLessThanOrEqual(width);
+    expect(layout.bodyWidth).toBeLessThanOrEqual(width);
+    expect(layout.appLeft).toBeGreaterThanOrEqual(0);
+    expect(layout.appRight).toBeLessThanOrEqual(width);
+    for (const list of [layout.toolbar, layout.actions, layout.icons, layout.layers]) {
+      for (const item of list) {
+        expect(item.height).toBeGreaterThanOrEqual(43.5);
+        expect(item.width).toBeGreaterThanOrEqual(43.5);
+      }
+    }
+
+    await focusStage(page);
+    const stage = await page.locator('#se-frame').boundingBox();
+    const scrollBefore = await page.evaluate(() => window.scrollY);
+    await page.mouse.move(stage.x + stage.width / 2, stage.y + stage.height / 2);
+    await page.mouse.wheel(0, 260);
+    await page.waitForTimeout(400);
+    const scrollAfter = await page.evaluate(() => window.scrollY);
+    expect(scrollAfter).toBeGreaterThan(scrollBefore + 40);
+
+    await page.evaluate(() => window.__VE__.open('text'));
+    await page.waitForSelector('.se-sheet');
+    await page.locator('.se-sheet .se-grid-2 button').first().click();
+    await page.locator('.se-sheet .se-textarea').waitFor();
+    await page.waitForTimeout(300);
+    const sheet = await page.locator('.se-sheet').boundingBox();
+    const close = await page.locator('.se-sheet-close').boundingBox();
+    expect(sheet.y).toBeGreaterThanOrEqual(0);
+    expect(sheet.y + sheet.height).toBeLessThanOrEqual(741);
+    expect(sheet.width).toBeLessThanOrEqual(width);
+    expect(close.width).toBeGreaterThanOrEqual(43.5);
+    expect(close.height).toBeGreaterThanOrEqual(43.5);
+
+    const sheetMetrics = await page.evaluate(() => {
+      const body = document.querySelector('.se-sheet-body');
+      const foot = document.querySelector('.se-sheet-foot');
+      return {
+        scrollable: body.scrollHeight > body.clientHeight,
+        bodyHeight: body.clientHeight,
+        footHeight: foot ? foot.getBoundingClientRect().height : 0
+      };
+    });
+    expect(sheetMetrics.bodyHeight).toBeGreaterThan(100);
+    expect(sheetMetrics.footHeight).toBeGreaterThanOrEqual(44);
+
+    await page.screenshot({ path: `test-results/editor-${width}.png` });
     await page.keyboard.press('Escape');
-    await expect(page.locator('#ve-project-menu')).toBeHidden();
-
-    await page.evaluate(() => window.__videoEditor.addTextPreset('plain'));
-    await expect.poll(async () => (await projectState(page)).tracks.flatMap((track) => track.clips).length).toBe(1);
-    await page.click('#ve-mobile-export');
-    await expect(page.locator('#ve-export-dialog')).toBeVisible();
-    await page.click('#ve-export-dialog [data-export-action="close"]');
-    await expect(page.locator('#ve-export-dialog')).toBeHidden();
     expect(errors).toEqual([]);
   });
 }
 
-test('tablet layout at 768px keeps the desktop dock and sheets usable', async ({ page }) => {
-  await page.setViewportSize({ width: 768, height: 1024 });
-  const errors = await openEditor(page);
-  const overflow = await page.evaluate(() => ({
-    scroll: document.documentElement.scrollWidth,
-    inner: window.innerWidth
-  }));
-  expect(overflow.scroll).toBeLessThanOrEqual(overflow.inner + 1);
-  await expect(page.locator('.ve-mobile-dock')).toBeVisible();
-  await page.click('[data-open-sheet="library"]');
-  await expect(page.locator('#ve-library')).toBeVisible();
-  await expect(page.locator('#ve-rail [data-category]')).toHaveCount(9);
-  await page.click('#ve-library-close');
-  expect(errors).toEqual([]);
+test('tablet and desktop keep the preview and layers usable side by side', async ({ page }) => {
+  for (const width of [768, 1280]) {
+    await page.setViewportSize({ width, height: 900 });
+    const errors = await openEditor(page);
+    await uploadVideo(page);
+    await addTextThroughUI(page, 'Wide layout');
+
+    const layout = await page.evaluate(() => {
+      const stage = document.getElementById('se-stage').getBoundingClientRect();
+      const layers = document.getElementById('se-layers').getBoundingClientRect();
+      return {
+        viewport: window.innerWidth,
+        documentWidth: document.documentElement.scrollWidth,
+        stage: { left: stage.left, right: stage.right, top: stage.top, bottom: stage.bottom, width: stage.width },
+        layers: { left: layers.left, right: layers.right, top: layers.top, width: layers.width }
+      };
+    });
+    expect(layout.documentWidth).toBeLessThanOrEqual(width);
+    expect(layout.stage.width).toBeGreaterThan(300);
+    expect(layout.stage.left).toBeGreaterThanOrEqual(0);
+    expect(layout.stage.right).toBeLessThanOrEqual(width);
+    expect(layout.layers.left).toBeGreaterThanOrEqual(layout.stage.left - 1);
+    expect(layout.layers.top).toBeGreaterThanOrEqual(layout.stage.bottom - 1);
+    expect(errors).toEqual([]);
+  }
 });

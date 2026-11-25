@@ -1,31 +1,34 @@
-/* LetitEdit editor V3 — preview monitor, direct canvas editing and transport.
- * The page and the export worker still share ../renderer.js, so the frame in
- * this monitor is produced by the same rules as the exported file.
+/* LetitEdit Video Editor — preview monitor and direct canvas editing.
+ *
+ * The page and the export worker share ../renderer.js, so the frame in this
+ * monitor is produced by the same rules as the exported file. Composition
+ * passes are coalesced to one in-flight pass: a slow decode can no longer
+ * queue stale frames and make the picture fall seconds behind the ruler.
  */
 
 import { clipBounds, renderComposition, resolveTransform } from '../renderer.js';
-import { clipAtTime, clipEnd, projectDuration } from '../model.js';
+import { clipAtTime, clipEnd } from '../model.js';
 import { PreviewAudioMixer } from '../preview-audio.js';
-import { clamp, num } from './dom.js';
+import { clamp } from '../utils.js';
 
 const MAX_PREVIEW_EDGE = 1280;
 const QUALITY_EDGE = { low: 540, standard: 720, high: 1080 };
 
 export class Preview {
-  constructor({ store, media, onTime, onStatus, onSelect }) {
+  constructor({ store, media, onTime, onStatus, onSelect, onRequestEdit }) {
     this.store = store;
     this.media = media;
+    this.onTime = onTime || (() => {});
+    this.onStatus = onStatus || (() => {});
+    this.onSelect = onSelect || (() => {});
+    this.onRequestEdit = onRequestEdit || (() => {});
     this.source = {
       getFrame: (id, time, maxDimension) => media.frameAt(id, time, maxDimension),
       getImage: (id) => media.getImage(id)
     };
-    this.onTime = onTime || (() => {});
-    this.onStatus = onStatus || (() => {});
-    this.onSelect = onSelect || (() => {});
     this.canvas = null;
     this.ctx = null;
     this.frame = null;
-    this.shell = null;
     this.stage = null;
     this.overlay = null;
     this.empty = null;
@@ -35,17 +38,19 @@ export class Preview {
     this.renderInFlight = false;
     this.renderPending = false;
     this.lastRenderedTime = null;
-    this.lastRenderStartedAt = 0;
-    this.lastRenderFinishedAt = 0;
     this.lastRenderMs = 0;
     this.raf = 0;
     this.playStart = 0;
     this.playFrom = 0;
     this.playToken = 0;
     this.playing = false;
-    this.lastDemoFrame = -1;
+    this.rate = 1;
+    this.quality = 'standard';
+    this.drag = null;
     this.selectionBox = null;
-    this.guides = null;
+    this.lastTap = { id: null, at: 0 };
+    this._boundPointerMove = this.onPointerMove.bind(this);
+    this._boundPointerUp = this.onPointerUp.bind(this);
     this.audio = new PreviewAudioMixer({
       getProject: () => this.store.project,
       getTime: () => this.store.playhead,
@@ -54,28 +59,20 @@ export class Preview {
       onBlocked: () => this.onStatus('The browser blocked preview audio. Press play again to allow sound.', 'warn'),
       onStatus: (message, tone) => this.onStatus(message, tone)
     });
-    this.rate = 1;
-    this.quality = 'standard';
-    this.drag = null;
-    this._boundPointerMove = this.onPointerMove.bind(this);
-    this._boundPointerUp = this.onPointerUp.bind(this);
+    this.audio.setMuted(Boolean(this.store.previewMuted));
   }
 
   mount(root) {
     this.root = root;
-    this.canvas = root.querySelector('#ve-preview-canvas');
+    this.canvas = root.querySelector('#se-canvas');
     this.ctx = this.canvas.getContext('2d', { alpha: false });
-    this.frame = root.querySelector('.ve-canvas-frame');
-    this.shell = root.querySelector('#ve-preview-shell');
-    this.stage = root.querySelector('#ve-preview-stage');
-    this.overlay = root.querySelector('#ve-canvas-overlay');
-    this.empty = root.querySelector('#ve-preview-empty');
-    this.guides = root.querySelector('#ve-preview-guides');
+    this.frame = root.querySelector('#se-frame');
+    this.stage = root.id === 'se-stage' ? root : root.querySelector('#se-stage');
+    this.overlay = root.querySelector('#se-overlay');
+    this.empty = root.querySelector('#se-empty');
     this.overlay.addEventListener('pointerdown', this.onPointerDown.bind(this));
     this._resize = this.layout.bind(this);
     this._visibility = () => {
-      /* rAF stops while the tab is hidden but the audio clock does not, so
-       * stop both instead of letting sound run ahead of the picture. */
       if (document.hidden && this.playing) this.pause();
     };
     document.addEventListener('visibilitychange', this._visibility);
@@ -87,10 +84,13 @@ export class Preview {
     }
     this.store.subscribe((reason) => {
       if (!this.playing) this.scheduleRender();
-      if (this.store.selectedSubtitle) this.updateOverlay();
-      else this.updateOverlay();
+      else this.audio.refresh();
+      this.updateOverlay();
       this.onTime(this.store.playhead);
       if (reason === 'undo' || reason === 'redo' || reason === 'replace') this.layout();
+      const dims = this.store.dimensions();
+      if (this.lastDims && (this.lastDims.width !== dims.width || this.lastDims.height !== dims.height)) this.layout();
+      this.lastDims = dims;
     });
     this.layout();
     this.scheduleRender();
@@ -101,27 +101,27 @@ export class Preview {
     const project = this.store.project;
     const dims = this.store.dimensions();
     const rect = this.stage.getBoundingClientRect();
-    const pad = 24;
-    const availableW = Math.max(120, rect.width - pad);
-    const availableH = Math.max(100, rect.height - pad);
-    const zoom = clamp(this.store.previewZoom || 1, 0.5, 2.5);
-    const scale = Math.min(availableW / dims.width, availableH / dims.height) * zoom;
-    const width = Math.max(120, Math.round(dims.width * scale));
-    const height = Math.max(80, Math.round(dims.height * scale));
-    this.frame.style.width = `${width}px`;
-    this.frame.style.height = `${height}px`;
-    this.frame.style.setProperty('--ve-aspect', `${dims.width} / ${dims.height}`);
-
-    const qualityEdge = QUALITY_EDGE[this.quality] || QUALITY_EDGE.standard;
-    const previewEdge = Math.min(MAX_PREVIEW_EDGE, qualityEdge, Math.max(dims.width, dims.height));
+    const horizontal = window.innerWidth <= 430 ? 18 : window.innerWidth < 760 ? 30 : 50;
+    const availableW = Math.max(150, rect.width - horizontal);
+    const maxH = Math.max(170, Math.min(window.innerHeight * (window.innerWidth < 560 ? 0.46 : 0.58), 640));
     const ratio = dims.width / dims.height;
+    let width = availableW;
+    let height = width / ratio;
+    if (height > maxH) {
+      height = maxH;
+      width = height * ratio;
+    }
+    this.frame.style.width = `${Math.max(120, Math.round(width))}px`;
+    this.frame.style.height = `${Math.max(80, Math.round(height))}px`;
+
+    const edge = Math.min(MAX_PREVIEW_EDGE, QUALITY_EDGE[this.quality] || QUALITY_EDGE.standard, Math.max(dims.width, dims.height));
     let bw;
     let bh;
     if (ratio >= 1) {
-      bw = Math.min(dims.width, previewEdge);
+      bw = Math.min(dims.width, edge);
       bh = Math.max(2, Math.round(bw / ratio));
     } else {
-      bh = Math.min(dims.height, previewEdge);
+      bh = Math.min(dims.height, edge);
       bw = Math.max(2, Math.round(bh * ratio));
     }
     const roundedW = Math.max(2, Math.round(bw / 2) * 2);
@@ -135,20 +135,8 @@ export class Preview {
     }
     this.frame.dataset.width = String(dims.width);
     this.frame.dataset.height = String(dims.height);
-    this.updateGuides();
+    this.lastDims = dims;
     this.updateOverlay();
-  }
-
-  updateGuides() {
-    if (!this.guides) return;
-    const guides = this.store.project.guides || {};
-    this.guides.classList.toggle('show-center', Boolean(guides.center));
-    this.guides.classList.toggle('show-safe', Boolean(guides.safe));
-  }
-
-  setZoom(zoom) {
-    this.store.previewZoom = clamp(zoom, 0.5, 2.5);
-    this.layout();
   }
 
   scheduleRender() {
@@ -160,15 +148,7 @@ export class Preview {
     });
   }
 
-  /* One composition pass at a time, newest request wins.
-   *
-   * The old code started a render on every animation frame without waiting
-   * for the previous one. Each pass seeks the same MediaBunny canvas sink and
-   * draws through the same scratch canvases, so a slow file accumulated a
-   * queue of stale frame requests. The visible frame then fell seconds behind
-   * the ruler while the discarded passes kept decoding. Coalescing to a
-   * single in-flight pass keeps at most one seek alive and drops every
-   * intermediate time that is already obsolete. */
+  /* One composition pass at a time, newest request wins. */
   requestRender() {
     if (this.renderInFlight) {
       this.renderPending = true;
@@ -187,8 +167,6 @@ export class Preview {
       });
   }
 
-  /* Called by seeks and pauses: an in-flight pass for the old time must not
-   * paint over the new playhead when it finally resolves. */
   invalidateRender() {
     this.renderToken += 1;
     if (this.renderInFlight) this.renderPending = true;
@@ -198,7 +176,6 @@ export class Preview {
     const token = ++this.renderToken;
     const time = this.store.playhead;
     const startedAt = performance.now();
-    this.lastRenderStartedAt = startedAt;
     try {
       await renderComposition(this.back.getContext('2d'), this.store.project, this.source, time, {
         maxDimension: Math.max(this.canvas.width, this.canvas.height)
@@ -208,13 +185,13 @@ export class Preview {
       this.ctx.setTransform(1, 0, 0, 1, 0, 0);
       this.ctx.globalAlpha = 1;
       this.ctx.globalCompositeOperation = 'source-over';
+      this.ctx.filter = 'none';
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.ctx.drawImage(this.back, 0, 0);
       this.ctx.restore();
       this.lastRenderedTime = time;
-      this.lastRenderFinishedAt = performance.now();
-      this.lastRenderMs = this.lastRenderFinishedAt - startedAt;
-      this.empty.hidden = this.hasContentAt(time);
+      this.lastRenderMs = performance.now() - startedAt;
+      this.updateEmptyState(time);
       this.updateOverlay();
     } catch (error) {
       if (token !== this.renderToken) return;
@@ -229,28 +206,31 @@ export class Preview {
 
   hasContentAt(time) {
     return this.store.project.tracks.some((track) =>
-      track.kind === 'video' && !track.hidden &&
+      track.kind === 'video' &&
+      !track.hidden &&
       track.clips.some((clip) => !clip.hidden && time >= clip.start - 1e-6 && time < clipEnd(clip) - 1e-6)
-    ) || this.store.project.subtitles.items.some((item) => time >= item.start && time < item.end && item.text.trim());
+    ) || (this.store.project.subtitles?.items || []).some(
+      (item) => time >= item.start && time < item.end && String(item.text || '').trim()
+    );
+  }
+
+  updateEmptyState(time = this.store.playhead) {
+    if (!this.empty) return;
+    this.empty.hidden = this.hasContentAt(time) || this.store.duration() > 0;
   }
 
   duration() {
-    return Math.max(
-      projectDuration(this.store.project),
-      this.store.project.subtitles?.items?.reduce((max, item) => Math.max(max, item.end), 0) || 0
-    );
+    return this.store.duration();
   }
 
   seek(time, { keepPlaying = false } = {}) {
     const duration = this.duration();
-    this.store.playhead = clamp(time, 0, Math.max(0, duration));
-    /* A pass that was already decoding the old time must not paint over the
-       frame we are seeking to. */
+    this.store.playhead = clamp(Number(time) || 0, 0, Math.max(0, duration));
     this.invalidateRender();
     if (this.playing && !keepPlaying) {
       this.pause();
     } else if (this.playing) {
-      this.playStart = performance.now() - (this.store.playhead - this.playFrom) * 1000 / this.rate;
+      this.playStart = performance.now() - ((this.store.playhead - this.playFrom) * 1000) / this.rate;
       this.audio.seek();
     }
     this.onTime(this.store.playhead);
@@ -258,7 +238,7 @@ export class Preview {
   }
 
   stepFrames(direction) {
-    const fps = Math.max(1, num(this.store.project.fps, 30));
+    const fps = Math.max(1, Number(this.store.project.fps) || 30);
     this.seek(this.store.playhead + direction / fps);
   }
 
@@ -269,16 +249,20 @@ export class Preview {
       this.playStart = performance.now();
     }
     this.rate = next;
-    /* Re-schedule so the new speed applies to the already-started sources. */
     this.audio.seek();
     return next;
+  }
+
+  setMuted(muted) {
+    this.store.previewMuted = Boolean(muted);
+    this.audio.setMuted(this.store.previewMuted);
   }
 
   play() {
     if (this.playing) return true;
     const duration = this.duration();
     if (duration <= 0) {
-      this.onStatus('Add something to the timeline before playing.', 'info');
+      this.onStatus('Add a video or another layer before playing.', 'info');
       return false;
     }
     if (this.store.playhead >= duration - 0.01) this.seek(0);
@@ -290,8 +274,6 @@ export class Preview {
     this.audio.start();
     this.onTime(this.store.playhead);
     const tick = (now) => {
-      /* A pause or a second play() invalidates this loop, so an old timer can
-         never overwrite the authoritative playhead. */
       if (!this.playing || generation !== this.playToken) return;
       const elapsed = (now - this.playStart) / 1000;
       const next = this.playFrom + elapsed * this.rate;
@@ -308,8 +290,6 @@ export class Preview {
       this.scheduleRender();
       this.raf = requestAnimationFrame(tick);
     };
-    /* The mixer joins at the live playhead once the file can actually play,
-     * so a slow-buffering MP4 starts in sync instead of half a second late. */
     this.raf = requestAnimationFrame(tick);
     return true;
   }
@@ -340,20 +320,10 @@ export class Preview {
 
   /* Direct canvas manipulation ------------------------------------------- */
 
-  activeVisual() {
-    const current = this.store.playhead;
-    for (const track of this.store.project.tracks) {
-      if (track.kind !== 'video' || track.hidden) continue;
-      const clip = clipAtTime(track, current);
-      if (clip && !clip.hidden) return { track, clip };
-    }
-    return null;
-  }
-
   selectedVisual() {
-    const found = this.store.firstSelected();
+    const found = this.store.selected();
     if (!found || found.track.kind !== 'video' || found.clip.hidden) return null;
-    if (this.store.playhead < found.clip.start || this.store.playhead >= clipEnd(found.clip)) return null;
+    if (this.store.playhead < found.clip.start - 1e-6 || this.store.playhead >= clipEnd(found.clip) - 1e-6) return null;
     return found;
   }
 
@@ -369,48 +339,68 @@ export class Preview {
 
   boundsFor(clip) {
     const source = this.sourceSize(clip);
-    return clipBounds(clip, this.store.playhead - clip.start, this.canvas.width, this.canvas.height, source.width, source.height);
+    return clipBounds(
+      clip,
+      clamp(this.store.playhead - clip.start, 0, Math.max(0, clip.duration)),
+      this.canvas.width,
+      this.canvas.height,
+      source.width,
+      source.height
+    );
   }
 
   updateOverlay() {
     if (!this.overlay || !this.frame) return;
     const selected = this.selectedVisual();
-    this.overlay.innerHTML = '';
-    this.overlay.classList.toggle('has-selection', Boolean(selected));
-    if (!selected) return;
-    const bounds = this.boundsFor(selected.clip);
+    if (!selected) {
+      if (this.selectionBox) {
+        this.selectionBox.remove();
+        this.selectionBox = null;
+      }
+      this.overlay.classList.remove('has-selection');
+      return;
+    }
+    const clip = selected.clip;
+    const base = this.store.isBaseClip(clip);
+    const bounds = this.boundsFor(clip);
     const scaleX = this.frame.clientWidth / this.canvas.width;
     const scaleY = this.frame.clientHeight / this.canvas.height;
-    const width = Math.max(18, bounds.width * scaleX);
-    const height = Math.max(18, bounds.height * scaleY);
+    const width = Math.max(20, bounds.width * scaleX);
+    const height = Math.max(20, bounds.height * scaleY);
     const left = bounds.x * scaleX;
     const top = bounds.y * scaleY;
-    const box = document.createElement('div');
-    box.className = 've-selection-box';
-    box.dataset.selectedId = selected.clip.id;
+
+    let box = this.selectionBox;
+    if (!box || box.dataset.selectedId !== clip.id) {
+      if (box) box.remove();
+      box = document.createElement('div');
+      box.className = `se-selection-box${base ? ' is-base' : ''}`;
+      box.dataset.selectedId = clip.id;
+      if (!base && !clip.locked) {
+        box.innerHTML = [
+          '<span class="se-handle se-handle-nw" data-handle="nw"></span>',
+          '<span class="se-handle se-handle-ne" data-handle="ne"></span>',
+          '<span class="se-handle se-handle-sw" data-handle="sw"></span>',
+          '<span class="se-handle se-handle-se" data-handle="se"></span>',
+          '<span class="se-handle se-handle-rotate" data-handle="rotate"></span>'
+        ].join('');
+      }
+      this.overlay.appendChild(box);
+      this.selectionBox = box;
+    }
     box.style.left = `${left}px`;
     box.style.top = `${top}px`;
     box.style.width = `${width}px`;
     box.style.height = `${height}px`;
     box.style.transform = `translate(-50%, -50%) rotate(${bounds.rotation || 0}deg)`;
-    box.innerHTML = [
-      '<span class="ve-handle ve-handle-nw" data-handle="nw"></span>',
-      '<span class="ve-handle ve-handle-ne" data-handle="ne"></span>',
-      '<span class="ve-handle ve-handle-sw" data-handle="sw"></span>',
-      '<span class="ve-handle ve-handle-se" data-handle="se"></span>',
-      '<span class="ve-handle ve-handle-rotate" data-handle="rotate"></span>'
-    ].join('');
-    this.overlay.appendChild(box);
-    this.selectionBox = box;
+    this.overlay.classList.add('has-selection');
   }
 
   pointInClip(clip, point) {
     const bounds = this.boundsFor(clip);
-    const x = point.x;
-    const y = point.y;
-    const angle = -(bounds.rotation || 0) * Math.PI / 180;
-    const dx = x - bounds.x;
-    const dy = y - bounds.y;
+    const angle = (-(bounds.rotation || 0) * Math.PI) / 180;
+    const dx = point.x - bounds.x;
+    const dy = point.y - bounds.y;
     const rx = dx * Math.cos(angle) - dy * Math.sin(angle);
     const ry = dx * Math.sin(angle) + dy * Math.cos(angle);
     return Math.abs(rx) <= bounds.width / 2 && Math.abs(ry) <= bounds.height / 2;
@@ -419,8 +409,8 @@ export class Preview {
   eventPoint(event) {
     const rect = this.frame.getBoundingClientRect();
     return {
-      x: (event.clientX - rect.left) / Math.max(1, rect.width) * this.canvas.width,
-      y: (event.clientY - rect.top) / Math.max(1, rect.height) * this.canvas.height
+      x: ((event.clientX - rect.left) / Math.max(1, rect.width)) * this.canvas.width,
+      y: ((event.clientY - rect.top) / Math.max(1, rect.height)) * this.canvas.height
     };
   }
 
@@ -431,32 +421,46 @@ export class Preview {
     let selected = this.selectedVisual();
     if (handle && selected) {
       event.preventDefault();
+      event.stopPropagation();
       this.startDrag(event, selected, handle.dataset.handle, point);
       return;
     }
     let hit = null;
-    for (const track of this.store.project.tracks) {
-      if (track.kind !== 'video' || track.hidden || track.locked) continue;
+    for (const track of this.store.visualTracks()) {
+      if (track.hidden) continue;
       const clip = clipAtTime(track, this.store.playhead);
-      if (!clip || clip.hidden || clip.locked) continue;
+      if (!clip || clip.hidden) continue;
       if (this.pointInClip(clip, point)) {
         hit = { track, clip };
         break;
       }
     }
     if (!hit) {
-      this.store.clearSelection();
-      this.store.emit('selection');
-      this.updateOverlay();
-      this.onSelect(null);
+      if (this.store.selectedId) {
+        this.store.clearSelection();
+        this.store.emit('selection');
+        this.onSelect(null);
+        this.updateOverlay();
+      }
       return;
     }
-    this.store.selectClip(hit.clip.id);
+    const now = performance.now();
+    const wasSelected = this.store.selectedId === hit.clip.id;
+    this.store.select(hit.clip.id);
     this.store.emit('selection');
     this.onSelect(hit.clip.id);
     this.updateOverlay();
-    event.preventDefault();
-    this.startDrag(event, hit, 'move', point);
+    if (wasSelected && now - this.lastTap.at < 360 && this.lastTap.id === hit.clip.id) {
+      this.lastTap = { id: null, at: 0 };
+      this.onRequestEdit(hit.clip.id);
+      return;
+    }
+    this.lastTap = { id: hit.clip.id, at: now };
+
+    const base = this.store.isBaseClip(hit.clip);
+    if (!base && !hit.clip.locked) {
+      this.startDrag(event, hit, 'move', point);
+    }
   }
 
   startDrag(event, found, mode, point) {
@@ -473,9 +477,9 @@ export class Preview {
       startRotation: transform.rotation,
       center: this.boundsFor(clip),
       point,
-      moved: false
+      moved: false,
+      axis: mode === 'move' ? null : 'active'
     };
-    this.frame.setPointerCapture?.(event.pointerId);
     window.addEventListener('pointermove', this._boundPointerMove, { passive: false });
     window.addEventListener('pointerup', this._boundPointerUp, { once: true });
     window.addEventListener('pointercancel', this._boundPointerUp, { once: true });
@@ -486,6 +490,17 @@ export class Preview {
     const point = this.eventPoint(event);
     const dx = point.x - this.drag.point.x;
     const dy = point.y - this.drag.point.y;
+    if (this.drag.mode === 'move' && this.drag.axis === null) {
+      const ax = Math.abs(dx);
+      const ay = Math.abs(dy);
+      if (ay > 6 && ay > ax * 1.15) {
+        /* A vertical swipe belongs to the page, not to the layer. */
+        this.cancelDrag();
+        return;
+      }
+      if (ax < 4) return;
+      this.drag.axis = 'x';
+    }
     if (Math.abs(dx) + Math.abs(dy) > 1) this.drag.moved = true;
     const found = this.store.trackForClip(this.drag.clipId);
     if (!found) return;
@@ -493,23 +508,17 @@ export class Preview {
     if (this.drag.mode === 'move') {
       let x = this.drag.startX + dx / this.canvas.width;
       let y = this.drag.startY + dy / this.canvas.height;
-      if (this.store.snapping) {
-        x = this.snap(x, 0.5, 0.012);
-        y = this.snap(y, 0.5, 0.012);
-      }
-      x = clamp(x, -0.5, 1.5);
-      y = clamp(y, -0.5, 1.5);
-      this.writeAnimated(clip, 'x', x);
-      this.writeAnimated(clip, 'y', y);
-      this.showGuide('v', Math.abs(x - 0.5) < 0.015);
-      this.showGuide('h', Math.abs(y - 0.5) < 0.015);
+      if (Math.abs(x - 0.5) < 0.012) x = 0.5;
+      if (Math.abs(y - 0.5) < 0.012) y = 0.5;
+      this.writeAnimated(clip, 'x', clamp(x, -0.5, 1.5));
+      this.writeAnimated(clip, 'y', clamp(y, -0.5, 1.5));
     } else if (this.drag.mode === 'rotate') {
-      const angle = Math.atan2(point.y - this.drag.center.y, point.x - this.drag.center.x) * 180 / Math.PI + 90;
+      const angle = (Math.atan2(point.y - this.drag.center.y, point.x - this.drag.center.x) * 180) / Math.PI + 90;
       this.writeAnimated(clip, 'rotation', Math.round(angle * 10) / 10);
     } else {
-      const distanceStart = Math.hypot(this.drag.point.x - this.drag.center.x, this.drag.point.y - this.drag.center.y);
-      const distanceNow = Math.hypot(point.x - this.drag.center.x, point.y - this.drag.center.y);
-      const factor = distanceStart > 5 ? distanceNow / distanceStart : 1;
+      const startDistance = Math.hypot(this.drag.point.x - this.drag.center.x, this.drag.point.y - this.drag.center.y);
+      const nowDistance = Math.hypot(point.x - this.drag.center.x, point.y - this.drag.center.y);
+      const factor = startDistance > 5 ? nowDistance / startDistance : 1;
       this.writeAnimated(clip, 'scale', clamp(this.drag.startScale * factor, 0.04, 8));
     }
     this.store.emit('live-drag');
@@ -518,8 +527,7 @@ export class Preview {
     event.preventDefault();
   }
 
-  /* Dragging an animated layer writes the keyframe under the playhead instead
-   * of a base value that interpolation would immediately hide. */
+  /* Dragging an animated layer writes the keyframe under the playhead. */
   writeAnimated(clip, prop, value) {
     const list = clip.keyframes?.[prop];
     if (!list || !list.length) {
@@ -535,14 +543,15 @@ export class Preview {
     }
   }
 
-  snap(value, target, threshold) {
-    return Math.abs(value - target) < threshold ? target : value;
-  }
-
-  showGuide(axis, show) {
-    if (!this.guides || !this.store.project.guides) return;
-    const line = this.guides.querySelector(axis === 'v' ? '.ve-guide-v' : '.ve-guide-h');
-    if (line) line.classList.toggle('is-active', Boolean(show));
+  cancelDrag() {
+    if (!this.drag) return;
+    window.removeEventListener('pointermove', this._boundPointerMove);
+    window.removeEventListener('pointerup', this._boundPointerUp);
+    window.removeEventListener('pointercancel', this._boundPointerUp);
+    this.drag = null;
+    this.store.end({ history: false });
+    this.updateOverlay();
+    this.scheduleRender();
   }
 
   onPointerUp(event) {
@@ -559,18 +568,13 @@ export class Preview {
     this.onTime(this.store.playhead);
   }
 
-  zoomToFit() {
-    this.store.previewZoom = 1;
-    this.layout();
-  }
-
   async fullscreen() {
     try {
       if (document.fullscreenElement) await document.exitFullscreen();
-      else await this.shell.requestFullscreen();
+      else await this.frame.requestFullscreen();
       return true;
     } catch (error) {
-      this.onStatus('Fullscreen was blocked by the browser.', 'warn');
+      this.onStatus('Full screen was blocked by the browser.', 'warn');
       return false;
     }
   }
@@ -586,7 +590,7 @@ export class Preview {
       renderPending: this.renderPending,
       audio: this.audio.debug(),
       canvas: { width: this.canvas.width, height: this.canvas.height },
-      selection: this.store.firstSelected()?.clip?.id || null
+      selection: this.store.selectedId
     };
   }
 }
