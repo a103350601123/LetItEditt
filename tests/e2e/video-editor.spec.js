@@ -552,6 +552,17 @@ test('export writes a real file that decodes with the edited duration', async ({
   await qualitySeg.getByRole('button', { name: 'Small' }).click();
   await page.click('#se-export-start');
 
+  await page.waitForFunction(
+    () => {
+      const bar = document.querySelector('.se-progress > span');
+      return Boolean(bar && /%$/.test(bar.style.width));
+    },
+    null,
+    { timeout: 60000 }
+  );
+  const phaseText = await page.locator('#se-export-phase').innerText();
+  expect(phaseText).toMatch(/%/);
+
   await expect(page.locator('.se-sheet-title')).toHaveText('Export complete', { timeout: 150000 });
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Download video' }).click();

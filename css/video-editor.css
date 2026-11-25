@@ -279,6 +279,14 @@
 .se-handle-sw { left: 0; top: 100%; cursor: nesw-resize; }
 .se-handle-se { left: 100%; top: 100%; cursor: nwse-resize; }
 
+/* Small selections keep the bottom-right resize target and the rotate target;
+   the other three 44 px targets would cover the layer being edited. */
+.se-selection-box.is-small .se-handle-nw,
+.se-selection-box.is-small .se-handle-ne,
+.se-selection-box.is-small .se-handle-sw { display: none; }
+.se-selection-box.is-small .se-handle::after { inset: 13px; }
+.se-selection-box.is-small .se-handle-rotate { top: -30px; }
+
 .se-handle-rotate {
   left: 50%;
   top: -34px;

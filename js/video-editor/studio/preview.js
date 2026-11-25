@@ -393,6 +393,8 @@ export class Preview {
     box.style.width = `${width}px`;
     box.style.height = `${height}px`;
     box.style.transform = `translate(-50%, -50%) rotate(${bounds.rotation || 0}deg)`;
+    /* Four 44 px corner targets would hide a small text layer completely. */
+    box.classList.toggle('is-small', width < 120 || height < 64);
     this.overlay.classList.add('has-selection');
   }
 
