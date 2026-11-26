@@ -668,7 +668,11 @@ function drawWaveform() {
   const canvas = els.canvas;
   const cssWidth = state.waveformWidth;
   const cssHeight = Math.max(80, els.waveInner.clientHeight || 180);
-  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const maxBackingWidth = 32000;
+  const dpr = Math.max(
+    1,
+    Math.min(2, window.devicePixelRatio || 1, maxBackingWidth / Math.max(1, cssWidth))
+  );
   canvas.width = Math.max(1, Math.round(cssWidth * dpr));
   canvas.height = Math.max(1, Math.round(cssHeight * dpr));
   canvas.style.width = `${cssWidth}px`;
@@ -1061,7 +1065,9 @@ function adoptBuffer(file, buffer, peaks, metadata) {
   els.fileName.textContent = file.name;
   const rateLabel = state.ratePreserved
     ? formatSampleRate(buffer.sampleRate)
-    : `${formatSampleRate(buffer.sampleRate)} decoded`;
+    : state.sourceRate
+      ? `${formatSampleRate(buffer.sampleRate)} decoded from ${formatSampleRate(state.sourceRate)}`
+      : `${formatSampleRate(buffer.sampleRate)} decoded`;
   els.fileMeta.textContent =
     `${formatBytes(file.size)} · ${formatClock(buffer.duration)} · ${rateLabel} · ${channelLabel(buffer.numberOfChannels)}`;
   els.total.textContent = formatClock(buffer.duration);
