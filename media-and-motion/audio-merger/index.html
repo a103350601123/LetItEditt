@@ -80,7 +80,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h5l2 2h9v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M12 11v5M9.5 13.5h5"/></svg>
           </span>
           <p class="amg-drop-title">Drag and drop audio files here</p>
-          <p class="amg-drop-sub">MP3, WAV, M4A, AAC, OGG, FLAC or WebM &middot; add up to 20 files</p>
+          <p class="amg-drop-sub">MP3, WAV, AIFF, FLAC, M4A/AAC, OGG/Opus or WebM &middot; add up to 20 files</p>
           <button class="amg-btn amg-btn-primary" type="button" data-browse>Browse audio files</button>
           <p class="amg-drop-note">No upload. The files stay in this browser tab.</p>
         </div>
@@ -118,7 +118,7 @@
           <div class="amg-section-head">
             <div>
               <h3 id="transitions-title">Transitions between tracks</h3>
-              <p>Each boundary has its own setting. A gap inserts silence; a crossfade overlaps the two tracks with equal-power fades.</p>
+              <p>Each boundary has its own transition: a direct cut, a silence gap, an equal-power, linear or smooth crossfade, a volume dip, or a fade in/out.</p>
             </div>
           </div>
           <div class="amg-transition-list" data-transitions></div>
@@ -155,7 +155,7 @@
 
           <div class="amg-timeline-scroll" data-timeline-scroll>
             <div class="amg-timeline-inner" data-timeline-inner>
-              <canvas class="amg-timeline" data-timeline aria-label="Merged sequence waveform with track segments, silence gaps and crossfade regions."></canvas>
+              <canvas class="amg-timeline" data-timeline aria-label="Merged sequence waveform with track segments, silence gaps, crossfade regions and fade regions."></canvas>
               <div class="amg-timeline-playhead" data-timeline-playhead aria-hidden="true"></div>
             </div>
           </div>
@@ -163,6 +163,7 @@
             <span><i class="amg-swatch amg-swatch-track"></i>Track</span>
             <span><i class="amg-swatch amg-swatch-gap"></i>Silence gap</span>
             <span><i class="amg-swatch amg-swatch-fade"></i>Crossfade</span>
+            <span><i class="amg-swatch amg-swatch-fadeout"></i>Fade</span>
             <span><i class="amg-swatch amg-swatch-playhead"></i>Playhead</span>
           </div>
           <p class="amg-hint">The timeline scrolls horizontally on narrow screens. Click the waveform to seek; the slider works with a keyboard too.</p>
@@ -257,7 +258,7 @@
         </div>
       </div>
 
-      <input type="file" hidden multiple data-file-input accept="audio/*,.mp3,.wav,.wave,.m4a,.m4b,.aac,.ogg,.oga,.opus,.flac,.webm,.aif,.aiff">
+      <input type="file" hidden multiple data-file-input accept="audio/*,.mp3,.wav,.wave,.m4a,.m4b,.aac,.ogg,.oga,.opus,.flac,.webm,.weba,.aif,.aiff,.aifc,.caf">
       <noscript><p class="amg-alert">This audio merger needs JavaScript. All processing runs locally in your browser.</p></noscript>
     </div>
   </div>

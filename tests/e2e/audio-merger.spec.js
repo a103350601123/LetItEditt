@@ -1,8 +1,10 @@
 'use strict';
 
+const fs = require('fs');
 const { test, expect } = require('@playwright/test');
 
 const PAGE = '/media-and-motion/audio-merger/';
+const CONVERTER = '/media-and-motion/audio-converter/';
 const TRIMMER = '/media-and-motion/audio-trimmer/';
 const CATEGORY = '/categories/audio-music-editing/';
 
@@ -38,6 +40,211 @@ function makeWav({ seconds = 2, rate = 44100, channels = 2, freq = 440, amplitud
 
 function wavFile(name, options = {}) {
   return { name, mimeType: 'audio/wav', buffer: makeWav(options) };
+}
+
+/* Build a real AIFF or AIFC file, including 24-bit and little-endian sowt variants. */
+function extended80(value) {
+  const bytes = Buffer.alloc(10);
+  if (!(value > 0)) return bytes;
+  const exponent = Math.floor(Math.log2(value));
+  const mantissa = Number.isInteger(value) && exponent <= 63
+    ? BigInt(value) << BigInt(63 - exponent)
+    : BigInt(Math.round(value * Math.pow(2, 63 - exponent)));
+  bytes.writeUInt16BE(exponent + 16383, 0);
+  bytes.writeUInt32BE(Number((mantissa >> 32n) & 0xffffffffn), 2);
+  bytes.writeUInt32BE(Number(mantissa & 0xffffffffn), 6);
+  return bytes;
+}
+
+function makeAiff({
+  seconds = 1,
+  rate = 44100,
+  channels = 2,
+  freq = 440,
+  amplitude = 0.4,
+  bits = 16,
+  aifc = false,
+  littleEndian = false
+} = {}) {
+  const frames = Math.round(seconds * rate);
+  const bytesPerSample = bits / 8;
+  const dataBytes = frames * channels * bytesPerSample;
+  const commSize = aifc ? 22 : 18;
+  const ssndSize = 8 + dataBytes;
+  const formSize = 4 + (8 + commSize) + (8 + ssndSize);
+  const buffer = Buffer.alloc(8 + formSize);
+  buffer.write('FORM', 0);
+  buffer.writeUInt32BE(formSize, 4);
+  buffer.write(aifc ? 'AIFC' : 'AIFF', 8);
+  buffer.write('COMM', 12);
+  buffer.writeUInt32BE(commSize, 16);
+  buffer.writeUInt16BE(channels, 20);
+  buffer.writeUInt32BE(frames, 22);
+  buffer.writeUInt16BE(bits, 26);
+  extended80(rate).copy(buffer, 28);
+  if (aifc) buffer.write(littleEndian ? 'sowt' : 'NONE', 38);
+  const ssnd = 20 + commSize;
+  buffer.write('SSND', ssnd);
+  buffer.writeUInt32BE(ssndSize, ssnd + 4);
+  buffer.writeUInt32BE(0, ssnd + 8);
+  buffer.writeUInt32BE(0, ssnd + 12);
+  let offset = ssnd + 16;
+  for (let frame = 0; frame < frames; frame += 1) {
+    const value = Math.sin((2 * Math.PI * freq * frame) / rate) * amplitude;
+    for (let channel = 0; channel < channels; channel += 1) {
+      if (bits === 16) {
+        const sample = Math.round(value * 32767);
+        if (littleEndian) buffer.writeInt16LE(sample, offset);
+        else buffer.writeInt16BE(sample, offset);
+        offset += 2;
+      } else if (bits === 24) {
+        const sample = Math.round(value * 8388607);
+        const unsigned = sample < 0 ? sample + 0x1000000 : sample;
+        if (littleEndian) {
+          buffer[offset] = unsigned & 0xff;
+          buffer[offset + 1] = (unsigned >> 8) & 0xff;
+          buffer[offset + 2] = (unsigned >> 16) & 0xff;
+        } else {
+          buffer[offset] = (unsigned >> 16) & 0xff;
+          buffer[offset + 1] = (unsigned >> 8) & 0xff;
+          buffer[offset + 2] = unsigned & 0xff;
+        }
+        offset += 3;
+      } else {
+        buffer.writeInt8(Math.round(value * 127), offset);
+        offset += 1;
+      }
+    }
+  }
+  return buffer;
+}
+
+function aiffFile(name, options = {}) {
+  return { name, mimeType: options.aifc ? 'audio/x-aiff' : 'audio/aiff', buffer: makeAiff(options) };
+}
+
+/* Generate real MP3/FLAC/M4A/OGG fixtures with the existing converter tool. */
+async function convertFixtures(page, formats) {
+  await page.goto(CONVERTER, { waitUntil: 'networkidle' });
+  await page.waitForFunction(() => window.__AC__?.debug().capabilities.mp3Probed, null, { timeout: 30000 });
+  await page.setInputFiles('[data-file-input]', {
+    name: 'fixture-tone.wav',
+    mimeType: 'audio/wav',
+    buffer: makeWav({ seconds: 1, rate: 44100, channels: 2, freq: 440, amplitude: 0.4 })
+  });
+  await page.waitForFunction(() => window.__AC__?.debug().fileCount === 1, null, { timeout: 30000 });
+  const fixtures = {};
+  for (const format of formats) {
+    await page.selectOption('[data-format]', format);
+    const downloadPromise = page.waitForEvent('download', { timeout: 120000 });
+    await page.click('[data-convert]');
+    const download = await downloadPromise;
+    await page.waitForFunction(() => !window.__AC__.debug().converting, null, { timeout: 120000 });
+    fixtures[format] = fs.readFileSync(await download.path());
+  }
+  return fixtures;
+}
+
+/* Record a real audio-only WebM/Opus file in the page. */
+async function makeWebmAudio(page, seconds = 1) {
+  const bytes = await page.evaluate(async (duration) => {
+    const context = new AudioContext();
+    const destination = context.createMediaStreamDestination();
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.frequency.value = 523.25;
+    gain.gain.value = 0.4;
+    oscillator.connect(gain);
+    gain.connect(destination);
+    const chunks = [];
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+      ? 'audio/webm;codecs=opus'
+      : 'audio/webm';
+    const recorder = new MediaRecorder(destination.stream, { mimeType });
+    recorder.ondataavailable = (event) => {
+      if (event.data.size) chunks.push(event.data);
+    };
+    const stopped = new Promise((resolve) => { recorder.onstop = resolve; });
+    oscillator.start();
+    recorder.start();
+    await new Promise((resolve) => setTimeout(resolve, duration * 1000));
+    recorder.stop();
+    oscillator.stop();
+    await stopped;
+    await context.close();
+    const blob = new Blob(chunks, { type: mimeType });
+    return Array.from(new Uint8Array(await blob.arrayBuffer()));
+  }, seconds);
+  return Buffer.from(bytes);
+}
+
+/* Encode a real ADTS AAC file with WebCodecs when this Chrome can encode AAC. */
+async function makeAdtsAac(page, seconds = 1) {
+  const bytes = await page.evaluate(async (duration) => {
+    if (typeof AudioEncoder !== 'function' || typeof AudioData !== 'function') return null;
+    const rate = 44100;
+    const config = { codec: 'mp4a.40.2', sampleRate: rate, numberOfChannels: 1, bitrate: 128000 };
+    try {
+      const support = await AudioEncoder.isConfigSupported(config);
+      if (!support.supported) return null;
+    } catch (error) {
+      return null;
+    }
+    const frames = Math.round(duration * rate);
+    const samples = new Float32Array(frames);
+    for (let index = 0; index < frames; index += 1) {
+      samples[index] = Math.sin((2 * Math.PI * 440 * index) / rate) * 0.4;
+    }
+    const chunks = [];
+    let failure = null;
+    const encoder = new AudioEncoder({
+      output: (chunk) => {
+        const data = new Uint8Array(chunk.byteLength);
+        chunk.copyTo(data);
+        chunks.push(data);
+      },
+      error: (error) => { failure = error; }
+    });
+    try {
+      encoder.configure(config);
+      encoder.encode(new AudioData({
+        format: 'f32',
+        sampleRate: rate,
+        numberOfFrames: frames,
+        numberOfChannels: 1,
+        timestamp: 0,
+        data: samples
+      }));
+      await encoder.flush();
+    } catch (error) {
+      try { encoder.close(); } catch (closeError) { /* already closed */ }
+      return null;
+    }
+    encoder.close();
+    if (failure || !chunks.length) return null;
+    const parts = [];
+    for (const payload of chunks) {
+      const frameLength = 7 + payload.length;
+      const header = new Uint8Array(7);
+      header[0] = 0xff;
+      header[1] = 0xf1;
+      header[2] = (1 << 6) | (4 << 2);
+      header[3] = (1 << 6) | ((frameLength >> 11) & 0x03);
+      header[4] = (frameLength >> 3) & 0xff;
+      header[5] = ((frameLength & 0x07) << 5) | 0x1f;
+      header[6] = 0xfc;
+      parts.push(header, payload);
+    }
+    const total = parts.reduce((sum, part) => sum + part.length, 0);
+    const result = new Uint8Array(total);
+    let offset = 0;
+    for (const part of parts) {
+      result.set(part, offset);
+      offset += part.length;
+    }
+    return Array.from(result);
+  }, seconds);
+  return bytes ? Buffer.from(bytes) : null;
 }
 
 function contrastRatio(first, second) {
@@ -111,6 +318,7 @@ async function readWav(page, windows = []) {
           let peak = 0;
           let crossings = 0;
           let previous = 0;
+          let maxDelta = 0;
           let count = 0;
           for (let frame = first; frame < last; frame += 1) {
             const sample = view.getInt16(44 + frame * blockAlign + channel * 2, true) / 32768;
@@ -118,12 +326,17 @@ async function readWav(page, windows = []) {
             const absolute = Math.abs(sample);
             if (absolute > peak) peak = absolute;
             if (frame > first && (sample >= 0) !== (previous >= 0)) crossings += 1;
+            if (frame > first) {
+              const delta = Math.abs(sample - previous);
+              if (delta > maxDelta) maxDelta = delta;
+            }
             previous = sample;
             count += 1;
           }
           return {
             rms: Math.sqrt(sum / Math.max(1, count)),
             peak,
+            maxDelta,
             crossings,
             frames: count,
             seconds: count / sampleRate,
@@ -531,6 +744,199 @@ test('applies a real equal-power crossfade, caps it at half the shorter track an
   expect(debug.totalDuration).toBeCloseTo(3.5, 3);
 });
 
+test('applies different transitions on different boundaries with exact layout math', async ({ page }) => {
+  await openPage(page);
+  await loadFiles(page, [
+    wavFile('mix-a.wav', { seconds: 1, rate: 44100, channels: 2, freq: 440, amplitude: 0.4 }),
+    wavFile('mix-b.wav', { seconds: 1, rate: 44100, channels: 2, freq: 660, amplitude: 0.4 }),
+    wavFile('mix-c.wav', { seconds: 1, rate: 44100, channels: 2, freq: 880, amplitude: 0.4 })
+  ]);
+
+  await setTransition(page, 0, 'crossfade', 0.5);
+  await setTransition(page, 1, 'linear', 0.25);
+  let debug = await getDebug(page);
+  expect(debug.transitions.map((item) => item.mode)).toEqual(['crossfade', 'linear']);
+  expect(debug.transitions.map((item) => item.duration)).toEqual([0.5, 0.25]);
+  expect(debug.segments.map((item) => item.start)).toEqual([0, 0.5, 1.25]);
+  expect(debug.totalDuration).toBeCloseTo(2.25, 3);
+  expect(debug.timelineCrossfades).toBe(2);
+  expect(debug.timelineGaps).toBe(0);
+  await expect(page.locator('[data-transition-row]').nth(0).locator('.amg-transition-note'))
+    .toContainText('Equal-power overlap');
+  await expect(page.locator('[data-transition-row]').nth(1).locator('.amg-transition-note'))
+    .toContainText('Linear overlap');
+
+  await exportMix(page, 'wav');
+  const wav = await readWav(page, [[0.1, 0.4], [0.6, 0.9], [1.1, 1.2], [1.6, 2.1]]);
+  expect(wav.frames).toBe(Math.round(2.25 * 44100));
+  expect(wav.duration).toBeCloseTo(2.25, 3);
+  expect(wav.windows.every((window) => window.rms > 0.08)).toBe(true);
+
+  await setTransition(page, 0, 'gap', 0.5);
+  await setTransition(page, 1, 'dip', 0.5);
+  debug = await getDebug(page);
+  expect(debug.transitions.map((item) => item.mode)).toEqual(['gap', 'dip']);
+  expect(debug.segments.map((item) => item.start)).toEqual([0, 1.5, 2]);
+  expect(debug.totalDuration).toBeCloseTo(3, 3);
+  expect(debug.timelineGaps).toBe(1);
+  expect(debug.timelineCrossfades).toBe(1);
+
+  await exportMix(page, 'wav');
+  const mixed = await readWav(page, [[0.1, 0.8], [1.05, 1.45], [2.1, 2.9]]);
+  expect(mixed.duration).toBeCloseTo(3, 3);
+  expect(mixed.windows[0].rms).toBeGreaterThan(0.2);
+  expect(mixed.windows[1].rms).toBeLessThan(0.003);
+  expect(mixed.windows[2].rms).toBeGreaterThan(0.1);
+});
+
+test('implements every transition type with audible, click-free audio', async ({ page }) => {
+  test.setTimeout(240000);
+  await openPage(page);
+  await loadFiles(page, [
+    wavFile('types-a.wav', { seconds: 2, rate: 44100, channels: 2, freq: 440, amplitude: 0.4 }),
+    wavFile('types-b.wav', { seconds: 2, rate: 44100, channels: 2, freq: 660, amplitude: 0.4 })
+  ]);
+
+  const cases = [
+    { mode: 'cut', duration: null, total: 4 },
+    { mode: 'gap', duration: 0.5, total: 4.5 },
+    { mode: 'crossfade', duration: 0.5, total: 3.5 },
+    { mode: 'linear', duration: 0.5, total: 3.5 },
+    { mode: 'smooth', duration: 0.5, total: 3.5 },
+    { mode: 'dip', duration: 0.5, total: 3.5 },
+    { mode: 'fade', duration: 0.5, total: 4 },
+    { mode: 'fadein', duration: 0.5, total: 4 },
+    { mode: 'fadeout', duration: 0.5, total: 4 }
+  ];
+  const centerRms = {};
+  for (const item of cases) {
+    await setTransition(page, 0, item.mode, item.duration === null ? undefined : item.duration);
+    const debug = await getDebug(page);
+    expect(debug.transitions[0].mode).toBe(item.mode);
+    expect(debug.totalDuration).toBeCloseTo(item.total, 3);
+    if (item.mode === 'cut') {
+      expect(debug.transitions[0].duration).toBe(0);
+      expect(debug.timelineCuts).toBe(1);
+    } else {
+      expect(debug.transitions[0].duration).toBeCloseTo(item.duration, 3);
+      if (item.mode === 'gap') expect(debug.timelineGaps).toBe(1);
+      else if (['crossfade', 'linear', 'smooth', 'dip'].includes(item.mode)) {
+        expect(debug.timelineCrossfades).toBe(1);
+      } else {
+        expect(debug.timelineFades).toBe(1);
+      }
+    }
+
+    await exportMix(page, 'wav');
+    const windows = [
+      [0.2, 0.8],
+      [1.7, 1.8],
+      [1.98, 2.02],
+      [2.6, 3.2],
+      [2.05, 2.45],
+      [2, 2.05],
+      [1.95, 1.995],
+      [1.73, 1.77]
+    ];
+    const wav = await readWav(page, windows);
+    expect(wav.duration).toBeCloseTo(item.total, 3);
+    expect(wav.windows[0].rms).toBeGreaterThan(0.15);
+    expect(wav.windows[0].peak).toBeLessThanOrEqual(0.99);
+    expect(wav.windows[2].maxDelta).toBeLessThan(0.2);
+
+    if (item.mode === 'gap') {
+      expect(wav.windows[4].rms).toBeLessThan(0.003);
+      expect(wav.windows[3].rms).toBeGreaterThan(0.15);
+    } else if (item.mode === 'fade') {
+      expect(wav.windows[2].rms).toBeLessThan(0.03);
+      expect(wav.windows[3].rms).toBeGreaterThan(0.15);
+    } else if (item.mode === 'fadein') {
+      expect(wav.windows[5].rms).toBeLessThan(0.08);
+      expect(wav.windows[3].rms).toBeGreaterThan(0.15);
+    } else if (item.mode === 'fadeout') {
+      expect(wav.windows[6].rms).toBeLessThan(0.08);
+      expect(wav.windows[3].rms).toBeGreaterThan(0.15);
+    } else if (item.mode === 'cut') {
+      expect(wav.windows[1].rms).toBeGreaterThan(0.15);
+      expect(wav.windows[2].rms).toBeGreaterThan(0.15);
+      expect(wav.windows[3].rms).toBeGreaterThan(0.15);
+    } else {
+      expect(wav.windows[1].rms).toBeGreaterThan(0.08);
+      expect(wav.windows[2].rms).toBeGreaterThan(0.08);
+      expect(wav.windows[3].rms).toBeGreaterThan(0.15);
+    }
+    centerRms[item.mode] = wav.windows[7].rms;
+  }
+
+  expect(centerRms.crossfade).toBeGreaterThan(centerRms.linear + 0.03);
+  expect(centerRms.linear).toBeGreaterThan(centerRms.dip + 0.03);
+});
+
+test('clamps new transition durations on very short tracks and accepts custom values', async ({ page }) => {
+  await openPage(page);
+  await loadFiles(page, [
+    wavFile('short-a.wav', { seconds: 0.3, rate: 44100, channels: 2, freq: 440, amplitude: 0.4 }),
+    wavFile('short-b.wav', { seconds: 0.3, rate: 44100, channels: 2, freq: 660, amplitude: 0.4 })
+  ]);
+
+  for (const mode of ['crossfade', 'linear', 'smooth', 'dip', 'fade', 'fadein', 'fadeout']) {
+    await setTransition(page, 0, mode, 5);
+    const debug = await getDebug(page);
+    expect(debug.transitions[0].mode).toBe(mode);
+    expect(debug.transitions[0].duration).toBeCloseTo(0.15, 4);
+    const overlap = ['crossfade', 'linear', 'smooth', 'dip'].includes(mode);
+    expect(debug.totalDuration).toBeCloseTo(overlap ? 0.45 : 0.6, 4);
+    await expect(page.locator('[data-transition-status]')).toContainText(/limited to 0.15 s/i);
+    await expect(page.locator('[data-transition-row] [data-custom-duration]')).toHaveAttribute('max', '0.15');
+  }
+
+  await setTransition(page, 0, 'gap', 5);
+  let debug = await getDebug(page);
+  expect(debug.transitions[0].duration).toBe(5);
+  expect(debug.totalDuration).toBeCloseTo(5.6, 4);
+  await setTransition(page, 0, null, 99);
+  debug = await getDebug(page);
+  expect(debug.transitions[0].duration).toBe(30);
+  expect(debug.totalDuration).toBeCloseTo(30.6, 4);
+  await expect(page.locator('[data-transition-status]')).toContainText(/limited to 30 s/i);
+
+  await setTransition(page, 0, 'linear', 0.05);
+  debug = await getDebug(page);
+  expect(debug.transitions[0].duration).toBe(0.05);
+  expect(debug.totalDuration).toBeCloseTo(0.55, 4);
+  await setTransition(page, 0, null, 0);
+  debug = await getDebug(page);
+  expect(debug.transitions[0].duration).toBe(0.01);
+  expect(debug.totalDuration).toBeCloseTo(0.59, 4);
+});
+
+test('previews the same non-crossfade transition mix that it exports', async ({ page }) => {
+  await openPage(page);
+  await loadFiles(page, [
+    wavFile('preview-dip-a.wav', { seconds: 2, rate: 44100, channels: 2, freq: 440, amplitude: 0.4 }),
+    wavFile('preview-dip-b.wav', { seconds: 1.5, rate: 44100, channels: 2, freq: 660, amplitude: 0.3 })
+  ]);
+
+  await setTransition(page, 0, 'dip', 0.5);
+  let debug = await getDebug(page);
+  expect(debug.totalDuration).toBeCloseTo(3, 3);
+  expect(debug.timelineCrossfades).toBe(1);
+  expect(debug.timelineFades).toBe(0);
+
+  await page.click('[data-seq-play]');
+  await page.waitForFunction(() => window.__AM__.debug().seqPlaying, null, { timeout: 30000 });
+  debug = await getDebug(page);
+  expect(debug.seqBufferDuration).toBeCloseTo(3, 2);
+  await page.click('[data-seq-play]');
+  await page.waitForFunction(() => !window.__AM__.debug().seqPlaying, null, { timeout: 5000 });
+
+  await exportMix(page, 'wav');
+  debug = await getDebug(page);
+  expect(debug.result.duration).toBeCloseTo(3, 3);
+  expect(debug.result.duration).toBeCloseTo(debug.totalDuration, 3);
+  expect(debug.seqBufferDuration).toBeCloseTo(debug.result.duration, 2);
+});
+
 test('changes per-track volume, mute and reset, and scales the master only to stop clipping', async ({ page }) => {
   await openPage(page);
   await loadFiles(page, [
@@ -835,6 +1241,121 @@ test('rejects corrupted, empty and non-audio files without losing loaded tracks'
   await expect(page.locator('[data-export]')).toBeEnabled();
   expect(await page.evaluate(() => window.__AM__.debug().trackCount)).toBe(2);
   expect(pageErrors).toEqual([]);
+});
+
+test('merges real AIFF, AIFC, MP3, FLAC, M4A/AAC, OGG/Opus and WebM inputs', async ({ page }) => {
+  test.setTimeout(300000);
+  const pageErrors = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+  await openPage(page);
+
+  const webm = await makeWebmAudio(page, 1);
+  const aac = await makeAdtsAac(page, 1);
+  const fixtures = await convertFixtures(page, ['mp3', 'flac', 'm4a', 'ogg']);
+  const aiff16 = makeAiff({ seconds: 1, bits: 16, freq: 440 });
+  const aiff24 = makeAiff({ seconds: 1, bits: 24, freq: 550 });
+  const aifcSowt = makeAiff({ seconds: 1, bits: 16, aifc: true, littleEndian: true, freq: 660 });
+  const monoLow = makeWav({ seconds: 1, rate: 22050, channels: 1, freq: 330, amplitude: 0.4 });
+  const mislabelled = makeAiff({ seconds: 1, bits: 16, freq: 770 });
+
+  const inputs = [
+    { name: 'mono-22k.wav', mimeType: 'audio/wav', buffer: monoLow },
+    { name: 'tone.aiff', mimeType: 'audio/aiff', buffer: aiff16 },
+    { name: 'tone-24bit.aiff', mimeType: 'audio/aiff', buffer: aiff24 },
+    { name: 'tone-sowt.aifc', mimeType: 'audio/x-aiff', buffer: aifcSowt },
+    { name: 'tone.aif', mimeType: 'audio/aiff', buffer: aiff16 },
+    { name: 'mislabelled.wav', mimeType: 'audio/wav', buffer: mislabelled },
+    { name: 'tone.mp3', mimeType: 'audio/mpeg', buffer: fixtures.mp3 },
+    { name: 'tone.flac', mimeType: 'audio/flac', buffer: fixtures.flac },
+    { name: 'tone.m4a', mimeType: 'audio/mp4', buffer: fixtures.m4a },
+    { name: 'tone.ogg', mimeType: 'audio/ogg', buffer: fixtures.ogg },
+    { name: 'tone.webm', mimeType: 'audio/webm', buffer: webm }
+  ];
+  if (aac) inputs.push({ name: 'tone.aac', mimeType: 'audio/aac', buffer: aac });
+
+  await page.goto(PAGE, { waitUntil: 'networkidle' });
+  await page.waitForFunction(() => window.__AM__?.debug().mp3Probed, null, { timeout: 25000 });
+  await loadFiles(page, inputs);
+
+  let debug = await getDebug(page);
+  expect(debug.trackCount).toBe(inputs.length);
+  expect(debug.tracks.filter((track) => track.container === 'aiff')).toHaveLength(5);
+  expect(debug.tracks.map((track) => track.container)).toEqual(
+    expect.arrayContaining(['wav', 'aiff', 'mp3', 'flac', 'mp4', 'ogg', 'webm'])
+  );
+  if (aac) expect(debug.tracks.some((track) => track.container === 'aac')).toBe(true);
+  expect(debug.tracks.every((track) => track.duration >= 0.85 && track.duration < 1.3)).toBe(true);
+  expect(debug.tracks[0].sampleRate).toBe(22050);
+  expect(debug.tracks[0].channels).toBe(1);
+  expect(debug.tracks[1].sampleRate).toBe(44100);
+  expect(debug.tracks[1].channels).toBe(2);
+  expect(debug.tracks[2].sampleRate).toBe(44100);
+  expect(debug.tracks[3].sampleRate).toBe(44100);
+  expect(debug.tracks[9].sampleRate).toBe(48000);
+  expect(debug.tracks[10].sampleRate).toBe(48000);
+
+  await exportMix(page, 'wav');
+  debug = await getDebug(page);
+  const windows = debug.segments.map((segment) => [
+    segment.start + 0.1,
+    Math.max(segment.start + 0.15, Math.min(segment.end - 0.1, segment.start + 0.9))
+  ]);
+  const wav = await readWav(page, windows);
+  expect(wav.sampleRate).toBe(48000);
+  expect(wav.channels).toBe(2);
+  expect(wav.duration).toBeCloseTo(debug.totalDuration, 2);
+  expect(wav.windows.every((window) => window.rms > 0.05)).toBe(true);
+
+  const played = await page.evaluate(async () => {
+    const audio = document.querySelector('[data-result-audio]');
+    if (audio.readyState < 1) {
+      await new Promise((resolve) => {
+        audio.onloadedmetadata = resolve;
+        setTimeout(resolve, 4000);
+      });
+    }
+    return { duration: audio.duration, error: audio.error ? audio.error.code : null };
+  });
+  expect(played.error).toBeNull();
+  expect(played.duration).toBeCloseTo(debug.totalDuration, 1);
+  expect(pageErrors).toEqual([]);
+});
+
+test('reports WMA and malformed AIFF clearly, and sniffs AIFF content behind a WAV name', async ({ page }) => {
+  await openPage(page);
+  await loadFiles(page, [
+    wavFile('keep-wma-a.wav', { seconds: 1, rate: 44100, channels: 2, freq: 440, amplitude: 0.4 }),
+    wavFile('keep-wma-b.wav', { seconds: 1, rate: 44100, channels: 2, freq: 660, amplitude: 0.4 })
+  ]);
+
+  await page.setInputFiles('[data-file-input]', {
+    name: 'song.wma',
+    mimeType: 'audio/x-ms-wma',
+    buffer: Buffer.from([0x30, 0x26, 0xb2, 0x75, 0, 0, 0, 0, 0, 0, 0, 0])
+  });
+  await expect(page.locator('[data-global-error]')).toBeVisible({ timeout: 30000 });
+  await expect(page.locator('[data-global-error]')).toContainText(/WMA/i);
+  expect(await page.evaluate(() => window.__AM__.debug().trackCount)).toBe(2);
+
+  const brokenAiff = Buffer.from(makeAiff({ seconds: 1 }));
+  brokenAiff.writeUInt16BE(0, 20);
+  await page.setInputFiles('[data-file-input]', {
+    name: 'broken.aiff',
+    mimeType: 'audio/aiff',
+    buffer: brokenAiff
+  });
+  await expect(page.locator('[data-global-error]')).toContainText(/AIFF/i);
+  expect(await page.evaluate(() => window.__AM__.debug().trackCount)).toBe(2);
+
+  await page.setInputFiles('[data-file-input]', {
+    name: 'actually-aiff.wav',
+    mimeType: 'audio/wav',
+    buffer: makeAiff({ seconds: 1, bits: 16, freq: 550 })
+  });
+  await page.waitForFunction(() => window.__AM__.debug().trackCount === 3, null, { timeout: 30000 });
+  const debug = await getDebug(page);
+  expect(debug.tracks[2].container).toBe('aiff');
+  expect(debug.tracks[2].duration).toBeCloseTo(1, 2);
 });
 
 test('replaces and removes a single track, clears everything and revokes the old result', async ({ page }) => {

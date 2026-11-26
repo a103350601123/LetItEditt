@@ -84,12 +84,26 @@ const PEAK_BUCKETS = 3000;
 const TIMELINE_PX_PER_SEC = 38;
 const TIMELINE_MAX_WIDTH = 12000;
 const MP3_SAMPLE_RATES = new Set([32000, 44100, 48000]);
-const GAP_PRESETS = [0, 0.5, 1, 2, 5];
-const CROSSFADE_PRESETS = [0.5, 1, 2, 3];
+const TRANSITION_PRESETS = [0.25, 0.5, 1, 2, 3, 5];
+const GAP_PRESETS = [0, ...TRANSITION_PRESETS];
+const DIP_DEPTH = 0.5;
+const DECLICK_SECONDS = 0.005;
+const TRANSITION_MODES = {
+  cut: { label: 'Direct cut', short: 'Cut', kind: 'cut' },
+  gap: { label: 'Silence gap', short: 'Gap', kind: 'gap' },
+  crossfade: { label: 'Equal-power crossfade', short: 'Equal-power', kind: 'overlap' },
+  linear: { label: 'Linear crossfade', short: 'Linear', kind: 'overlap' },
+  smooth: { label: 'Smooth crossfade', short: 'Smooth', kind: 'overlap' },
+  dip: { label: 'Volume dip', short: 'Volume dip', kind: 'overlap' },
+  fade: { label: 'Fade out then fade in', short: 'Fade out/in', kind: 'butt' },
+  fadein: { label: 'Fade in only', short: 'Fade in', kind: 'butt' },
+  fadeout: { label: 'Fade out only', short: 'Fade out', kind: 'butt' }
+};
+const TRANSITION_MODE_ORDER = ['cut', 'gap', 'crossfade', 'linear', 'smooth', 'dip', 'fade', 'fadein', 'fadeout'];
 const TICK_STEPS = [0.1, 0.2, 0.5, 1, 2, 5, 10, 15, 30, 60, 120, 300, 600, 900, 1800, 3600];
 const PLAY_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>';
 const PAUSE_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5h3v14H8zM13 5h3v14h-3z" fill="currentColor"/></svg>';
-const KNOWN_AUDIO = /\.(mp3|wav|wave|m4a|m4b|mp4|aac|ogg|oga|opus|flac|webm|aif|aiff)$/i;
+const KNOWN_AUDIO = /\.(mp3|wav|wave|m4a|m4b|mp4|aac|ogg|oga|opus|flac|webm|weba|aif|aiff|aifc|caf|wma|asf)$/i;
 const DRAG_MIME = 'application/x-letitedit-audio-track';
 
 const AudioCtor = window.AudioContext || window.webkitAudioContext;
@@ -150,6 +164,8 @@ const state = {
   timelineSegments: 0,
   timelineGaps: 0,
   timelineCrossfades: 0,
+  timelineFades: 0,
+  timelineCuts: 0,
   result: null,
   resultUrl: '',
   exportRender: null,
@@ -367,6 +383,82 @@ async function probeMetadata(file) {
   }
 }
 
+function asciiAt(bytes, offset, length) {
+  if (!bytes || offset < 0 || offset + length > bytes.byteLength) return '';
+  let text = '';
+  for (let index = 0; index < length; index += 1) {
+    text += String.fromCharCode(bytes[offset + index]);
+  }
+  return text;
+}
+
+/* Inspect the first bytes of the file instead of trusting its extension. */
+function sniffAudioContainer(bytes) {
+  if (!bytes || !bytes.byteLength) return 'empty';
+  const head = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const length = head.byteLength;
+  if (length >= 12 && asciiAt(head, 0, 4) === 'RIFF' && asciiAt(head, 8, 4) === 'WAVE') return 'wav';
+  if (length >= 12 && asciiAt(head, 0, 4) === 'FORM') {
+    const type = asciiAt(head, 8, 4);
+    if (type === 'AIFF' || type === 'AIFC') return 'aiff';
+  }
+  if (length >= 4 && asciiAt(head, 0, 4) === 'fLaC') return 'flac';
+  if (length >= 4 && asciiAt(head, 0, 4) === 'OggS') return 'ogg';
+  if (length >= 4 && asciiAt(head, 0, 4) === 'caff') return 'caf';
+  if (length >= 4 && head[0] === 0x1a && head[1] === 0x45 && head[2] === 0xdf && head[3] === 0xa3) return 'webm';
+  if (length >= 12 && asciiAt(head, 4, 4) === 'ftyp') return 'mp4';
+  if (length >= 4 && head[0] === 0x30 && head[1] === 0x26 && head[2] === 0xb2 && head[3] === 0x75) return 'asf';
+  if (length >= 2 && head[0] === 0xff && (head[1] & 0xf6) === 0xf0) return 'aac';
+  if (length >= 3 && asciiAt(head, 0, 3) === 'ID3') return 'mp3';
+  if (length >= 2 && head[0] === 0xff && (head[1] & 0xe0) === 0xe0) return 'mp3';
+  return 'unknown';
+}
+
+/* AIFF/AIFC is not decoded by Chrome's decodeAudioData, so use the local PCM decoder. */
+async function decodeAiffBuffer(bytes) {
+  let decodeAiff;
+  try {
+    ({ decodeAiff } = await import('./audio-codecs.js'));
+  } catch (error) {
+    throw new Error('the local AIFF decoder could not be loaded');
+  }
+  const decoded = decodeAiff(bytes);
+  const channelCount = decoded.channels.length;
+  if (!channelCount || !decoded.frames) {
+    throw new Error('the AIFF file contains no audio samples');
+  }
+  let context = null;
+  try {
+    context = caps.offline ? new OfflineCtor(1, 1, decoded.sampleRate) : new AudioCtor();
+  } catch (error) {
+    throw new Error(`the browser cannot create a ${decoded.sampleRate} Hz audio buffer for this AIFF file`);
+  }
+  let buffer;
+  try {
+    buffer = context.createBuffer(channelCount, decoded.frames, decoded.sampleRate);
+    for (let channel = 0; channel < channelCount; channel += 1) {
+      const samples = decoded.channels[channel];
+      if (typeof buffer.copyToChannel === 'function') buffer.copyToChannel(samples, channel);
+      else buffer.getChannelData(channel).set(samples);
+    }
+  } catch (error) {
+    throw new Error(
+      `the browser could not hold this AIFF file (${error && error.message ? error.message : 'buffer creation failed'})`
+    );
+  } finally {
+    if (context && typeof context.close === 'function') {
+      try { await context.close(); } catch (error) { /* already closed */ }
+    }
+  }
+  return {
+    buffer,
+    sampleRate: decoded.sampleRate,
+    channels: channelCount,
+    bits: decoded.bits,
+    compression: decoded.compression
+  };
+}
+
 async function decodeBuffer(data, preferredRate) {
   let context = null;
   if (preferredRate && caps.offline) {
@@ -439,20 +531,66 @@ async function computeAnalysis(buffer, token, onProgress) {
 }
 
 function decodeErrorMessage(file, error) {
+  const container = error && error.container ? error.container : 'unknown';
   const detail = error && error.message ? ` (${error.message})` : '';
-  return `This browser could not decode "${file.name}"${detail}. The file may be corrupted, use a codec this browser does not support, or be too large for the device. Try a WAV, MP3, M4A, AAC, OGG, FLAC or WebM file that plays in this browser.`;
+  if (container === 'asf') {
+    return `"${file.name}" looks like a WMA/ASF file. WMA is not decoded by this local browser tool${detail}. Convert it to WAV or MP3 first, then add it here.`;
+  }
+  if (container === 'aiff') {
+    return `"${file.name}" is an AIFF/AIFC file, but its audio could not be decoded${detail}. Uncompressed AIFF (PCM 8/16/24/32-bit, sowt, fl32/fl64) is supported; compressed AIFF-C variants are not. Convert it to WAV or MP3 and try again.`;
+  }
+  if (container === 'caf') {
+    return `"${file.name}" looks like a CAF file. This browser could not decode it${detail}. Try WAV, MP3, M4A/AAC, OGG/Opus, FLAC, WebM or AIFF.`;
+  }
+  return `This browser could not decode "${file.name}"${detail}. The file may be corrupted, use a codec this browser does not support, or be too large for the device. Try a WAV, MP3, M4A/AAC, OGG/Opus, FLAC, WebM or AIFF file that plays in this browser.`;
 }
 
 async function decodeTrack(file, token) {
   setLoadingText(`Reading ${file.name}...`);
+  let head = null;
+  try {
+    const slice = file.slice(0, Math.min(64, file.size));
+    head = new Uint8Array(await slice.arrayBuffer());
+  } catch (error) {
+    head = null;
+  }
+  if (token !== state.addToken) return null;
+  const container = sniffAudioContainer(head);
   const metadata = await withTimeout(probeMetadata(file), 6000, null);
   if (token !== state.addToken) return null;
-  setLoadingText(`Decoding ${file.name}...`);
-  const data = await file.arrayBuffer();
+
+  let buffer = null;
+  let aiff = null;
+  if (container === 'aiff') {
+    setLoadingText(`Decoding ${file.name} (AIFF)...`);
+    const data = await file.arrayBuffer();
+    if (token !== state.addToken) return null;
+    try {
+      aiff = await decodeAiffBuffer(data);
+      buffer = aiff.buffer;
+    } catch (error) {
+      const wrapped = new Error(error && error.message ? error.message : 'the AIFF decoder failed');
+      wrapped.container = 'aiff';
+      throw wrapped;
+    }
+  } else {
+    setLoadingText(`Decoding ${file.name}...`);
+    const data = await file.arrayBuffer();
+    if (token !== state.addToken) return null;
+    try {
+      buffer = await decodeBuffer(data, metadata && metadata.sampleRate);
+    } catch (error) {
+      const wrapped = new Error(error && error.message ? error.message : 'the browser decoder failed');
+      wrapped.container = container;
+      throw wrapped;
+    }
+  }
   if (token !== state.addToken) return null;
-  const buffer = await decodeBuffer(data, metadata && metadata.sampleRate);
-  if (token !== state.addToken) return null;
-  if (!buffer || !buffer.length) throw new Error('the decoded audio is empty');
+  if (!buffer || !buffer.length) {
+    const error = new Error('the decoded audio is empty');
+    error.container = container;
+    throw error;
+  }
 
   setLoadingText(`Building the waveform for ${file.name}...`);
   const analysis = await computeAnalysis(buffer, token, (ratio) => {
@@ -460,7 +598,8 @@ async function decodeTrack(file, token) {
   });
   if (!analysis || token !== state.addToken) return null;
 
-  const sourceRate = metadata && metadata.sampleRate ? metadata.sampleRate : null;
+  const sourceRate = aiff ? aiff.sampleRate : (metadata && metadata.sampleRate ? metadata.sampleRate : null);
+  const sourceChannels = aiff ? aiff.channels : (metadata && metadata.channels ? metadata.channels : null);
   const ratePreserved = Boolean(sourceRate) && sourceRate === buffer.sampleRate;
   state.decodeCount += 1;
   return {
@@ -474,8 +613,9 @@ async function decodeTrack(file, token) {
     sampleRate: buffer.sampleRate,
     sourceRate,
     ratePreserved,
-    metadataChannels: metadata && metadata.channels ? metadata.channels : null,
+    metadataChannels: sourceChannels,
     channels: buffer.numberOfChannels,
+    container,
     peak: analysis.peak,
     rms: analysis.rms,
     volume: 1,
@@ -505,20 +645,59 @@ function transitionKey(from, to) {
   return `${from.id}|${to.id}`;
 }
 
+function transitionKind(mode) {
+  return (TRANSITION_MODES[mode] || TRANSITION_MODES.gap).kind;
+}
+
+function transitionLabel(mode) {
+  return (TRANSITION_MODES[mode] || TRANSITION_MODES.gap).label;
+}
+
 function crossfadeMax(from, to) {
-  return Math.max(MIN_CROSSFADE, Math.min(from.duration, to.duration) / 2);
+  return Math.max(0, Math.min(from.duration, to.duration) / 2);
+}
+
+function transitionMax(mode, from, to) {
+  if (mode === 'cut') return 0;
+  if (mode === 'gap') return MAX_GAP;
+  if (mode === 'fadeout') return Math.max(0, from.duration / 2);
+  if (mode === 'fadein') return Math.max(0, to.duration / 2);
+  return crossfadeMax(from, to);
+}
+
+function transitionMin(mode) {
+  return mode === 'gap' || mode === 'cut' ? 0 : MIN_CROSSFADE;
 }
 
 function normalizeTransition(transition, from, to) {
-  if (transition.mode === 'crossfade') {
-    const max = crossfadeMax(from, to);
-    const min = Math.min(MIN_CROSSFADE, max);
-    transition.duration = clamp(Number(transition.duration) || 0, min, max);
-  } else {
-    transition.mode = 'gap';
-    transition.duration = clamp(Number(transition.duration) || 0, 0, MAX_GAP);
+  const mode = TRANSITION_MODES[transition.mode] ? transition.mode : 'gap';
+  transition.mode = mode;
+  if (mode === 'cut') {
+    transition.duration = 0;
+    return transition;
   }
+  const max = transitionMax(mode, from, to);
+  const min = Math.min(transitionMin(mode), max);
+  transition.duration = clamp(Number(transition.duration) || 0, min, max);
   return transition;
+}
+
+function transitionGainAt(mode, side, progress) {
+  const t = clamp(progress, 0, 1);
+  if (mode === 'linear') return side === 'in' ? t : 1 - t;
+  if (mode === 'smooth') {
+    const smooth = t * t * (3 - 2 * t);
+    return side === 'in' ? smooth : 1 - smooth;
+  }
+  if (mode === 'dip') {
+    const base = side === 'in' ? Math.sin(t * Math.PI / 2) : Math.cos(t * Math.PI / 2);
+    return base * (1 - DIP_DEPTH * Math.sin(Math.PI * t));
+  }
+  return side === 'in' ? Math.sin(t * Math.PI / 2) : Math.cos(t * Math.PI / 2);
+}
+
+function declickLength(track) {
+  return Math.min(DECLICK_SECONDS, Math.max(0, track.duration / 4));
 }
 
 function getTransition(from, to) {
@@ -540,21 +719,56 @@ function buildLayout() {
     const previousTransition = previous ? getTransition(previous.track, track) : null;
     const nextTrack = state.tracks[index + 1] || null;
     const nextTransition = nextTrack ? getTransition(track, nextTrack) : null;
-    const fadeIn = previousTransition && previousTransition.mode === 'crossfade'
-      ? previousTransition.duration
-      : 0;
-    const start = previous
-      ? previousTransition.mode === 'crossfade'
-        ? previous.end - previousTransition.duration
-        : previous.end + previousTransition.duration
-      : 0;
+
+    let start = 0;
+    if (previous) {
+      const previousKind = transitionKind(previousTransition.mode);
+      if (previousKind === 'overlap') {
+        start = previous.end - previousTransition.duration;
+      } else if (previousKind === 'gap') {
+        start = previous.end + previousTransition.duration;
+      } else {
+        start = previous.end;
+      }
+    }
+
+    let fadeIn = 0;
+    let fadeInMode = null;
+    if (previousTransition) {
+      const mode = previousTransition.mode;
+      const kind = transitionKind(mode);
+      if (kind === 'overlap' || mode === 'fade' || mode === 'fadein') {
+        fadeIn = Math.min(previousTransition.duration, track.duration);
+        fadeInMode = mode;
+      } else if (mode === 'fadeout' || mode === 'cut' || (mode === 'gap' && previousTransition.duration > 0)) {
+        fadeIn = declickLength(track);
+        fadeInMode = 'declick';
+      }
+    }
+
+    let fadeOut = 0;
+    let fadeOutMode = null;
+    if (nextTransition) {
+      const mode = nextTransition.mode;
+      const kind = transitionKind(mode);
+      if (kind === 'overlap' || mode === 'fade' || mode === 'fadeout') {
+        fadeOut = Math.min(nextTransition.duration, track.duration);
+        fadeOutMode = mode;
+      } else if (mode === 'fadein' || mode === 'cut' || (mode === 'gap' && nextTransition.duration > 0)) {
+        fadeOut = declickLength(track);
+        fadeOutMode = 'declick';
+      }
+    }
+
     const segment = {
       track,
       index,
       start,
       end: start + track.duration,
       fadeIn,
-      fadeOut: nextTransition && nextTransition.mode === 'crossfade' ? nextTransition.duration : 0,
+      fadeInMode,
+      fadeOut,
+      fadeOutMode,
       nextTransition
     };
     segments.push(segment);
@@ -566,13 +780,24 @@ function buildLayout() {
     const from = segments[index];
     const to = segments[index + 1];
     const transition = getTransition(from.track, to.track);
-    transitions.push({
-      from,
-      to,
-      transition,
-      start: transition.mode === 'crossfade' ? to.start : from.end,
-      end: transition.mode === 'crossfade' ? from.end : to.start
-    });
+    const kind = transitionKind(transition.mode);
+    let start = from.end;
+    let end = to.start;
+    if (kind === 'overlap') {
+      start = to.start;
+      end = from.end;
+    } else if (kind === 'cut') {
+      start = from.end;
+      end = from.end;
+    } else if (kind === 'butt') {
+      start = transition.mode === 'fade' || transition.mode === 'fadeout'
+        ? from.end - transition.duration
+        : from.end;
+      end = transition.mode === 'fade' || transition.mode === 'fadein'
+        ? to.start + transition.duration
+        : to.start;
+    }
+    transitions.push({ from, to, transition, start, end });
   }
 
   return {
@@ -913,48 +1138,69 @@ function drawTrackWaveform(track, canvas) {
 /* Transition editor                                                  */
 /* ------------------------------------------------------------------ */
 
+function transitionNote(mode, duration, max) {
+  const value = formatSecondsShort(duration);
+  const limit = formatSecondsShort(max);
+  if (mode === 'cut') return 'Direct cut at a sample boundary with a short de-click ramp.';
+  if (mode === 'gap') {
+    return duration > 0
+      ? `${value} s of silence between the tracks.`
+      : 'Direct join at a sample boundary (zero gap).';
+  }
+  if (mode === 'crossfade') return `Equal-power overlap of ${value} s. Maximum ${limit} s for these two tracks.`;
+  if (mode === 'linear') return `Linear overlap of ${value} s. Maximum ${limit} s for these two tracks.`;
+  if (mode === 'smooth') return `Smooth S-curve overlap of ${value} s. Maximum ${limit} s for these two tracks.`;
+  if (mode === 'dip') return `Overlap of ${value} s with a gentle volume dip at the centre. Maximum ${limit} s.`;
+  if (mode === 'fade') return `Fades out over ${value} s, then fades in over ${value} s at the join. Maximum ${limit} s.`;
+  if (mode === 'fadein') return `Fades in the next track over ${value} s. Maximum ${limit} s.`;
+  if (mode === 'fadeout') return `Fades out the previous track over ${value} s. Maximum ${limit} s.`;
+  return '';
+}
+
 function renderTransitions() {
   if (state.tracks.length < 2) {
-    els.transitions.innerHTML = '<p class="amg-hint">Add at least two tracks to set a gap or crossfade between them.</p>';
+    els.transitions.innerHTML = '<p class="amg-hint">Add at least two tracks to set a transition between them.</p>';
     setTransitionStatus('');
     return;
   }
   const layout = buildLayout();
   els.transitions.innerHTML = layout.transitions.map((item, index) => {
     const { from, to, transition } = item;
-    const max = transition.mode === 'crossfade'
-      ? crossfadeMax(from.track, to.track)
-      : MAX_GAP;
-    const presets = transition.mode === 'crossfade' ? CROSSFADE_PRESETS : GAP_PRESETS;
+    const mode = transition.mode;
+    const max = transitionMax(mode, from.track, to.track);
+    const presets = mode === 'cut' ? [0] : mode === 'gap' ? GAP_PRESETS : TRANSITION_PRESETS;
     const presetHtml = presets.map((value) => {
       const disabled = value > max + 1e-9 ? ' disabled' : '';
       const active = Math.abs(value - transition.duration) < 0.001 ? ' is-active' : '';
       return `<button class="amg-preset${active}" type="button" data-preset-duration="${value}"${disabled} aria-pressed="${active ? 'true' : 'false'}">${value === 0 ? '0 s' : `${formatSecondsShort(value)} s`}</button>`;
     }).join('');
-    const note = transition.mode === 'crossfade'
-      ? `Equal-power overlap of ${formatSecondsShort(transition.duration)} s. Maximum ${formatSecondsShort(max)} s for these two tracks.`
-      : transition.duration > 0
-        ? `${formatSecondsShort(transition.duration)} s of silence between the tracks.`
-        : 'Direct join at a sample boundary (zero gap).';
-    const warning = transition.mode === 'crossfade' && max < 0.5
-      ? ' is-warning'
-      : '';
+    const note = transitionNote(mode, transition.duration, max);
+    const warning = mode !== 'gap' && mode !== 'cut' && max < 0.5 ? ' is-warning' : '';
+    const customDisabled = mode === 'cut' ? ' disabled' : '';
+    const customMin = mode === 'cut' ? 0 : Math.min(transitionMin(mode), max);
+    const summary = mode === 'cut'
+      ? 'Cut - 0 s'
+      : mode === 'gap'
+        ? `${transition.duration > 0 ? 'Silence' : 'Direct join'} - ${formatSecondsShort(transition.duration)} s`
+        : `${TRANSITION_MODES[mode].short} - ${formatSecondsShort(transition.duration)} s`;
+    const modeOptions = TRANSITION_MODE_ORDER.map((value) => (
+      `<option value="${value}"${value === mode ? ' selected' : ''}>${TRANSITION_MODES[value].label}</option>`
+    )).join('');
     return `
       <div class="amg-transition" data-transition-row data-from-id="${from.track.id}" data-to-id="${to.track.id}">
         <div class="amg-transition-name">
           <strong title="${escapeHtml(from.track.name)} to ${escapeHtml(to.track.name)}">${index + 1}. ${escapeHtml(truncate(from.track.name, 24))} to ${index + 2}. ${escapeHtml(truncate(to.track.name, 24))}</strong>
-          <span>${transition.mode === 'crossfade' ? 'Overlap' : 'Silence'} - ${formatSecondsShort(transition.duration)} s</span>
+          <span>${summary}</span>
         </div>
         <select class="amg-select" data-transition-mode aria-label="Transition type between ${escapeHtml(from.track.name)} and ${escapeHtml(to.track.name)}">
-          <option value="gap"${transition.mode === 'gap' ? ' selected' : ''}>Silence gap</option>
-          <option value="crossfade"${transition.mode === 'crossfade' ? ' selected' : ''}>Equal-power crossfade</option>
+          ${modeOptions}
         </select>
         <div class="amg-presets" aria-label="Transition duration presets">
           ${presetHtml}
         </div>
         <label class="amg-custom">
           <span class="visually-hidden">Custom duration between ${escapeHtml(from.track.name)} and ${escapeHtml(to.track.name)}</span>
-          <input type="number" inputmode="decimal" data-custom-duration min="${transition.mode === 'crossfade' ? Math.min(MIN_CROSSFADE, max) : 0}" max="${max}" step="0.1" value="${formatSecondsShort(transition.duration)}" aria-label="Custom ${transition.mode} duration in seconds">
+          <input type="number" inputmode="decimal" data-custom-duration min="${customMin}" max="${max}" step="0.05" value="${formatSecondsShort(transition.duration)}" aria-label="Custom ${transitionLabel(mode)} duration in seconds"${customDisabled}>
           <span>s</span>
         </label>
         <p class="amg-transition-note${warning}">${note}</p>
@@ -1052,10 +1298,18 @@ function composeTimelinePeaks(layout, width) {
       const relative = time - segment.start;
       let envelope = track.volume * (balance.get(track.id) || 1);
       if (segment.fadeIn > 0 && relative < segment.fadeIn) {
-        envelope *= Math.sin((relative / segment.fadeIn) * Math.PI / 2);
+        envelope *= transitionGainAt(
+          segment.fadeInMode || 'crossfade',
+          'in',
+          relative / segment.fadeIn
+        );
       }
       if (segment.fadeOut > 0 && relative > track.duration - segment.fadeOut) {
-        envelope *= Math.cos(((relative - (track.duration - segment.fadeOut)) / segment.fadeOut) * Math.PI / 2);
+        envelope *= transitionGainAt(
+          segment.fadeOutMode || 'crossfade',
+          'out',
+          (relative - (track.duration - segment.fadeOut)) / segment.fadeOut
+        );
       }
       const peaks = sampleTrackPeaks(track, relative);
       min += peaks.min * envelope;
@@ -1121,7 +1375,9 @@ function drawTimeline(renderedBuffer) {
 
   state.timelineSegments = layout.segments.length;
   state.timelineGaps = layout.transitions.filter((item) => item.transition.mode === 'gap' && item.transition.duration > 0).length;
-  state.timelineCrossfades = layout.transitions.filter((item) => item.transition.mode === 'crossfade').length;
+  state.timelineCrossfades = layout.transitions.filter((item) => transitionKind(item.transition.mode) === 'overlap').length;
+  state.timelineFades = layout.transitions.filter((item) => transitionKind(item.transition.mode) === 'butt').length;
+  state.timelineCuts = layout.transitions.filter((item) => item.transition.mode === 'cut').length;
   state.timelineDrawn = layout.segments.length > 0;
 
   if (!layout.segments.length || total <= 0) {
@@ -1163,11 +1419,30 @@ function drawTimeline(renderedBuffer) {
   }
 
   for (const item of layout.transitions) {
+    const mode = item.transition.mode;
+    const kind = transitionKind(mode);
+    if (kind === 'cut') {
+      const x = timeToX(item.start);
+      context.strokeStyle = '#7c3aed';
+      context.lineWidth = 2;
+      context.beginPath();
+      context.moveTo(x + 0.5, laneTop);
+      context.lineTo(x + 0.5, laneTop + laneHeight);
+      context.stroke();
+      context.lineWidth = 1;
+      if (width > 48) {
+        context.fillStyle = '#7c3aed';
+        context.font = '600 9px system-ui, sans-serif';
+        context.textAlign = 'center';
+        context.fillText('Cut', clamp(x, 18, width - 18), laneTop + 12);
+      }
+      continue;
+    }
     const x1 = timeToX(item.start);
     const x2 = timeToX(item.end);
     const regionWidth = Math.max(0, x2 - x1);
     if (regionWidth < 0.5) continue;
-    if (item.transition.mode === 'gap') {
+    if (kind === 'gap') {
       context.fillStyle = 'rgba(239, 246, 255, .96)';
       context.fillRect(x1, laneTop, regionWidth, laneHeight);
       context.strokeStyle = '#60a5fa';
@@ -1180,7 +1455,7 @@ function drawTimeline(renderedBuffer) {
         context.textAlign = 'center';
         context.fillText(`Gap ${formatSecondsShort(item.transition.duration)} s`, x1 + regionWidth / 2, laneTop + 12);
       }
-    } else {
+    } else if (kind === 'overlap') {
       context.fillStyle = 'rgba(96, 165, 250, .32)';
       context.fillRect(x1, laneTop, regionWidth, laneHeight);
       context.strokeStyle = '#2563eb';
@@ -1188,10 +1463,29 @@ function drawTimeline(renderedBuffer) {
       context.strokeRect(x1 + 0.5, laneTop + 0.5, Math.max(0, regionWidth - 1), laneHeight - 1);
       context.setLineDash([]);
       if (regionWidth > 48) {
+        const label = mode === 'crossfade'
+          ? `XFade ${formatSecondsShort(item.transition.duration)} s`
+          : `${TRANSITION_MODES[mode].short} ${formatSecondsShort(item.transition.duration)} s`;
         context.fillStyle = '#0f172a';
         context.font = '600 9px system-ui, sans-serif';
         context.textAlign = 'center';
-        context.fillText(`XFade ${formatSecondsShort(item.transition.duration)} s`, x1 + regionWidth / 2, laneTop + 12);
+        context.fillText(label, x1 + regionWidth / 2, laneTop + 12);
+      }
+    } else {
+      context.fillStyle = 'rgba(167, 139, 250, .26)';
+      context.fillRect(x1, laneTop, regionWidth, laneHeight);
+      context.strokeStyle = '#7c3aed';
+      context.setLineDash([3, 3]);
+      context.strokeRect(x1 + 0.5, laneTop + 0.5, Math.max(0, regionWidth - 1), laneHeight - 1);
+      context.setLineDash([]);
+      if (regionWidth > 52) {
+        const label = mode === 'fade'
+          ? `Fade ${formatSecondsShort(item.transition.duration)} s`
+          : `${TRANSITION_MODES[mode].short} ${formatSecondsShort(item.transition.duration)} s`;
+        context.fillStyle = '#5b21b6';
+        context.font = '600 9px system-ui, sans-serif';
+        context.textAlign = 'center';
+        context.fillText(label, x1 + regionWidth / 2, laneTop + 12);
       }
     }
   }
@@ -1245,16 +1539,22 @@ function scheduleTrackGain(param, segment, base) {
   if (duration <= 0) return;
   const fadeIn = Math.min(segment.fadeIn, duration);
   const fadeOut = Math.min(segment.fadeOut, duration);
+  const fadeInMode = segment.fadeInMode || 'crossfade';
+  const fadeOutMode = segment.fadeOutMode || 'crossfade';
 
   if (fadeIn > 0 && fadeOut > 0 && fadeIn + fadeOut >= duration - 1e-6) {
-    const points = 257;
+    const points = 1025;
     const curve = new Float32Array(points);
     for (let index = 0; index < points; index += 1) {
       const time = (index / (points - 1)) * duration;
       let envelope = 1;
-      if (time < fadeIn) envelope *= Math.sin((time / fadeIn) * Math.PI / 2);
+      if (time < fadeIn) {
+        envelope *= transitionGainAt(fadeInMode, 'in', time / fadeIn);
+      }
       const fadeStart = duration - fadeOut;
-      if (time > fadeStart) envelope *= Math.cos(((time - fadeStart) / fadeOut) * Math.PI / 2);
+      if (time > fadeStart) {
+        envelope *= transitionGainAt(fadeOutMode, 'out', (time - fadeStart) / fadeOut);
+      }
       curve[index] = base * envelope;
     }
     param.setValueCurveAtTime(curve, segment.start, duration);
@@ -1265,7 +1565,7 @@ function scheduleTrackGain(param, segment, base) {
     const points = 65;
     const curve = new Float32Array(points);
     for (let index = 0; index < points; index += 1) {
-      curve[index] = base * Math.sin((index / (points - 1)) * Math.PI / 2);
+      curve[index] = base * transitionGainAt(fadeInMode, 'in', index / (points - 1));
     }
     param.setValueCurveAtTime(curve, segment.start, fadeIn);
   } else {
@@ -1276,7 +1576,7 @@ function scheduleTrackGain(param, segment, base) {
     const points = 65;
     const curve = new Float32Array(points);
     for (let index = 0; index < points; index += 1) {
-      curve[index] = base * Math.cos((index / (points - 1)) * Math.PI / 2);
+      curve[index] = base * transitionGainAt(fadeOutMode, 'out', index / (points - 1));
     }
     const fadeStart = segment.start + duration - fadeOut;
     param.setValueAtTime(base, fadeStart);
@@ -1541,7 +1841,7 @@ async function prepareAndPlaySequence() {
     }
     const layout = buildLayout();
     if (state.seqPlayhead >= layout.totalDuration - 0.001) state.seqPlayhead = 0;
-    setPlayStatus('Preparing the full mix. Gaps, crossfades and volume are included...');
+    setPlayStatus('Preparing the full mix. Gaps, crossfades, fades and volume are included...');
     const rendered = await ensureRendered((value, label) => {
       if (token === state.seqRequestToken) {
         setPlayStatus(label || 'Preparing the full mix...');
@@ -2065,7 +2365,7 @@ async function addFiles(fileList) {
       continue;
     }
     if (!isProbablyAudio(file)) {
-      errors.push(`"${file.name}" is not an audio file. Choose MP3, WAV, M4A, AAC, OGG, FLAC or WebM.`);
+      errors.push(`"${file.name}" is not an audio file. Choose MP3, WAV, AIFF, FLAC, M4A/AAC, OGG/Opus or WebM.`);
       continue;
     }
     if (!file.size) {
@@ -2363,6 +2663,12 @@ function focusTransitionControl(fromId, toId, selector) {
   });
 }
 
+function transitionStatusLabel(mode) {
+  if (mode === 'gap') return 'silence gap';
+  if (mode === 'crossfade') return 'equal-power crossfade';
+  return transitionLabel(mode).toLowerCase();
+}
+
 function setTransitionDuration(from, to, requested, sourceLabel, focusPreset) {
   const transition = getTransition(from, to);
   transition.duration = Number.isFinite(requested) ? requested : 0;
@@ -2378,12 +2684,12 @@ function setTransitionDuration(from, to, requested, sourceLabel, focusPreset) {
   if (Math.abs(applied - requested) > 1e-6) {
     setTransitionStatus(
       `${sourceLabel} was limited to ${formatSecondsShort(applied)} s by the available audio ` +
-      `or the ${transition.mode === 'crossfade' ? 'crossfade' : 'gap'} limit.`
+      `or the ${transitionStatusLabel(transition.mode)} limit.`
     );
   } else {
     setTransitionStatus(
       `${sourceLabel} set to ${formatSecondsShort(applied)} s ` +
-      `(${transition.mode === 'crossfade' ? 'equal-power crossfade' : 'silence gap'}).`
+      `(${transitionStatusLabel(transition.mode)}).`
     );
   }
 }
@@ -2636,19 +2942,24 @@ function wireTransitions() {
     const { from, to } = targets;
     const transition = getTransition(from, to);
     if (event.target.matches('[data-transition-mode]')) {
-      transition.mode = event.target.value === 'crossfade' ? 'crossfade' : 'gap';
-      transition.duration = transition.mode === 'crossfade'
-        ? Math.min(1, crossfadeMax(from, to))
-        : 0;
+      const mode = TRANSITION_MODES[event.target.value] ? event.target.value : 'gap';
+      transition.mode = mode;
+      transition.duration = mode === 'cut' || mode === 'gap'
+        ? 0
+        : Math.min(1, transitionMax(mode, from, to));
       normalizeTransition(transition, from, to);
       invalidateMix();
       renderTransitions();
       focusTransitionControl(from.id, to.id, '[data-transition-mode]');
-      setTransitionStatus(
-        transition.mode === 'crossfade'
-          ? `Crossfade enabled at ${formatSecondsShort(transition.duration)} s.`
-          : 'Silence gap enabled at zero seconds.'
-      );
+      if (mode === 'crossfade') {
+        setTransitionStatus(`Crossfade enabled at ${formatSecondsShort(transition.duration)} s.`);
+      } else if (mode === 'gap') {
+        setTransitionStatus('Silence gap enabled at zero seconds.');
+      } else if (mode === 'cut') {
+        setTransitionStatus('Direct cut enabled.');
+      } else {
+        setTransitionStatus(`${transitionLabel(mode)} enabled at ${formatSecondsShort(transition.duration)} s.`);
+      }
       return;
     }
     if (event.target.matches('[data-custom-duration]')) {
@@ -2837,6 +3148,7 @@ function exposeDebug() {
           sampleRate: track.sampleRate,
           sourceRate: track.sourceRate,
           ratePreserved: track.ratePreserved,
+          container: track.container,
           channels: track.channels,
           peaks: track.peaks ? track.peaks.buckets : 0,
           peak: track.peak,
@@ -2848,7 +3160,9 @@ function exposeDebug() {
           from: item.from.track.id,
           to: item.to.track.id,
           mode: item.transition.mode,
+          kind: transitionKind(item.transition.mode),
           duration: item.transition.duration,
+          max: transitionMax(item.transition.mode, item.from.track, item.to.track),
           start: item.start,
           end: item.end
         })),
@@ -2858,7 +3172,9 @@ function exposeDebug() {
           start: segment.start,
           end: segment.end,
           fadeIn: segment.fadeIn,
-          fadeOut: segment.fadeOut
+          fadeInMode: segment.fadeInMode,
+          fadeOut: segment.fadeOut,
+          fadeOutMode: segment.fadeOutMode
         })),
         totalDuration: layout.totalDuration,
         inputBytes: totalInputBytes(),
@@ -2895,6 +3211,8 @@ function exposeDebug() {
         timelineSegments: state.timelineSegments,
         timelineGaps: state.timelineGaps,
         timelineCrossfades: state.timelineCrossfades,
+        timelineFades: state.timelineFades || 0,
+        timelineCuts: state.timelineCuts || 0,
         timelineScrollable: els.timelineScroll.scrollWidth > els.timelineScroll.clientWidth + 1,
         trackCanvases: els.trackList.querySelectorAll('[data-track-wave]').length,
         result: state.result
