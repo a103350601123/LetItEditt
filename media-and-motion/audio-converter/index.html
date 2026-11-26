@@ -1,0 +1,405 @@
+﻿<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Audio Converter - MP3, WAV, FLAC, M4A &amp; OGG | LetitEdit</title>
+<meta name="description" content="Convert audio files in your browser: MP3, WAV, FLAC, M4A/AAC, OGG/Opus and AIFF. Batch convert, choose bitrate and sample rate, and download real files. No upload.">
+<meta name="theme-color" content="#2563EB">
+<link rel="canonical" href="https://letitedit.com/media-and-motion/audio-converter/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Free Audio Converter - MP3, WAV, FLAC, M4A &amp; OGG | LetitEdit">
+<meta property="og:description" content="Convert and batch-convert audio in your browser. Real MP3, WAV, FLAC, M4A/AAC, OGG/Opus and AIFF output with bitrate, sample rate and channel controls.">
+<meta property="og:url" content="https://letitedit.com/media-and-motion/audio-converter/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="stylesheet" href="../../css/audio-converter.css">
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Categories","item":"https://letitedit.com/categories/"},{"@type":"ListItem","position":3,"name":"Audio & Music Editing","item":"https://letitedit.com/categories/audio-music-editing/"},{"@type":"ListItem","position":4,"name":"Audio Converter","item":"https://letitedit.com/media-and-motion/audio-converter/"}]},{"@type":"SoftwareApplication","name":"Free Online Audio Converter","applicationCategory":"MultimediaApplication","operatingSystem":"Any modern browser","url":"https://letitedit.com/media-and-motion/audio-converter/","description":"Convert audio files between MP3, WAV, FLAC, M4A/AAC, OGG/Opus and AIFF in the browser. Batch conversion, bitrate, sample rate and channel controls, real encoders and local processing without uploads.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Browser-side audio conversion","Multi-file picker and drag-and-drop","Batch conversion with a combined ZIP download","MP3 output through a real LAME encoder","WAV and AIFF 16-bit PCM output","Lossless FLAC output","M4A/AAC and OGG/Opus output through WebCodecs","Bitrate presets from 64 to 320 kbps","22.05, 44.1 and 48 kHz sample rates","Mono or stereo output","Per-file preview and download","Real progress and cancellation","Local processing with no upload"]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does the audio converter upload my files?","acceptedAnswer":{"@type":"Answer","text":"No. Files are read, decoded, resampled and encoded inside your browser tab. Nothing is sent to LetitEdit or to a third-party service, and no account is required."}},{"@type":"Question","name":"Which formats can I convert from and to?","acceptedAnswer":{"@type":"Answer","text":"Input depends on the browser decoder: MP3, WAV, AIFF/AIFC, FLAC, OGG/Opus, M4A/AAC and WebM audio usually work. Output is MP3, WAV, FLAC, M4A/AAC, OGG/Opus or AIFF. WMA is not supported."}},{"@type":"Question","name":"Does converting MP3 to WAV improve quality?","acceptedAnswer":{"@type":"Answer","text":"No. Decoding an MP3 to WAV preserves what is already there and adds no new detail. The lost frequencies cannot be reconstructed. WAV is useful for editing because it is uncompressed, not because it sounds better than the original MP3."}},{"@type":"Question","name":"Is it safe to convert audio online here?","acceptedAnswer":{"@type":"Answer","text":"The conversion runs locally, so your audio never leaves the device. The page loads its code and encoder libraries from the same site, does not use an upload endpoint and does not require an account."}},{"@type":"Question","name":"What bitrate should I use for MP3?","acceptedAnswer":{"@type":"Answer","text":"For speech and podcasts, 64 to 96 kbps mono is often enough. For music, 192 kbps is a good balance, and 256 to 320 kbps is appropriate for critical listening or archiving. Higher bitrates cannot restore detail that a lossy source already lost."}},{"@type":"Question","name":"Can I convert several files at once?","acceptedAnswer":{"@type":"Answer","text":"Yes. Add up to 20 files, choose one output format, and convert them in a single batch. Each finished file gets its own download link, and the whole batch can be downloaded as one ZIP archive."}},{"@type":"Question","name":"Why is M4A or OGG disabled?","acceptedAnswer":{"@type":"Answer","text":"M4A/AAC and OGG/Opus output use the browser WebCodecs audio encoder. When the browser does not expose a working encoder for the selected rate and channel count, the option is disabled instead of producing a file with the wrong contents."}},{"@type":"Question","name":"Are the output files real conversions?","acceptedAnswer":{"@type":"Answer","text":"Yes. Every output is decoded to samples, resampled and mixed when needed, and then encoded with the matching encoder. The tool never renames a file to pretend it is another format."}}]},{"@type":"HowTo","name":"How to convert an audio file in the browser","step":[{"@type":"HowToStep","name":"Add audio files","text":"Drag files onto the page or use Browse audio files. Up to 20 files can be queued."},{"@type":"HowToStep","name":"Choose the output format","text":"Select MP3, WAV, FLAC, M4A, OGG or AIFF and set the bitrate, sample rate and channels."},{"@type":"HowToStep","name":"Convert and download","text":"Press Convert and download. The page reports real progress and creates a local download when each file is complete."}]}]}
+</script>
+</head>
+<body class="acv-page">
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="topbar">
+  <nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+    <div class="nav-links" id="primary-links">
+      <a href="/categories/">Categories</a>
+      <a href="/blog/">Blog</a>
+      <a href="/news/">News</a>
+      <a href="/faq/">FAQ</a>
+    </div>
+    <div class="nav-actions">
+      <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
+    </div>
+  </nav>
+</header>
+
+<main id="main-content">
+<nav class="container breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../">Home</a><span aria-hidden="true">/</span>
+  <a href="../../categories/">Categories</a><span aria-hidden="true">/</span>
+  <a href="../../categories/audio-music-editing/">Audio &amp; Music Editing</a><span aria-hidden="true">/</span>
+  <span aria-current="page">Audio Converter</span>
+</nav>
+
+<section class="acv-hero">
+  <div class="container">
+    <span class="eyebrow">Media &amp; Motion &middot; Audio &amp; Music Editing &middot; Live tool</span>
+    <h1>Convert Audio Files Online</h1>
+    <p>Turn MP3, WAV, FLAC, M4A, OGG, Opus and AIFF files into the format you need. Add several files, pick an output format, bitrate and sample rate, then download real converted audio. Every file is decoded and encoded in your browser, so nothing is uploaded.</p>
+    <ul class="acv-hero-points">
+      <li>Runs on your device</li>
+      <li>Batch conversion</li>
+      <li>Six output formats</li>
+      <li>No upload or account</li>
+    </ul>
+  </div>
+</section>
+
+<section class="acv-section" aria-labelledby="converter-title">
+  <div class="container acv-workspace">
+    <div class="acv-panel" data-app>
+      <div class="acv-panel-head">
+        <div>
+          <h2 id="converter-title">Convert your audio</h2>
+          <p>Add files, choose one output format, and convert them together. Your original files are not modified or uploaded.</p>
+        </div>
+        <span class="acv-local-badge">Local processing</span>
+      </div>
+
+      <p class="acv-alert" data-support role="alert" hidden><span data-support-text></span></p>
+
+      <div class="acv-empty" data-empty>
+        <div class="acv-drop" data-dropzone>
+          <span class="acv-drop-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h5l2 2h9v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M12 11v5M9.5 13.5h5"/></svg>
+          </span>
+          <p class="acv-drop-title">Drag and drop audio files here</p>
+          <p class="acv-drop-sub">MP3, WAV, AIFF, FLAC, M4A, AAC, OGG, Opus or WebM &middot; up to 20 files</p>
+          <button class="acv-btn acv-btn-primary" type="button" data-browse>Browse audio files</button>
+          <p class="acv-drop-note">No upload. The files stay in this browser tab.</p>
+        </div>
+        <p class="acv-hint">You can add more files later. Files are decoded one at a time during conversion, which keeps memory use lower on phones and tablets.</p>
+      </div>
+
+      <div class="acv-loading" data-loading hidden>
+        <span class="acv-spinner" aria-hidden="true"></span>
+        <div>
+          <p data-loading-text role="status" aria-live="polite">Reading audio...</p>
+          <p class="acv-loading-note">Inspecting the file and reading its metadata. Keep this tab open.</p>
+        </div>
+      </div>
+
+      <p class="acv-alert" data-global-error role="alert" hidden></p>
+      <p class="acv-status" data-status role="status" aria-live="polite"></p>
+
+      <div class="acv-editor" data-editor hidden>
+        <div class="acv-editor-head">
+          <div class="acv-editor-title">
+            <h3 data-summary-title>1 file ready</h3>
+            <p data-summary-meta></p>
+          </div>
+          <div class="acv-head-actions">
+            <button class="acv-btn acv-btn-secondary acv-btn-small" type="button" data-add-more>Add more audio</button>
+            <button class="acv-btn acv-btn-ghost acv-btn-small" type="button" data-clear-all>Clear all</button>
+          </div>
+        </div>
+
+        <ul class="acv-file-list" data-file-list aria-label="Audio files to convert"></ul>
+        <p class="acv-alert" data-file-error role="alert" hidden></p>
+
+        <div class="acv-mix-grid">
+          <fieldset class="acv-settings">
+            <legend>Output settings</legend>
+
+            <div class="acv-field">
+              <label for="acv-format">Output format</label>
+              <select id="acv-format" data-format>
+                <option value="mp3" selected>MP3 &middot; lossy, widely compatible</option>
+                <option value="wav">WAV &middot; 16-bit PCM, uncompressed</option>
+                <option value="flac">FLAC &middot; lossless compression</option>
+                <option value="m4a">M4A &middot; AAC audio in MP4</option>
+                <option value="ogg">OGG &middot; Opus audio</option>
+                <option value="aiff">AIFF &middot; 16-bit PCM, Apple</option>
+              </select>
+              <p class="acv-hint" data-format-note>MP3 is the safest choice for phones, car stereos and older software. It is lossy, so some detail is discarded during encoding.</p>
+            </div>
+
+            <div class="acv-field" data-quality-field>
+              <label for="acv-quality">Quality preset</label>
+              <select id="acv-quality" data-quality>
+                <option value="custom">Custom bitrate</option>
+                <option value="64">Data saver &middot; 64 kbps</option>
+                <option value="96">Speech &middot; 96 kbps</option>
+                <option value="128">Standard &middot; 128 kbps</option>
+                <option value="192" selected>High &middot; 192 kbps</option>
+                <option value="256">Very high &middot; 256 kbps</option>
+                <option value="320">Maximum &middot; 320 kbps</option>
+              </select>
+              <p class="acv-hint">Presets are shortcuts for the bitrate below. A higher bitrate makes a larger file; it cannot recover quality that a lossy source already lost.</p>
+            </div>
+
+            <div class="acv-field" data-bitrate-field>
+              <label for="acv-bitrate">Bitrate</label>
+              <select id="acv-bitrate" data-bitrate>
+                <option value="64">64 kbps</option>
+                <option value="96">96 kbps</option>
+                <option value="128">128 kbps</option>
+                <option value="192" selected>192 kbps</option>
+                <option value="256">256 kbps</option>
+                <option value="320">320 kbps</option>
+              </select>
+            </div>
+
+            <div class="acv-field-row">
+              <div class="acv-field">
+                <label for="acv-rate">Sample rate</label>
+                <select id="acv-rate" data-rate>
+                  <option value="auto" selected>Auto &middot; keep the source rate</option>
+                  <option value="48000">48 kHz</option>
+                  <option value="44100">44.1 kHz</option>
+                  <option value="22050">22.05 kHz</option>
+                </select>
+              </div>
+              <div class="acv-field">
+                <label for="acv-channels">Channels</label>
+                <select id="acv-channels" data-channels>
+                  <option value="auto" selected>Auto &middot; keep the source layout</option>
+                  <option value="stereo">Stereo</option>
+                  <option value="mono">Mono</option>
+                </select>
+              </div>
+            </div>
+            <p class="acv-hint" data-rate-note>Auto keeps each file's own sample rate and channel layout when the chosen format supports them.</p>
+          </fieldset>
+
+          <div class="acv-export-card">
+            <h3>Convert and download</h3>
+            <p class="acv-export-summary" data-export-summary>Add audio files to see the output summary.</p>
+            <button class="acv-btn acv-btn-primary acv-export-button" type="button" data-convert disabled>Convert files</button>
+            <button class="acv-btn acv-btn-secondary" type="button" data-cancel hidden>Cancel conversion</button>
+            <p class="acv-hint">The download is created only after each file has been fully encoded. A single file downloads automatically; a batch shows a link for every file and a ZIP option.</p>
+          </div>
+        </div>
+
+        <div class="acv-progress" data-progress hidden>
+          <div class="acv-progress-track" data-progress-track role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Conversion progress"><div class="acv-progress-bar" data-progress-bar></div></div>
+          <p class="acv-progress-label" data-progress-label role="status" aria-live="polite">Preparing the conversion...</p>
+        </div>
+
+        <div class="acv-results" data-results hidden aria-live="polite">
+          <div class="acv-results-head">
+            <div>
+              <h3 data-results-title>Conversion finished</h3>
+              <p data-results-summary>Your files are ready.</p>
+            </div>
+            <div class="acv-results-actions">
+              <button class="acv-btn acv-btn-primary acv-btn-small" type="button" data-download-zip hidden>Download all as ZIP</button>
+              <button class="acv-btn acv-btn-ghost acv-btn-small" type="button" data-clear-results>Clear results</button>
+            </div>
+          </div>
+          <p class="acv-hint">Every download is a local blob. Nothing was sent to a server. Keep this tab open until the files you need have been saved.</p>
+        </div>
+      </div>
+
+      <audio data-player preload="none" hidden></audio>
+      <input type="file" hidden multiple data-file-input accept="audio/*,.mp3,.wav,.wave,.aif,.aiff,.aifc,.flac,.m4a,.m4b,.mp4,.aac,.ogg,.oga,.opus,.webm">
+      <noscript><p class="acv-alert">This audio converter needs JavaScript. All processing runs locally in your browser.</p></noscript>
+    </div>
+  </div>
+</section>
+
+<section class="section acv-content">
+  <div class="container acv-content-layout">
+    <article class="article-card acv-article">
+      <span class="eyebrow" style="color:#2563eb">Guide</span>
+      <h2>What an audio converter actually does</h2>
+      <p>An audio file is a container of encoded samples. Converting it means decoding those samples into raw audio, changing the sample rate or channel layout if you asked for it, and then encoding the result with a different codec or setting. Renaming <code>song.wav</code> to <code>song.mp3</code> does not convert anything: the bytes stay WAV and most players will either reject the file or play silence. This tool performs the real decode and encode steps, so the extension, the MIME type and the contents agree.</p>
+      <p>The original file on your device is never modified. The converted copy is created in memory and offered as a download. You can convert the same file several times with different settings, and the source stays untouched.</p>
+
+      <h2>How to convert audio files</h2>
+      <ol>
+        <li><strong>Add your audio.</strong> Drag files onto the drop area or choose Browse audio files. You can queue up to 20 files, and the list shows each file's detected format, duration and size.</li>
+        <li><strong>Pick an output format.</strong> MP3 is the most compatible lossy format. WAV and AIFF are uncompressed PCM. FLAC is lossless compression. M4A (AAC) and OGG (Opus) are efficient modern lossy formats.</li>
+        <li><strong>Set the quality.</strong> Choose a bitrate preset from 64 to 320 kbps for lossy formats, a sample rate, and mono or stereo. Irrelevant controls are hidden for WAV, AIFF and FLAC, which do not use a bitrate.</li>
+        <li><strong>Convert.</strong> Press Convert files. Files are decoded and encoded one at a time, and the progress bar reports real work rather than a timer.</li>
+        <li><strong>Download.</strong> A single file downloads automatically. For a batch, each row gets its own link and you can download everything as one ZIP archive.</li>
+      </ol>
+
+      <h2>Supported input and output formats</h2>
+      <p>Input support comes from the browser. Current Chrome and Edge usually decode MP3, WAV, FLAC, OGG/Opus, M4A/AAC and WebM audio. AIFF is decoded by this page itself, because Chrome does not decode AIFF natively. Firefox and Safari expose different codec sets, so a file that works in one browser may be rejected in another. WMA is not supported: no current browser decodes it, and pretending otherwise would produce a broken file.</p>
+      <div class="acv-table-wrap">
+        <table class="acv-table">
+          <caption class="acv-visually-hidden">Output formats and what they are suitable for</caption>
+          <thead>
+            <tr><th scope="col">Format</th><th scope="col">Type</th><th scope="col">Best for</th><th scope="col">Settings</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">MP3</th><td>Lossy</td><td>Phones, car stereos, email, the widest compatibility</td><td>64â€“320 kbps, 22.05/44.1/48 kHz, mono or stereo</td></tr>
+            <tr><th scope="row">WAV</th><td>Uncompressed PCM</td><td>Editing, video projects, maximum compatibility</td><td>16-bit PCM, sample rate and channels</td></tr>
+            <tr><th scope="row">AIFF</th><td>Uncompressed PCM</td><td>Apple software, Pro Tools, CD-style workflows</td><td>16-bit PCM, sample rate and channels</td></tr>
+            <tr><th scope="row">FLAC</th><td>Lossless</td><td>Archiving, home audio, smaller files than WAV</td><td>16-bit lossless, sample rate and channels</td></tr>
+            <tr><th scope="row">M4A (AAC)</th><td>Lossy</td><td>iPhones, iPads, Apple Music-style playback, small files</td><td>64â€“320 kbps, 22.05/44.1/48 kHz</td></tr>
+            <tr><th scope="row">OGG (Opus)</th><td>Lossy</td><td>Web audio, voice, efficient streaming</td><td>64â€“320 kbps, fixed 48 kHz</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Lossy and lossless: what you can and cannot get back</h2>
+      <p>MP3, AAC and Opus are lossy. They discard information that is hard to hear in exchange for a much smaller file. Once that information is gone, no converter can put it back. Decoding an MP3 to WAV gives you an uncompressed file that contains exactly the audio the MP3 already had; it does not add detail, and the file becomes much larger. That is still useful when an editor or a video tool insists on WAV, but it is not an upgrade in quality.</p>
+      <p>WAV, AIFF and FLAC are lossless in the sense that decoding them returns the samples that were written. FLAC stores the same 16-bit samples as WAV in a compressed form, so it usually takes roughly half the space. Converting FLAC to MP3 is lossy; converting MP3 to FLAC is lossless in file terms but keeps the MP3's original lossy quality. The table above describes the format, not a promise about the source.</p>
+      <p>This converter always decodes to samples before encoding. That means a lossy-to-lossy conversion such as MP3 to M4A involves two lossy generations, and the second one can remove a little more detail. When you have a choice, convert from the highest-quality source you still have, ideally a WAV, AIFF or FLAC master.</p>
+
+      <h2>Choosing a bitrate, sample rate and channel layout</h2>
+      <p>Bitrate is the amount of data used per second. For MP3, 64 kbps mono is common for speech, 96 to 128 kbps suits podcasts and casual listening, 192 kbps is a good general music setting, and 256 to 320 kbps is appropriate for critical listening. Higher settings are not harmful, but they quickly stop improving a source that was already compressed.</p>
+      <p>Sample rate is how many samples are stored per second. 44.1 kHz matches CD audio, 48 kHz matches most video and modern recording interfaces, and 22.05 kHz halves the storage at the cost of everything above roughly 11 kHz. Converting 44.1 kHz to 48 kHz is a real resample; it does not add missing high frequencies. Auto keeps each file's own rate when the chosen format supports it, which avoids an unnecessary resample.</p>
+      <p>Stereo stores two channels and mono stores one. Mono halves the size and is often enough for spoken word. Downmixing stereo to mono combines both channels, so a hard-panned instrument becomes quieter rather than disappearing. Opus output is fixed at 48 kHz because that is the rate the WebCodecs Opus encoder accepts; the page states this instead of silently pretending otherwise.</p>
+
+      <h2>Batch conversion and ZIP downloads</h2>
+      <p>A batch is simply several files queued with the same output settings. Files are converted one after another so that only one decoded file needs to be in memory at a time. Each finished file appears in the list with its output size and a download link. When more than one file is converted, the page also offers a ZIP archive; the ZIP is built locally and uses the store method, so it packages the files without re-compressing them.</p>
+      <p>If one file in a batch fails, the rest still convert. The failed row keeps a clear error message so you can remove it and retry the others. Conversion can be cancelled between files and during encoding; a cancelled batch keeps any files that had already finished.</p>
+
+      <h2>Privacy, memory and practical limits</h2>
+      <p>There is no upload, no account, no paid API and no server-side copy. The page loads its own code and encoder libraries, reads your files through the browser's file picker, and creates downloads with local object URLs. Temporary URLs are released when you remove a file, clear the list, convert again or leave the page.</p>
+      <p>The page accepts up to 20 files, 500 MB per file, 1 GB of input in total and 30 minutes per file. The real limit is device memory: a decoded stereo file at 48 kHz uses about 23 MB per minute as 32-bit floats, and encoding needs room for the output as well. On a phone, prefer shorter files and close other memory-heavy tabs. A file that is too large or too long is rejected with an explanation rather than freezing the page.</p>
+
+      <h2>What this tool does not do</h2>
+      <p>It does not repair corrupted files, remove noise, change pitch or tempo, normalise loudness, edit metadata tags, split tracks or record audio. It does not bypass DRM, and it cannot decode a codec the browser does not implement. Those jobs belong in other tools. Keeping the scope narrow makes the output predictable.</p>
+
+      <h2>Troubleshooting</h2>
+      <p><strong>A file is rejected.</strong> The browser may not decode its codec, the file may be corrupt, or it may exceed the size or duration limit. Try playing it in the same browser first. WMA is not supported at all.</p>
+      <p><strong>M4A or OGG is disabled.</strong> The browser did not expose a working WebCodecs encoder for that codec. Chrome and Edge usually support both; some Firefox and Safari versions do not. MP3, WAV, FLAC and AIFF remain available.</p>
+      <p><strong>The output sounds worse than the source.</strong> A lossy output at a low bitrate, or a second lossy generation, removes detail. Raise the bitrate or choose WAV or FLAC if size is not the priority.</p>
+      <p><strong>The download did not appear.</strong> Some browsers block automatic downloads until you allow them for this site. Use the download link in the file row, or the ZIP button for a batch.</p>
+      <p><strong>The page is slow with long files.</strong> Decoding and encoding are real work. Close other tabs, convert fewer files at a time, and keep the tab in the foreground on mobile.</p>
+
+      <h2>Frequently asked questions</h2>
+      <div class="acv-faq">
+        <details class="faq-item"><summary>Does the audio converter upload my files?</summary><p>No. Files are read, decoded, resampled and encoded inside your browser tab. Nothing is sent to LetitEdit or to a third-party service, and no account is required.</p></details>
+        <details class="faq-item"><summary>Which formats can I convert from and to?</summary><p>Input depends on the browser decoder: MP3, WAV, AIFF/AIFC, FLAC, OGG/Opus, M4A/AAC and WebM audio usually work. Output is MP3, WAV, FLAC, M4A/AAC, OGG/Opus or AIFF. WMA is not supported.</p></details>
+        <details class="faq-item"><summary>Does converting MP3 to WAV improve quality?</summary><p>No. Decoding an MP3 to WAV preserves what is already there and adds no new detail. The lost frequencies cannot be reconstructed. WAV is useful for editing because it is uncompressed, not because it sounds better than the original MP3.</p></details>
+        <details class="faq-item"><summary>Is it safe to convert audio online here?</summary><p>The conversion runs locally, so your audio never leaves the device. The page loads its code and encoder libraries from the same site, does not use an upload endpoint and does not require an account.</p></details>
+        <details class="faq-item"><summary>What bitrate should I use for MP3?</summary><p>For speech and podcasts, 64 to 96 kbps mono is often enough. For music, 192 kbps is a good balance, and 256 to 320 kbps is appropriate for critical listening or archiving. Higher bitrates cannot restore detail that a lossy source already lost.</p></details>
+        <details class="faq-item"><summary>Can I convert several files at once?</summary><p>Yes. Add up to 20 files, choose one output format, and convert them in a single batch. Each finished file gets its own download link, and the whole batch can be downloaded as one ZIP archive.</p></details>
+        <details class="faq-item"><summary>Why is M4A or OGG disabled?</summary><p>M4A/AAC and OGG/Opus output use the browser WebCodecs audio encoder. When the browser does not expose a working encoder for the selected rate and channel count, the option is disabled instead of producing a file with the wrong contents.</p></details>
+        <details class="faq-item"><summary>Are the output files real conversions?</summary><p>Yes. Every output is decoded to samples, resampled and mixed when needed, and then encoded with the matching encoder. The tool never renames a file to pretend it is another format.</p></details>
+        <details class="faq-item"><summary>Why does an M4A or OGG file last a few milliseconds longer?</summary><p>AAC and Opus encoders add a short priming or padding period at the start and end. The difference is normally around 10 to 25 milliseconds and is part of how those codecs work, not a sign that the audio was duplicated.</p></details>
+      </div>
+    </article>
+
+    <aside class="acv-side">
+      <div class="info-card">
+        <h2>At a glance</h2>
+        <ul class="acv-facts">
+          <li>Input <span>MP3, WAV, AIFF, FLAC, M4A, AAC, OGG, Opus, WebM*</span></li>
+          <li>Output <span>MP3, WAV, FLAC, M4A, OGG, AIFF</span></li>
+          <li>Batch <span>Up to 20 files</span></li>
+          <li>Bitrate <span>64â€“320 kbps for lossy formats</span></li>
+          <li>Sample rates <span>22.05, 44.1 and 48 kHz</span></li>
+          <li>Channels <span>Mono or stereo</span></li>
+          <li>Processing <span>On your device</span></li>
+          <li>Price <span>Free</span></li>
+        </ul>
+        <p class="acv-hint">*Accepted when this browser can decode the file. WMA is not supported. M4A and OGG output need WebCodecs.</p>
+      </div>
+      <div class="info-card">
+        <h2>Related</h2>
+        <ul class="related-list">
+          <li><a href="/categories/audio-music-editing/"><span class="related-icon" aria-hidden="true">&#9835;</span><span>Audio &amp; Music Editing category</span></a></li>
+          <li><a href="/media-and-motion/audio-trimmer/"><span class="related-icon" aria-hidden="true">&#9986;</span><span>Audio Trimmer</span></a></li>
+          <li><a href="/media-and-motion/audio-merger/"><span class="related-icon" aria-hidden="true">&#8801;</span><span>Audio Merger</span></a></li>
+          <li><a href="/media-and-motion/video-converter/"><span class="related-icon" aria-hidden="true">&#9654;</span><span>Video Converter</span></a></li>
+          <li><a href="/categories/"><span class="related-icon" aria-hidden="true">&#9638;</span><span>All categories</span></a></li>
+        </ul>
+        <p><a class="text-link" href="/categories/">Browse all 28 categories &rarr;</a></p>
+      </div>
+      <div class="info-card">
+        <h2>Privacy by design</h2>
+        <p>The files stay in this tab. There is no upload, no account and no server copy. Clear the list when you are done to release the decoded audio and download URLs.</p>
+      </div>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="footer-logo" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+        <p>A category-led home for guides, updates and carefully built browser-side tools. The tool library is being rebuilt one focused release at a time.</p>
+        <a class="footer-contact" href="mailto:info@letitedit.com">info@letitedit.com</a>
+      </div>
+      <div class="footer-column">
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="/categories/">Categories</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/news/">News</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Trust &amp; policies</h3>
+        <ul>
+          <li><a href="/about/">About LetitEdit</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="/terms-of-service/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-categories">
+      <h3>All categories</h3>
+      <ul class="footer-category-list">
+        <li><a href="/categories/image-photo-editing/">Image &amp; Photo Editing</a></li>
+        <li><a href="/categories/video-editing/">Video Editing</a></li>
+        <li><a href="/categories/audio-music-editing/">Audio &amp; Music Editing</a></li>
+        <li><a href="/categories/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+        <li><a href="/categories/text-writing-editing/">Text &amp; Writing Editing</a></li>
+        <li><a href="/categories/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+        <li><a href="/categories/web-code-editing/">Web &amp; Code Editing</a></li>
+        <li><a href="/categories/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+        <li><a href="/categories/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
+        <li><a href="/categories/face-portrait-editing/">Face &amp; Portrait Editing</a></li>
+        <li><a href="/categories/ai-image-enhancement-restoration/">AI Image Enhancement &amp; Restoration</a></li>
+        <li><a href="/categories/3d-design-model-editing/">3D Design &amp; Model Editing</a></li>
+        <li><a href="/categories/animation-motion-graphics/">Animation &amp; Motion Graphics</a></li>
+        <li><a href="/categories/font-typography-editing/">Font &amp; Typography Editing</a></li>
+        <li><a href="/categories/color-gradient-tools/">Color &amp; Gradient Tools</a></li>
+        <li><a href="/categories/logo-branding-tools/">Logo &amp; Branding Tools</a></li>
+        <li><a href="/categories/social-media-design-tools/">Social Media Design Tools</a></li>
+        <li><a href="/categories/screenshot-screen-image-editing/">Screenshot &amp; Screen Image Editing</a></li>
+        <li><a href="/categories/data-visualization-infographic-editing/">Data Visualization &amp; Infographic Editing</a></li>
+        <li><a href="/categories/ebook-publishing-tools/">eBook &amp; Publishing Tools</a></li>
+        <li><a href="/categories/email-newsletter-design/">Email &amp; Newsletter Design</a></li>
+        <li><a href="/categories/sound-effects-voice-design/">Sound Effects &amp; Voice Design</a></li>
+        <li><a href="/categories/cad-technical-drawing/">CAD &amp; Technical Drawing</a></li>
+        <li><a href="/categories/signature-document-annotation/">Signature &amp; Document Annotation</a></li>
+        <li><a href="/categories/ui-ux-website-design-tools/">UI/UX Website Design Tools</a></li>
+        <li><a href="/categories/print-marketing-material-design/">Print &amp; Marketing Material Design</a></li>
+        <li><a href="/categories/metadata-file-information-editing/">Metadata &amp; File Information Editing</a></li>
+        <li><a href="/categories/digital-drawing-illustration/">Digital Drawing &amp; Illustration</a></li>
+      </ul>
+      <a class="footer-all-categories" href="/categories/">Browse all 28 categories &rarr;</a>
+    </div>
+    <div class="footer-promise">
+      <span aria-hidden="true">&#128274;</span>
+      <p><strong>Privacy by design.</strong> This tool converts your audio in your browser, avoids accounts and explains exactly what each output format does.</p>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; <span data-year>2026</span> LetitEdit.com</span>
+      <span>Built for privacy, accuracy and plain-English tooling.</span>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="../../js/audio-converter.js"></script>
+</body>
+</html>
+
