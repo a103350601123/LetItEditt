@@ -204,7 +204,40 @@ test('loads a real WAV, reports metadata, and draws a waveform', async ({ page }
   expect(ticks.length).toBeGreaterThan(3);
   expect(ticks[0]).toMatch(/0:00|0\.0s/);
 
+  const baseWidth = state.waveformWidth;
+  await page.click('[data-zoom-in]');
+  expect(await page.evaluate(() => window.__AT__.debug().zoom)).toBe(2);
+  expect(await page.evaluate(() => window.__AT__.debug().waveformWidth)).toBeGreaterThan(baseWidth);
+  await expect(page.locator('[data-zoom-label]')).toHaveText('2×');
+  await page.click('[data-zoom-fit]');
+  expect(await page.evaluate(() => window.__AT__.debug().zoom)).toBe(1);
+  await expect(page.locator('[data-zoom-label]')).toHaveText('1×');
+
   expect(pageErrors).toEqual([]);
+});
+
+test('accepts a real drag-and-drop upload and highlights the drop area', async ({ page }) => {
+  await openPage(page);
+  const base64 = makeWav({ seconds: 2 }).toString('base64');
+
+  const highlighted = await page.evaluate((data) => {
+    const bytes = Uint8Array.from(atob(data), (character) => character.charCodeAt(0));
+    const file = new File([bytes], 'dropped-tone.wav', { type: 'audio/wav' });
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+    const target = document.querySelector('[data-app]');
+    target.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true, dataTransfer: transfer }));
+    const active = document.querySelector('[data-dropzone]').classList.contains('is-dragover') &&
+      target.classList.contains('is-dragover');
+    target.dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: transfer }));
+    return active;
+  }, base64);
+  expect(highlighted).toBe(true);
+
+  await expect(page.locator('[data-editor]')).toBeVisible({ timeout: 30000 });
+  await expect(page.locator('[data-file-name]')).toHaveText('dropped-tone.wav');
+  await page.waitForFunction(() => window.__AT__.debug().phase === 'ready', null, { timeout: 30000 });
+  await expect(page.locator('[data-total]')).toHaveText('00:02.0');
 });
 
 test('plays, pauses, seeks and scrubs through the audio', async ({ page }) => {
