@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Online Audio Trimmer – Cut Audio Precisely | LetitEdit</title>
+<meta name="description" content="Trim audio in your browser for free. Drag start and end handles on the waveform, preview the selection and download a real trimmed WAV or MP3 file. No upload, no account.">
+<meta name="theme-color" content="#2563EB">
+<link rel="canonical" href="https://letitedit.com/media-and-motion/audio-trimmer/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Free Online Audio Trimmer – Cut Audio Precisely | LetitEdit">
+<meta property="og:description" content="Trim audio in your browser for free. Drag start and end handles on the waveform, preview the selection and download a real trimmed WAV or MP3 file. No upload, no account.">
+<meta property="og:url" content="https://letitedit.com/media-and-motion/audio-trimmer/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="stylesheet" href="../../css/audio-trimmer.css">
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Categories","item":"https://letitedit.com/categories/"},{"@type":"ListItem","position":3,"name":"Audio & Music Editing","item":"https://letitedit.com/categories/audio-music-editing/"},{"@type":"ListItem","position":4,"name":"Audio Trimmer","item":"https://letitedit.com/media-and-motion/audio-trimmer/"}]},{"@type":"SoftwareApplication","name":"Free Online Audio Trimmer","applicationCategory":"MultimediaApplication","operatingSystem":"Any modern browser","url":"https://letitedit.com/media-and-motion/audio-trimmer/","description":"Trim an audio file in the browser by selecting a start and end time on a waveform. Preview the selection and download a real WAV or MP3 file. Files are processed locally and are not uploaded.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Browser-side audio trimming","Waveform with draggable start and end handles","Exact time inputs","Selection preview and looping","WAV output with source sample rate and channels where supported","MP3 output when the local encoder supports the file","Local processing with no upload"]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does the audio trimmer upload my file?","acceptedAnswer":{"@type":"Answer","text":"No. The audio is decoded, trimmed and encoded inside your browser tab. It is not sent to LetitEdit or to a third-party service, and no account is required."}},{"@type":"Question","name":"Which audio formats can I trim?","acceptedAnswer":{"@type":"Answer","text":"MP3, WAV, M4A, AAC, OGG, Opus, FLAC and WebM are accepted when this browser can decode them. AIFF may also work. A file the browser cannot decode is rejected with a clear message."}},{"@type":"Question","name":"Does the WAV export keep the original sample rate and channels?","acceptedAnswer":{"@type":"Answer","text":"The tool asks the browser to decode at the source sample rate and writes uncompressed 16-bit PCM with the decoded channel count. The actual rate used is shown before and after export. If the browser cannot decode at that rate, it falls back to its own rate and says so."}},{"@type":"Question","name":"Is MP3 export always available?","acceptedAnswer":{"@type":"Answer","text":"No. MP3 uses a local LAME encoder and is offered only when the encoder starts and the decoded audio is mono or stereo at 32 kHz, 44.1 kHz or 48 kHz. Otherwise the MP3 option is disabled and WAV remains available."}},{"@type":"Question","name":"Is trimming lossless?","acceptedAnswer":{"@type":"Answer","text":"WAV export copies the decoded PCM samples in the selected range into a new 16-bit PCM file, so no additional lossy encoding is applied. MP3 export re-encodes the selection and is lossy, with a short amount of encoder padding."}},{"@type":"Question","name":"Can I remove a middle section and join the rest?","acceptedAnswer":{"@type":"Answer","text":"Not in this version. The Audio Trimmer keeps the selected section and removes everything outside it. Removing a middle section would need a separate join workflow, so the option is not offered."}},{"@type":"Question","name":"Does the tool work on phones and tablets?","acceptedAnswer":{"@type":"Answer","text":"Yes. The layout is responsive and the waveform handles are touch-friendly. Long files can still exhaust the memory of a phone, so shorter clips are the most reliable."}},{"@type":"Question","name":"Is there a file size limit?","acceptedAnswer":{"@type":"Answer","text":"The input limit is 500 MB, but the practical limit is the memory available on your device. Very long files may fail to decode. The page reports the failure instead of producing a broken download."}}]}]}
+</script>
+</head>
+<body class="atr-page">
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="topbar">
+  <nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+    <div class="nav-links" id="primary-links">
+      <a href="/categories/">Categories</a>
+      <a href="/blog/">Blog</a>
+      <a href="/news/">News</a>
+      <a href="/faq/">FAQ</a>
+    </div>
+    <div class="nav-actions">
+      <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
+    </div>
+  </nav>
+</header>
+
+<main id="main-content">
+<nav class="container breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../">Home</a><span aria-hidden="true">/</span>
+  <a href="../../categories/">Categories</a><span aria-hidden="true">/</span>
+  <a href="../../categories/audio-music-editing/">Audio &amp; Music Editing</a><span aria-hidden="true">/</span>
+  <span aria-current="page">Audio Trimmer</span>
+</nav>
+
+<section class="atr-hero">
+  <div class="container">
+    <span class="eyebrow">Media &amp; Motion · Audio &amp; Music Editing · Live tool</span>
+    <h1>Free Online Audio Trimmer</h1>
+    <p>Cut an audio file to the exact section you need. Drag the start and end handles on the waveform, type precise times, preview the selection, and download a real trimmed file. Everything runs in your browser and your audio is never uploaded.</p>
+    <ul class="atr-hero-points">
+      <li>Runs on your device</li>
+      <li>Waveform selection</li>
+      <li>WAV and MP3 output</li>
+      <li>Precise time inputs</li>
+    </ul>
+  </div>
+</section>
+
+<section class="atr-section" aria-labelledby="trimmer-title">
+  <div class="container atr-workspace">
+    <div class="atr-panel" data-app>
+      <div class="atr-panel-head">
+        <h2 id="trimmer-title">Trim your audio</h2>
+        <p>Drop a file, choose the section, then export. The original file is not modified or uploaded.</p>
+      </div>
+
+      <div class="atr-drop" data-dropzone>
+        <span class="atr-drop-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h2l2-5 3 12 3-16 3 11 2-2h3"/></svg>
+        </span>
+        <p class="atr-drop-title">Drag and drop an audio file here</p>
+        <p class="atr-drop-sub">MP3, WAV, M4A, AAC, OGG, FLAC or WebM · up to 500 MB</p>
+        <button class="atr-btn atr-btn-primary" type="button" data-browse>Browse audio</button>
+        <p class="atr-drop-note">No upload. The file stays in this browser tab.</p>
+        <input type="file" hidden data-file-input accept="audio/*,.mp3,.wav,.wave,.m4a,.m4b,.aac,.ogg,.oga,.opus,.flac,.webm,.aif,.aiff">
+      </div>
+
+      <p class="atr-alert" data-support role="alert" hidden><span data-support-text></span></p>
+      <p class="atr-alert" data-global-error role="alert" hidden></p>
+
+      <div class="atr-loading" data-loading hidden>
+        <span class="atr-spinner" aria-hidden="true"></span>
+        <p data-loading-text role="status" aria-live="polite">Reading audio…</p>
+      </div>
+
+      <div class="atr-editor" data-editor hidden>
+        <div class="atr-editor-head">
+          <div class="atr-file">
+            <strong data-file-name>audio.mp3</strong>
+            <span data-file-meta></span>
+          </div>
+          <div class="atr-file-actions">
+            <button class="atr-btn atr-btn-small atr-btn-secondary" type="button" data-change>Change audio</button>
+            <button class="atr-btn atr-btn-small atr-btn-ghost" type="button" data-remove>Remove</button>
+          </div>
+        </div>
+
+        <div class="atr-player">
+          <div class="atr-controls">
+            <button class="atr-icon-btn" type="button" data-play aria-label="Play audio" title="Play">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>
+            </button>
+            <span class="atr-time" data-current>00:00.0</span>
+            <input class="atr-range atr-seek" type="range" data-seek min="0" max="1000" step="1" value="0" aria-label="Seek through the audio">
+            <span class="atr-time" data-total>00:00.0</span>
+            <div class="atr-volume-group">
+              <input class="atr-range atr-volume" type="range" data-volume min="0" max="1" step="0.01" value="0.9" aria-label="Volume">
+            </div>
+          </div>
+          <p class="atr-play-status" data-play-status role="status" aria-live="polite">Choose an audio file to begin.</p>
+        </div>
+
+        <p class="atr-hint">Keyboard: Space or K play/pause · ←/→ seek 1 s · Shift + ←/→ seek 5 s · L toggles loop.</p>
+
+        <div class="atr-wave-block">
+          <div class="atr-wave-head">
+            <div>
+              <h3>Waveform and selection</h3>
+              <p>Drag the blue handles, or click the waveform to move the playhead.</p>
+            </div>
+            <div class="atr-zoom" aria-label="Waveform zoom">
+              <button class="atr-zoom-btn" type="button" data-zoom-out aria-label="Zoom out">−</button>
+              <span class="atr-zoom-label" data-zoom-label>1×</span>
+              <button class="atr-zoom-btn" type="button" data-zoom-in aria-label="Zoom in">+</button>
+              <button class="atr-zoom-btn atr-zoom-fit" type="button" data-zoom-fit>Fit</button>
+            </div>
+          </div>
+
+          <div class="atr-wave-scroll" data-wave-scroll>
+            <div class="atr-wave-inner" data-wave-inner>
+              <canvas class="atr-waveform" data-waveform aria-label="Audio waveform. Click or drag to seek; use the handles to set the selection."></canvas>
+              <div class="atr-shade atr-shade-start" data-shade-start aria-hidden="true"></div>
+              <div class="atr-shade atr-shade-end" data-shade-end aria-hidden="true"></div>
+              <div class="atr-selection" data-selection aria-hidden="true"></div>
+              <button class="atr-handle atr-handle-start" type="button" data-handle-start role="slider" aria-orientation="horizontal" aria-label="Selection start" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" aria-valuetext="00:00.000" disabled><span aria-hidden="true"></span></button>
+              <button class="atr-handle atr-handle-end" type="button" data-handle-end role="slider" aria-orientation="horizontal" aria-label="Selection end" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" aria-valuetext="00:00.000" disabled><span aria-hidden="true"></span></button>
+              <div class="atr-playhead" data-playhead aria-hidden="true"></div>
+              <div class="atr-ticks" data-ticks aria-hidden="true"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="atr-precise">
+          <div class="atr-time-fields">
+            <div class="atr-field">
+              <label for="atr-start">Start time</label>
+              <input id="atr-start" data-start-input type="text" inputmode="decimal" autocomplete="off" spellcheck="false" value="00:00.000">
+              <div class="atr-field-actions">
+                <button type="button" data-set-start>Set to playhead</button>
+              </div>
+            </div>
+            <div class="atr-field">
+              <label for="atr-end">End time</label>
+              <input id="atr-end" data-end-input type="text" inputmode="decimal" autocomplete="off" spellcheck="false" value="00:00.000">
+              <div class="atr-field-actions">
+                <button type="button" data-set-end>Set to playhead</button>
+              </div>
+            </div>
+            <div class="atr-field atr-field-duration">
+              <span>Selected duration</span>
+              <p class="atr-duration-value" data-selected-duration>00:00.000</p>
+              <p class="atr-duration-seconds" data-selected-seconds>0.000 seconds</p>
+              <div class="atr-field-actions">
+                <button type="button" data-reset-selection>Reset to full file</button>
+              </div>
+            </div>
+          </div>
+          <div class="atr-selection-actions">
+            <button class="atr-btn atr-btn-secondary" type="button" data-preview>Preview selection</button>
+            <label class="atr-toggle"><input type="checkbox" data-loop><span>Loop preview</span></label>
+          </div>
+          <p class="atr-validation" data-validation role="alert" hidden></p>
+        </div>
+
+        <div class="atr-export-grid">
+          <fieldset class="atr-export">
+            <legend>Export settings</legend>
+            <div class="atr-field">
+              <label for="atr-format">Output format</label>
+              <select id="atr-format" data-format>
+                <option value="wav" selected>WAV · 16-bit PCM (reliable)</option>
+                <option value="mp3" disabled>MP3 · checking…</option>
+              </select>
+              <p class="atr-hint" data-format-note>WAV writes uncompressed 16-bit PCM. MP3 is smaller but lossy and appears only when the local encoder supports the file.</p>
+            </div>
+            <div class="atr-field" data-bitrate-field hidden>
+              <label for="atr-bitrate">MP3 bitrate</label>
+              <select id="atr-bitrate" data-bitrate>
+                <option value="128">128 kbps</option>
+                <option value="192" selected>192 kbps</option>
+                <option value="256">256 kbps</option>
+                <option value="320">320 kbps</option>
+              </select>
+            </div>
+          </fieldset>
+
+          <div class="atr-export-action">
+            <button class="atr-btn atr-btn-primary atr-export-button" type="button" data-export disabled>Trim and download</button>
+            <button class="atr-btn atr-btn-secondary" type="button" data-cancel-export hidden>Cancel export</button>
+            <p class="atr-export-summary" data-export-summary></p>
+            <p class="atr-hint">The selection is copied at audio-sample boundaries. WAV is the most predictable result.</p>
+          </div>
+        </div>
+
+        <div class="atr-progress" data-progress hidden>
+          <div class="atr-progress-track" data-progress-track role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Export progress"><div class="atr-progress-bar" data-progress-bar></div></div>
+          <p class="atr-progress-label" data-progress-label role="status" aria-live="polite">Preparing the export…</p>
+        </div>
+
+        <div class="atr-result" data-result hidden aria-live="polite">
+          <div class="atr-result-head">
+            <span class="atr-result-check" aria-hidden="true">✓</span>
+            <div>
+              <h3>Your trimmed audio is ready</h3>
+              <p data-result-note>Created locally. The original file was not uploaded.</p>
+            </div>
+          </div>
+          <audio class="atr-result-audio" data-result-audio controls preload="metadata" aria-label="Trimmed audio preview"></audio>
+          <dl class="atr-result-meta">
+            <div><dt>File</dt><dd data-result-name>—</dd></div>
+            <div><dt>Format</dt><dd data-result-format>—</dd></div>
+            <div><dt>Duration</dt><dd data-result-duration>—</dd></div>
+            <div><dt>Size</dt><dd data-result-size>—</dd></div>
+            <div><dt>Sample rate</dt><dd data-result-rate>—</dd></div>
+            <div><dt>Channels</dt><dd data-result-channels>—</dd></div>
+          </dl>
+          <div class="atr-result-actions">
+            <a class="atr-btn atr-btn-primary" data-download download aria-disabled="true">Download audio</a>
+            <button class="atr-btn atr-btn-secondary" type="button" data-trim-another>Trim another section</button>
+            <button class="atr-btn atr-btn-ghost" type="button" data-upload-another>Upload another file</button>
+          </div>
+          <p class="atr-hint">The download is a local blob. Nothing was sent to a server.</p>
+        </div>
+      </div>
+
+      <noscript><p class="atr-alert">This audio trimmer needs JavaScript. All processing runs locally in your browser.</p></noscript>
+    </div>
+  </div>
+</section>
+
+<section class="section atr-content">
+  <div class="container atr-content-layout">
+    <article class="article-card atr-article">
+      <span class="eyebrow" style="color:#2563eb">Guide</span>
+      <h2>What audio trimming means</h2>
+      <p>Trimming is the simplest edit you can make to an audio file: you choose a start point and an end point, and everything outside that range is removed. It is different from compression, which changes the bitrate, and from noise reduction or normalization, which change the sound inside the file. A trim changes the duration while keeping the audio that falls inside the range.</p>
+      <p>This tool keeps the selected section and discards the rest. The original file on your device is never modified. A new file is created in the browser and offered as a download, so you can trim the same source several times without losing anything.</p>
+
+      <h2>How to trim audio</h2>
+      <ol>
+        <li><strong>Add a file.</strong> Drag an audio file onto the upload area or choose Browse audio. MP3, WAV, M4A, AAC, OGG, FLAC and WebM are accepted when this browser can decode them.</li>
+        <li><strong>Listen and find the section.</strong> Press Play, drag the seek bar, click the waveform, or use the keyboard shortcuts. The playhead follows playback.</li>
+        <li><strong>Set the boundaries.</strong> Drag the blue start and end handles, type exact times, or press Set to playhead. The selected duration updates as you move them.</li>
+        <li><strong>Preview the cut.</strong> Preview selection plays only the highlighted range. Turn on Loop preview to repeat it while you adjust the edges.</li>
+        <li><strong>Zoom when needed.</strong> The + and − buttons stretch the waveform horizontally. Use the scrollbar under the waveform, or a trackpad, to reach the part you are editing. Fit returns to the whole file.</li>
+        <li><strong>Export.</strong> Choose WAV or MP3, then press Trim and download. The tool shows real progress and only offers the download after the file has been written.</li>
+      </ol>
+
+      <h2>Waveform, handles and exact times</h2>
+      <p>The waveform is drawn from the decoded samples, so quiet passages and loud peaks are visible before you cut. The shaded areas are outside the selection; the blue highlighted area is what the export will keep. The vertical line is the playhead.</p>
+      <p>The start and end fields accept <code>HH:MM:SS.mmm</code>, <code>MM:SS.mmm</code> or a plain number of seconds. Dragging a handle updates the matching field, and typing a time moves the handle. The end must be later than the start, the start cannot be negative, and neither value can pass the file's duration. An invalid value is marked and the export button stays disabled until it is corrected.</p>
+      <p>The handles work with a mouse, a trackpad, a pen and a touch screen. Arrow keys move a focused handle by 0.1 seconds, or by 1 second with Shift. Home and End jump the focused handle to the start or end of the file.</p>
+
+      <h2>Supported formats and browser limits</h2>
+      <p>The tool reads the file with the browser's own audio decoder. That means support depends on the browser and its codecs, not on a fixed server-side list. Current Chrome and Edge usually decode MP3, WAV, M4A/AAC, OGG/Opus, FLAC and WebM. Firefox and Safari expose different codec sets, so a format that works in one browser may be rejected in another. AIFF sometimes works. A corrupted file, a DRM-protected file or a codec the browser does not implement is rejected with a message instead of a broken result.</p>
+      <p>WAV is always the baseline output. MP3 is offered only when the local LAME encoder starts and the decoded audio is mono or stereo at 32 kHz, 44.1 kHz or 48 kHz. When MP3 is not available, the option is disabled and the page explains why; it is never renamed or offered as a format the bytes do not match.</p>
+
+      <h2>Sample rate, channels and output quality</h2>
+      <p>Before decoding, the tool reads the source sample rate and channel count from the file's container. It then asks the browser to decode at that sample rate, so a 44.1 kHz stereo source stays 44.1 kHz stereo in the WAV export instead of being silently converted to the browser's default rate. The rate actually used is shown in the file details and in the export summary.</p>
+      <p>WAV output is uncompressed 16-bit PCM. It is larger than the source MP3, but it is the most predictable result and needs no encoder beyond the browser. The selected samples are copied at audio-sample boundaries, so the cut is sample-accurate relative to the decoded audio.</p>
+      <p>MP3 output is a real LAME encode at the bitrate you choose. It is lossy and adds a short amount of encoder padding (often tens of milliseconds) at the start or end, so its playing time can differ slightly from the selected duration. The reported duration comes from the samples that were encoded, not from a guess. If you need the exact sample count, use WAV.</p>
+
+      <h2>What this tool does not do</h2>
+      <p>This is a trimmer, not a full audio editor. It does not remove a middle section and join the two remaining parts, add fades, normalize loudness, remove noise, change pitch or tempo, mix multiple tracks, or convert a whole video. Those jobs belong in separate tools. Keeping the scope narrow makes the trim workflow faster and the result easier to predict.</p>
+
+      <h2>Privacy and local processing</h2>
+      <p>Your audio is decoded, trimmed and encoded inside this browser tab. There is no upload, no account, no paid API and no server-side copy. Temporary object URLs are released when you remove the file, trim another section or leave the page. The export worker is closed when it is no longer needed, which releases its encoder buffers.</p>
+      <p>Very large files are limited by device memory rather than by a server quota. The page accepts files up to 500 MB, but a long recording can still exhaust memory on a phone. For the most reliable result, trim a shorter clip or close other memory-heavy tabs first. If decoding fails, the page says so and keeps the previous file intact.</p>
+
+      <h2>Troubleshooting</h2>
+      <p><strong>The file will not load.</strong> The browser may not support its codec, the file may be corrupted, or it may be too large for the device. Try playing it in the same browser first, then convert it to WAV or MP3 elsewhere if needed.</p>
+      <p><strong>The export button is disabled.</strong> The selection may be empty, a time field may be invalid, or an export may already be running. Correct the field or wait for the current export to finish.</p>
+      <p><strong>MP3 is greyed out.</strong> The local encoder did not start, or the decoded file is not mono/stereo at a supported rate. WAV export still works and keeps the decoded sample rate.</p>
+      <p><strong>The result is silent.</strong> Check that the selected range contains sound in the waveform and that the source file plays normally. A selection in a silent passage produces a silent file, which is the correct result.</p>
+
+      <h2>Frequently asked questions</h2>
+      <div class="atr-faq">
+        <details class="faq-item"><summary>Does the audio trimmer upload my file?</summary><p>No. The audio is decoded, trimmed and encoded inside your browser tab. It is not sent to LetitEdit or to a third-party service, and no account is required.</p></details>
+        <details class="faq-item"><summary>Which audio formats can I trim?</summary><p>MP3, WAV, M4A, AAC, OGG, Opus, FLAC and WebM are accepted when this browser can decode them. AIFF may also work. A file the browser cannot decode is rejected with a clear message.</p></details>
+        <details class="faq-item"><summary>Does the WAV export keep the original sample rate and channels?</summary><p>The tool asks the browser to decode at the source sample rate and writes uncompressed 16-bit PCM with the decoded channel count. The actual rate used is shown before and after export. If the browser cannot decode at that rate, it falls back to its own rate and says so.</p></details>
+        <details class="faq-item"><summary>Is MP3 export always available?</summary><p>No. MP3 uses a local LAME encoder and is offered only when the encoder starts and the decoded audio is mono or stereo at 32 kHz, 44.1 kHz or 48 kHz. Otherwise the MP3 option is disabled and WAV remains available.</p></details>
+        <details class="faq-item"><summary>Is trimming lossless?</summary><p>WAV export copies the decoded PCM samples in the selected range into a new 16-bit PCM file, so no additional lossy encoding is applied. MP3 export re-encodes the selection and is lossy, with a short amount of encoder padding.</p></details>
+        <details class="faq-item"><summary>Can I remove a middle section and join the rest?</summary><p>Not in this version. The Audio Trimmer keeps the selected section and removes everything outside it. Removing a middle section would need a separate join workflow, so the option is not offered.</p></details>
+        <details class="faq-item"><summary>Does the tool work on phones and tablets?</summary><p>Yes. The layout is responsive and the waveform handles are touch-friendly. Long files can still exhaust the memory of a phone, so shorter clips are the most reliable.</p></details>
+        <details class="faq-item"><summary>Is there a file size limit?</summary><p>The input limit is 500 MB, but the practical limit is the memory available on your device. Very long files may fail to decode. The page reports the failure instead of producing a broken download.</p></details>
+      </div>
+    </article>
+
+    <aside class="atr-side">
+      <div class="info-card">
+        <h2>At a glance</h2>
+        <ul class="atr-facts">
+          <li>Input <span>MP3, WAV, M4A, AAC, OGG, FLAC, WebM*</span></li>
+          <li>Output <span>WAV (16-bit PCM), MP3†</span></li>
+          <li>Sample rate <span>Source rate for WAV</span></li>
+          <li>Channels <span>Decoded channel layout</span></li>
+          <li>Selection <span>Drag, type or set to playhead</span></li>
+          <li>Processing <span>On your device</span></li>
+          <li>Price <span>Free</span></li>
+        </ul>
+        <p class="atr-hint">*Accepted when this browser can decode the file. †MP3 appears only when the local encoder supports the decoded rate and channel count.</p>
+      </div>
+      <div class="info-card">
+        <h2>Related</h2>
+        <ul class="related-list">
+          <li><a href="/categories/audio-music-editing/"><span class="related-icon" aria-hidden="true">🎧</span><span>Audio &amp; Music Editing category</span></a></li>
+          <li><a href="/media-and-motion/video-trimmer/"><span class="related-icon" aria-hidden="true">🎬</span><span>Video Trimmer</span></a></li>
+          <li><a href="/media-and-motion/video-converter/"><span class="related-icon" aria-hidden="true">🔄</span><span>Video Converter</span></a></li>
+          <li><a href="/categories/"><span class="related-icon" aria-hidden="true">🧭</span><span>All categories</span></a></li>
+        </ul>
+        <p><a class="text-link" href="/categories/">Browse all 28 categories →</a></p>
+      </div>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="footer-logo" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+        <p>A category-led home for guides, updates and carefully built browser-side tools. The tool library is being rebuilt one focused release at a time.</p>
+        <a class="footer-contact" href="mailto:info@letitedit.com">info@letitedit.com</a>
+      </div>
+      <div class="footer-column">
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="/categories/">Categories</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/news/">News</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Trust &amp; policies</h3>
+        <ul>
+          <li><a href="/about/">About LetitEdit</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="/terms-of-service/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-categories">
+      <h3>All categories</h3>
+      <ul class="footer-category-list">
+        <li><a href="/categories/image-photo-editing/">Image &amp; Photo Editing</a></li>
+        <li><a href="/categories/video-editing/">Video Editing</a></li>
+        <li><a href="/categories/audio-music-editing/">Audio &amp; Music Editing</a></li>
+        <li><a href="/categories/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+        <li><a href="/categories/text-writing-editing/">Text &amp; Writing Editing</a></li>
+        <li><a href="/categories/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+        <li><a href="/categories/web-code-editing/">Web &amp; Code Editing</a></li>
+        <li><a href="/categories/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+        <li><a href="/categories/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
+        <li><a href="/categories/face-portrait-editing/">Face &amp; Portrait Editing</a></li>
+        <li><a href="/categories/ai-image-enhancement-restoration/">AI Image Enhancement &amp; Restoration</a></li>
+        <li><a href="/categories/3d-design-model-editing/">3D Design &amp; Model Editing</a></li>
+        <li><a href="/categories/animation-motion-graphics/">Animation &amp; Motion Graphics</a></li>
+        <li><a href="/categories/font-typography-editing/">Font &amp; Typography Editing</a></li>
+        <li><a href="/categories/color-gradient-tools/">Color &amp; Gradient Tools</a></li>
+        <li><a href="/categories/logo-branding-tools/">Logo &amp; Branding Tools</a></li>
+        <li><a href="/categories/social-media-design-tools/">Social Media Design Tools</a></li>
+        <li><a href="/categories/screenshot-screen-image-editing/">Screenshot &amp; Screen Image Editing</a></li>
+        <li><a href="/categories/data-visualization-infographic-editing/">Data Visualization &amp; Infographic Editing</a></li>
+        <li><a href="/categories/ebook-publishing-tools/">eBook &amp; Publishing Tools</a></li>
+        <li><a href="/categories/email-newsletter-design/">Email &amp; Newsletter Design</a></li>
+        <li><a href="/categories/sound-effects-voice-design/">Sound Effects &amp; Voice Design</a></li>
+        <li><a href="/categories/cad-technical-drawing/">CAD &amp; Technical Drawing</a></li>
+        <li><a href="/categories/signature-document-annotation/">Signature &amp; Document Annotation</a></li>
+        <li><a href="/categories/ui-ux-website-design-tools/">UI/UX &amp; Website Design Tools</a></li>
+        <li><a href="/categories/print-marketing-material-design/">Print &amp; Marketing Material Design</a></li>
+        <li><a href="/categories/metadata-file-information-editing/">Metadata &amp; File Information Editing</a></li>
+        <li><a href="/categories/digital-drawing-illustration/">Digital Drawing &amp; Illustration</a></li>
+      </ul>
+      <a class="footer-all-categories" href="/categories/">Browse all 28 categories →</a>
+    </div>
+    <div class="footer-promise">
+      <span aria-hidden="true">🔒</span>
+      <p><strong>Privacy by design.</strong> This tool keeps your audio in your browser, avoids accounts and explains exactly what the export does.</p>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> LetitEdit.com</span>
+      <span>Built for privacy, accuracy and plain-English tooling.</span>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="../../js/audio-trimmer.js"></script>
+</body>
+</html>
