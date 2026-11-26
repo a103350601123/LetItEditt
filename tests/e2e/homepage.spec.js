@@ -168,7 +168,7 @@ test.describe('homepage', () => {
   });
 
   test('fits every target viewport without horizontal overflow', async ({ page }) => {
-    const widths = [320, 360, 375, 390, 430, 768, 1024, 1440];
+    const widths = [320, 360, 375, 390, 430, 768, 1024, 1440, 1920];
 
     for (const width of widths) {
       await page.setViewportSize({ width, height: 900 });

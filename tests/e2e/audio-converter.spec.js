@@ -992,7 +992,11 @@ test('processes audio locally without uploads or third-party requests', async ({
   await convertSingle(page, 'mp3');
 
   const origin = new URL(baseURL).origin;
-  const external = requests.filter((request) => !request.url.startsWith(origin) && !request.url.startsWith('blob:') && !request.url.startsWith('data:'));
+  // The site loads its Google Tag Manager container on every page; that single
+  // loader request is expected and carries no audio data. Every other external
+  // request still fails this test.
+  const analyticsLoader = /^https:\/\/www\.googletagmanager\.com\/gtm\.js\?id=GTM-TRTFBNML$/;
+  const external = requests.filter((request) => !request.url.startsWith(origin) && !request.url.startsWith('blob:') && !request.url.startsWith('data:') && !analyticsLoader.test(request.url));
   expect(external).toEqual([]);
   expect(requests.every((request) => request.method === 'GET')).toBe(true);
   expect(requests.some((request) => /upload|convert\?/i.test(request.url))).toBe(false);
