@@ -189,6 +189,10 @@
   function activeLayer() {
     return state.layers.filter(function (layer) { return layer.id === state.activeLayerId; })[0] || null;
   }
+  function isLayerTool(tool) {
+    tool = tool || state.tool;
+    return tool === 'text' || tool === 'shapes' || tool === 'layers';
+  }
   function uid() { return 'layer-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7); }
   function nextFrame() { return new Promise(function (resolve) { requestAnimationFrame(function () { resolve(); }); }); }
 
@@ -777,6 +781,19 @@
     return isMobile() ? 14 : 24;
   }
 
+  function updateCanvasClip(rect) {
+    if (!isMobile() || !state.source) {
+      canvas.style.clipPath = '';
+      return;
+    }
+    var left = Math.max(0, view.offsetX);
+    var top = Math.max(0, view.offsetY);
+    var right = Math.max(0, rect.width - (view.offsetX + view.drawW));
+    var bottom = Math.max(0, rect.height - (view.offsetY + view.drawH));
+    canvas.style.clipPath = 'inset(' + top.toFixed(2) + 'px ' + right.toFixed(2) + 'px ' +
+      bottom.toFixed(2) + 'px ' + left.toFixed(2) + 'px)';
+  }
+
   function computeView(imageW, imageH, rect) {
     var padding = canvasPadding();
     var fit = Math.min((rect.width - padding * 2) / imageW, (rect.height - padding * 2) / imageH);
@@ -825,6 +842,8 @@
     var display = state.compare && state.source ? state.source.canvas : previewCanvas;
     if (!display && state.source) display = state.base ? state.base.canvas : state.source.canvas;
     if (!display || !state.source) {
+      canvas.style.pointerEvents = 'none';
+      canvas.style.clipPath = '';
       screenCtx.fillStyle = '#7f87a5';
       screenCtx.font = '600 13px "Segoe UI", system-ui, sans-serif';
       screenCtx.textAlign = 'center';
@@ -837,6 +856,8 @@
     }
     var logical = getLogicalSize();
     computeView(logical.width, logical.height, rect);
+    canvas.style.pointerEvents = '';
+    updateCanvasClip(rect);
     screenCtx.save();
     screenCtx.translate(view.offsetX, view.offsetY);
     screenCtx.fillStyle = ensureChecker();
@@ -849,7 +870,7 @@
       drawCropOverlay();
     } else if (!state.compare) {
       if (interaction && interaction.type === 'draw') drawLiveStroke();
-      else drawLayerSelection();
+      else if (isLayerTool()) drawLayerSelection();
     }
     updateZoomLabel();
     updateStatus();
@@ -963,9 +984,30 @@
     screenCtx.restore();
   }
 
+  function layerScreenScale() {
+    if (state.tool === 'crop' || !state.crop) return { x: view.scale, y: view.scale };
+    var out = getOutputSize();
+    return {
+      x: view.scale * (out.width / state.crop.w),
+      y: view.scale * (out.height / state.crop.h)
+    };
+  }
+
   function layerScreenGeometry(layer) {
     var center = baseToScreen(layer.x + layer.w / 2, layer.y + layer.h / 2);
-    return { cx: center.x, cy: center.y, scale: baseScale(), w: layer.w * baseScale(), h: layer.h * baseScale() };
+    var scale = layerScreenScale();
+    return {
+      cx: center.x, cy: center.y, sx: scale.x, sy: scale.y,
+      w: layer.w * scale.x, h: layer.h * scale.y
+    };
+  }
+
+  function layerHandleSize() {
+    return isMobile() ? 7 : 5;
+  }
+
+  function layerRotateOffset() {
+    return isMobile() ? 32 : 26;
   }
 
   function layerHandlePoints(layer) {
@@ -979,9 +1021,10 @@
     var halfW = geometry.w / 2;
     var halfH = geometry.h / 2;
     return {
-      nw: rotate(-halfW, -halfH), ne: rotate(halfW, -halfH),
-      se: rotate(halfW, halfH), sw: rotate(-halfW, halfH),
-      rotate: rotate(0, -halfH - 26)
+      nw: rotate(-halfW, -halfH), n: rotate(0, -halfH), ne: rotate(halfW, -halfH),
+      e: rotate(halfW, 0), se: rotate(halfW, halfH), s: rotate(0, halfH),
+      sw: rotate(-halfW, halfH), w: rotate(-halfW, 0),
+      rotate: rotate(0, -halfH - layerRotateOffset())
     };
   }
 
@@ -990,6 +1033,7 @@
     if (!layer || !layer.visible) return;
     var geometry = layerScreenGeometry(layer);
     var angle = (Number(layer.rotation) || 0) * Math.PI / 180;
+    var size = layerHandleSize();
     screenCtx.save();
     screenCtx.translate(geometry.cx, geometry.cy);
     screenCtx.rotate(angle);
@@ -998,21 +1042,25 @@
     screenCtx.setLineDash([5, 4]);
     screenCtx.strokeRect(-geometry.w / 2, -geometry.h / 2, geometry.w, geometry.h);
     screenCtx.setLineDash([]);
+    screenCtx.beginPath();
+    screenCtx.moveTo(0, -geometry.h / 2);
+    screenCtx.lineTo(0, -geometry.h / 2 - layerRotateOffset());
+    screenCtx.stroke();
     screenCtx.restore();
     var points = layerHandlePoints(layer);
     screenCtx.save();
     screenCtx.fillStyle = '#ffffff';
     screenCtx.strokeStyle = layer.locked ? '#f59e0b' : '#5c2ddd';
     screenCtx.lineWidth = 2;
-    ['nw', 'ne', 'se', 'sw'].forEach(function (key) {
+    ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'].forEach(function (key) {
       var point = points[key];
       screenCtx.beginPath();
-      screenCtx.rect(point.x - 4, point.y - 4, 8, 8);
+      screenCtx.rect(point.x - size, point.y - size, size * 2, size * 2);
       screenCtx.fill();
       screenCtx.stroke();
     });
     screenCtx.beginPath();
-    screenCtx.arc(points.rotate.x, points.rotate.y, 5, 0, Math.PI * 2);
+    screenCtx.arc(points.rotate.x, points.rotate.y, size + 1, 0, Math.PI * 2);
     screenCtx.fill();
     screenCtx.stroke();
     screenCtx.restore();
@@ -1035,15 +1083,15 @@
     return null;
   }
 
-  function hitLayerHandle(clientX, clientY) {
+  function hitLayerHandle(x, y) {
     var layer = activeLayer();
     if (!layer || layer.locked) return null;
     var points = layerHandlePoints(layer);
-    var radius = 12;
-    var keys = Object.keys(points);
+    var radius = isMobile() ? 14 : 12;
+    var keys = ['nw', 'ne', 'se', 'sw', 'n', 'e', 's', 'w', 'rotate'];
     for (var i = 0; i < keys.length; i += 1) {
       var point = points[keys[i]];
-      if (Math.abs(clientX - point.x) <= radius && Math.abs(clientY - point.y) <= radius) return keys[i];
+      if (Math.abs(x - point.x) <= radius && Math.abs(y - point.y) <= radius) return keys[i];
     }
     return null;
   }
@@ -2169,7 +2217,7 @@
       '<button class="editor-button" type="button" data-action="duplicate-layer">Duplicate</button>' +
       '<button class="editor-button editor-button-danger" type="button" data-action="delete-layer">Delete</button>' +
       '</div>' +
-      '<p class="editor-hint">Drag the text on the canvas to move it. Use the corner handles to resize the text box and the round handle to rotate it.</p>';
+      '<p class="editor-hint">Drag the text on the canvas to move it. Use the corner and edge handles to resize the text box and the round handle to rotate it.</p>';
   }
 
   function updateTextLayerHeight(layer) {
@@ -2249,7 +2297,7 @@
     var html = '<div class="editor-button-row" style="margin-top:0">' + buttons + '</div>';
     var active = activeLayer();
     if (!active || active.type !== 'shape') {
-      return html + '<p class="editor-hint">Add a shape, then drag it on the canvas. Use the corner handles to resize and the round handle to rotate.</p>';
+      return html + '<p class="editor-hint">Add a shape, then drag it on the canvas. Use the corner and edge handles to resize and the round handle to rotate.</p>';
     }
     var shape = active.shape;
     return html +
@@ -2614,6 +2662,12 @@
       var input = $('[data-layer-field="' + field + '"]', els.panelBody);
       if (input) input.value = Math.round(layer[field]);
     });
+    var rotation = $('[data-layer-prop="rotation"]', els.panelBody);
+    if (rotation) {
+      rotation.value = Math.round(Number(layer.rotation) || 0);
+      var output = rotation.parentNode.querySelector('output');
+      if (output) output.textContent = rotation.value + '°';
+    }
   }
 
   /* ---------- Export ---------- */
@@ -3322,25 +3376,37 @@
   }
 
   function startLayerInteraction(event) {
-    var handle = hitLayerHandle(event.clientX, event.clientY);
+    var local = pointerLocal(event);
+    var handle = hitLayerHandle(local.x, local.y);
     if (handle) {
       var current = activeLayer();
       if (!current || current.locked) return true;
+      var startPoint = screenToBase(event.clientX, event.clientY);
+      var startCenterX = current.x + current.w / 2;
+      var startCenterY = current.y + current.h / 2;
       interaction = {
         type: 'layer-transform', handle: handle, layer: current,
         start: {
           x: current.x, y: current.y, w: current.w, h: current.h,
-          rotation: Number(current.rotation) || 0
+          rotation: Number(current.rotation) || 0,
+          angle: Math.atan2(startPoint.y - startCenterY, startPoint.x - startCenterX) * 180 / Math.PI
         },
-        startPoint: screenToBase(event.clientX, event.clientY),
+        startPoint: startPoint,
         changed: false
       };
       return true;
     }
     var hit = hitLayer(event.clientX, event.clientY);
-    if (!hit) return false;
+    if (!hit) {
+      if (state.activeLayerId) {
+        state.activeLayerId = null;
+        if (isLayerTool()) renderPanel(state.tool, true);
+        drawToScreen();
+      }
+      return false;
+    }
     state.activeLayerId = hit.id;
-    if (state.tool === 'layers' || state.tool === 'text' || state.tool === 'shapes') {
+    if (isLayerTool()) {
       renderPanel(state.tool, true);
     }
     drawToScreen();
@@ -3396,8 +3462,9 @@
     } else if (interaction.handle === 'rotate') {
       var centerX = layer.x + layer.w / 2;
       var centerY = layer.y + layer.h / 2;
-      var angle = Math.atan2(point.y - centerY, point.x - centerX) * 180 / Math.PI + 90;
-      layer.rotation = Math.round(angle);
+      var angle = Math.atan2(point.y - centerY, point.x - centerX) * 180 / Math.PI;
+      var rotation = interaction.start.rotation + (angle - interaction.start.angle);
+      layer.rotation = Math.round(((rotation + 180) % 360 + 360) % 360 - 180);
     } else {
       var startCenterX = interaction.start.x + interaction.start.w / 2;
       var startCenterY = interaction.start.y + interaction.start.h / 2;
@@ -3502,7 +3569,7 @@
       startDraw(event);
       return;
     }
-    if (state.tool === 'text' || state.tool === 'shapes' || state.tool === 'layers') {
+    if (isLayerTool()) {
       if (startLayerInteraction(event)) return;
     }
     startPan(event);
@@ -3742,7 +3809,7 @@
     canvas.addEventListener('pointercancel', onPointerUp);
     canvas.addEventListener('contextmenu', function (event) { event.preventDefault(); });
     canvas.addEventListener('dblclick', function (event) {
-      if (state.tool !== 'text' && state.tool !== 'shapes' && state.tool !== 'layers') return;
+      if (!isLayerTool()) return;
       var hit = hitLayer(event.clientX, event.clientY);
       if (hit && hit.type === 'text') {
         state.activeLayerId = hit.id;
