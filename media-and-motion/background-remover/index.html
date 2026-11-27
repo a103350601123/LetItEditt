@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<script async src="https://www.googletagmanager.com/gtm.js?id=GTM-TRTFBNML"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Background Remover – Remove Image Background Free | LetitEdit</title>
+<meta name="description" content="Remove image backgrounds free with a local AI background remover. Keep hair detail, add transparent, white or studio backgrounds, and download PNG, JPG or WebP.">
+<meta name="theme-color" content="#2563EB">
+<link rel="canonical" href="https://letitedit.com/media-and-motion/background-remover/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AI Background Remover – Remove Image Background Free | LetitEdit">
+<meta property="og:description" content="Remove image backgrounds free with a local AI background remover. Keep hair detail, add transparent, white or studio backgrounds, and download PNG, JPG or WebP.">
+<meta property="og:url" content="https://letitedit.com/media-and-motion/background-remover/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AI Background Remover – Remove Image Background Free | LetitEdit">
+<meta name="twitter:description" content="Remove image backgrounds free with a local AI background remover. Keep hair detail, add transparent, white or studio backgrounds, and download PNG, JPG or WebP.">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M6 17V7h3l3 5 3-5h3v10' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="stylesheet" href="../../css/background-remover.css">
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://letitedit.com/"},{"@type":"ListItem","position":2,"name":"Categories","item":"https://letitedit.com/categories/"},{"@type":"ListItem","position":3,"name":"Image & Photo Editing","item":"https://letitedit.com/categories/image-photo-editing/"},{"@type":"ListItem","position":4,"name":"AI Background Remover","item":"https://letitedit.com/media-and-motion/background-remover/"}]},{"@type":"SoftwareApplication","name":"AI Background Remover","applicationCategory":"MultimediaApplication","operatingSystem":"Any modern browser","url":"https://letitedit.com/media-and-motion/background-remover/","description":"Remove image backgrounds with a local AI segmentation model. Refine hair and edges, add transparent, white, colour, gradient, image or studio backgrounds, and download PNG, JPG or WebP.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Local AI background removal","Transparent PNG and WebP output","White, black, grey, colour and gradient backgrounds","Premium white studio effect with contact shadow and reflection","Erase and restore brushes with undo and redo","Background blur and depth blur","JPG, PNG, WebP and AVIF input where the browser supports it","EXIF orientation respected","No image upload"]},{"@type":"HowTo","name":"How to remove an image background","step":[{"@type":"HowToStep","name":"Choose an image","text":"Drop a JPG, PNG, WebP or AVIF image into the tool, or use the file picker."},{"@type":"HowToStep","name":"Remove the background","text":"Select Remove background. The AI model runs locally in your browser and creates a soft alpha matte."},{"@type":"HowToStep","name":"Refine and choose a background","text":"Use Erase or Restore for difficult edges, then choose transparent, white, colour, gradient, image or studio white."},{"@type":"HowToStep","name":"Download","text":"Choose PNG, JPG or WebP and download the final image with the background and effects baked in."}]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is this background remover really free?","acceptedAnswer":{"@type":"Answer","text":"Yes. The tool is free to use, needs no account and does not require a paid API. The AI model is downloaded to your browser the first time you remove a background."}},{"@type":"Question","name":"Are my images uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. The image is decoded, segmented and exported on your device. Only the AI model file is downloaded from LetitEdit; your image is not sent to LetitEdit or to a third-party service."}},{"@type":"Question","name":"Which AI model does the tool use?","acceptedAnswer":{"@type":"Answer","text":"The tool uses BiRefNet Lite, an MIT-licensed foreground segmentation model, through ONNX Runtime Web. It runs with WebGPU where available and falls back to WebAssembly on the CPU."}},{"@type":"Question","name":"Can it keep fine hair and fur?","acceptedAnswer":{"@type":"Answer","text":"BiRefNet produces a soft alpha matte and the tool refines it against the original pixels. Straight hair, curls, beards and most fur edges are handled well. Very fine flyaway hair against a similar colour, motion blur and transparent objects can still need manual cleanup."}},{"@type":"Question","name":"Which formats can I download?","acceptedAnswer":{"@type":"Answer","text":"PNG with transparency, JPG with the selected background, and WebP where the browser supports it. JPG cannot store transparency, so transparent areas are exported on white."}},{"@type":"Question","name":"Does it change the image dimensions?","acceptedAnswer":{"@type":"Answer","text":"The export keeps the original aspect ratio and, for images up to 6000 pixels on the long edge and about 24 megapixels, the original dimensions. Very large images are capped for browser memory safety, so the tool never claims AI upscaling."}},{"@type":"Question","name":"Why is the first removal slow?","acceptedAnswer":{"@type":"Answer","text":"The first run downloads about 94 MB of model weights and initialises ONNX Runtime Web. Later images reuse the loaded model. WebGPU is much faster than the CPU fallback."}},{"@type":"Question","name":"What are the limitations?","acceptedAnswer":{"@type":"Answer","text":"The model works on one main subject and can struggle with transparent glass, smoke, extremely fine hair, heavy motion blur, very low contrast and busy scenes with several subjects. Manual erase, restore and background controls help, but the tool does not promise perfect results for every photo."}}]}]}
+</script>
+</head>
+<body class="bgr-page">
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="topbar">
+  <nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+    <div class="nav-links" id="primary-links">
+      <a href="/categories/">Categories</a>
+      <a href="/blog/">Blog</a>
+      <a href="/news/">News</a>
+      <a href="/faq/">FAQ</a>
+    </div>
+    <div class="nav-actions">
+      <button class="menu-button" type="button" aria-controls="primary-links" aria-expanded="false">Menu</button>
+    </div>
+  </nav>
+</header>
+
+<div id="main-content">
+<nav class="container breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../">Home</a><span aria-hidden="true">/</span>
+  <a href="../../categories/">Categories</a><span aria-hidden="true">/</span>
+  <a href="../../categories/image-photo-editing/">Image &amp; Photo Editing</a><span aria-hidden="true">/</span>
+  <span aria-current="page">AI Background Remover</span>
+</nav>
+
+<section class="bgr-hero">
+  <div class="container">
+    <span class="eyebrow">Image &amp; Photo · AI tool</span>
+    <h1>AI Background Remover</h1>
+    <p class="bgr-hero-lead">Remove the background from an image in your browser. The AI model runs on your device, produces a soft alpha matte for hair and edges, and lets you add a transparent, white, colour, gradient, image or premium studio background before downloading.</p>
+    <ul class="bgr-hero-points">
+      <li>Free, no account</li>
+      <li>Images stay on your device</li>
+      <li>Hair-aware alpha matte</li>
+      <li>PNG, JPG and WebP download</li>
+    </ul>
+    <p class="bgr-hero-note">First run downloads a 94 MB local AI model. Nothing is uploaded.</p>
+  </div>
+</section>
+
+<section class="bgr-workspace-section" aria-labelledby="workspace-title">
+  <div class="container bgr-workspace">
+    <div class="bgr-stage-card">
+      <div class="bgr-stage-head">
+        <div>
+          <h2 id="workspace-title">Background remover</h2>
+          <p data-stage-subtitle>Upload a photo to start.</p>
+        </div>
+        <div class="bgr-stage-actions">
+          <button class="bgr-btn bgr-btn-quiet" type="button" data-compare aria-pressed="false" disabled>Compare original</button>
+          <button class="bgr-btn bgr-btn-quiet" type="button" data-zoom-fit>Fit</button>
+        </div>
+      </div>
+
+      <div class="bgr-stage" data-stage>
+        <canvas data-canvas width="1200" height="800" aria-label="Background removal preview. Use the toolbar to pan, zoom, erase or restore." data-tool="pan" tabindex="0"></canvas>
+        <div class="bgr-empty" data-empty>
+          <div class="bgr-dropzone" data-dropzone>
+            <span class="bgr-drop-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+            </span>
+            <p class="bgr-drop-title">Drop an image here</p>
+            <p class="bgr-drop-sub">JPG, PNG, WebP or AVIF · up to 25 MB</p>
+            <button class="bgr-btn bgr-btn-primary" type="button" data-browse>Choose an image</button>
+            <p class="bgr-drop-note">The image is processed locally. Nothing is uploaded.</p>
+          </div>
+        </div>
+
+        <div class="bgr-processing" data-processing hidden>
+          <div class="bgr-processing-card">
+            <p class="bgr-processing-title">Working on your image</p>
+            <div class="bgr-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <span class="bgr-progress-bar" data-progress-bar></span>
+            </div>
+            <p class="bgr-progress-text" data-progress-text>Preparing…</p>
+            <button class="bgr-btn bgr-btn-quiet" type="button" data-cancel>Cancel</button>
+          </div>
+        </div>
+
+        <span class="bgr-compare-badge" data-compare-badge hidden>Original</span>
+        <p class="bgr-stage-hint" data-stage-hint>Pan mode: drag the image, pinch to zoom, or use the wheel.</p>
+      </div>
+
+      <div class="bgr-toolbar">
+        <div class="bgr-tool-group" role="group" aria-label="Preview tool">
+          <button class="bgr-tool is-active" type="button" data-tool="pan" aria-pressed="true">Pan</button>
+          <button class="bgr-tool" type="button" data-tool="erase" aria-pressed="false">Erase</button>
+          <button class="bgr-tool" type="button" data-tool="restore" aria-pressed="false">Restore</button>
+        </div>
+        <div class="bgr-zoom" role="group" aria-label="Zoom">
+          <button class="bgr-icon-btn" type="button" data-zoom-out aria-label="Zoom out">−</button>
+          <output class="bgr-zoom-label" data-zoom-label>100%</output>
+          <button class="bgr-icon-btn" type="button" data-zoom-in aria-label="Zoom in">+</button>
+          <button class="bgr-btn bgr-btn-quiet" type="button" data-zoom-fit>Fit</button>
+        </div>
+        <p class="bgr-status" role="status" aria-live="polite" data-status>Choose an image to begin.</p>
+      </div>
+
+      <div class="bgr-error" data-error role="alert" hidden>
+        <span data-error-text></span>
+        <button class="bgr-icon-btn" type="button" data-error-close aria-label="Dismiss error">×</button>
+      </div>
+    </div>
+
+    <aside class="bgr-panel" aria-label="Background removal controls">
+      <section class="bgr-panel-section">
+        <div class="bgr-section-head">
+          <h2>1. Image</h2>
+          <span class="bgr-step" data-file-meta>No image selected.</span>
+        </div>
+        <div class="bgr-button-row">
+          <button class="bgr-btn bgr-btn-secondary" type="button" data-browse>Choose image</button>
+          <button class="bgr-btn bgr-btn-quiet" type="button" data-new-image hidden>New image</button>
+        </div>
+        <input type="file" hidden data-file-input accept="image/jpeg,image/png,image/webp,image/avif,.jpg,.jpeg,.png,.webp,.avif">
+        <button class="bgr-btn bgr-btn-primary bgr-btn-wide" type="button" data-process disabled>Remove background</button>
+        <p class="bgr-model-note" data-model-note>The 94 MB AI model downloads only when you first remove a background. Images are processed on this device.</p>
+      </section>
+
+      <section class="bgr-panel-section" data-controls hidden>
+        <div class="bgr-section-head">
+          <h2>2. Background</h2>
+        </div>
+        <div class="bgr-bg-grid" role="radiogroup" aria-label="Background style">
+          <label class="bgr-bg-option"><input type="radio" name="bgr-background" value="transparent" checked><span class="bgr-swatch bgr-swatch-checker" aria-hidden="true"></span><span>Transparent</span></label>
+          <label class="bgr-bg-option"><input type="radio" name="bgr-background" value="white"><span class="bgr-swatch" style="background:#ffffff" aria-hidden="true"></span><span>White</span></label>
+          <label class="bgr-bg-option"><input type="radio" name="bgr-background" value="black"><span class="bgr-swatch" style="background:#000000" aria-hidden="true"></span><span>Black</span></label>
+          <label class="bgr-bg-option"><input type="radio" name="bgr-background" value="grey"><span class="bgr-swatch" style="background:#e2e8f0" aria-hidden="true"></span><span>Grey</span></label>
+          <label class="bgr-bg-option"><input type="radio" name="bgr-background" value="color"><span class="bgr-swatch" style="background:#2563eb" aria-hidden="true"></span><span>Colour</span></label>
+          <label class="bgr-bg-option"><input type="radio" name="bgr-background" value="gradient"><span class="bgr-swatch" style="background:linear-gradient(135deg,#eff6ff,#2563eb)" aria-hidden="true"></span><span>Gradient</span></label>
+          <label class="bgr-bg-option"><input type="radio" name="bgr-background" value="image"><span class="bgr-swatch bgr-swatch-image" aria-hidden="true"></span><span>Your image</span></label>
+          <label class="bgr-bg-option"><input type="radio" name="bgr-background" value="original"><span class="bgr-swatch bgr-swatch-original" aria-hidden="true"></span><span>Original photo</span></label>
+          <label class="bgr-bg-option bgr-bg-option-wide"><input type="radio" name="bgr-background" value="studio"><span class="bgr-swatch bgr-swatch-studio" aria-hidden="true"></span><span><strong>Studio white</strong><small>Contact shadow, soft light and optional reflection</small></span></label>
+        </div>
+
+        <div class="bgr-subpanel" data-bg-panel="color" hidden>
+          <label class="bgr-field" for="bgr-color">
+            <span>Background colour</span>
+            <span class="bgr-color-row"><input id="bgr-color" type="color" value="#2563eb" data-color><input type="text" value="#2563eb" data-color-hex aria-label="Background colour hex value" spellcheck="false"></span>
+          </label>
+        </div>
+
+        <div class="bgr-subpanel" data-bg-panel="gradient" hidden>
+          <div class="bgr-field-row">
+            <label class="bgr-field" for="bgr-gradient-from"><span>From</span><input id="bgr-gradient-from" type="color" value="#eff6ff" data-gradient-from></label>
+            <label class="bgr-field" for="bgr-gradient-to"><span>To</span><input id="bgr-gradient-to" type="color" value="#2563eb" data-gradient-to></label>
+          </div>
+          <label class="bgr-field" for="bgr-gradient-angle"><span>Angle <output data-gradient-angle-value>135°</output></span><input id="bgr-gradient-angle" type="range" min="0" max="360" value="135" data-gradient-angle></label>
+        </div>
+
+        <div class="bgr-subpanel" data-bg-panel="image" hidden>
+          <label class="bgr-field" for="bgr-bg-image"><span>Background image</span><input id="bgr-bg-image" type="file" accept="image/jpeg,image/png,image/webp,image/avif" data-bg-image-input></label>
+          <p class="bgr-hint" data-bg-image-meta>No background image selected.</p>
+        </div>
+
+        <div class="bgr-subpanel" data-bg-panel="studio" hidden>
+          <div class="bgr-field-row">
+            <label class="bgr-field" for="bgr-shadow-opacity"><span>Shadow opacity <output data-shadow-opacity-value>38%</output></span><input id="bgr-shadow-opacity" type="range" min="0" max="100" value="38" data-shadow-opacity data-studio-input="shadowOpacity"></label>
+            <label class="bgr-field" for="bgr-shadow-blur"><span>Shadow blur <output data-shadow-blur-value>34</output></span><input id="bgr-shadow-blur" type="range" min="0" max="100" value="34" data-shadow-blur data-studio-input="shadowBlur"></label>
+          </div>
+          <div class="bgr-field-row">
+            <label class="bgr-field" for="bgr-shadow-direction"><span>Direction <output data-shadow-direction-value>90°</output></span><input id="bgr-shadow-direction" type="range" min="-180" max="180" value="90" data-shadow-direction data-studio-input="shadowDirection"></label>
+            <label class="bgr-field" for="bgr-shadow-offset"><span>Offset <output data-shadow-offset-value>14</output></span><input id="bgr-shadow-offset" type="range" min="0" max="100" value="14" data-shadow-offset data-studio-input="shadowOffset"></label>
+          </div>
+          <label class="bgr-field" for="bgr-shadow-fade"><span>Shadow fade <output data-shadow-fade-value>55</output></span><input id="bgr-shadow-fade" type="range" min="0" max="100" value="55" data-shadow-fade data-studio-input="shadowFade"></label>
+          <div class="bgr-field-row">
+            <label class="bgr-field" for="bgr-reflection"><span>Reflection <output data-reflection-value>16%</output></span><input id="bgr-reflection" type="range" min="0" max="100" value="16" data-reflection data-studio-input="reflection"></label>
+            <label class="bgr-field" for="bgr-reflection-fade"><span>Reflection fade <output data-reflection-fade-value>62</output></span><input id="bgr-reflection-fade" type="range" min="0" max="100" value="62" data-reflection-fade data-studio-input="reflectionFade"></label>
+          </div>
+          <button class="bgr-btn bgr-btn-quiet" type="button" data-studio-reset>Reset studio look</button>
+        </div>
+
+        <div class="bgr-subpanel" data-blur-wrap hidden>
+          <label class="bgr-field" for="bgr-blur"><span>Background blur <output data-blur-value>0</output></span><input id="bgr-blur" type="range" min="0" max="60" value="0" data-blur></label>
+          <label class="bgr-field" for="bgr-depth"><span>Depth blur <output data-depth-value>0</output></span><input id="bgr-depth" type="range" min="0" max="60" value="0" data-depth></label>
+          <p class="bgr-hint">Blur applies to the original photo or your uploaded background, never to the subject.</p>
+        </div>
+      </section>
+
+      <section class="bgr-panel-section" data-controls hidden>
+        <div class="bgr-section-head">
+          <h2>3. Refine edges</h2>
+        </div>
+        <div class="bgr-tool-group bgr-tool-group-wide" role="group" aria-label="Refinement tool">
+          <button class="bgr-tool" type="button" data-tool="erase" aria-pressed="false">Erase</button>
+          <button class="bgr-tool" type="button" data-tool="restore" aria-pressed="false">Restore</button>
+          <button class="bgr-tool" type="button" data-tool="pan" aria-pressed="true">Pan</button>
+        </div>
+        <label class="bgr-field" for="bgr-brush-size"><span>Brush size <output data-brush-size-value>64 px</output></span><input id="bgr-brush-size" type="range" min="2" max="220" value="64" data-brush-size></label>
+        <label class="bgr-field" for="bgr-brush-softness"><span>Brush softness <output data-brush-softness-value>65%</output></span><input id="bgr-brush-softness" type="range" min="0" max="100" value="65" data-brush-softness></label>
+        <div class="bgr-button-row">
+          <button class="bgr-btn bgr-btn-quiet" type="button" data-undo disabled>Undo</button>
+          <button class="bgr-btn bgr-btn-quiet" type="button" data-redo disabled>Redo</button>
+          <button class="bgr-btn bgr-btn-quiet" type="button" data-reset-mask disabled>Reset refinement</button>
+        </div>
+        <p class="bgr-hint">Erase removes foreground; Restore paints it back. Use a larger, softer brush for flyaway hair. Undo and redo cover brush strokes.</p>
+      </section>
+
+      <section class="bgr-panel-section" data-controls hidden>
+        <div class="bgr-section-head">
+          <h2>4. Download</h2>
+        </div>
+        <label class="bgr-field" for="bgr-format"><span>Format</span>
+          <select id="bgr-format" data-format>
+            <option value="image/png">PNG with transparency</option>
+            <option value="image/jpeg">JPG with background</option>
+            <option value="image/webp">WebP</option>
+          </select>
+        </label>
+        <label class="bgr-field" for="bgr-quality" data-quality-wrap hidden><span>Quality <output data-quality-value>92%</output></span><input id="bgr-quality" type="range" min="35" max="100" value="92" data-quality></label>
+        <button class="bgr-btn bgr-btn-primary bgr-btn-wide" type="button" data-download disabled>Download image</button>
+        <p class="bgr-hint" data-export-note>PNG and WebP keep transparency. JPG will use a white background.</p>
+        <p class="bgr-export-meta" data-export-meta></p>
+      </section>
+    </aside>
+  </div>
+</section>
+
+<section class="bgr-content">
+  <div class="container bgr-content-grid">
+    <article class="bgr-article">
+      <h2>Remove an image background without uploading it</h2>
+      <p>This background remover uses a real foreground segmentation model, BiRefNet Lite, running through ONNX Runtime Web. The model looks at the whole frame, predicts a soft alpha matte and then refines that matte against the original pixels. The result is a cutout with smooth transitions instead of a hard, jagged outline. The work happens in your browser, so the photo is not sent to a server and no API key is involved.</p>
+      <p>The tool is designed for portraits, product shots, pets, objects and other photos with one clear main subject. It can also handle several subjects, but the strongest results come from a subject that is reasonably separated from the background.</p>
+
+      <h2>How to remove a background from an image</h2>
+      <ol class="bgr-steps">
+        <li><strong>Choose an image.</strong> Drag a JPG, PNG, WebP or AVIF file into the stage, paste it, or use the file picker. The limit is 25 MB per image.</li>
+        <li><strong>Select Remove background.</strong> The first run downloads the local AI model and shows real download, initialisation and inference progress. Later images reuse the loaded model.</li>
+        <li><strong>Check the matte.</strong> Use Compare original to inspect the source. Choose Erase or Restore, set a brush size and softness, then drag over the image to correct missed hair, a leftover background patch or an over-cut edge.</li>
+        <li><strong>Pick a background.</strong> Keep transparency, use pure white or black, choose a solid colour, build a gradient, upload your own background image, or apply the studio white effect with a contact shadow and optional floor reflection.</li>
+        <li><strong>Download.</strong> PNG preserves transparency, JPG bakes the selected background, and WebP gives a smaller file. The shadow, reflection and background blur you see in the preview are rendered into the exported file.</li>
+      </ol>
+
+      <h2>Transparent PNG or white background?</h2>
+      <p>A transparent PNG or WebP is the right choice when the cutout will be placed on another design, a product page, a slide or a video. Transparency keeps every soft hair edge intact. A white background is better when the image will be printed, used in a marketplace listing that requires a white backdrop, or shown where transparent pixels would appear black or checkered.</p>
+      <p>JPG cannot store transparency. If you choose JPG while the transparent background is active, the exporter places the subject on white and says so in the download panel. It does not silently turn transparent pixels black.</p>
+
+      <h2>Create a clean white studio product photo</h2>
+      <p>The Studio white option is more than a white fill. It adds a bright studio sweep with a subtle ambient falloff, a soft contact shadow under the subject, and an optional floor reflection. The shadow controls let you change opacity, blur, direction, offset and fade. The reflection has separate intensity and fade controls. This produces a more natural product-photo look than a flat white rectangle, especially for shoes, bottles, watches and other objects that need to feel grounded.</p>
+      <p>For the most believable result, keep the shadow opacity moderate, place the light direction consistently, and use a small reflection rather than a mirror-perfect copy. The effect is rendered at the export resolution, not just painted on the preview.</p>
+
+      <h2>Hair, fur and difficult edges</h2>
+      <p>Fine hair is the hardest part of background removal. A binary mask cuts through strands and leaves a helmet-like edge. This tool keeps a soft alpha channel, then uses a guided refinement pass to pull the matte toward real colour boundaries in the photo. That helps with straight hair, curls, beards and fur, and it reduces the light halo that appears when a subject is photographed against a bright background.</p>
+      <p>No browser model is perfect. Very fine flyaway hair against a background of a similar colour, motion-blurred edges, semi-transparent glass, smoke, netting and chain-link details may still need manual work. Use a soft Erase brush at a small size for leftover background, and a soft Restore brush for hair the model removed. Compare original makes those corrections easier to judge.</p>
+
+      <h2>Background blur and depth blur</h2>
+      <p>Background blur softens the original photo or an uploaded background image while keeping the cutout sharp. Depth blur adds a second, stronger blur toward the bottom of the frame, which can suggest a shallow depth of field without pretending to be a physically accurate lens simulation. Both effects are applied to the final export.</p>
+
+      <h2>Supported formats, size and resolution</h2>
+      <p>JPG, PNG, WebP and AVIF are accepted when the browser can decode them. AVIF support varies by browser and operating system, so the tool reports a clear error if the file cannot be decoded. The input limit is 25 MB. The AI model works at 512 × 512 and the interactive preview is capped at 1800 pixels on the long edge for responsive editing. Export keeps the original aspect ratio and dimensions up to 6000 pixels on the long edge and about 24 megapixels in total. Larger images are scaled down for memory safety, and the tool does not claim AI upscaling or extra detail that was never captured.</p>
+      <p>EXIF orientation is applied while the image is decoded, so a phone photo that displays upright in your gallery is not rotated sideways in the editor. The exporter writes a new file and does not copy the original camera metadata.</p>
+
+      <h2>Privacy and local processing</h2>
+      <p>Your image is decoded, segmented, refined and exported on your device. It is not uploaded to LetitEdit and it is not sent to an external AI service. The only network request used by the editor is the download of the model and runtime files from LetitEdit itself. The model file is about 94 MB and is requested only when you first select Remove background. There is no account, no paid API and no hidden image-upload endpoint.</p>
+
+      <h2>Troubleshooting</h2>
+      <h3>The model download stops or fails</h3>
+      <p>Check your connection and try again. The first run has to download the model; a blocked request or an offline connection will stop it. If your network blocks large files, try a desktop connection or a different network.</p>
+      <h3>Processing is slow</h3>
+      <p>Without WebGPU the model runs through WebAssembly on the CPU, which can take 30–90 seconds on a laptop and longer on a phone. Close other heavy tabs, use a smaller image, and try a browser with WebGPU support for the fastest path.</p>
+      <h3>The cutout missed some hair</h3>
+      <p>Switch to Restore, choose a soft brush and paint over the missing strands. Then switch to Erase for any background that came back with them. Undo and redo let you compare corrections without starting over.</p>
+      <h3>The edge has a light halo</h3>
+      <p>Try a slightly smaller brush with Erase along the boundary, or export to a background colour that matches the original lighting. The guided refinement reduces colour spill, but a very bright background can still leave a faint fringe on dark hair.</p>
+
+      <h2>Frequently asked questions</h2>
+      <div class="bgr-faq">
+        <details class="faq-item"><summary>Is this background remover really free?</summary><p>Yes. The tool is free to use, needs no account and does not require a paid API. The AI model is downloaded to your browser the first time you remove a background.</p></details>
+        <details class="faq-item"><summary>Are my images uploaded?</summary><p>No. The image is decoded, segmented and exported on your device. Only the AI model file is downloaded from LetitEdit; your image is not sent to LetitEdit or to a third-party service.</p></details>
+        <details class="faq-item"><summary>Which AI model does the tool use?</summary><p>The tool uses BiRefNet Lite, an MIT-licensed foreground segmentation model, through ONNX Runtime Web. It runs with WebGPU where available and falls back to WebAssembly on the CPU.</p></details>
+        <details class="faq-item"><summary>Can it keep fine hair and fur?</summary><p>BiRefNet produces a soft alpha matte and the tool refines it against the original pixels. Straight hair, curls, beards and most fur edges are handled well. Very fine flyaway hair against a similar colour, motion blur and transparent objects can still need manual cleanup.</p></details>
+        <details class="faq-item"><summary>Which formats can I download?</summary><p>PNG with transparency, JPG with the selected background, and WebP where the browser supports it. JPG cannot store transparency, so transparent areas are exported on white.</p></details>
+        <details class="faq-item"><summary>Does it change the image dimensions?</summary><p>The export keeps the original aspect ratio and, for images up to 6000 pixels on the long edge and about 24 megapixels, the original dimensions. Very large images are capped for browser memory safety, so the tool never claims AI upscaling.</p></details>
+        <details class="faq-item"><summary>Why is the first removal slow?</summary><p>The first run downloads about 94 MB of model weights and initialises ONNX Runtime Web. Later images reuse the loaded model. WebGPU is much faster than the CPU fallback.</p></details>
+        <details class="faq-item"><summary>What are the limitations?</summary><p>The model works on one main subject and can struggle with transparent glass, smoke, extremely fine hair, heavy motion blur, very low contrast and busy scenes with several subjects. Manual erase, restore and background controls help, but the tool does not promise perfect results for every photo.</p></details>
+      </div>
+    </article>
+
+    <aside class="bgr-side">
+      <div class="info-card">
+        <h2>At a glance</h2>
+        <ul class="bgr-facts">
+          <li>Input <span>JPG, PNG, WebP, AVIF*</span></li>
+          <li>Output <span>PNG, JPG, WebP</span></li>
+          <li>AI model <span>BiRefNet Lite (MIT)</span></li>
+          <li>Processing <span>Local, in your browser</span></li>
+          <li>Max input <span>25 MB</span></li>
+          <li>Max export <span>6000 px / 24 MP</span></li>
+          <li>Price <span>Free</span></li>
+        </ul>
+        <p class="bgr-hint">*AVIF appears only when your browser can decode it.</p>
+      </div>
+      <div class="info-card">
+        <h2>Related image tools</h2>
+        <ul class="related-list">
+          <li><a href="/media-and-motion/image-photo-editor/"><span class="related-icon" aria-hidden="true">▧</span><span>Image &amp; Photo Editor</span></a></li>
+          <li><a href="/media-and-motion/image-size-compressor/"><span class="related-icon" aria-hidden="true">▤</span><span>Image Size Compressor</span></a></li>
+          <li><a href="/categories/image-photo-editing/"><span class="related-icon" aria-hidden="true">▦</span><span>Image &amp; Photo Editing</span></a></li>
+          <li><a href="/categories/face-portrait-editing/"><span class="related-icon" aria-hidden="true">◉</span><span>Face &amp; Portrait Editing</span></a></li>
+          <li><a href="/categories/"><span class="related-icon" aria-hidden="true">▥</span><span>All categories</span></a></li>
+        </ul>
+      </div>
+      <div class="info-card">
+        <h2>Privacy by design</h2>
+        <p>Images stay in this browser tab. The editor does not upload them, store them in an account, or send them to an AI API. The model is downloaded from LetitEdit and runs locally.</p>
+        <p><a class="text-link" href="/privacy-policy/">Read the privacy policy</a></p>
+      </div>
+    </aside>
+  </div>
+</section>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="footer-logo" href="/" aria-label="LetitEdit home"><span class="brand-mark" aria-hidden="true">L</span><span>LetitEdit</span></a>
+        <p>A category-led home for guides, updates and carefully built browser-side tools. The tool library is being rebuilt one focused release at a time.</p>
+        <a class="footer-contact" href="mailto:info@letitedit.com">info@letitedit.com</a>
+      </div>
+      <div class="footer-column">
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="/categories/">Categories</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/news/">News</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Trust &amp; policies</h3>
+        <ul>
+          <li><a href="/about/">About LetitEdit</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="/terms-of-service/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-categories">
+      <h3>All categories</h3>
+      <ul class="footer-category-list">
+        <li><a href="/categories/image-photo-editing/">Image &amp; Photo Editing</a></li>
+        <li><a href="/categories/video-editing/">Video Editing</a></li>
+        <li><a href="/categories/audio-music-editing/">Audio &amp; Music Editing</a></li>
+        <li><a href="/categories/pdf-document-editing/">PDF &amp; Document Editing</a></li>
+        <li><a href="/categories/text-writing-editing/">Text &amp; Writing Editing</a></li>
+        <li><a href="/categories/graphic-design-creative-editing/">Graphic Design &amp; Creative Editing</a></li>
+        <li><a href="/categories/web-code-editing/">Web &amp; Code Editing</a></li>
+        <li><a href="/categories/diagram-presentation-productivity-design/">Diagram, Presentation &amp; Productivity Design</a></li>
+        <li><a href="/categories/qr-barcode-utility-design/">QR, Barcode &amp; Utility Design</a></li>
+        <li><a href="/categories/face-portrait-editing/">Face &amp; Portrait Editing</a></li>
+        <li><a href="/categories/ai-image-enhancement-restoration/">AI Image Enhancement &amp; Restoration</a></li>
+        <li><a href="/categories/3d-design-model-editing/">3D Design &amp; Model Editing</a></li>
+        <li><a href="/categories/animation-motion-graphics/">Animation &amp; Motion Graphics</a></li>
+        <li><a href="/categories/font-typography-editing/">Font &amp; Typography Editing</a></li>
+        <li><a href="/categories/color-gradient-tools/">Color &amp; Gradient Tools</a></li>
+        <li><a href="/categories/logo-branding-tools/">Logo &amp; Branding Tools</a></li>
+        <li><a href="/categories/social-media-design-tools/">Social Media Design Tools</a></li>
+        <li><a href="/categories/screenshot-screen-image-editing/">Screenshot &amp; Screen Image Editing</a></li>
+        <li><a href="/categories/data-visualization-infographic-editing/">Data Visualization &amp; Infographic Editing</a></li>
+        <li><a href="/categories/ebook-publishing-tools/">eBook &amp; Publishing Tools</a></li>
+        <li><a href="/categories/email-newsletter-design/">Email &amp; Newsletter Design</a></li>
+        <li><a href="/categories/sound-effects-voice-design/">Sound Effects &amp; Voice Design</a></li>
+        <li><a href="/categories/cad-technical-drawing/">CAD &amp; Technical Drawing</a></li>
+        <li><a href="/categories/signature-document-annotation/">Signature &amp; Document Annotation</a></li>
+        <li><a href="/categories/ui-ux-website-design-tools/">UI/UX &amp; Website Design Tools</a></li>
+        <li><a href="/categories/print-marketing-material-design/">Print &amp; Marketing Material Design</a></li>
+        <li><a href="/categories/metadata-file-information-editing/">Metadata &amp; File Information Editing</a></li>
+        <li><a href="/categories/digital-drawing-illustration/">Digital Drawing &amp; Illustration</a></li>
+      </ul>
+      <a class="footer-all-categories" href="/categories/">Browse all 28 categories →</a>
+    </div>
+    <div class="footer-promise">
+      <span aria-hidden="true">◆</span>
+      <p><strong>Privacy by design.</strong> Tools keep files in your browser, avoid accounts and explain exactly what each result does.</p>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> LetitEdit.com</span>
+      <span>Built for privacy, accuracy and plain-English tooling.</span>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="../../js/background-remover/app.js"></script>
+</body>
+</html>

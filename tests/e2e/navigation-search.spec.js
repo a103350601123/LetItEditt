@@ -10,7 +10,7 @@ test.describe('sitewide navigation and search', () => {
     const data = await page.evaluate(() => window.LETITEDIT_SEARCH);
 
     expect(data.categories).toHaveLength(28);
-    expect(data.tools).toHaveLength(13);
+    expect(data.tools).toHaveLength(14);
 
     for (const item of [...data.categories, ...data.tools]) {
       expect(item.path, item.name).toMatch(/^\/(categories|media-and-motion)\//);
@@ -29,7 +29,7 @@ test.describe('sitewide navigation and search', () => {
     const input = page.locator('#site-search');
     await expect(dialog).toBeVisible();
     await expect(input).toBeFocused();
-    await expect(page.locator('.search-hint')).toHaveText('Search all 28 categories and 13 live tools.');
+    await expect(page.locator('.search-hint')).toHaveText('Search all 28 categories and 14 live tools.');
     await expect(input).toHaveAttribute('placeholder', /compress/);
 
     await input.fill('COMPR');
@@ -55,7 +55,7 @@ test.describe('sitewide navigation and search', () => {
     const dialog = page.locator('#search-dialog');
     const input = page.locator('#site-search');
     await expect(dialog).toBeVisible();
-    await expect(page.locator('.search-status')).toContainText('28 categories and 13 live tools');
+    await expect(page.locator('.search-status')).toContainText('28 categories and 14 live tools');
     await expect(page.locator('.search-group-title')).toHaveText('Popular categories');
 
     await input.fill('zzzz');
