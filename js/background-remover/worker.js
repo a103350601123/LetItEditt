@@ -1,9 +1,13 @@
 /* Background Remover inference worker.
  * Runs BiRefNet Lite (MIT) locally with ONNX Runtime Web.
- * Images never leave the browser. */
+ * Images never leave the browser. Only the model file is downloaded from the
+ * configured model host; inference stays in this worker. */
 
-const MODEL_URL = '/vendor/background-removal/model_fp16.onnx';
-const MODEL_BYTES = 98484532;
+import { MODEL_CONFIG } from './model-config.mjs';
+import { verifyModelBuffer } from './integrity.js';
+
+const MODEL_URL = MODEL_CONFIG.url;
+const MODEL_BYTES = MODEL_CONFIG.bytes;
 const MODEL_SIZE = 512;
 const ORT_PATH = '/vendor/onnxruntime/';
 
@@ -46,10 +50,34 @@ async function importOrt(preferWebGPU) {
   return mod;
 }
 
-async function fetchModel() {
-  const response = await fetch(MODEL_URL, { cache: 'force-cache' });
+function modelHost() {
+  try {
+    return new URL(MODEL_URL, self.location.href).host;
+  } catch (error) {
+    return 'the configured model host';
+  }
+}
+
+async function fetchModel(cacheMode) {
+  let response;
+  try {
+    response = await fetch(MODEL_URL, { cache: cacheMode, mode: 'cors' });
+  } catch (error) {
+    throw new Error(
+      'The AI model host (' +
+        modelHost() +
+        ') could not be reached. Check your connection, the configured model URL, ' +
+        'and that the host allows cross-origin GET requests (CORS).'
+    );
+  }
   if (!response.ok) {
-    throw new Error('The AI model could not be downloaded (HTTP ' + response.status + ').');
+    throw new Error(
+      'The AI model could not be downloaded from ' +
+        modelHost() +
+        ' (HTTP ' +
+        response.status +
+        '). Check that the public model URL is correct and that the object is publicly readable.'
+    );
   }
   const total = Number(response.headers.get('content-length')) || MODEL_BYTES;
   if (!response.body) {
@@ -58,22 +86,66 @@ async function fetchModel() {
     return buffer;
   }
   const reader = response.body.getReader();
-  const chunks = [];
+  const buffer = new Uint8Array(MODEL_BYTES);
   let loaded = 0;
   let lastReport = 0;
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    chunks.push(value);
-    loaded += value.length;
-    const now = Date.now();
-    if (now - lastReport > 240) {
-      lastReport = now;
-      post('model-progress', { loaded, total });
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (loaded + value.length > buffer.length) {
+        throw new Error(
+          'The AI model download is larger than the published ' +
+            MODEL_BYTES +
+            ' bytes. The hosted file does not match the published model.'
+        );
+      }
+      buffer.set(value, loaded);
+      loaded += value.length;
+      const now = Date.now();
+      if (now - lastReport > 240) {
+        lastReport = now;
+        post('model-progress', { loaded, total });
+      }
     }
+  } catch (error) {
+    if (error && /larger than the published/.test(error.message)) throw error;
+    throw new Error(
+      'The AI model download was interrupted after ' +
+        loaded +
+        ' bytes. Check your connection and try again.'
+    );
+  }
+  if (loaded !== MODEL_BYTES) {
+    throw new Error(
+      'The AI model download was incomplete (' +
+        loaded +
+        ' of ' +
+        MODEL_BYTES +
+        ' bytes). Check your connection and try again.'
+    );
   }
   post('model-progress', { loaded, total });
-  return new Blob(chunks).arrayBuffer();
+  return buffer.buffer;
+}
+
+async function downloadVerifiedModel() {
+  let lastError = null;
+  for (const cacheMode of ['force-cache', 'reload']) {
+    if (cacheMode === 'reload') {
+      post('model-stage', { stage: 'retry', backend });
+    }
+    try {
+      const buffer = await fetchModel(cacheMode);
+      post('model-stage', { stage: 'verify', backend });
+      const result = await verifyModelBuffer(buffer, MODEL_CONFIG);
+      return { buffer, verified: result.verified };
+    } catch (error) {
+      lastError = error;
+      if (!/integrity|incomplete|interrupted/i.test(error.message)) throw error;
+    }
+  }
+  throw lastError;
 }
 
 async function loadSession() {
@@ -84,7 +156,7 @@ async function loadSession() {
     const preferWebGPU = typeof navigator !== 'undefined' && !!navigator.gpu;
     let mod = await importOrt(preferWebGPU);
     post('model-stage', { stage: 'download', backend });
-    const buffer = await fetchModel();
+    const { buffer, verified } = await downloadVerifiedModel();
     post('model-stage', { stage: 'initialise', backend });
     const options = {
       executionProviders: [backend === 'webgpu' ? 'webgpu' : 'wasm'],
@@ -109,7 +181,9 @@ async function loadSession() {
     post('model-ready', {
       backend,
       loadMs: Math.round(performance.now() - started),
-      bytes: MODEL_BYTES
+      bytes: buffer.byteLength,
+      verified: !!verified,
+      sha256: MODEL_CONFIG.sha256
     });
     return session;
   })().catch((error) => {

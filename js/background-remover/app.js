@@ -45,6 +45,7 @@ const state = {
   status: 'empty',
   compare: false,
   model: 'idle',
+  modelVerified: false,
   backend: 'wasm',
   jobId: 0,
   worker: null,
@@ -188,10 +189,12 @@ function showProcessing(show) {
 function updateModelNote() {
   if (!els.modelNote) return;
   if (state.model === 'ready') {
+    const verification = state.modelVerified ? ' SHA-256 verified.' : '';
     els.modelNote.textContent =
-      state.backend === 'webgpu'
+      (state.backend === 'webgpu'
         ? 'AI model ready — WebGPU acceleration is active.'
-        : 'AI model ready — CPU (WASM) fallback is active. Processing may take 30–90 seconds.';
+        : 'AI model ready — CPU (WASM) fallback is active. Processing may take 30–90 seconds.') +
+      verification;
   } else if (state.model === 'loading') {
     els.modelNote.textContent = 'Loading the AI model. The first run downloads about 94 MB.';
   } else if (state.model === 'error') {
@@ -563,6 +566,7 @@ function ensureWorker() {
     state.worker = null;
     showProcessing(false);
     state.model = 'error';
+    state.modelVerified = false;
     updateModelNote();
     showError(event.message || 'The local AI worker stopped unexpectedly. Try again.');
     setStatus('Processing failed.');
@@ -585,12 +589,20 @@ function handleWorkerMessage(message) {
     } else if (message.stage === 'fallback') {
       setProgress(64, 'WebGPU was unavailable. Switching to the CPU fallback…');
     } else if (message.stage === 'download') {
+      state.model = 'loading';
+      state.modelVerified = false;
+      updateModelNote();
       setProgress(6, 'Downloading the AI model…');
+    } else if (message.stage === 'verify') {
+      setProgress(61, 'Verifying the AI model SHA-256 integrity…');
+    } else if (message.stage === 'retry') {
+      setProgress(5, 'The cached model was incomplete. Retrying the download…');
     }
     return;
   }
   if (message.type === 'model-ready') {
     state.model = 'ready';
+    state.modelVerified = message.verified === true;
     state.backend = message.backend || 'wasm';
     updateModelNote();
     setProgress(70, 'AI model ready. Running segmentation…');
@@ -614,6 +626,7 @@ function handleWorkerMessage(message) {
   if (message.type === 'error') {
     if (message.id && message.id !== state.jobId) return;
     state.model = 'error';
+    state.modelVerified = false;
     updateModelNote();
     showProcessing(false);
     showError(message.message || 'The AI model could not process this image.');
@@ -1505,6 +1518,7 @@ function installTestHooks() {
         hasAlpha: !!state.alpha,
         backend: state.backend,
         model: state.model,
+        modelVerified: state.modelVerified,
         processing: state.processing,
         compare: state.compare,
         studio: { ...state.studio },

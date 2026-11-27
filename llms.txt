@@ -1,0 +1,70 @@
+# LetitEdit
+
+> LetitEdit is a free, browser-based tool site for editing images, video, audio and screen recordings. The 13 published tools run locally in the browser, require no account, and do not upload media to a LetitEdit server. The site also publishes 28 category pages covering image, video, audio, PDF, design, document and web topics.
+
+Canonical site: https://letitedit.com/
+
+## Live tools
+
+- [Image & Photo Editor](https://letitedit.com/media-and-motion/image-photo-editor/): Crop, resize, rotate, adjust colour, add text or shapes, apply filters and export images.
+- [Image Size Compressor](https://letitedit.com/media-and-motion/image-size-compressor/): Reduce JPG, PNG and WebP file sizes while keeping dimensions and transparency.
+- [Video Editor](https://letitedit.com/media-and-motion/video-editor/): Trim, add text, music, filters and motion, then export MP4 or WebM.
+- [Video Trimmer](https://letitedit.com/media-and-motion/video-trimmer/): Cut or remove an exact section of a video and download the result.
+- [Video Merger](https://letitedit.com/media-and-motion/video-merger/): Combine clips, reorder them and choose output settings.
+- [Video Cropper](https://letitedit.com/media-and-motion/video-cropper/): Crop to custom areas or ready-made aspect ratios for social platforms.
+- [Video Resizer](https://letitedit.com/media-and-motion/video-resizer/): Resize to 4K, 1080p, 720p or a custom resolution.
+- [Video Compressor](https://letitedit.com/media-and-motion/video-compressor/): Shrink MP4, WebM, MOV, M4V and MKV files with presets or a target size.
+- [Video Converter](https://letitedit.com/media-and-motion/video-converter/): Convert video to MP4, WebM, MOV or MKV, or extract MP3 audio.
+- [Audio Trimmer](https://letitedit.com/media-and-motion/audio-trimmer/): Cut audio precisely on the waveform and export WAV or MP3.
+- [Audio Merger](https://letitedit.com/media-and-motion/audio-merger/): Join tracks, reorder them and add gaps or crossfades.
+- [Audio Converter](https://letitedit.com/media-and-motion/audio-converter/): Convert MP3, WAV, FLAC, M4A/AAC, OGG/Opus and AIFF with batch support.
+- [Screen Recorder](https://letitedit.com/media-and-motion/screen-recorder/): Record a screen, tab or window with microphone, system audio and webcam overlay.
+
+## Categories
+
+- [Image & Photo Editing](https://letitedit.com/categories/image-photo-editing/): Cropping, resizing, compressing, retouching and exporting photos.
+- [Video Editing](https://letitedit.com/categories/video-editing/): Trimming, merging, cropping, resizing, compressing and converting video.
+- [Audio & Music Editing](https://letitedit.com/categories/audio-music-editing/): Trimming, merging and converting audio files.
+- [PDF & Document Editing](https://letitedit.com/categories/pdf-document-editing/): PDF and document editing topics.
+- [Text & Writing Editing](https://letitedit.com/categories/text-writing-editing/): Text cleanup, writing and Unicode-aware editing.
+- [Graphic Design & Creative Editing](https://letitedit.com/categories/graphic-design-creative-editing/): Creative layouts, graphics and design projects.
+- [Web & Code Editing](https://letitedit.com/categories/web-code-editing/): Web, code and developer-focused editing topics.
+- [Diagram, Presentation & Productivity Design](https://letitedit.com/categories/diagram-presentation-productivity-design/): Diagrams, presentations and planning layouts.
+- [QR, Barcode & Utility Design](https://letitedit.com/categories/qr-barcode-utility-design/): QR codes, barcodes and small utility design.
+- [Face & Portrait Editing](https://letitedit.com/categories/face-portrait-editing/): Portrait retouching, lighting and background topics.
+- [AI Image Enhancement & Restoration](https://letitedit.com/categories/ai-image-enhancement-restoration/): Upscaling, restoration, sharpening and photo repair.
+- [3D Design & Model Editing](https://letitedit.com/categories/3d-design-model-editing/): 3D model viewing, conversion and optimisation.
+- [Animation & Motion Graphics](https://letitedit.com/categories/animation-motion-graphics/): GIF, motion, SVG and frame-by-frame animation.
+- [Font & Typography Editing](https://letitedit.com/categories/font-typography-editing/): Font preview, pairing, conversion and typography.
+- [Color & Gradient Tools](https://letitedit.com/categories/color-gradient-tools/): Colour pickers, palettes, gradients and contrast.
+- [Logo & Branding Tools](https://letitedit.com/categories/logo-branding-tools/): Logos, favicons, watermarks and brand kits.
+- [Social Media Design Tools](https://letitedit.com/categories/social-media-design-tools/): Posts, stories, banners and social profiles.
+- [Screenshot & Screen Image Editing](https://letitedit.com/categories/screenshot-screen-image-editing/): Screenshot annotation, redaction and device frames.
+- [Data Visualization & Infographic Editing](https://letitedit.com/categories/data-visualization-infographic-editing/): Charts, graphs, timelines and infographics.
+- [eBook & Publishing Tools](https://letitedit.com/categories/ebook-publishing-tools/): eBook editing, EPUB conversion and publishing.
+- [Email & Newsletter Design](https://letitedit.com/categories/email-newsletter-design/): Email templates, newsletters and responsive previews.
+- [Sound Effects & Voice Design](https://letitedit.com/categories/sound-effects-voice-design/): Sound effects, voice, pitch and audio visualisation.
+- [CAD & Technical Drawing](https://letitedit.com/categories/cad-technical-drawing/): CAD viewing, DXF, measurement and technical drawing.
+- [Signature & Document Annotation](https://letitedit.com/categories/signature-document-annotation/): Digital signatures, stamps and document markup.
+- [UI/UX & Website Design Tools](https://letitedit.com/categories/ui-ux-website-design-tools/): Wireframes, mockups, CSS and responsive design.
+- [Print & Marketing Material Design](https://letitedit.com/categories/print-marketing-material-design/): Flyers, posters, brochures and print layouts.
+- [Metadata & File Information Editing](https://letitedit.com/categories/metadata-file-information-editing/): EXIF, media tags and file property details.
+- [Digital Drawing & Illustration](https://letitedit.com/categories/digital-drawing-illustration/): Drawing, vector, pixel art and illustration.
+
+## Site pages
+
+- [All categories](https://letitedit.com/categories/): Directory of the 28 category pages.
+- [About LetitEdit](https://letitedit.com/about/): How the site is organised and how the tools are built.
+- [FAQ](https://letitedit.com/faq/): Answers about accounts, file handling and tool availability.
+- [Blog](https://letitedit.com/blog/): Notes about privacy, browser-side processing and releases.
+- [News](https://letitedit.com/news/): Site updates.
+- [Contact](https://letitedit.com/contact/): Contact information.
+- [Privacy Policy](https://letitedit.com/privacy-policy/): How data is handled.
+- [Terms of Service](https://letitedit.com/terms-of-service/): Terms for using the site.
+
+## Notes
+
+- Tool pages document their own formats, limits and processing behaviour.
+- All 28 categories are published; 13 tools are live. New tools are added when they are ready.
+- XML sitemap: https://letitedit.com/sitemap.xml
+- Robots policy: https://letitedit.com/robots.txt

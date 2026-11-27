@@ -1,5 +1,7 @@
 const { test, expect } = require('@playwright/test');
+const { execFileSync } = require('node:child_process');
 const fs = require('node:fs');
+const http = require('node:http');
 const path = require('node:path');
 
 const toolPath = '/media-and-motion/background-remover/';
@@ -9,7 +11,69 @@ const sharedFixture = (name) => path.join(__dirname, '..', 'fixtures', name);
 const isAnalyticsNoise = (text) => /googletagmanager|google-analytics|gtag|GTM-/i.test(String(text));
 const isRuntimeNoise = (text) =>
   isAnalyticsNoise(text) ||
-  /onnxruntime|wasm streaming compile failed|falling back to ArrayBuffer/i.test(String(text));
+  /onnxruntime|wasm streaming compile failed|falling back to ArrayBuffer/i.test(String(text)) ||
+  /Failed to load resource|ERR_INTERNET_DISCONNECTED|ERR_NETWORK_CHANGED/i.test(String(text));
+
+const modelPath = path.join(
+  __dirname,
+  '..',
+  '..',
+  'vendor',
+  'background-removal',
+  'model_fp16.onnx'
+);
+const modelConfigModule =
+  'export const MODEL_CONFIG = Object.freeze(' +
+  JSON.stringify({
+    url: 'MODEL_URL',
+    sha256: 'eff9216bb2f9d3f023d9c2b7196845a7485739ab1f231593633e4d2344ffc516',
+    bytes: 98484532,
+    version: 'birefnet-lite-512-fp16-962e679'
+  }) +
+  ');';
+
+let modelServer;
+let modelOrigin;
+
+test.beforeAll(async () => {
+  modelServer = http.createServer((request, response) => {
+    const pathname = new URL(request.url, 'http://127.0.0.1').pathname;
+    const cors = pathname !== '/no-cors/model_fp16.onnx';
+    const headers = {
+      'Content-Type': 'application/octet-stream',
+      'Cache-Control': 'public, max-age=31536000, immutable'
+    };
+    if (cors) headers['Access-Control-Allow-Origin'] = '*';
+    if (pathname === '/model_fp16.onnx' || pathname === '/no-cors/model_fp16.onnx') {
+      headers['Content-Length'] = String(fs.statSync(modelPath).size);
+      response.writeHead(200, headers);
+      fs.createReadStream(modelPath).pipe(response);
+      return;
+    }
+    response.writeHead(404, { ...headers, 'Content-Type': 'text/plain' });
+    response.end('Not found');
+  });
+  await new Promise((resolve, reject) => {
+    modelServer.once('error', reject);
+    modelServer.listen(0, '127.0.0.1', resolve);
+  });
+  modelOrigin = 'http://127.0.0.1:' + modelServer.address().port;
+});
+
+test.afterAll(async () => {
+  if (!modelServer) return;
+  await new Promise((resolve) => modelServer.close(resolve));
+});
+
+async function pointModelAt(context, url) {
+  await context.route('**/js/background-remover/model-config.mjs', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'text/javascript; charset=utf-8',
+      body: modelConfigModule.replace('MODEL_URL', () => url)
+    })
+  );
+}
 
 async function openTool(page) {
   await page.goto(toolPath);
@@ -123,7 +187,14 @@ test.describe('AI background remover', () => {
       'content',
       'https://letitedit.com/media-and-motion/background-remover/'
     );
-    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute('content', 'summary');
+    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+      'content',
+      'summary_large_image'
+    );
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+      'content',
+      'https://letitedit.com/assets/og-letitedit.jpg'
+    );
 
     const seoLengths = await page.evaluate(() => ({
       title: document.title.length,
@@ -612,6 +683,8 @@ test.describe('AI background remover', () => {
     }));
     expect(alpha.corner).toBeLessThan(12);
     expect(alpha.centre).toBeGreaterThan(180);
+    expect(state.modelVerified).toBe(true);
+    await expect(page.locator('[data-model-note]')).toContainText('SHA-256 verified');
 
     expect(modelDownloads).toBe(1);
     const meaningful = requests.filter((request) => !isAnalyticsNoise(request.url));
@@ -643,6 +716,111 @@ test.describe('AI background remover', () => {
     const studio = await scenePixels(page, [[6, 6]]);
     expect(studio.pixels[0].slice(0, 3)).toEqual([255, 255, 255]);
     expect(problems).toEqual([]);
+  });
+
+  test('downloads and verifies the model from a configured cross-origin host', async ({
+    page,
+    context
+  }) => {
+    test.setTimeout(300000);
+    const modelUrl = modelOrigin + '/model_fp16.onnx';
+    await pointModelAt(context, modelUrl);
+    const requests = [];
+    page.on('request', (request) => requests.push(request.url()));
+
+    await openTool(page);
+    await page.locator('[data-file-input]').setInputFiles(fixture('portrait-hair.jpg'));
+    await expect(page.locator('[data-process]')).toBeEnabled();
+    await page.locator('[data-process]').click();
+    await expect(page.locator('[data-download]')).toBeEnabled({ timeout: 270000 });
+    await expect(page.locator('[data-processing]')).toBeHidden();
+
+    const state = await page.evaluate(() => window.__bgrTest.getState());
+    expect(state.status).toBe('done');
+    expect(state.modelVerified).toBe(true);
+    expect(['wasm', 'webgpu']).toContain(state.backend);
+    expect(requests.filter((url) => url === modelUrl)).toHaveLength(1);
+    await expect(page.locator('[data-model-note]')).toContainText('SHA-256 verified');
+  });
+
+  test('explains a cross-origin model host that does not allow CORS', async ({ page, context }) => {
+    const modelUrl = modelOrigin + '/no-cors/model_fp16.onnx';
+    await pointModelAt(context, modelUrl);
+    await openTool(page);
+    await page.locator('[data-file-input]').setInputFiles(sharedFixture('sample.png'));
+    await page.locator('[data-process]').click();
+    await expect(page.locator('[data-error]')).toBeVisible({ timeout: 60000 });
+    await expect(page.locator('[data-error-text]')).toContainText(/CORS|could not be reached/i);
+    await expect(page.locator('[data-processing]')).toBeHidden();
+    await expect(page.locator('[data-process]')).toBeEnabled();
+  });
+
+  test('rejects a corrupted model and retries the download once', async ({ page, context }) => {
+    const badConfig =
+      'export const MODEL_CONFIG = Object.freeze(' +
+      JSON.stringify({
+        url: '/test-model.onnx',
+        sha256: '0000000000000000000000000000000000000000000000000000000000000000',
+        bytes: 16,
+        version: 'test-invalid'
+      }) +
+      ');';
+    await context.route('**/js/background-remover/model-config.mjs', (route) =>
+      route.fulfill({ status: 200, contentType: 'text/javascript', body: badConfig })
+    );
+    let requests = 0;
+    await context.route('**/test-model.onnx', (route) => {
+      requests += 1;
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/octet-stream',
+        body: Buffer.alloc(16, 7)
+      });
+    });
+
+    await openTool(page);
+    await page.locator('[data-file-input]').setInputFiles(sharedFixture('sample.png'));
+    await page.locator('[data-process]').click();
+    await expect(page.locator('[data-error]')).toBeVisible({ timeout: 60000 });
+    await expect(page.locator('[data-error-text]')).toContainText(/SHA-256 integrity/i);
+    expect(requests).toBe(2);
+    await expect(page.locator('[data-processing]')).toBeHidden();
+    await expect(page.locator('[data-process]')).toBeEnabled();
+  });
+
+  test('builds a Cloudflare Pages output with no file over 25 MiB', async () => {
+    test.setTimeout(120000);
+    const root = path.join(__dirname, '..', '..');
+    execFileSync(process.execPath, [path.join(root, 'scripts', 'build-pages.js')], {
+      cwd: root,
+      env: {
+        ...process.env,
+        BGR_MODEL_URL:
+          'https://models.example.invalid/birefnet/962e67969ec6acec9c19fab76acee4f5e22e990c/model_fp16.onnx'
+      },
+      stdio: 'pipe'
+    });
+    const output = path.join(root, 'dist');
+    const files = [];
+    const walk = (directory) => {
+      for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+        const full = path.join(directory, entry.name);
+        if (entry.isDirectory()) walk(full);
+        else files.push({ full, size: fs.statSync(full).size });
+      }
+    };
+    walk(output);
+    expect(files.length).toBeGreaterThan(100);
+    expect(files.filter((file) => file.size > 25 * 1024 * 1024)).toEqual([]);
+    expect(fs.existsSync(path.join(output, 'vendor', 'background-removal', 'model_fp16.onnx'))).toBe(
+      false
+    );
+    const config = fs.readFileSync(
+      path.join(output, 'js', 'background-remover', 'model-config.mjs'),
+      'utf8'
+    );
+    expect(config).toContain('models.example.invalid');
+    expect(config).toContain('eff9216bb2f9d3f023d9c2b7196845a7485739ab1f231593633e4d2344ffc516');
   });
 
   test('serves the model and runtime licences with the vendored assets', async ({ page, request }) => {

@@ -60,7 +60,15 @@ test.describe('homepage', () => {
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://letitedit.com/');
     await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', 'Free Online Tools for Images, Video & Audio | LetitEdit');
     await expect(page.locator('meta[property="og:url"]')).toHaveAttribute('content', 'https://letitedit.com/');
-    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute('content', 'summary');
+    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute('content', 'summary_large_image');
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+      'content',
+      'https://letitedit.com/assets/og-letitedit.jpg'
+    );
+    await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute(
+      'content',
+      'https://letitedit.com/assets/og-letitedit.jpg'
+    );
 
     await expect(page.locator('h1')).toHaveCount(1);
     await expect(page.locator('h1')).toContainText('Everything you need');
