@@ -4,7 +4,7 @@
   "private": true,
   "description": "LetitEdit — category pages, guides and site updates. The tool library is being rebuilt.",
   "scripts": {
-    "build": "node scripts/build.js",
+    "build": "npm run build:pages",
     "build:pages": "node scripts/build-pages.js",
     "test": "vitest run",
     "test:watch": "vitest",
