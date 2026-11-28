@@ -1962,11 +1962,11 @@ test('processes the mix locally without uploading audio or contacting external h
 
   expect(requests.length).toBeGreaterThan(0);
   const origin = new URL(baseURL).origin;
-  // The site loads its Google Tag Manager container on every page; that single
-  // loader request is expected and carries no audio data. Every other external
-  // host still fails this test.
-  const analyticsLoader = /^https:\/\/www\.googletagmanager\.com\/gtm\.js\?id=GTM-TRTFBNML$/;
-  for (const request of requests.filter((item) => !analyticsLoader.test(item.url))) {
+  // The site loads Google Tag Manager on every page. The container requests
+  // gtag.js and sends GA4 beacons; those analytics requests are expected and
+  // carry no audio data. Every other external host still fails this test.
+  const analytics = /^https:\/\/(www\.googletagmanager\.com|www\.google-analytics\.com|analytics\.google\.com|region1\.google-analytics\.com|stats\.g\.doubleclick\.net)\//;
+  for (const request of requests.filter((item) => !analytics.test(item.url))) {
     expect(request.method).toBe('GET');
     expect(new URL(request.url).origin).toBe(origin);
     expect(request.url).not.toMatch(/upload|api\//i);

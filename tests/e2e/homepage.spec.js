@@ -103,6 +103,9 @@ test.describe('homepage', () => {
   test('searches real tools and categories from the hero', async ({ page }) => {
     await page.goto('/');
     const input = page.locator('#tool-search');
+    await expect(
+      page.getByRole('searchbox', { name: 'Search tools and categories' })
+    ).toHaveCount(1);
     await input.fill('compress');
 
     await expect(page.locator('#search-results')).toBeVisible();
@@ -217,7 +220,10 @@ test.describe('homepage', () => {
     await expect(first.locator('p')).toBeVisible();
 
     await expect(page.locator('.hp-footer a[href="mailto:info@letitedit.com"]')).toBeVisible();
-    await expect(page.locator('.hp-footer-cats a')).toHaveCount(28);
+    /* The homepage already has the full category directory in the page body,
+     * so the footer does not repeat the same 28 links. */
+    await expect(page.locator('#categories .hp-category-card')).toHaveCount(28);
+    await expect(page.locator('.hp-footer-cats')).toHaveCount(0);
   });
 
   test('skip link appears on keyboard focus and anchors clear the sticky header', async ({ page }) => {

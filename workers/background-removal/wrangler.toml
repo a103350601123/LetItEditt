@@ -1,0 +1,21 @@
+# LetitEdit Background Remover — Cloudflare Images Worker
+#
+# Deploy with:
+#   npx wrangler deploy --config workers/background-removal/wrangler.toml
+#
+# The Worker has no route. It is reached only through the Pages Function
+# service binding `BGR_WORKER` in the Pages project settings.
+#
+# The Images binding uses the Images Free plan. Do not enable a paid Images
+# plan, paid overage or automatic paid fallback.
+
+name = "letitedit-bgr"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+workers_dev = false
+
+[images]
+binding = "IMAGES"
+
+[observability]
+enabled = false

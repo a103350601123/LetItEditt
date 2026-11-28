@@ -3,6 +3,7 @@ const { execFileSync } = require('node:child_process');
 const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
+const zlib = require('node:zlib');
 
 const toolPath = '/media-and-motion/background-remover/';
 const categoryPath = '/categories/image-photo-editing/';
@@ -88,6 +89,11 @@ async function loadSynthetic(page, options = { width: 900, height: 700 }) {
   await expect(page.locator('[data-download]')).toBeEnabled();
 }
 
+/* Simulate a returning visitor whose local model is already cached. */
+async function useLocal(page) {
+  await page.evaluate(() => window.__bgrTest.setLocalAvailable(true));
+}
+
 async function chooseBackground(page, value) {
   await page
     .locator(`.bgr-bg-option input[value="${value}"]`)
@@ -162,6 +168,60 @@ async function downloadAndDecode(page, trigger, mime, points) {
   return { filename, buffer, decoded };
 }
 
+/* Minimal RGBA PNG encoder used to mock the Cloudflare Images response without
+ * adding a dependency. The result has a transparent border and an opaque oval. */
+const CRC_TABLE = (() => {
+  const table = new Int32Array(256);
+  for (let n = 0; n < 256; n += 1) {
+    let c = n;
+    for (let k = 0; k < 8; k += 1) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+    table[n] = c;
+  }
+  return table;
+})();
+
+function crc32(buffer) {
+  let c = -1;
+  for (let i = 0; i < buffer.length; i += 1) c = CRC_TABLE[(c ^ buffer[i]) & 0xff] ^ (c >>> 8);
+  return (c ^ -1) >>> 0;
+}
+
+function pngChunk(type, data) {
+  const length = Buffer.alloc(4);
+  length.writeUInt32BE(data.length, 0);
+  const body = Buffer.concat([Buffer.from(type, 'ascii'), data]);
+  const crc = Buffer.alloc(4);
+  crc.writeUInt32BE(crc32(body), 0);
+  return Buffer.concat([length, body, crc]);
+}
+
+function makeMaskPng(size = 96) {
+  const stride = size * 4 + 1;
+  const raw = Buffer.alloc(stride * size);
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      const offset = y * stride + 1 + x * 4;
+      const dx = (x - size / 2) / (size * 0.34);
+      const dy = (y - size * 0.55) / (size * 0.42);
+      raw[offset] = 240;
+      raw[offset + 1] = 120;
+      raw[offset + 2] = 60;
+      raw[offset + 3] = dx * dx + dy * dy < 1 ? 255 : 0;
+    }
+  }
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(size, 0);
+  ihdr.writeUInt32BE(size, 4);
+  ihdr[8] = 8;
+  ihdr[9] = 6;
+  return Buffer.concat([
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    pngChunk('IHDR', ihdr),
+    pngChunk('IDAT', zlib.deflateSync(raw)),
+    pngChunk('IEND', Buffer.alloc(0))
+  ]);
+}
+
 test.describe('AI background remover', () => {
   test('renders unique SEO metadata, structured data and an accessible empty workspace', async ({ page }) => {
     const problems = [];
@@ -232,7 +292,7 @@ test.describe('AI background remover', () => {
     );
     await expect(page.locator('input[name="bgr-background"]')).toHaveCount(9);
     await expect(page.locator('[data-model-note]')).toContainText('94 MB');
-    await expect(page.locator('body')).toContainText('Images stay in this browser tab.');
+    await expect(page.locator('body')).toContainText('images are processed in this browser tab');
     expect(problems).toEqual([]);
   });
 
@@ -611,6 +671,7 @@ test.describe('AI background remover', () => {
 
   test('cancels a running job without leaving the tool stuck', async ({ page }) => {
     await openTool(page);
+    await useLocal(page);
     const problems = [];
     page.on('pageerror', (error) => problems.push(error.message));
     await page.locator('[data-file-input]').setInputFiles(fixture('portrait-curls.jpg'));
@@ -627,6 +688,7 @@ test.describe('AI background remover', () => {
   test('reports a clear, recoverable error when the model cannot load', async ({ page }) => {
     await page.route('**/vendor/background-removal/model_fp16.onnx', (route) => route.abort());
     await openTool(page);
+    await useLocal(page);
     await page.locator('[data-file-input]').setInputFiles(sharedFixture('sample.png'));
     await expect(page.locator('[data-process]')).toBeEnabled();
     await page.locator('[data-process]').click();
@@ -636,6 +698,11 @@ test.describe('AI background remover', () => {
     await expect(page.locator('[data-download]')).toBeDisabled();
     await expect(page.locator('[data-process]')).toBeEnabled();
     await expect(page.locator('[data-status]')).toContainText('failed');
+
+    /* The local failure offers Cloudflare as an explicit, consent-gated fallback. */
+    await expect(page.locator('[data-fallback-dialog]')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('[data-fallback-dialog]')).toBeHidden();
 
     await page.locator('[data-error-close]').click();
     await page.unroute('**/vendor/background-removal/model_fp16.onnx');
@@ -662,13 +729,15 @@ test.describe('AI background remover', () => {
     });
 
     await openTool(page);
+    await useLocal(page);
     await page.locator('[data-file-input]').setInputFiles(fixture('portrait-hair.jpg'));
     await expect(page.locator('[data-file-meta]')).toContainText('1200 × 1800 px');
     await page.locator('[data-process]').click();
     await expect(page.locator('[data-processing]')).toBeVisible();
+    await expect(page.locator('[data-consent-dialog]')).toBeHidden();
     await expect(page.locator('[data-download]')).toBeEnabled({ timeout: 270000 });
     await expect(page.locator('[data-processing]')).toBeHidden();
-    await expect(page.locator('[data-model-note]')).toContainText('AI model ready');
+    await expect(page.locator('[data-model-note]')).toContainText('Local AI ready');
 
     const state = await page.evaluate(() => window.__bgrTest.getState());
     expect(state.hasAlpha).toBe(true);
@@ -729,6 +798,7 @@ test.describe('AI background remover', () => {
     page.on('request', (request) => requests.push(request.url()));
 
     await openTool(page);
+    await useLocal(page);
     await page.locator('[data-file-input]').setInputFiles(fixture('portrait-hair.jpg'));
     await expect(page.locator('[data-process]')).toBeEnabled();
     await page.locator('[data-process]').click();
@@ -747,12 +817,15 @@ test.describe('AI background remover', () => {
     const modelUrl = modelOrigin + '/no-cors/model_fp16.onnx';
     await pointModelAt(context, modelUrl);
     await openTool(page);
+    await useLocal(page);
     await page.locator('[data-file-input]').setInputFiles(sharedFixture('sample.png'));
     await page.locator('[data-process]').click();
     await expect(page.locator('[data-error]')).toBeVisible({ timeout: 60000 });
     await expect(page.locator('[data-error-text]')).toContainText(/CORS|could not be reached/i);
     await expect(page.locator('[data-processing]')).toBeHidden();
     await expect(page.locator('[data-process]')).toBeEnabled();
+    await expect(page.locator('[data-fallback-dialog]')).toBeVisible();
+    await page.keyboard.press('Escape');
   });
 
   test('rejects a corrupted model and retries the download once', async ({ page, context }) => {
@@ -779,6 +852,7 @@ test.describe('AI background remover', () => {
     });
 
     await openTool(page);
+    await useLocal(page);
     await page.locator('[data-file-input]').setInputFiles(sharedFixture('sample.png'));
     await page.locator('[data-process]').click();
     await expect(page.locator('[data-error]')).toBeVisible({ timeout: 60000 });
@@ -786,6 +860,181 @@ test.describe('AI background remover', () => {
     expect(requests).toBe(2);
     await expect(page.locator('[data-processing]')).toBeHidden();
     await expect(page.locator('[data-process]')).toBeEnabled();
+    await page.keyboard.press('Escape');
+  });
+
+  test('ignores and deletes a corrupted model already stored in Cache Storage', async ({
+    page,
+    context
+  }) => {
+    const badConfig =
+      'export const MODEL_CONFIG = Object.freeze(' +
+      JSON.stringify({
+        url: '/test-cached-model.onnx',
+        sha256: '0000000000000000000000000000000000000000000000000000000000000000',
+        bytes: 16,
+        version: 'test-invalid'
+      }) +
+      ');';
+    await context.route('**/js/background-remover/model-config.mjs', (route) =>
+      route.fulfill({ status: 200, contentType: 'text/javascript', body: badConfig })
+    );
+    let requests = 0;
+    await context.route('**/test-cached-model.onnx', (route) => {
+      requests += 1;
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/octet-stream',
+        body: Buffer.alloc(16, 7)
+      });
+    });
+
+    await openTool(page);
+    /* Seed the cache with the wrong bytes under the configured model URL. */
+    await page.evaluate(async () => {
+      const cache = await caches.open('letitedit-bgr-model-v1');
+      await cache.put(
+        new URL('/test-cached-model.onnx', location.href).href,
+        new Response(new Uint8Array(16).fill(1), {
+          headers: { 'content-type': 'application/octet-stream' }
+        })
+      );
+    });
+    await useLocal(page);
+    await page.locator('[data-file-input]').setInputFiles(sharedFixture('sample.png'));
+    await page.locator('[data-process]').click();
+    await expect(page.locator('[data-error]')).toBeVisible({ timeout: 60000 });
+    await expect(page.locator('[data-error-text]')).toContainText(/SHA-256 integrity/i);
+    expect(requests).toBe(2);
+    const stillCached = await page.evaluate(async () => {
+      const cache = await caches.open('letitedit-bgr-model-v1');
+      return !!(await cache.match(new URL('/test-cached-model.onnx', location.href).href));
+    });
+    expect(stillCached).toBe(false);
+    await page.keyboard.press('Escape');
+  });
+
+  test('asks for consent on a first visit and does not upload when declined', async ({ page }) => {
+    let posts = 0;
+    await page.route('**/api/background-removal', (route) => {
+      posts += 1;
+      return route.fulfill({ status: 200, contentType: 'image/png', body: makeMaskPng() });
+    });
+    await openTool(page);
+    await page.locator('[data-file-input]').setInputFiles(sharedFixture('sample.png'));
+    await page.locator('[data-process]').click();
+    await expect(page.locator('[data-consent-dialog]')).toBeVisible();
+    await expect(page.locator('[data-consent-dialog]')).toContainText('Cloudflare Images');
+    await expect(page.locator('[data-consent-dialog]')).toContainText('Send to Cloudflare');
+    await page.locator('[data-consent-dialog] button[value="decline"]').click();
+    await expect(page.locator('[data-consent-dialog]')).toBeHidden();
+    await expect(page.locator('[data-status]')).toContainText('not uploaded');
+    await expect(page.locator('[data-download]')).toBeDisabled();
+    expect(posts).toBe(0);
+  });
+
+  test('processes a first image through Cloudflare after consent', async ({ page }) => {
+    test.setTimeout(60000);
+    const png = makeMaskPng();
+    const requests = [];
+    await page.route('**/api/background-removal', (route) => {
+      requests.push(route.request().method());
+      return route.fulfill({ status: 200, contentType: 'image/png', body: png });
+    });
+    /* Do not download the 94 MB model during this cloud-path test. */
+    await page.route('**/vendor/background-removal/model_fp16.onnx', (route) => route.abort());
+
+    await openTool(page);
+    await page.locator('[data-file-input]').setInputFiles(sharedFixture('sample.png'));
+    await page.locator('[data-process]').click();
+    await expect(page.locator('[data-consent-dialog]')).toBeVisible();
+    await page.locator('[data-consent-go]').click();
+    await expect(page.locator('[data-download]')).toBeEnabled({ timeout: 30000 });
+    await expect(page.locator('[data-processing]')).toBeHidden();
+
+    const state = await page.evaluate(() => window.__bgrTest.getState());
+    expect(state.lastEngine).toBe('cloud');
+    expect(state.backend).toBe('cloudflare');
+    expect(state.hasAlpha).toBe(true);
+    expect(state.status).toBe('done');
+    expect(requests).toEqual(['POST']);
+    await expect(page.locator('[data-model-note]')).toContainText(/Cloudflare/i);
+  });
+
+  test('handles an exhausted Cloudflare Images free allowance without charging', async ({ page }) => {
+    await page.route('**/api/background-removal', (route) =>
+      route.fulfill({
+        status: 429,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          error: 'quota',
+          message:
+            'The monthly Cloudflare Images free allowance has been used up. No charge was made and no paid fallback was attempted.'
+        })
+      })
+    );
+    await openTool(page);
+    await page.locator('[data-file-input]').setInputFiles(sharedFixture('sample.png'));
+    await page.locator('[data-process]').click();
+    await page.locator('[data-consent-go]').click();
+    await expect(page.locator('[data-error]')).toBeVisible();
+    await expect(page.locator('[data-error-text]')).toContainText('free allowance');
+    await expect(page.locator('[data-fallback-dialog]')).toBeVisible();
+    await expect(page.locator('[data-fallback-dialog]')).toContainText('No charge was made');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('[data-download]')).toBeDisabled();
+  });
+
+  test('processes repeated images in one tab with consent for each upload', async ({ page }) => {
+    test.setTimeout(60000);
+    const png = makeMaskPng();
+    let posts = 0;
+    await page.route('**/api/background-removal', (route) => {
+      posts += 1;
+      return route.fulfill({ status: 200, contentType: 'image/png', body: png });
+    });
+    await page.route('**/vendor/background-removal/model_fp16.onnx', (route) => route.abort());
+
+    await openTool(page);
+    await page.locator('[data-file-input]').setInputFiles(sharedFixture('sample.png'));
+    await page.locator('[data-process]').click();
+    await page.locator('[data-consent-go]').click();
+    await expect(page.locator('[data-download]')).toBeEnabled({ timeout: 30000 });
+
+    await page.locator('[data-file-input]').setInputFiles(sharedFixture('sample.jpg'));
+    await expect(page.locator('[data-process]')).toBeEnabled();
+    await page.locator('[data-process]').click();
+    await expect(page.locator('[data-consent-dialog]')).toBeVisible();
+    await page.locator('[data-consent-go]').click();
+    await expect(page.locator('[data-download]')).toBeEnabled({ timeout: 30000 });
+
+    expect(posts).toBe(2);
+    const state = await page.evaluate(() => window.__bgrTest.getState());
+    expect(state.lastEngine).toBe('cloud');
+    expect(state.status).toBe('done');
+  });
+
+  test('keeps consent and upload state separate in two tabs', async ({ context }) => {
+    let posts = 0;
+    await context.route('**/api/background-removal', (route) => {
+      posts += 1;
+      return route.fulfill({ status: 200, contentType: 'image/png', body: makeMaskPng() });
+    });
+    const first = await context.newPage();
+    const second = await context.newPage();
+    await openTool(first);
+    await openTool(second);
+
+    for (const page of [first, second]) {
+      await page.locator('[data-file-input]').setInputFiles(sharedFixture('sample.png'));
+      await page.locator('[data-process]').click();
+      await expect(page.locator('[data-consent-dialog]')).toBeVisible();
+    }
+    await first.locator('[data-consent-dialog] button[value="decline"]').click();
+    await second.locator('[data-consent-dialog] button[value="decline"]').click();
+    await expect(first.locator('[data-status]')).toContainText('not uploaded');
+    await expect(second.locator('[data-status]')).toContainText('not uploaded');
+    expect(posts).toBe(0);
   });
 
   test('builds a Cloudflare Pages output with no file over 25 MiB', async () => {
@@ -821,6 +1070,17 @@ test.describe('AI background remover', () => {
     );
     expect(config).toContain('models.example.invalid');
     expect(config).toContain('eff9216bb2f9d3f023d9c2b7196845a7485739ab1f231593633e4d2344ffc516');
+
+    /* Worker code, Pages Functions and Wrangler config must stay out of the
+     * static output. Pages reads `functions/` from the project root instead. */
+    expect(fs.existsSync(path.join(output, 'functions'))).toBe(false);
+    expect(fs.existsSync(path.join(output, 'workers'))).toBe(false);
+    expect(fs.existsSync(path.join(output, 'wrangler.toml'))).toBe(false);
+    expect(fs.existsSync(path.join(output, '.env'))).toBe(false);
+
+    const headers = fs.readFileSync(path.join(output, '_headers'), 'utf8');
+    expect(headers).toContain('Cross-Origin-Embedder-Policy: credentialless');
+    expect(headers).toContain('Content-Security-Policy-Report-Only');
   });
 
   test('serves the model and runtime licences with the vendored assets', async ({ page, request }) => {

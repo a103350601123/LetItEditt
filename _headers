@@ -1,0 +1,36 @@
+# Cloudflare Pages headers for LetitEdit.
+#
+# Security headers are deliberately conservative. The Content-Security-Policy is
+# report-only while the existing inline analytics bootstrap and Google Tag
+# Manager container are audited; nothing is blocked by this file.
+#
+# Cross-origin isolation is enabled only on the Background Remover page. That
+# page runs the ONNX Runtime WASM build, which can use SharedArrayBuffer and
+# multiple threads when the document is cross-origin isolated. `credentialless`
+# is used instead of `require-corp` so the existing Google Tag Manager request
+# still loads (without credentials). Browsers that do not support credentialless
+# simply run the single-threaded WASM path.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(self), microphone=(self), geolocation=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000
+  Content-Security-Policy-Report-Only: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://stats.g.doubleclick.net https://models.letitedit.com; worker-src 'self' blob:; frame-src https://www.googletagmanager.com; media-src 'self' blob:
+
+/media-and-motion/background-remover/
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: credentialless
+
+/media-and-motion/background-remover/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: credentialless
+
+/vendor/onnxruntime/*
+  Cache-Control: public, max-age=31536000, immutable
+  Cross-Origin-Resource-Policy: same-origin
+
+/vendor/background-removal/*
+  Cache-Control: public, max-age=31536000, immutable
+  Cross-Origin-Resource-Policy: same-origin

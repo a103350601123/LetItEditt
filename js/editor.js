@@ -43,7 +43,7 @@
   };
   var DEFAULT_FRAME = {
     padding: 0, background: 'transparent', color: '#ffffff',
-    gradientFrom: '#5c2ddd', gradientTo: '#f2edff', gradientAngle: 135,
+    gradientFrom: '#2563eb', gradientTo: '#eff6ff', gradientAngle: 135,
     image: null, radius: 0, borderWidth: 0, borderColor: '#ffffff', shadow: false
   };
   var DEFAULT_RESIZE = { width: 0, height: 0, lock: true, custom: false, resample: 'smooth' };
@@ -132,7 +132,7 @@
       adjustments: Object.assign({}, DEFAULT_ADJUSTMENTS),
       filter: { name: 'none', intensity: 100 },
       blur: { type: 'none', amount: 12, angle: 0 },
-      draw: { color: '#5c2ddd', size: 12, opacity: 100, eraser: false },
+      draw: { color: '#2563eb', size: 12, opacity: 100, eraser: false },
       layers: [],
       activeLayerId: null,
       tool: 'import',
@@ -469,8 +469,8 @@
       var x2 = cx + Math.cos(angle) * length / 2;
       var y2 = cy + Math.sin(angle) * length / 2;
       var gradient = ctx.createLinearGradient(x1, y1, x2, y2);
-      gradient.addColorStop(0, frame.gradientFrom || '#5c2ddd');
-      gradient.addColorStop(1, frame.gradientTo || '#f2edff');
+      gradient.addColorStop(0, frame.gradientFrom || '#2563eb');
+      gradient.addColorStop(1, frame.gradientTo || '#eff6ff');
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
       return;
@@ -599,7 +599,7 @@
       ctx.lineTo(halfW, -halfH);
     }
     if (shape.fillEnabled && shape.kind !== 'line' && shape.kind !== 'arrow') {
-      ctx.fillStyle = shape.fill || '#5c2ddd';
+      ctx.fillStyle = shape.fill || '#2563eb';
       ctx.fill();
     }
     if (shape.strokeEnabled || shape.kind === 'line' || shape.kind === 'arrow') {
@@ -972,7 +972,7 @@
     }
     var points = cropHandlePoints(rect);
     screenCtx.fillStyle = '#ffffff';
-    screenCtx.strokeStyle = '#5c2ddd';
+    screenCtx.strokeStyle = '#2563eb';
     screenCtx.lineWidth = 2;
     Object.keys(points).forEach(function (key) {
       var point = points[key];
@@ -1037,7 +1037,7 @@
     screenCtx.save();
     screenCtx.translate(geometry.cx, geometry.cy);
     screenCtx.rotate(angle);
-    screenCtx.strokeStyle = layer.locked ? '#f59e0b' : '#a78bfa';
+    screenCtx.strokeStyle = layer.locked ? '#f59e0b' : '#60a5fa';
     screenCtx.lineWidth = 1.5;
     screenCtx.setLineDash([5, 4]);
     screenCtx.strokeRect(-geometry.w / 2, -geometry.h / 2, geometry.w, geometry.h);
@@ -1050,7 +1050,7 @@
     var points = layerHandlePoints(layer);
     screenCtx.save();
     screenCtx.fillStyle = '#ffffff';
-    screenCtx.strokeStyle = layer.locked ? '#f59e0b' : '#5c2ddd';
+    screenCtx.strokeStyle = layer.locked ? '#f59e0b' : '#2563eb';
     screenCtx.lineWidth = 2;
     ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'].forEach(function (key) {
       var point = points[key];
@@ -2035,7 +2035,7 @@
     layer.shape = {
       kind: kind,
       fillEnabled: kind !== 'line' && kind !== 'arrow',
-      fill: '#5c2ddd',
+      fill: '#2563eb',
       strokeEnabled: true,
       stroke: '#ffffff',
       strokeWidth: Math.max(2, Math.round(size * 0.035)),
@@ -2989,7 +2989,7 @@
     state.adjustments = Object.assign({}, DEFAULT_ADJUSTMENTS);
     state.filter = { name: 'none', intensity: 100 };
     state.blur = { type: 'none', amount: 12, angle: 0 };
-    state.draw = { color: '#5c2ddd', size: 12, opacity: 100, eraser: false };
+    state.draw = { color: '#2563eb', size: 12, opacity: 100, eraser: false };
     state.layers = [];
     state.activeLayerId = null;
     state.compare = false;

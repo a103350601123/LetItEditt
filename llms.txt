@@ -1,6 +1,6 @@
 # LetitEdit
 
-> LetitEdit is a free, browser-based tool site for editing images, video, audio and screen recordings. The 13 published tools run locally in the browser, require no account, and do not upload media to a LetitEdit server. The site also publishes 28 category pages covering image, video, audio, PDF, design, document and web topics.
+> LetitEdit is a free, browser-based tool site for editing images, video, audio and screen recordings. The 14 published tools need no account. Most process files entirely in the browser; the AI Background Remover uses Cloudflare Images for the first result only after explicit consent, then a verified local AI model on later visits. The site also publishes 28 category pages covering image, video, audio, PDF, design, document and web topics.
 
 Canonical site: https://letitedit.com/
 
@@ -8,6 +8,7 @@ Canonical site: https://letitedit.com/
 
 - [Image & Photo Editor](https://letitedit.com/media-and-motion/image-photo-editor/): Crop, resize, rotate, adjust colour, add text or shapes, apply filters and export images.
 - [Image Size Compressor](https://letitedit.com/media-and-motion/image-size-compressor/): Reduce JPG, PNG and WebP file sizes while keeping dimensions and transparency.
+- [AI Background Remover](https://letitedit.com/media-and-motion/background-remover/): Remove backgrounds with Cloudflare Images on first use after consent, then a local BiRefNet model; refine edges and export PNG, JPG or WebP.
 - [Video Editor](https://letitedit.com/media-and-motion/video-editor/): Trim, add text, music, filters and motion, then export MP4 or WebM.
 - [Video Trimmer](https://letitedit.com/media-and-motion/video-trimmer/): Cut or remove an exact section of a video and download the result.
 - [Video Merger](https://letitedit.com/media-and-motion/video-merger/): Combine clips, reorder them and choose output settings.

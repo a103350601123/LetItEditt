@@ -451,6 +451,64 @@
   line-height: 1.5;
 }
 
+.bgr-btn-small { padding: 7px 12px; font-size: .76rem; }
+
+/* Background model preparation (independent of the current result) */
+.bgr-model-prep {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #bfdbfe;
+  border-radius: 9px;
+  background: var(--bgr-pale);
+}
+.bgr-model-prep-copy { display: grid; gap: 3px; flex: 1; min-width: 0; }
+.bgr-model-prep-copy strong { color: var(--bgr-ink); font-size: .78rem; }
+.bgr-model-prep-copy span { color: var(--bgr-muted); font-size: .72rem; line-height: 1.4; }
+.bgr-model-prep-track {
+  height: 5px;
+  margin-top: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #dbeafe;
+}
+.bgr-model-prep-track span {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%);
+  transition: width .2s ease;
+}
+
+/* Consent and fallback dialogs */
+.bgr-dialog {
+  width: min(560px, calc(100% - 28px));
+  max-height: min(86vh, 720px);
+  padding: 0;
+  border: 1px solid var(--bgr-border);
+  border-radius: 16px;
+  background: var(--bgr-white);
+  color: #334155;
+  box-shadow: 0 30px 80px rgba(15, 23, 42, .28);
+}
+.bgr-dialog::backdrop { background: rgba(15, 23, 42, .55); }
+.bgr-dialog-card { display: grid; gap: 12px; padding: 24px; }
+.bgr-dialog-kicker {
+  color: var(--bgr-blue);
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.bgr-dialog-card h2 { margin: 0; font-size: 1.28rem; line-height: 1.25; }
+.bgr-dialog-card p { margin: 0; color: #475569; font-size: .92rem; line-height: 1.6; }
+.bgr-dialog-card ul { display: grid; gap: 6px; margin: 0; padding-inline-start: 18px; color: #475569; font-size: .86rem; line-height: 1.5; }
+.bgr-dialog-note { padding: 10px 12px; border-radius: 8px; background: #f8fafc; font-size: .82rem !important; }
+.bgr-dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+.bgr-dialog-actions .bgr-btn { flex: 0 1 auto; }
+
 /* Background choices */
 .bgr-bg-grid {
   display: grid;

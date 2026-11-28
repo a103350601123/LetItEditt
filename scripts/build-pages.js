@@ -28,11 +28,13 @@ const SKIP_TOP_LEVEL = new Set([
   '.wrangler',
   'dist',
   'docs',
+  'functions',
   'node_modules',
   'playwright-report',
   'scripts',
   'test-results',
-  'tests'
+  'tests',
+  'workers'
 ]);
 
 const SKIP_FILES = new Set([
@@ -40,7 +42,11 @@ const SKIP_FILES = new Set([
   '.gitignore',
   'package-lock.json',
   'package.json',
-  'playwright.config.js'
+  'playwright.config.js',
+  'vitest.config.js',
+  'wrangler.toml',
+  'wrangler.jsonc',
+  'wrangler.json'
 ]);
 
 function fail(message) {

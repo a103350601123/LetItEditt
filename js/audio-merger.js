@@ -1423,7 +1423,7 @@ function drawTimeline(renderedBuffer) {
     const kind = transitionKind(mode);
     if (kind === 'cut') {
       const x = timeToX(item.start);
-      context.strokeStyle = '#7c3aed';
+      context.strokeStyle = '#2563eb';
       context.lineWidth = 2;
       context.beginPath();
       context.moveTo(x + 0.5, laneTop);
@@ -1431,7 +1431,7 @@ function drawTimeline(renderedBuffer) {
       context.stroke();
       context.lineWidth = 1;
       if (width > 48) {
-        context.fillStyle = '#7c3aed';
+        context.fillStyle = '#2563eb';
         context.font = '600 9px system-ui, sans-serif';
         context.textAlign = 'center';
         context.fillText('Cut', clamp(x, 18, width - 18), laneTop + 12);
@@ -1472,9 +1472,9 @@ function drawTimeline(renderedBuffer) {
         context.fillText(label, x1 + regionWidth / 2, laneTop + 12);
       }
     } else {
-      context.fillStyle = 'rgba(167, 139, 250, .26)';
+      context.fillStyle = 'rgba(96, 165, 250, .30)';
       context.fillRect(x1, laneTop, regionWidth, laneHeight);
-      context.strokeStyle = '#7c3aed';
+      context.strokeStyle = '#2563eb';
       context.setLineDash([3, 3]);
       context.strokeRect(x1 + 0.5, laneTop + 0.5, Math.max(0, regionWidth - 1), laneHeight - 1);
       context.setLineDash([]);
@@ -1482,7 +1482,7 @@ function drawTimeline(renderedBuffer) {
         const label = mode === 'fade'
           ? `Fade ${formatSecondsShort(item.transition.duration)} s`
           : `${TRANSITION_MODES[mode].short} ${formatSecondsShort(item.transition.duration)} s`;
-        context.fillStyle = '#5b21b6';
+        context.fillStyle = '#1d4ed8';
         context.font = '600 9px system-ui, sans-serif';
         context.textAlign = 'center';
         context.fillText(label, x1 + regionWidth / 2, laneTop + 12);

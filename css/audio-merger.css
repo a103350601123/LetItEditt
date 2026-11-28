@@ -683,7 +683,7 @@
 .amg-swatch-track { background: var(--amg-blue); }
 .amg-swatch-gap { background: var(--amg-pale); border: 1px solid var(--amg-border); }
 .amg-swatch-fade { background: var(--amg-blue-light); }
-.amg-swatch-fadeout { background: #a78bfa; }
+.amg-swatch-fadeout { background: #60a5fa; }
 .amg-swatch-playhead { width: 3px; background: var(--amg-ink); }
 
 /* ---------- Mix settings and export ---------- */
